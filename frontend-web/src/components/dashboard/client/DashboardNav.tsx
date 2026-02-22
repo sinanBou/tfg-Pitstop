@@ -1,4 +1,4 @@
-import { DashboardIcon } from '../ui/Icons';
+import { DashboardIcon } from '../../ui/Icons';
 
 interface DashboardNavProps {
   secciones: string[];

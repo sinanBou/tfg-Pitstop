@@ -75,7 +75,7 @@
       if (!token) return false;
 
       try {
-        const response = await fetch(`${API_BASE_URL}/api/vehicles/register`, {
+        const response = await fetch(`${API_BASE_URL}/vehicles/register`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,

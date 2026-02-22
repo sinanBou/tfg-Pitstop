@@ -5,6 +5,8 @@ import lombok.*;
 import org.tfg.backend.client.Client;
 import org.tfg.backend.workshop.Workshop;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "vehicles")
 @Data
@@ -14,8 +16,9 @@ import org.tfg.backend.workshop.Workshop;
 public class Vehicle {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID) // Generación automática de UUID
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID id;
 
     @Column(nullable = false)
     private String brand; // Marca (ej: BMW)
@@ -32,8 +35,15 @@ public class Vehicle {
     private String status;
 
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = true)
     private String vin;
+    @PrePersist
+    @PreUpdate
+    private void prepareVin() {
+        if (this.vin != null && this.vin.isBlank()) {
+            this.vin = null;
+        }
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
