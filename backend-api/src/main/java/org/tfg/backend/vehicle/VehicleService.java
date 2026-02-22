@@ -34,6 +34,7 @@ public class VehicleService {
                 .model(request.getModel())
                 .licensePlate(request.getLicensePlate())
                 .year(request.getYear())
+                .vin(request.getVin())
                 .status("EN_CASA")
                 .client(client)
                 .build();
@@ -64,6 +65,7 @@ public class VehicleService {
                 .model(vehicle.getModel())
                 .licensePlate(vehicle.getLicensePlate())
                 .year(vehicle.getYear())
+                .vin(vehicle.getVin())
                 .status(vehicle.getStatus())
                 .workshopName(vehicle.getCurrentWorkshop() != null ?
                         vehicle.getCurrentWorkshop().getCompanyName() : null)

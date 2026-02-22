@@ -105,7 +105,7 @@
       appointments,
       history,
       refresh: loadDashboardData,
-      registerVehicle, // <--- IMPORTANTE: Exportar la función
+      registerVehicle, 
       logout
     };
   };

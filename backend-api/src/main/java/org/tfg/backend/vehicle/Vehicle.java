@@ -31,6 +31,10 @@ public class Vehicle {
     @Column(nullable = false)
     private String status;
 
+
+    @Column(unique = true)
+    private String vin;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;
