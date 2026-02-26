@@ -17,9 +17,9 @@ export default function Navbar() {
     navigate('/');
   };
   return (
-    <nav className="bg-black/80 backdrop-blur-md h-12 w-full px-5 flex items-center justify-between text-white border-b border-white/10">
+    <nav className="bg-zinc-950 backdrop-blur-md h-12 w-full px-5 py-8 flex items-center justify-between text-white border-b border-white/10">
       <div className="text-xl p-1">
-        <Link to="/" className="font-bold text-3xl">
+        <Link to="/" className="font-bold text-5xl">
           PitStop
         </Link>
       </div>

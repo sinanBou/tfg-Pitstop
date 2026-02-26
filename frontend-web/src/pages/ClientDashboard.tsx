@@ -3,7 +3,7 @@ import { useClientDashboard } from '../hooks/useClientDashboard';
 
 // Mantenemos tus componentes de UI base
 import FeatureCard from '../components/ui/FeatureCard';
-import { VehicleCard } from '../components/ui/VehicleCard';
+import { VehicleCard } from '../components/dashboard/client/VehicleCard';
 import { VehicleModal } from '../components/dashboard/client/VehicleModal';
 
 // Iconos inline para el nuevo diseño (puedes extraerlos luego si quieres)
@@ -12,10 +12,10 @@ const CalendarIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill=
 const HistoryIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
 const PlusCircleIcon = () => (<svg className="w-10 h-10 text-gray-600 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
 
-const SECCIONES = ['HOME', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
+const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
 
 export default function ClientDashboard() {
-  const { loading, userProfile, vehicles, appointments, history, registerVehicle } = useClientDashboard();
+  const { loading, vehicles, appointments, history, registerVehicle } = useClientDashboard();
   const [activeTab, setActiveTab] = useState(0);
 
   
@@ -37,13 +37,12 @@ export default function ClientDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col overflow-hidden font-sans bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-black to-black">
-      
+    <div className="min-h-screen bg-zinc-950 text-white flex flex-col overflow-hidden font-sans bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-black to-black">    
       {/* --- HEADER (INTACTO) --- */}
-      <header className="p-6 pb-2 bg-transparent z-10 flex justify-center items-start">
+      <header className=" mt-4 mx-6 p-6 bg-transparent z-10 flex justify-center items-start border border-white/10 rounded-full">
         <div>
-          <h1 className="text-5xl font-black uppercase tracking-tighter italic text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-500">
-            {SECCIONES[activeTab]} <span className="text-blue-600">_</span>
+          <h1 className="text-4xl  p-2 font-black uppercase tracking-tighter  text-transparent bg-clip-text bg-white">
+            {SECCIONES[activeTab]}
           </h1>
         </div>
 
@@ -56,15 +55,8 @@ export default function ClientDashboard() {
           style={{ transform: `translateX(${desplazamiento})` }}
         >
           
-          {/* ================= SECCIÓN 0: HOME (REDITADA) ================= */}
+          {/* ================= SECCIÓN 0: HOME ================= */}
           <section className="w-1/4 h-full p-6 overflow-y-auto pb-32 space-y-6 scrollbar-hide">
-             {/* Saludo mejorado con degradado */}
-             <div className="mb-8 relative">
-                <div className="absolute -left-4 top-0 w-1 h-full bg-blue-600 rounded-full"></div>
-                <h2 className="text-4xl font-black uppercase tracking-tighter italic text-transparent bg-clip-text bg-gradient-to-br from-white via-neutral-200 to-neutral-600">
-                  HOLA, <br/><span className="text-blue-500 drop-shadow-[0_0_10px_rgba(37,99,235,0.5)]">{userProfile?.firstname.toUpperCase() || 'PILOTO'}</span>.
-                </h2>
-             </div>
              
              <div className="grid grid-cols-2 gap-4">
                 {vehicles.length > 0 ? (
@@ -172,12 +164,12 @@ export default function ClientDashboard() {
                <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
               
               <div className="relative z-10">
-                <h3 className="text-xl font-black mb-1 uppercase italic text-white">
-                  <span className="text-red-600">#</span> Solicitar Diagnóstico
+                <h3 className="text-2xl font-black mb-1 uppercase text-white">
+                  <span className="text-red-600"></span> PEDIR CITA
                 </h3>
-                <p className="text-neutral-400 text-xs mb-6 font-mono">Inicie una nueva solicitud de servicio técnico.</p>
+                <p className="text-neutral-400 text-md mb-6 font-mono">Inicie una nueva solicitud de servicio técnico.</p>
                 <button className="w-full py-4 bg-red-600/90 hover:bg-red-600 text-white font-black rounded-2xl uppercase text-xs tracking-widest shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all relative overflow-hidden">
-                  <span className="relative z-10">CREAR TICKET _</span>
+                  <span className="relative z-10">NUEVA CITA</span>
                   {/* Brillo en el botón */}
                   <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg] animate-[shimmer_1.5s_infinite]"></div>
                 </button>
@@ -196,8 +188,8 @@ export default function ClientDashboard() {
                ) : (
                  <div className="pt-16 flex flex-col items-center justify-center opacity-40">
                     <CalendarIcon />
-                    <p className="text-neutral-500 font-black uppercase tracking-[0.2em] text-[10px] italic font-mono">
-                      Sin entradas en el calendario
+                    <p className="text-neutral-500 text-lg font-black uppercase tracking-[0.2em] text-[10px] font-mono">
+                      No tienes citas programadas
                     </p>
                  </div>
                )}

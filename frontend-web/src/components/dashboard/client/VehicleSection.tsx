@@ -1,4 +1,4 @@
-import { VehicleCard } from '../../ui/VehicleCard';
+import { VehicleCard } from './VehicleCard';
 
 // Definimos la estructura del vehículo para esta sección
 interface VehicleDTO {
