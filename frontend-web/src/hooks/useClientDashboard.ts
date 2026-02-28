@@ -1,7 +1,7 @@
   import { useState, useEffect, useCallback } from 'react';
   import { API_BASE_URL } from '../config/api';
   import { useNavigate } from 'react-router-dom';
-  import { type UserDTO, type VehicleDTO, type AppointmentDTO, type HistoryDTO } from '../types/client.ts';
+  import { type UserDTO, type VehicleDTO, type AppointmentDTO, type HistoryDTO, type AppointmentRequest, type WorkshopMinDTO} from '../types/client.ts';
 
   export const useClientDashboard = () => {
     const navigate = useNavigate();
@@ -10,6 +10,7 @@
     const [loading, setLoading] = useState(true);
     const [userProfile, setUserProfile] = useState<UserDTO | null>(null);
     const [vehicles, setVehicles] = useState<VehicleDTO[]>([]);
+    const [workshops, setWorkshops] = useState<WorkshopMinDTO[]>([]);
     const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
     const [history, setHistory] = useState<HistoryDTO[]>([]);
 
@@ -28,17 +29,21 @@
         setLoading(true);
         
         // 2. Llamadas a la API
-        const [resUser, resVehicles] = await Promise.all([
+        const [resUser, resVehicles, resWorkshops] = await Promise.all([
           fetch(`${API_BASE_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
           fetch(`${API_BASE_URL}/vehicles/my-vehicles`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch(`${API_BASE_URL}/workshops`, {
             headers: { 'Authorization': `Bearer ${token}` }
           })
         ]);
 
         if (resUser.ok) setUserProfile(await resUser.json());
         if (resVehicles.ok) setVehicles(await resVehicles.json());
+        if (resWorkshops.ok) setWorkshops(await resWorkshops.json());
         
         // Aquí añadirías las llamadas para appointments y history cuando existan en el backend
         setAppointments([]); 
@@ -97,15 +102,49 @@
         return false;
       }
     };
+    const createAppointment = async (appointmentData: AppointmentRequest) => {
+      const token = localStorage.getItem('jwt_token');
+      const response = await fetch(`${API_BASE_URL}/appointments/create`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(appointmentData)
+      });
+      return response.ok;
+    };
+
+    const getAvailableSlots = async (workshopId: number, date: string): Promise<string[]> => {
+      const token = localStorage.getItem('jwt_token');
+      if (!token || !workshopId || !date) return [];
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/appointments/available-slots?workshopId=${workshopId}&date=${date}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        if (response.ok) {
+          return await response.json(); // Se espera un array de strings: ["09:00", "10:30", ...]
+        }
+        return [];
+      } catch (error) {
+        console.error("Error al obtener disponibilidad:", error);
+        return [];
+      }
+    };
 
     return {
       loading,
       userProfile,
       vehicles,
+      workshops,
       appointments,
       history,
       refresh: loadDashboardData,
       registerVehicle, 
+      createAppointment,
+      getAvailableSlots,
       logout
     };
   };

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.tfg.backend.employee.Employee;
 import org.tfg.backend.vehicle.Vehicle;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -41,4 +42,14 @@ public class Workshop {
     @OneToMany(mappedBy = "currentWorkshop", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Vehicle> vehiclesInside = new ArrayList<>();
+
+
+    @Column(name = "open_time")
+    private LocalTime openTime;
+
+    @Column(name = "close_time")
+    private LocalTime closeTime;
+
+    @Column(name = "slot_duration_minutes")
+    private Integer slotDurationMinutes = 60;
 }

@@ -17,6 +17,8 @@ import org.tfg.backend.user.UserRepository;
 import org.tfg.backend.workshop.Workshop;
 import org.tfg.backend.workshop.WorkshopRepository;
 
+import java.time.LocalTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -75,6 +77,8 @@ public class AuthService {
     }
 
     // --- REGISTRO DE DUEÑO + TALLER ---
+    // En backend/auth/AuthService.java
+
     @Transactional
     public String registerWorkshop(RegisterRequest request) {
         validateCommonData(request);
@@ -82,24 +86,25 @@ public class AuthService {
             throw new RuntimeException("El CIF ya está registrado.");
         }
 
-        // 1. Crear el usuario con rol OWNER
         User user = createBaseUser(request, Role.WORKSHOP_OWNER);
 
-        // 2. Crear el perfil de Empleado (el dueño es el primer empleado)
         Employee ownerEmployee = Employee.builder()
                 .user(user)
                 .build();
         employeeRepository.save(ownerEmployee);
 
-        // 3. Crear el taller
+        // Creamos el taller con valores por defecto
         Workshop workshop = Workshop.builder()
                 .owner(ownerEmployee)
                 .cif(request.getCif())
                 .companyName(request.getWorkshopName())
+                .openTime(LocalTime.of(9, 0))          // Por defecto 09:00
+                .closeTime(LocalTime.of(18, 0))         // Por defecto 18:00
+                .slotDurationMinutes(60)                // Por defecto 1 hora
                 .build();
+
         Workshop savedWorkshop = workshopRepository.save(workshop);
 
-        // 4. Vincular el empleado al taller
         ownerEmployee.setWorkshop(savedWorkshop);
         employeeRepository.save(ownerEmployee);
 

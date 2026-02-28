@@ -1,14 +1,10 @@
 package org.tfg.backend.appointment;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.tfg.backend.client.Client;
 import org.tfg.backend.vehicle.Vehicle;
 import org.tfg.backend.workshop.Workshop;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -24,10 +20,10 @@ public class Appointment {
     private UUID id;
 
     @Column(nullable = false)
-    private LocalDateTime dateTime;
+    private LocalDateTime dateTime; // Almacena fecha y hora
 
-    private String description;
-
+    @Column(nullable = false)
+    private String description; // El "motivo" de la cita
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)

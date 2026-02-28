@@ -38,3 +38,18 @@ export interface VehicleRequest {
   year: number;
   color: string;
 }
+
+export interface AppointmentRequest {
+  vehicleId: number;
+  workshopId: number;
+  date: string;
+  time: string;
+  serviceType: string;
+  description: string;
+}
+
+
+export interface WorkshopMinDTO {
+  id: number;
+  workshopName: string;
+}

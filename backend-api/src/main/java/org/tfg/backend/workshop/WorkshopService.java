@@ -23,24 +23,24 @@ public class WorkshopService {
      */
     @Transactional
     public WorkshopDTO saveWorkshop(WorkshopRequest request) {
-        // Validación de CIF único
         if (workshopRepository.existsByCif(request.getCif())) {
             throw new RuntimeException("Ya existe un taller registrado con el CIF: " + request.getCif());
         }
 
-        // Búsqueda del empleado que será el dueño/gerente
         Employee owner = employeeRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("No se encontró el empleado con ID: " + request.getOwnerId()));
 
-        // Creación de la entidad Workshop usando el patrón Builder
+        // Construcción de la entidad incluyendo los nuevos campos de tiempo
         Workshop workshop = Workshop.builder()
                 .cif(request.getCif())
                 .companyName(request.getCompanyName())
                 .owner(owner)
+                .openTime(request.getOpenTime()) // <-- NUEVO
+                .closeTime(request.getCloseTime()) // <-- NUEVO
+                .slotDurationMinutes(request.getSlotDurationMinutes()) // <-- NUEVO
                 .build();
 
         Workshop savedWorkshop = workshopRepository.save(workshop);
-
         return mapToDTO(savedWorkshop);
     }
 
@@ -65,6 +65,21 @@ public class WorkshopService {
         return mapToDTO(workshop);
     }
 
+    @Transactional
+    public WorkshopDTO updateWorkshopSettings(UUID workshopId, WorkshopRequest request) {
+        Workshop workshop = workshopRepository.findById(workshopId)
+                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+
+        // El dueño ahora puede cambiar la duración a 30, 45, 120 min, etc.
+        if (request.getOpenTime() != null) workshop.setOpenTime(request.getOpenTime());
+        if (request.getCloseTime() != null) workshop.setCloseTime(request.getCloseTime());
+        if (request.getSlotDurationMinutes() != null) {
+            workshop.setSlotDurationMinutes(request.getSlotDurationMinutes());
+        }
+
+        return mapToDTO(workshopRepository.save(workshop));
+    }
+
     /**
      * Método privado para transformar la entidad Workshop al objeto de transferencia WorkshopDTO.
      * Maneja la lógica de conteo de empleados y vehículos, así como la obtención del nombre del dueño.
@@ -82,6 +97,9 @@ public class WorkshopService {
                 .cif(workshop.getCif())
                 .companyName(workshop.getCompanyName())
                 .ownerName(ownerName)
+                .openTime(workshop.getOpenTime()) // Mapeo de hora apertura
+                .closeTime(workshop.getCloseTime()) // Mapeo de hora cierre
+                .slotDurationMinutes(workshop.getSlotDurationMinutes())
                 // Calculamos el tamaño de las listas para las estadísticas del DTO
                 .totalEmployees(workshop.getEmployees() != null ? workshop.getEmployees().size() : 0)
                 .vehiclesCurrentCount(workshop.getVehiclesInside() != null ? workshop.getVehiclesInside().size() : 0)

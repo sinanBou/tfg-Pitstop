@@ -40,7 +40,7 @@ export default function Registration() {
     // Validaciones específicas según el rol
     if (role === 'workshop') {
       const workshopData = workshopReg.formData; // Usamos los datos específicos del taller
-      if (!workshopData.workshopName) { newErrors.workshopName = 'El nombre del taller es obligatorio.'; isValid = false; }
+      if (!workshopData.companyName) { newErrors.workshopName = 'El nombre del taller es obligatorio.'; isValid = false; }
       if (!workshopData.cif) { newErrors.cif = 'El CIF es obligatorio.'; isValid = false; }
     } else if (role === 'client') {
       const clientData = clientReg.formData; // Usamos los datos específicos del cliente
@@ -59,6 +59,22 @@ export default function Registration() {
         await workshopReg.registerWorkshop(e);
       }
     }
+
+    // Dentro de handleRegistrationSubmit en Registration.tsx
+
+  if (role === 'workshop') {
+    const { openTime, closeTime } = workshopReg.formData;
+    const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/; // Valida formato 24h (00:00 a 23:59)
+
+    if (!timeRegex.test(openTime)) {
+      newErrors.openingTime = 'Use formato 24h (HH:mm).';
+      isValid = false;
+    }
+    if (!timeRegex.test(closeTime)) {
+      newErrors.closeTime = 'Use formato 24h (HH:mm).';
+      isValid = false;
+    }
+  }
   };
 
   return (
@@ -128,8 +144,31 @@ export default function Registration() {
                     <div className="p-4 bg-neutral-900 rounded-lg border border-neutral-700 my-2">
                         <h4 className="text-gray-400 text-xs font-bold uppercase mb-3 tracking-widest">Datos de la Empresa</h4>
                         <div className="flex flex-col gap-3">
-                            <InputGroup label="Nombre Comercial Taller *" name="workshopName" value={workshopReg.formData.workshopName} onChange={workshopReg.handleChange} error={errors.workshopName} placeholder="Ej: Talleres Motosport" />
+                            <InputGroup label="Nombre Comercial Taller *" name="companyName" value={workshopReg.formData.companyName} onChange={workshopReg.handleChange} error={errors.companyName} placeholder="Ej: Talleres Motosport" />
                             <InputGroup label="CIF *" name="cif" value={workshopReg.formData.cif} onChange={workshopReg.handleChange} error={errors.cif} placeholder="B-12345678" />
+                            <div className="flex gap-4">
+                              <InputGroup 
+                                label="Hora Apertura (HH:mm) *" 
+                                name="openTime" 
+                                type="text" 
+                                value={workshopReg.formData.openTime} 
+                                onChange={workshopReg.handleChange} 
+                                error={errors.openTime}
+                                placeholder="09:00"
+                                maxLength={5}
+                                // maxLength se asegura de que el formato no se rompa
+                              />
+                              <InputGroup 
+                                label="Hora Cierre (HH:mm) *" 
+                                name="closeTime" 
+                                type="text" 
+                                value={workshopReg.formData.closeTime} 
+                                onChange={workshopReg.handleChange} 
+                                error={errors.closeTime}
+                                placeholder="18:00"
+                                maxLength={5}
+                              />
+                            </div>
                         </div>
                     </div>
                   </>

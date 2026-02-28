@@ -3,8 +3,10 @@ import { useClientDashboard } from '../hooks/useClientDashboard';
 
 // Mantenemos tus componentes de UI base
 import FeatureCard from '../components/ui/FeatureCard';
-import { VehicleCard } from '../components/dashboard/client/VehicleCard';
-import { VehicleModal } from '../components/dashboard/client/VehicleModal';
+import { VehicleCard } from '../components/dashboard/client/vehicle/VehicleCard';
+import { VehicleModal } from '../components/dashboard/client/vehicle/VehicleModal';
+
+import { AppointmentModal } from '../components/dashboard/client/appointments/AppoointmentModal';
 
 // Iconos inline para el nuevo diseño (puedes extraerlos luego si quieres)
 const GarageIcon = () => (<svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>);
@@ -15,7 +17,7 @@ const PlusCircleIcon = () => (<svg className="w-10 h-10 text-gray-600 group-hove
 const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
 
 export default function ClientDashboard() {
-  const { loading, vehicles, appointments, history, registerVehicle } = useClientDashboard();
+  const { loading, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots } = useClientDashboard();
   const [activeTab, setActiveTab] = useState(0);
 
   
@@ -24,6 +26,8 @@ export default function ClientDashboard() {
 
   const desplazamiento = `-${activeTab * 25}%`;
   const cocheEnTaller = vehicles.find((v) => v.status !== 'EN_CASA');
+
+  const [isAppModalOpen, setIsAppModalOpen] = useState(false);
 
   if (loading) {
     return (
@@ -168,11 +172,15 @@ export default function ClientDashboard() {
                   <span className="text-red-600"></span> PEDIR CITA
                 </h3>
                 <p className="text-neutral-400 text-md mb-6 font-mono">Inicie una nueva solicitud de servicio técnico.</p>
-                <button className="w-full py-4 bg-red-600/90 hover:bg-red-600 text-white font-black rounded-2xl uppercase text-xs tracking-widest shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all relative overflow-hidden">
-                  <span className="relative z-10">NUEVA CITA</span>
-                  {/* Brillo en el botón */}
-                  <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-20deg] animate-[shimmer_1.5s_infinite]"></div>
+                {/* SECCIÓN CITAS: Actualizar el botón */}
+                <button 
+                  onClick={() => setIsAppModalOpen(true)}
+                  className="w-full py-4 bg-red-600/90 hover:bg-red-600 rounded-2xl text-white font-bold uppercase tracking-widest transition-colors"
+                >
+                  NUEVA CITA
                 </button>
+
+                
               </div>
             </div>
             
@@ -196,7 +204,7 @@ export default function ClientDashboard() {
             </div>
           </section>
 
-          {/* ================= SECCIÓN 3: HISTORIAL (REDITADA) ================= */}
+          {/* ================= SECCIÓN 3: HISTORIAL ================= */}
           <section className="w-1/4 h-full p-6 overflow-y-auto pb-32 space-y-4 scrollbar-hide relative">
              {/* Línea de tiempo de fondo */}
              <div className="absolute left-9 top-0 h-full w-px bg-neutral-800 z-0"></div>
@@ -244,6 +252,14 @@ export default function ClientDashboard() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={registerVehicle} // registerVehicle debe recibir (data: VehicleRequest)
+      />
+      <AppointmentModal 
+        isOpen={isAppModalOpen}
+        onClose={() => setIsAppModalOpen(false)}
+        vehicles={vehicles}
+        workshops={workshops} // Debes tener esto en tu hook useClientDashboard
+        onSubmit={createAppointment}
+        fetchSlots={getAvailableSlots}
       />
     </div>
   );

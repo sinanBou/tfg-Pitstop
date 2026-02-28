@@ -41,4 +41,18 @@ public class WorkshopController {
     public ResponseEntity<WorkshopDTO> getWorkshopById(@PathVariable UUID id) {
         return ResponseEntity.ok(workshopService.getWorkshopById(id));
     }
+
+    // En backend/workshop/WorkshopController.java
+
+    /**
+     * Actualiza la configuración de horario y duración de citas de un taller.
+     * @param id UUID del taller a modificar
+     * @param request Datos con el nuevo horario/duración
+     */
+    @PutMapping("/{id}/settings")
+    public ResponseEntity<WorkshopDTO> updateSettings(
+            @PathVariable UUID id,
+            @RequestBody WorkshopRequest request) {
+        return ResponseEntity.ok(workshopService.updateWorkshopSettings(id, request));
+    }
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+// src/components/ui/InputGroup.tsx
 
 interface InputGroupProps {
   label: string;
@@ -8,10 +8,12 @@ interface InputGroupProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string;
   placeholder?: string;
+  // Añadimos maxLength opcional
+  maxLength?: number; 
 }
 
 export default function InputGroup({ 
-  label, name, type = "text", value, onChange, error, placeholder 
+  label, name, type = "text", value, onChange, error, placeholder, maxLength 
 }: InputGroupProps) {
   return (
     <div className="w-full">
@@ -22,6 +24,7 @@ export default function InputGroup({
         value={value}
         onChange={onChange}
         placeholder={placeholder}
+        maxLength={maxLength}
         className={`w-full bg-black border rounded-lg p-3 text-white text-sm focus:outline-none transition-colors ${
           error ? 'border-red-500' : 'border-neutral-700 focus:border-white'
         }`}
