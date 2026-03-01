@@ -17,7 +17,7 @@ const PlusCircleIcon = () => (<svg className="w-10 h-10 text-gray-600 group-hove
 const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
 
 export default function ClientDashboard() {
-  const { loading, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots } = useClientDashboard();
+  const { loading, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots, deleteAppointment,refresh } = useClientDashboard();
   const [activeTab, setActiveTab] = useState(0);
 
   
@@ -162,45 +162,54 @@ export default function ClientDashboard() {
 
           {/* ================= SECCIÓN 2: CITAS (REDITADA) ================= */}
           <section className="w-1/4 h-full p-6 overflow-y-auto pb-32 space-y-6 scrollbar-hide">
-            {/* Tarjeta CTA rediseñada como terminal */}
+            {/* Tarjeta CTA (Botón Nueva Cita) */}
             <div className="relative bg-gradient-to-br from-neutral-900 to-black p-6 rounded-3xl border border-neutral-800 overflow-hidden group hover:border-red-900/50 transition-colors">
-              {/* Ruido de fondo */}
-               <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
-              
+              <div className="absolute inset-0 opacity-[0.03] bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] pointer-events-none"></div>
               <div className="relative z-10">
-                <h3 className="text-2xl font-black mb-1 uppercase text-white">
-                  <span className="text-red-600"></span> PEDIR CITA
-                </h3>
+                <h3 className="text-2xl font-black mb-1 uppercase text-white">PEDIR CITA</h3>
                 <p className="text-neutral-400 text-md mb-6 font-mono">Inicie una nueva solicitud de servicio técnico.</p>
-                {/* SECCIÓN CITAS: Actualizar el botón */}
                 <button 
                   onClick={() => setIsAppModalOpen(true)}
-                  className="w-full py-4 bg-red-600/90 hover:bg-red-600 rounded-2xl text-white font-bold uppercase tracking-widest transition-colors"
+                  className="w-full py-4 bg-red-600/90 hover:bg-red-600 rounded-2xl text-white font-bold uppercase tracking-widest transition-colors shadow-[0_0_20px_rgba(220,38,38,0.3)]"
                 >
                   NUEVA CITA
                 </button>
-
-                
               </div>
             </div>
             
             <div className="space-y-3">
-               <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mb-4 ml-2">Próximos Eventos</h4>
-               {appointments.length > 0 ? (
-                 appointments.map(app => (
-                   <div key={app.id} className="p-4 bg-neutral-900/80 border-l-2 border-red-600 rounded-r-xl backdrop-blur-sm">
-                     <p className="font-bold">{app.date}</p>
-                     <p className="text-xs text-neutral-400">{app.serviceType}</p>
-                   </div>
-                 ))
-               ) : (
-                 <div className="pt-16 flex flex-col items-center justify-center opacity-40">
-                    <CalendarIcon />
-                    <p className="text-neutral-500 text-lg font-black uppercase tracking-[0.2em] text-[10px] font-mono">
-                      No tienes citas programadas
-                    </p>
-                 </div>
-               )}
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mb-4 ml-2">Próximos Eventos</h4>
+              {appointments.length > 0 ? (
+                appointments.map(app => (
+                  <div key={app.id} className="p-5 bg-neutral-900/80 border-l-2 border-red-600 rounded-r-xl backdrop-blur-sm group hover:bg-neutral-800 transition-colors">
+                    <div className="flex justify-between items-start mb-2">
+                      <p className="text-white font-bold text-lg">{app.date} <span className="text-red-600">@</span> {app.time}</p>
+                      <span className={`text-[8px] font-black px-2 py-1 rounded-full uppercase ${
+                        app.status === 'CONFIRMADA' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+                      }`}>
+                        {app.status}
+                      </span>
+                      <button 
+                        onClick={() => {
+                          if(window.confirm("¿Cancelar esta cita?")) deleteAppointment(app.id);
+                        }}
+                        className="text-[10px] text-neutral-500 hover:text-red-500 uppercase font-black transition-colors"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                    <p className="text-xs text-neutral-300 font-bold uppercase italic">{app.serviceType}</p>
+                    <p className="text-[10px] text-neutral-500 font-mono mt-2 tracking-tighter">{app.vehiclePlate}</p>
+                  </div>
+                ))
+              ) : (
+                <div className="pt-16 flex flex-col items-center justify-center opacity-40">
+                  <CalendarIcon />
+                  <p className="text-neutral-500 text-lg font-black uppercase tracking-[0.2em] text-[10px] font-mono">
+                    No tienes citas programadas
+                  </p>
+                </div>
+              )}
             </div>
           </section>
 
@@ -253,14 +262,23 @@ export default function ClientDashboard() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={registerVehicle} // registerVehicle debe recibir (data: VehicleRequest)
       />
+      <div className="min-h-screen ...">
+      {/* ... */}
       <AppointmentModal 
         isOpen={isAppModalOpen}
         onClose={() => setIsAppModalOpen(false)}
         vehicles={vehicles}
-        workshops={workshops} // Debes tener esto en tu hook useClientDashboard
-        onSubmit={createAppointment}
+        workshops={workshops}
+        onSubmit={async (data) => {
+          const success = await createAppointment(data);
+          if (success) {
+            refresh(); 
+          }
+          return success;
+        }}
         fetchSlots={getAvailableSlots}
       />
+    </div>
     </div>
   );
 }

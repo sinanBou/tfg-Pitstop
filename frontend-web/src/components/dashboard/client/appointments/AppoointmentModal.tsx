@@ -11,7 +11,7 @@ interface AppointmentModalProps {
   vehicles: VehicleDTO[];
   workshops: WorkshopMinDTO[];
   onSubmit: (data: AppointmentRequest) => Promise<boolean>;
-  fetchSlots: (workshopId: number, date: string) => Promise<string[]>;
+  fetchSlots: (workshopId: string, date: string) => Promise<string[]>;
 }
 
 export const AppointmentModal = ({ 
@@ -27,25 +27,25 @@ export const AppointmentModal = ({
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   
   const [formData, setFormData] = useState<AppointmentRequest>({
-    vehicleId: 0,
-    workshopId: 0,
+    vehicleId: '',
+    workshopId: '',
     date: '',
     time: '',
     serviceType: '',
     description: ''
   });
 
-  // Carga de disponibilidad real desde la base de datos
   useEffect(() => {
     if (formData.workshopId && formData.date && step === 3) {
+      console.log("Consultando taller:", formData.workshopId, "para la fecha:", formData.date);
       const loadSlots = async () => {
         setIsLoadingSlots(true);
         try {
           const slots = await fetchSlots(formData.workshopId, formData.date);
+          console.log("Slots encontrados:", slots);
           setAvailableSlots(slots);
-        } catch (error) {
-          console.error("Error al cargar disponibilidad:", error);
-          setAvailableSlots([]);
+        } catch (err) {
+          console.error("Error en fetchSlots:", err);
         } finally {
           setIsLoadingSlots(false);
         }
@@ -63,8 +63,9 @@ export const AppointmentModal = ({
     const success = await onSubmit(formData);
     if (success) {
       setStep(1);
+      setAvailableSlots([]);
       setFormData({
-        vehicleId: 0, workshopId: 0, date: '', 
+        vehicleId: '', workshopId: '', date: '', 
         time: '', serviceType: '', description: ''
       });
       onClose();
@@ -125,10 +126,13 @@ export const AppointmentModal = ({
                   <button 
                     key={w.id}
                     onClick={() => { setFormData({...formData, workshopId: w.id}); nextStep(); }}
-                    className={`p-4 rounded-2xl border transition-all text-left ${formData.workshopId === w.id ? 'border-red-600 bg-red-600/10' : 'border-neutral-800 bg-black hover:border-neutral-600'}`}
+                    className={`p-4 rounded-2xl border transition-all text-left ${
+                      formData.workshopId === w.id ? 'border-red-600 bg-red-600/10' : 'border-neutral-800 bg-black hover:border-neutral-600'
+                    }`}
                   >
-                    <p className="text-white font-bold">{w.workshopName}</p>
-                    <p className="text-[10px] text-neutral-500 uppercase mt-1">Punto de servicio autorizado</p>
+                    {/* Muestra el nombre real del taller que viene del objeto 'w' */}
+                    <p className="text-white font-bold uppercase">{w.companyName}</p>
+                    
                   </button>
                 ))}
               </div>
@@ -140,18 +144,27 @@ export const AppointmentModal = ({
           {step === 3 && (
             <div className="animate-in fade-in slide-in-from-right-4 duration-300">
               <header className="mb-6">
-                <h3 className="text-xl font-black uppercase italic text-white">Agenda <span className="text-red-600">_</span></h3>
+                <h3 className="text-xl font-black uppercase italic text-white">
+                  Agenda <span className="text-red-600">_</span>
+                </h3>
                 <p className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Paso 03/04</p>
               </header>
               
-              <input 
-                type="date" 
-                required
-                min={new Date().toISOString().split('T')[0]}
-                className="w-full bg-black border border-neutral-800 rounded-xl p-4 text-white mb-6 outline-none focus:border-red-600 transition-all"
-                value={formData.date}
-                onChange={(e) => setFormData({...formData, date: e.target.value, time: ''})}
-              />
+              <div className="relative mb-6">
+                <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2 mb-1 block">
+                  Selecciona el día
+                </label>
+                <input 
+                  type="date" 
+                  required
+                  // Restricción para que no elijan fechas pasadas
+                  min={new Date().toISOString().split('T')[0]}
+                  className="w-full bg-black border border-neutral-800 rounded-xl p-4 text-white outline-none focus:border-red-600 transition-all appearance-none"
+                  style={{ colorScheme: 'dark' }} // Esto fuerza al calendario nativo a ser oscuro
+                  value={formData.date}
+                  onChange={(e) => setFormData({...formData, date: e.target.value, time: ''})}
+                />
+              </div>
 
               {isLoadingSlots ? (
                 <div className="py-10 text-center animate-pulse text-[10px] font-black text-neutral-500 uppercase tracking-widest">
@@ -178,7 +191,7 @@ export const AppointmentModal = ({
                   )}
                 </div>
               )}
-              <button onClick={prevStep} className="mt-6 text-neutral-500 text-[10px] font-black uppercase tracking-widest">← Volver</button>
+              <button onClick={prevStep} className="mt-6 text-neutral-500 text-[10px] font-black uppercase tracking-widest border rounded-2xl p-1 border-neutral-500 hover:border-neutral-400 transition-colors">← Volver</button>
             </div>
           )}
 
@@ -210,7 +223,7 @@ export const AppointmentModal = ({
                   Confirmar Cita
                 </button>
               </div>
-              <button onClick={prevStep} className="mt-6 text-neutral-500 text-[10px] font-black uppercase tracking-widest">← Volver</button>
+              <button onClick={prevStep} className="mt-6 text-neutral-500 text-[10px] font-black uppercase tracking-widest border rounded-2xl p-1 border-neutral-500 hover:border-neutral-400 transition-colors">← Volver</button>
             </div>
           )}
         </div>

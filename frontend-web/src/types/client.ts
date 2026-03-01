@@ -7,7 +7,7 @@ export interface UserDTO {
 }
 
 export interface VehicleDTO {
-  id: number;
+  id: string;
   brand: string;
   model: string;
   licensePlate: string;
@@ -16,11 +16,16 @@ export interface VehicleDTO {
 
 export interface AppointmentDTO {
   id: string;
-  date: string;
-  time: string;
-  serviceType: string;
+  dateTime: string;      // Viene del Backend (ISO string)
+  description: string;   // Viene del Backend
   status: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
-  vehiclePlate: string;
+  vehiclePlate: string;  // Viene del Backend
+  vehicleDisplay?: string; // Opcional para mostrar "Marca Modelo"
+  
+  // Campos calculados para el Frontend
+  date: string; 
+  time: string;
+  serviceType: string; 
 }
 
 export interface HistoryDTO {
@@ -40,8 +45,8 @@ export interface VehicleRequest {
 }
 
 export interface AppointmentRequest {
-  vehicleId: number;
-  workshopId: number;
+  vehicleId: string;
+  workshopId: string;
   date: string;
   time: string;
   serviceType: string;
@@ -50,6 +55,11 @@ export interface AppointmentRequest {
 
 
 export interface WorkshopMinDTO {
-  id: number;
-  workshopName: string;
+  id: string; // Cambiar de number a string para soportar UUID
+  companyName: string;
+}
+
+export interface AvailableSlotDTO {
+  time: string;      // Viene como "09:00:00"
+  available: boolean;
 }

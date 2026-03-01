@@ -1,7 +1,7 @@
   import { useState, useEffect, useCallback } from 'react';
   import { API_BASE_URL } from '../config/api';
   import { useNavigate } from 'react-router-dom';
-  import { type UserDTO, type VehicleDTO, type AppointmentDTO, type HistoryDTO, type AppointmentRequest, type WorkshopMinDTO} from '../types/client.ts';
+  import { type UserDTO, type VehicleDTO, type AppointmentDTO, type HistoryDTO, type AppointmentRequest, type WorkshopMinDTO, type AvailableSlotDTO} from '../types/client.ts';
 
   export const useClientDashboard = () => {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@
         setLoading(true);
         
         // 2. Llamadas a la API
-        const [resUser, resVehicles, resWorkshops] = await Promise.all([
+        const [resUser, resVehicles, resWorkshops, resApps] = await Promise.all([
           fetch(`${API_BASE_URL}/users/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
           }),
@@ -38,15 +38,34 @@
           }),
           fetch(`${API_BASE_URL}/workshops`, {
             headers: { 'Authorization': `Bearer ${token}` }
+          }),
+          fetch(`${API_BASE_URL}/appointments/my-appointments`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
           })
         ]);
 
         if (resUser.ok) setUserProfile(await resUser.json());
         if (resVehicles.ok) setVehicles(await resVehicles.json());
         if (resWorkshops.ok) setWorkshops(await resWorkshops.json());
-        
+        if (resApps.ok) {
+            const data: AppointmentDTO[] = await resApps.json(); // Tipado correcto
+            
+            const formattedApps = data.map((app) => {
+                // El backend envía "2024-10-20T10:00:00"
+                const [datePart, timePart] = app.dateTime.split('T');
+                
+                return {
+                    ...app,
+                    // Asignamos los valores que esperan tus componentes visuales
+                    date: datePart,
+                    time: timePart ? timePart.substring(0, 5) : '', // "10:00"
+                    serviceType: app.description, // Mapeamos description a serviceType
+                    status: app.status || 'CONFIRMADA'
+                };
+            });
+            setAppointments(formattedApps);
+        }
         // Aquí añadirías las llamadas para appointments y history cuando existan en el backend
-        setAppointments([]); 
         setHistory([]);
 
       } catch (error) {
@@ -104,35 +123,76 @@
     };
     const createAppointment = async (appointmentData: AppointmentRequest) => {
       const token = localStorage.getItem('jwt_token');
-      const response = await fetch(`${API_BASE_URL}/appointments/create`, {
+      
+      // Combinamos fecha y hora para que Jackson pueda convertirlo a LocalDateTime
+      // Formato esperado: "YYYY-MM-DDTHH:mm:ss"
+      const payload = {
+        vehicleId: appointmentData.vehicleId,
+        workshopId: appointmentData.workshopId,
+        description: appointmentData.description,
+        dateTime: `${appointmentData.date}T${appointmentData.time}:00` 
+      };
+
+      const response = await fetch(`${API_BASE_URL}/appointments`, { // Asegúrate de que la ruta sea correcta
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(appointmentData)
+        body: JSON.stringify(payload)
       });
       return response.ok;
     };
 
-    const getAvailableSlots = async (workshopId: number, date: string): Promise<string[]> => {
-      const token = localStorage.getItem('jwt_token');
-      if (!token || !workshopId || !date) return [];
+  const getAvailableSlots = async (workshopId: string, date: string): Promise<string[]> => {
+    const token = localStorage.getItem('jwt_token');
+    if (!token || !workshopId || !date) return [];
 
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/appointments/available-slots?workshopId=${workshopId}&date=${date}`,
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        if (response.ok) {
-          return await response.json(); // Se espera un array de strings: ["09:00", "10:30", ...]
-        }
-        return [];
-      } catch (error) {
-        console.error("Error al obtener disponibilidad:", error);
-        return [];
+    // Aseguramos que la fecha sea YYYY-MM-DD
+    const formattedDate = date;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/appointments/availability/${workshopId}?date=${formattedDate}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (response.ok) {
+        const data: AvailableSlotDTO[] = await response.json();
+        // El backend devuelve LocalTime, que llega como "HH:mm:ss" o "HH:mm"
+        return data
+          .filter(slot => slot.available)
+          .map(slot => slot.time.substring(0, 5)); 
       }
-    };
+      return [];
+    } catch (error) {
+      console.error("Error al obtener disponibilidad:", error);
+      return [];
+    }
+  };
+
+  const deleteAppointment = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    if (!token) return false;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/appointments/${appointmentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        await loadDashboardData(); // Refresca la lista tras eliminar
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error al eliminar la cita:", error);
+      return false;
+    }
+  };
 
     return {
       loading,
@@ -145,6 +205,7 @@
       registerVehicle, 
       createAppointment,
       getAvailableSlots,
+      deleteAppointment,
       logout
     };
   };

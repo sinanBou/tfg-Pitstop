@@ -144,7 +144,7 @@ export default function Registration() {
                     <div className="p-4 bg-neutral-900 rounded-lg border border-neutral-700 my-2">
                         <h4 className="text-gray-400 text-xs font-bold uppercase mb-3 tracking-widest">Datos de la Empresa</h4>
                         <div className="flex flex-col gap-3">
-                            <InputGroup label="Nombre Comercial Taller *" name="companyName" value={workshopReg.formData.companyName} onChange={workshopReg.handleChange} error={errors.companyName} placeholder="Ej: Talleres Motosport" />
+                            <InputGroup label="Nombre Comercial Taller *" name="companyName" value={workshopReg.formData.companyName} onChange={workshopReg.handleChange} error={errors.workshopName} placeholder="Ej: Talleres Motosport" />
                             <InputGroup label="CIF *" name="cif" value={workshopReg.formData.cif} onChange={workshopReg.handleChange} error={errors.cif} placeholder="B-12345678" />
                             <div className="flex gap-4">
                               <InputGroup 

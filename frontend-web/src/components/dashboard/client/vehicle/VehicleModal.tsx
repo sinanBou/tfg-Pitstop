@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { VehicleRequest } from '../../../types/client.ts';
+import { type VehicleRequest } from '../../../../types/client.ts';
 
 // 1. Definimos una interfaz clara para las props del Modal
 interface VehicleModalProps {
