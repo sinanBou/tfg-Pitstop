@@ -28,6 +28,7 @@ public class UserController {
                 .role(userDto.getRole())
                 .clientId(userDto.getClientId())
                 .employeeId(userDto.getEmployeeId())
+                .workshopId(userDto.getWorkshopId())
                 .build();
 
         return ResponseEntity.ok(finalDto);

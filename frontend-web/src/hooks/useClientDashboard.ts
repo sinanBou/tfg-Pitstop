@@ -59,7 +59,7 @@
                     // Asignamos los valores que esperan tus componentes visuales
                     date: datePart,
                     time: timePart ? timePart.substring(0, 5) : '', // "10:00"
-                    serviceType: app.description, // Mapeamos description a serviceType
+                    serviceType: app.serviceType || app.description, // Priorizamos serviceType
                     status: app.status || 'CONFIRMADA'
                 };
             });
@@ -130,6 +130,7 @@
         vehicleId: appointmentData.vehicleId,
         workshopId: appointmentData.workshopId,
         description: appointmentData.description,
+        serviceType: appointmentData.serviceType,
         dateTime: `${appointmentData.date}T${appointmentData.time}:00` 
       };
 

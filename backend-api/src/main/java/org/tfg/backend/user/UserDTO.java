@@ -18,4 +18,5 @@ public class UserDTO {
     private String role;
     private UUID clientId;    // ID de perfil de cliente si existe
     private UUID employeeId;  // ID de perfil de empleado si existe
+    private UUID workshopId;  // ID del taller si es dueño/empleado
 }

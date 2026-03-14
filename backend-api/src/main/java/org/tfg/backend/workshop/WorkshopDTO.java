@@ -16,6 +16,7 @@ public class WorkshopDTO {
     private UUID id;
     private String cif;
     private String companyName;
+    private String address;
     private String ownerName;
     private Integer totalEmployees;
     private Integer vehiclesCurrentCount;
@@ -24,4 +25,5 @@ public class WorkshopDTO {
     private LocalTime openTime;
     private LocalTime closeTime;
     private Integer slotDurationMinutes;
+    private String workingDays;
 }

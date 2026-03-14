@@ -24,6 +24,6 @@ public class RegisterRequest {
 
     // Específicos Taller
     private String cif;
-    private String workshopName;
+    private String companyName;
     // Usaremos 'firstname' como nombre del taller si es rol WORKSHOP
 }

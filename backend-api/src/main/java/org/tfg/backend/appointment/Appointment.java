@@ -20,10 +20,13 @@ public class Appointment {
     private UUID id;
 
     @Column(nullable = false)
-    private LocalDateTime dateTime; // Almacena fecha y hora
+    private LocalDateTime dateTime; // Almacena fecha y hora #@
 
     @Column(nullable = false)
-    private String description; // El "motivo" de la cita
+    private String description; // El "motivo" detallado de la cita
+
+    @Column(name = "service_type")
+    private String serviceType; // El "título" corto de la cita
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)

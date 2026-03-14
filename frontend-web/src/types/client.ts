@@ -19,8 +19,9 @@ export interface AppointmentDTO {
   dateTime: string;      // Viene del Backend (ISO string)
   description: string;   // Viene del Backend
   status: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
-  vehiclePlate: string;  // Viene del Backend
-  vehicleDisplay?: string; // Opcional para mostrar "Marca Modelo"
+  vehiclePlate?: string;  // Por compatibilidad
+  vehicleDisplay?: string; // Ejemplo: "BMW Serie 3 (1234ABC)"
+  workshopName?: string;
   
   // Campos calculados para el Frontend
   date: string; 
@@ -57,6 +58,8 @@ export interface AppointmentRequest {
 export interface WorkshopMinDTO {
   id: string; // Cambiar de number a string para soportar UUID
   companyName: string;
+  address?: string;
+  workingDays?: string;
 }
 
 export interface AvailableSlotDTO {

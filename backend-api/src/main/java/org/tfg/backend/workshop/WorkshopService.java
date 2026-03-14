@@ -34,13 +34,17 @@ public class WorkshopService {
         Workshop workshop = Workshop.builder()
                 .cif(request.getCif())
                 .companyName(request.getCompanyName())
+                .address(request.getAddress())
                 .owner(owner)
                 .openTime(request.getOpenTime()) // <-- NUEVO
                 .closeTime(request.getCloseTime()) // <-- NUEVO
-                .slotDurationMinutes(request.getSlotDurationMinutes()) // <-- NUEVO
+                .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60) // <-- NUEVO
+                .workingDays(request.getWorkingDays())
                 .build();
 
         Workshop savedWorkshop = workshopRepository.save(workshop);
+        owner.setWorkshop(savedWorkshop);
+        employeeRepository.save(owner);
         return mapToDTO(savedWorkshop);
     }
 
@@ -50,6 +54,14 @@ public class WorkshopService {
     @Transactional(readOnly = true)
     public List<WorkshopDTO> getAllWorkshops() {
         return workshopRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkshopDTO> getWorkshopsByOwnerId(UUID ownerId) {
+        return workshopRepository.findByOwnerId(ownerId)
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
@@ -76,6 +88,8 @@ public class WorkshopService {
         if (request.getSlotDurationMinutes() != null) {
             workshop.setSlotDurationMinutes(request.getSlotDurationMinutes());
         }
+        if (request.getAddress() != null) workshop.setAddress(request.getAddress());
+        if (request.getWorkingDays() != null) workshop.setWorkingDays(request.getWorkingDays());
 
         return mapToDTO(workshopRepository.save(workshop));
     }
@@ -96,10 +110,12 @@ public class WorkshopService {
                 .id(workshop.getId())
                 .cif(workshop.getCif())
                 .companyName(workshop.getCompanyName())
+                .address(workshop.getAddress())
                 .ownerName(ownerName)
                 .openTime(workshop.getOpenTime()) // Mapeo de hora apertura
                 .closeTime(workshop.getCloseTime()) // Mapeo de hora cierre
                 .slotDurationMinutes(workshop.getSlotDurationMinutes())
+                .workingDays(workshop.getWorkingDays())
                 // Calculamos el tamaño de las listas para las estadísticas del DTO
                 .totalEmployees(workshop.getEmployees() != null ? workshop.getEmployees().size() : 0)
                 .vehiclesCurrentCount(workshop.getVehiclesInside() != null ? workshop.getVehiclesInside().size() : 0)

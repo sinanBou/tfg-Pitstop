@@ -16,6 +16,7 @@ public class AppointmentDTO {
     private UUID id;
     private LocalDateTime dateTime;
     private String description;
+    private String serviceType;
 
     // Información del Cliente
     private String clientFullName;

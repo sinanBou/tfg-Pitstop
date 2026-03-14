@@ -82,9 +82,6 @@ public class AuthService {
     @Transactional
     public String registerWorkshop(RegisterRequest request) {
         validateCommonData(request);
-        if (workshopRepository.existsByCif(request.getCif())) {
-            throw new RuntimeException("El CIF ya está registrado.");
-        }
 
         User user = createBaseUser(request, Role.WORKSHOP_OWNER);
 
@@ -93,22 +90,7 @@ public class AuthService {
                 .build();
         employeeRepository.save(ownerEmployee);
 
-        // Creamos el taller con valores por defecto
-        Workshop workshop = Workshop.builder()
-                .owner(ownerEmployee)
-                .cif(request.getCif())
-                .companyName(request.getWorkshopName())
-                .openTime(LocalTime.of(9, 0))          // Por defecto 09:00
-                .closeTime(LocalTime.of(18, 0))         // Por defecto 18:00
-                .slotDurationMinutes(60)                // Por defecto 1 hora
-                .build();
-
-        Workshop savedWorkshop = workshopRepository.save(workshop);
-
-        ownerEmployee.setWorkshop(savedWorkshop);
-        employeeRepository.save(ownerEmployee);
-
-        return "Taller y Dueño registrados correctamente";
+        return "Dueño registrado correctamente";
     }
 
     // --- MÉTODOS PRIVADOS DE APOYO ---

@@ -180,26 +180,94 @@ export default function ClientDashboard() {
             <div className="space-y-3">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-600 mb-4 ml-2">Próximos Eventos</h4>
               {appointments.length > 0 ? (
-                appointments.map(app => (
-                  <div key={app.id} className="p-5 bg-neutral-900/80 border-l-2 border-red-600 rounded-r-xl backdrop-blur-sm group hover:bg-neutral-800 transition-colors">
-                    <div className="flex justify-between items-start mb-2">
-                      <p className="text-white font-bold text-lg">{app.date} <span className="text-red-600">@</span> {app.time}</p>
-                      <span className={`text-[8px] font-black px-2 py-1 rounded-full uppercase ${
-                        app.status === 'CONFIRMADA' ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
-                      }`}>
-                        {app.status}
-                      </span>
-                      <button 
-                        onClick={() => {
-                          if(window.confirm("¿Cancelar esta cita?")) deleteAppointment(app.id);
-                        }}
-                        className="text-[10px] text-neutral-500 hover:text-red-500 uppercase font-black transition-colors"
-                      >
-                        Eliminar
-                      </button>
+                appointments.map((app) => (
+                  <div key={app.id} 
+                    className="relative p-5 bg-gradient-to-br from-neutral-900 to-neutral-950 border border-neutral-800 rounded-3xl overflow-hidden group hover:border-red-900/50 hover:shadow-[0_0_20px_rgba(220,38,38,0.15)] transition-all duration-300"
+                  >
+                    {/* Efecto hover fondo */}
+                    <div className="absolute inset-0 bg-red-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+                    
+                    {/* Header Cita: Fecha, Hora, Estado */}
+                    <div className="flex justify-between items-start mb-5 relative z-10">
+                      <div className="flex items-center gap-3">
+                        {/* Icono de Calendario decorativo */}
+                        <div className="p-3 bg-red-500/10 rounded-2xl border border-red-500/20 text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.15)] flex-shrink-0">
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        </div>
+                        
+                        <div>
+                          <div className="flex flex-col">
+                            <h4 className="text-lg font-black text-white tracking-widest leading-none mb-1">
+                              {app.date}
+                            </h4>
+                            <div className="flex items-center gap-1.5 text-neutral-400 mt-1">
+                              <svg className="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                              <span className="text-xs font-mono text-neutral-300">
+                                {app.time}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-sm ${
+                          app.status === 'CONFIRMADA' 
+                            ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                            : 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
+                        }`}>
+                          {app.status}
+                        </span>
+                        <p className="text-[10px] text-red-500 font-bold uppercase tracking-wider">{app.serviceType}</p>
+                      </div>
                     </div>
-                    <p className="text-xs text-neutral-300 font-bold uppercase italic">{app.serviceType}</p>
-                    <p className="text-[10px] text-neutral-500 font-mono mt-2 tracking-tighter">{app.vehiclePlate}</p>
+
+                    {/* Divisor */}
+                    <div className="h-px w-full bg-gradient-to-r from-neutral-800 via-neutral-700 to-neutral-800 my-4 relative z-10"></div>
+
+                    {/* Info: Vehiculo y Taller */}
+                    <div className="grid grid-cols-1 gap-3 relative z-10">
+                      {(app.vehicleDisplay || app.vehiclePlate) && (
+                        <div className="flex items-center gap-3 bg-black/40 p-3 rounded-2xl border border-neutral-800/50 group-hover:bg-black/60 transition-colors">
+                          <div className="p-2.5 bg-blue-500/10 rounded-xl text-blue-400">
+                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 10h14l1.5 4H3.5L5 10z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 14v4h2v-4m10 0v4h2v-4M8 10V8c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" /></svg>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest mb-0.5">Vehículo</p>
+                            <p className="text-sm text-neutral-200 font-mono">
+                              {app.vehicleDisplay || app.vehiclePlate}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {app.workshopName && (
+                        <div className="flex items-center gap-3 bg-black/40 p-3 rounded-2xl border border-neutral-800/50 group-hover:bg-black/60 transition-colors">
+                          <div className="p-2.5 bg-amber-500/10 rounded-xl text-amber-500">
+                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest mb-0.5">Taller</p>
+                            <p className="text-sm text-neutral-200 font-mono">
+                              {app.workshopName}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    
+                    {/* Botón Eliminar en la parte inferior */}
+                    <div className="mt-5 flex justify-end relative z-10">
+                        <button 
+                          onClick={() => {
+                            if(window.confirm("¿Cancelar esta cita?")) deleteAppointment(app.id);
+                          }}
+                          className="flex items-center gap-1.5 text-[10px] text-neutral-500 hover:text-red-500 uppercase font-black transition-all px-3 py-1.5 rounded-lg hover:bg-red-500/10 active:scale-95"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                          Cancelar Cita
+                        </button>
+                    </div>
                   </div>
                 ))
               ) : (

@@ -4,6 +4,7 @@ interface AppointmentDTO {
   date: string; // ISO String
   time: string;
   serviceType: string;
+  description: string;
   status: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
   vehiclePlate: string;
 }

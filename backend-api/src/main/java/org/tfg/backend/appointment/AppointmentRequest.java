@@ -10,4 +10,5 @@ public class AppointmentRequest {
     private UUID workshopId;
     private LocalDateTime dateTime;
     private String description;
+    private String serviceType;
 }

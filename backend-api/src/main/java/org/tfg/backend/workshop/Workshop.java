@@ -28,9 +28,13 @@ public class Workshop {
     @Column(unique = true, nullable = false)
     private String cif;
 
+    @Column(name = "company_name", nullable = false)
     private String companyName;
 
-    @OneToOne
+    @Column(name = "address")
+    private String address;
+
+    @ManyToOne
     @JoinColumn(name = "owner_id")
     private Employee owner;
 
@@ -52,4 +56,7 @@ public class Workshop {
 
     @Column(name = "slot_duration_minutes")
     private Integer slotDurationMinutes = 60;
+
+    @Column(name = "working_days")
+    private String workingDays;
 }

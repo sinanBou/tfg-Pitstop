@@ -1,7 +1,9 @@
 package org.tfg.backend.appointment;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/appointments")
@@ -31,5 +34,22 @@ public class AppointmentController {
             @AuthenticationPrincipal UserDetails userDetails) {
         appointmentService.createAppointment(request, userDetails.getUsername());
         return ResponseEntity.ok("Cita reservada con éxito");
+    }
+    @GetMapping("/my-appointments")
+    public ResponseEntity<List<AppointmentDTO>> getMyAppointments(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByUser(userDetails.getUsername()));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable UUID id) {
+        try {
+            appointmentService.deleteAppointment(id);
+            return ResponseEntity.ok().build(); // Retorna 200 OK si se borra
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al eliminar la cita");
+        }
     }
 }

@@ -42,6 +42,11 @@ public class WorkshopController {
         return ResponseEntity.ok(workshopService.getWorkshopById(id));
     }
 
+    @GetMapping("/owner/{ownerId}")
+    public ResponseEntity<List<WorkshopDTO>> getWorkshopsByOwner(@PathVariable UUID ownerId) {
+        return ResponseEntity.ok(workshopService.getWorkshopsByOwnerId(ownerId));
+    }
+
     // En backend/workshop/WorkshopController.java
 
     /**

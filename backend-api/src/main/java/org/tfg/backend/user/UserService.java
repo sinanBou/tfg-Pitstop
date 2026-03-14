@@ -34,6 +34,7 @@ public class UserService {
                 // Navegamos a las relaciones inversas para obtener los IDs de perfil
                 .clientId(user.getClient() != null ? user.getClient().getId() : null)
                 .employeeId(user.getEmployee() != null ? user.getEmployee().getId() : null)
+                .workshopId(user.getEmployee() != null && user.getEmployee().getWorkshop() != null ? user.getEmployee().getWorkshop().getId() : null)
                 .build();
     }
 }
