@@ -52,21 +52,32 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit }: VehicleModalProps) =
         onClick={onClose}
       ></div>
 
-      {/* Contenedor del Modal */}
-      <div className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden animate-in fade-in zoom-in duration-300">
+      <div className="relative bg-gradient-to-br from-neutral-900 to-black border border-neutral-800 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-300">
         
-        {/* Cabecera Neon */}
-        <div className="bg-gradient-to-r from-blue-900/20 to-neutral-900 p-6 border-b border-neutral-800">
-          <h3 className="text-xl font-black italic uppercase text-white">
-            Nueva Unidad <span className="text-blue-500">_</span>
-          </h3>
-          <p className="text-[10px] text-neutral-400 font-mono tracking-widest uppercase mt-1">
-            Registro en base de datos
-          </p>
+        {/* Cabecera del Modal */}
+        <div className="relative p-6 px-8 border-b border-neutral-800/50 bg-neutral-950/50 flex justify-between items-center z-10">
+          <div>
+            <h2 className="text-white text-2xl font-black uppercase tracking-widest flex items-center gap-3">
+              Nuevo Vehículo
+              <span className="flex h-2 w-2 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+            </h2>
+            <p className="text-[10px] text-neutral-500 font-mono mt-1 uppercase">Añade a tu garaje</p>
+          </div>
+          <button onClick={onClose} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        {/* Fondo decorativo interno */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+           <div className="absolute -top-[40%] -left-[40%] w-full h-full bg-blue-600/5 blur-[100px] rounded-full mix-blend-screen"></div>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-8 space-y-5 relative z-10">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">Marca</label>
@@ -138,7 +149,7 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit }: VehicleModalProps) =
             />
           </div>
 
-          <div className="pt-4 flex gap-3">
+          <div className="pt-6 border-t border-neutral-800/50 mt-4 -mx-8 px-8 flex gap-3">
             <button 
               type="button" 
               onClick={onClose}
