@@ -40,6 +40,13 @@ public class AppointmentController {
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByUser(userDetails.getUsername()));
     }
+
+    @GetMapping("/workshop/{workshopId}")
+    public ResponseEntity<List<AppointmentDTO>> getWorkshopAppointments(
+            @PathVariable UUID workshopId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsByWorkshop(workshopId));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {

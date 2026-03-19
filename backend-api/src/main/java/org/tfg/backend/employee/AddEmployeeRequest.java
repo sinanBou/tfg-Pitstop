@@ -4,18 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.UUID;
+import org.tfg.backend.user.Role;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmployeeDTO {
-    private UUID id;
+public class AddEmployeeRequest {
     private String firstname;
     private String lastname;
     private String email;
-    private String role;
-    private String workshopName;
-    private UUID workshopId;
+    private String password;
+    private Role role; // Permite mandar "WORKSHOP_STAFF" o "WORKSHOP_MANAGER"
 }

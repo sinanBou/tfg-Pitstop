@@ -15,14 +15,21 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ type }) => {
   };
 
   const isClient = type === 'client';
-  const subtitle = isClient ? 'Conductor' : 'Taller';
+  
+  let subtitle = 'Soy Conductor';
+  if (type === 'workshop') {
+    const role = localStorage.getItem('role');
+    if (role === 'WORKSHOP_STAFF') subtitle = 'Soy Mecánico';
+    else if (role === 'WORKSHOP_MANAGER') subtitle = 'Soy Encargado';
+    else subtitle = 'Soy Propietario';
+  }
   const subtitleColorClass = isClient 
     ? 'text-blue-400 drop-shadow-[0_0_10px_rgba(59,130,246,0.8)]' 
     : 'text-red-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]';
 
   return (
-    <header className="px-6 py-6 md:px-12 md:py-8 flex justify-between items-center z-20 sticky top-0 bg-transparent">
-      <div>
+    <header className="px-6 py-6 md:px-12 md:py-8 flex justify-between items-center z-20 sticky top-0 bg-transparent pointer-events-none">
+      <div className="pointer-events-auto">
          <h2 className="text-[2rem] md:text-[2.5rem] font-black italic tracking-tighter uppercase text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">PitStop</h2>
          <p className={`text-[10px] font-black uppercase tracking-[0.3em] mt-1 ${subtitleColorClass}`}>
             {subtitle}
@@ -30,7 +37,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ type }) => {
       </div>
       <button 
          onClick={handleLogout}
-         className="w-10 h-10 flex items-center justify-center text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] bg-neutral-900/50 border border-neutral-800"
+         className="pointer-events-auto w-10 h-10 flex items-center justify-center text-neutral-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] bg-neutral-900/50 border border-neutral-800"
          title="Cerrar Sesión"
       >
          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

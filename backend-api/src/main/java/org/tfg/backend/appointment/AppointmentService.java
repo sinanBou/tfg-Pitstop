@@ -134,6 +134,14 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getAppointmentsByWorkshop(UUID workshopId) {
+        return appointmentRepository.findByWorkshopIdOrderByDateTimeAsc(workshopId)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     public void deleteAppointment(UUID id) {
         // Verificamos si existe antes de borrar para evitar excepciones genéricas
         if (!appointmentRepository.existsById(id)) {

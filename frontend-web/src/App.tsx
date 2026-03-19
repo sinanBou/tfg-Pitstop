@@ -7,7 +7,9 @@ import Login from './pages/Login';
 import Registration from './pages/Registration';
 
 import ClientDashboard from './pages/ClientDashboard'; 
-import WorkshopDashboard from './pages/WorkshopDashboard';
+import OwnerDashboard from './pages/OwnerDashboard';
+import WorkshopAdminDashboard from './pages/WorkshopAdminDashboard';
+import WorkerDashboard from './pages/WorkerDashboard';
 
 function App() {
   return (
@@ -20,7 +22,9 @@ function App() {
           <Route path="/registration" element={<Registration />} />
 
           <Route path="/client-dashboard" element={<ClientDashboard />} />
-          <Route path="/workshop-dashboard" element={<WorkshopDashboard />} />
+          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+          <Route path="/workshop/:id" element={<WorkshopAdminDashboard />} />
+          <Route path="/worker-dashboard" element={<WorkerDashboard />} />
         </Routes>
       </main>
     </div>

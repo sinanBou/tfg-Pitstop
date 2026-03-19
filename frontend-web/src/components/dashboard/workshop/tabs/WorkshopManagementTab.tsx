@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom';
+
 interface WorkshopManagementTabProps {
   workshops: any[];
   onAddWorkshop: () => void;
@@ -10,6 +12,8 @@ const WorkshopIcon = () => (
 );
 
 export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopManagementTabProps) {
+  const navigate = useNavigate();
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -39,8 +43,8 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
                   </div>
                   
                   <div className="space-y-3 mb-8 bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
-                     <div className="flex items-start gap-3">
-                        <div className="p-1.5 bg-neutral-800/50 rounded-lg text-neutral-400 mt-0.5 shrink-0 border border-neutral-700/50">
+                     <div className="flex items-center gap-3">
+                        <div className="p-1.5 bg-neutral-800/50 rounded-lg text-neutral-400 shrink-0 border border-neutral-700/50">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
                         <p className="text-sm font-medium text-neutral-300 leading-snug">{workshop.address}</p>
@@ -54,7 +58,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
                   </div>
                </div>
                
-               <button className="w-full py-4 bg-neutral-800/50 border border-neutral-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:border-red-500 transition-all shadow-sm relative z-10 group/btn mt-auto overflow-hidden">
+               <button onClick={() => navigate(`/workshop/${workshop.id}`)} className="w-full py-4 bg-neutral-800/50 border border-neutral-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:border-red-500 transition-all shadow-sm relative z-10 group/btn mt-auto overflow-hidden">
                   <span className="flex items-center justify-center gap-2 relative z-10">
                      Gestionar Taller
                      <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
@@ -62,20 +66,6 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
                </button>
             </div>
          ))}
-         
-         <button 
-            onClick={onAddWorkshop}
-            className="bg-neutral-900/20 border-2 border-dashed border-neutral-800 p-8 rounded-[2rem] flex flex-col items-center justify-center gap-4 hover:border-red-500/50 hover:bg-neutral-900/60 transition-all group shadow-sm hover:shadow-2xl relative overflow-hidden min-h-[320px]"
-         >
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-red-600/5 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-            <div className="w-16 h-16 rounded-2xl bg-neutral-800/50 border border-neutral-700 group-hover:border-red-500/50 group-hover:bg-red-500/10 flex items-center justify-center text-neutral-500 group-hover:text-red-500 transition-all relative z-10 group-hover:scale-110 duration-300">
-               <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-            </div>
-            <div className="text-center relative z-10 mt-2">
-               <span className="block text-sm font-black uppercase tracking-widest text-neutral-400 group-hover:text-white transition-colors">Añadir Taller</span>
-               <span className="block text-[11px] text-neutral-600 mt-2 font-medium tracking-wide">Pulsa para configurar</span>
-            </div>
-         </button>
       </div>
     </div>
   );

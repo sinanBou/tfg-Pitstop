@@ -13,4 +13,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
             LocalDateTime end
     );
     List<Appointment> findByClientId(UUID clientId);
+    List<Appointment> findByWorkshopIdOrderByDateTimeAsc(UUID workshopId);
 }

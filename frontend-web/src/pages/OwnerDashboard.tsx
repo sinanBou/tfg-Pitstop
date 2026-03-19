@@ -9,7 +9,7 @@ import { WorkshopCreationModal } from '../components/dashboard/workshop/Workshop
 
 const API_URL = 'http://localhost:9091/api';
 
-export default function WorkshopDashboard() {
+export default function OwnerDashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [workshops, setWorkshops] = useState<any[]>([]);
@@ -78,7 +78,7 @@ export default function WorkshopDashboard() {
             
             <header className="flex justify-between items-end border-b border-neutral-800/60 pb-6 mb-8">
                <div>
-                  <h1 className="text-4xl md:text-5xl font-black uppercase tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-500">
+                  <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                      {SECCIONES[activeTab]}
                   </h1>
                </div>

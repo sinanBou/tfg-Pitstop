@@ -57,8 +57,12 @@
                 break;
 
               case 'WORKSHOP_OWNER':
+                navigate('/owner-dashboard');
+                break;
+
               case 'WORKSHOP_MANAGER':
-                navigate('/workshop-dashboard');
+              case 'WORKSHOP_STAFF':
+                navigate('/worker-dashboard');
                 break;
 
               default:

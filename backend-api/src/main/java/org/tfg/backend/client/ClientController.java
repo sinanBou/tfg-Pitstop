@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.tfg.backend.user.User;
 
 @RestController
-@RequestMapping("/api/v1/clients")
+@RequestMapping("/api/clients")
 @RequiredArgsConstructor
 public class ClientController {
 

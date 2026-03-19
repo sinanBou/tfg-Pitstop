@@ -13,7 +13,7 @@ import { ClientHistoryTab } from '../components/dashboard/client/tabs/ClientHist
 const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
 
 export default function ClientDashboard() {
-  const { loading, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots, deleteAppointment,refresh } = useClientDashboard();
+  const { loading, userProfile, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots, deleteAppointment,refresh } = useClientDashboard();
   const [activeTab, setActiveTab] = useState(0);
 
   
@@ -50,7 +50,7 @@ export default function ClientDashboard() {
             </header>
 
             {/* TAB CONTENT: INICIO */}
-            {activeTab === 0 && <ClientOverviewTab vehicles={vehicles} appointments={appointments} cocheEnTaller={cocheEnTaller} />}
+            {activeTab === 0 && <ClientOverviewTab vehicles={vehicles} appointments={appointments} cocheEnTaller={cocheEnTaller} userProfile={userProfile} />}
             {activeTab === 1 && <ClientVehiclesTab vehicles={vehicles} onAddVehicle={() => setIsModalOpen(true)} />}
             {activeTab === 2 && <ClientAppointmentsTab appointments={appointments} onAddAppointment={() => setIsAppModalOpen(true)} deleteAppointment={deleteAppointment} />}
             {activeTab === 3 && <ClientHistoryTab history={history} />}

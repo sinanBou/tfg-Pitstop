@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { VehicleCard } from '../vehicle/VehicleCard';
 
 interface ClientVehiclesTabProps {
