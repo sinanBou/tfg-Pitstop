@@ -7,6 +7,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.tfg.backend.user.User;
+import org.springframework.web.bind.annotation.*;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/clients")
@@ -21,5 +24,15 @@ public class ClientController {
     @GetMapping("/me")
     public ResponseEntity<ClientDTO> getMe(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(clientService.getClientProfile(user.getEmail()));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ClientSearchDTO>> search(@RequestParam String query) {
+        return ResponseEntity.ok(clientService.searchClients(query));
+    }
+
+    @PostMapping("/manual-register")
+    public ResponseEntity<ClientSearchDTO> manualRegister(@RequestBody ClientSearchDTO request) {
+        return ResponseEntity.ok(clientService.registerManualClient(request));
     }
 }

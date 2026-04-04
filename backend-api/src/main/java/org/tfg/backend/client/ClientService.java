@@ -3,8 +3,16 @@ package org.tfg.backend.client;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.tfg.backend.user.Role;
 import org.tfg.backend.user.User;
 import org.tfg.backend.user.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -12,6 +20,8 @@ public class ClientService {
 
     private final ClientRepository clientRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     /**
      * Obtiene el perfil del cliente logueado a través de su email.
@@ -42,5 +52,77 @@ public class ClientService {
                 .phoneNumber(client.getPhoneNumber())
                 .address(client.getAddress())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ClientSearchDTO> searchClients(String query) {
+        // Primero intentamos por NIF exacto
+        Optional<Client> byNif = clientRepository.findByNif(query);
+        if (byNif.isPresent()) {
+            return List.of(mapToSearchDTO(byNif.get()));
+        }
+
+        // Si no, por nombre/apellidos
+        return clientRepository.findByUserFirstnameContainingIgnoreCaseOrUserLastnameContainingIgnoreCase(query, query)
+                .stream()
+                .map(this::mapToSearchDTO)
+                .collect(Collectors.toList());
+    }
+
+    private ClientSearchDTO mapToSearchDTO(Client client) {
+        return ClientSearchDTO.builder()
+                .id(client.getId())
+                .firstname(client.getUser().getFirstname())
+                .lastname(client.getUser().getLastname())
+                .email(client.getUser().getEmail())
+                .nif(client.getNif())
+                .phoneNumber(client.getPhoneNumber())
+                .build();
+    }
+
+    @Transactional
+    public ClientSearchDTO registerManualClient(ClientSearchDTO request) {
+        // Validaciones básicas
+        if (request.getNif() == null || request.getNif().trim().isEmpty()) {
+            throw new RuntimeException("El NIF es obligatorio");
+        }
+
+        if (clientRepository.existsByNif(request.getNif())) {
+            throw new RuntimeException("Ya existe un cliente registrado con este NIF: " + request.getNif());
+        }
+
+        String email = (request.getEmail() != null && !request.getEmail().trim().isEmpty()) 
+                        ? request.getEmail() 
+                        : request.getNif().toLowerCase() + "@talleres-pitstop.com";
+
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Ya existe una cuenta con el email: " + email);
+        }
+        
+        // Creamos un usuario base
+        String tempPass = UUID.randomUUID().toString().substring(0, 8);
+        
+        User user = User.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
+                .email(email)
+                .password(passwordEncoder.encode(tempPass))
+                .role(Role.CLIENT)
+                .build();
+        
+        try {
+            userRepository.save(user);
+
+            Client client = Client.builder()
+                    .user(user)
+                    .nif(request.getNif())
+                    .phoneNumber(request.getPhoneNumber())
+                    .build();
+            clientRepository.save(client);
+
+            return mapToSearchDTO(client);
+        } catch (Exception e) {
+            throw new RuntimeException("Error técnico al guardar el cliente: " + e.getMessage());
+        }
     }
 }

@@ -80,6 +80,25 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Client client = user.getClient();
+        createBaseAppointment(request, client);
+    }
+
+    @Transactional
+    public void createManualAppointment(AppointmentRequest request) {
+        // En el caso manual (staff), el cliente viene por su ID (UUID)
+        // Necesitamos asegurar que el request tenga el clientId
+        // Pero el AppointmentRequest actual no lo tiene. Lo añadiremos o crearemos uno nuevo.
+        // Por ahora asumo que usaremos el clientId si el request lo permite.
+        // Si no, buscaremos el dueño del vehiculo.
+        
+        var vehicle = vehicleRepository.findById(request.getVehicleId())
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado"));
+        
+        Client client = vehicle.getClient();
+        createBaseAppointment(request, client);
+    }
+
+    private void createBaseAppointment(AppointmentRequest request, Client client) {
         var vehicle = vehicleRepository.findById(request.getVehicleId())
                 .orElseThrow(() -> new RuntimeException("Vehículo no encontrado"));
         var workshop = workshopRepository.findById(request.getWorkshopId())
@@ -104,6 +123,7 @@ public class AppointmentService {
 
         appointmentRepository.save(appointment);
     }
+
 
     public AppointmentDTO mapToDTO(Appointment appointment) {
         return AppointmentDTO.builder()

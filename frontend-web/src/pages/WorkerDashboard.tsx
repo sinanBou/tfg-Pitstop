@@ -4,6 +4,8 @@ import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { BottomNav } from '../components/dashboard/BottomNav';
 import { LoadingScreen } from '../components/dashboard/LoadingScreen';
 import { API_BASE_URL } from '../config/api';
+import { StaffAppointmentModal } from '../components/dashboard/workshop/appointments/StaffAppointmentModal';
+
 
 const SECCIONES = ['RESUMEN', 'CITAS'];
 
@@ -14,6 +16,8 @@ export default function WorkerDashboard() {
   
   const [employeeProfile, setEmployeeProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
+  const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+
 
   useEffect(() => {
     fetchWorkerData();
@@ -57,7 +61,24 @@ export default function WorkerDashboard() {
     return <LoadingScreen message="Sincronizando panel..." theme="workshop" />;
   }
 
+  const fetchMakes = async () => {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch(`${API_BASE_URL}/vehicles/catalog/makes`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  };
+
+  const fetchModels = async (make: string) => {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch(`${API_BASE_URL}/vehicles/catalog/models/${make}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  };
+
   // Comprobar si es manager o staff
+
   const isManager = employeeProfile?.role === 'WORKSHOP_MANAGER';
 
   return (
@@ -82,16 +103,27 @@ export default function WorkerDashboard() {
                   </h1>
                </div>
                
-               {/* BOTÓN PARA EL ENCARGADO */}
-               {isManager && employeeProfile?.workshopId && (
-                 <button 
-                   onClick={() => {/* navigate(`/workshop/${employeeProfile.workshopId}`) deshabilita por ahora */}}
-                   className="px-6 py-3 bg-red-600/20 hover:bg-red-600/40 text-red-500 hover:text-red-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all border border-red-500/30 hover:border-red-500 shadow-[0_0_20px_rgba(220,38,38,0.1)] flex items-center gap-2"
-                 >
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                   Gestión del Taller
-                 </button>
-               )}
+                <div className="flex items-center gap-4">
+                  {/* BOTÓN NUEVA CITA PRESENCIAL */}
+                  <button 
+                    onClick={() => setIsAppModalOpen(true)}
+                    className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+                    Nueva Cita
+                  </button>
+
+                  {/* BOTÓN PARA EL ENCARGADO */}
+                  {isManager && employeeProfile?.workshopId && (
+                    <button 
+                      onClick={() => navigate(`/workshop/${employeeProfile.workshopId}`)}
+                      className="px-6 py-3 bg-red-600/20 hover:bg-red-600/40 text-red-500 hover:text-red-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all border border-red-500/30 hover:border-red-500 shadow-[0_0_20px_rgba(220,38,38,0.1)] flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      Gestión del Taller
+                    </button>
+                  )}
+                </div>
             </header>
 
             {activeTab === 0 && (
@@ -174,8 +206,8 @@ export default function WorkerDashboard() {
       <style>{`
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #1f1f1f; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #333; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #444; }
         
         @keyframes fade-in-up {
            0% { opacity: 0; transform: translateY(20px); }
@@ -186,6 +218,18 @@ export default function WorkerDashboard() {
            opacity: 0;
         }
       `}</style>
+
+      {employeeProfile?.workshopId && (
+        <StaffAppointmentModal 
+          isOpen={isAppModalOpen}
+          onClose={() => setIsAppModalOpen(false)}
+          workshopId={employeeProfile.workshopId}
+          onSuccess={() => { fetchWorkerData(); setIsAppModalOpen(false); }}
+          fetchMakes={fetchMakes}
+          fetchModels={fetchModels}
+        />
+      )}
     </div>
+
   );
 }

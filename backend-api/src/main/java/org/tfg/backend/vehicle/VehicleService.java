@@ -3,11 +3,15 @@ package org.tfg.backend.vehicle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.tfg.backend.user.UserRepository;
 import org.tfg.backend.client.Client;
+import org.tfg.backend.client.ClientRepository;
+import org.tfg.backend.user.UserRepository;
 
+import java.util.Optional;
+import java.util.UUID;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -15,6 +19,8 @@ public class VehicleService {
 
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
+
 
     @Transactional
     public VehicleDTO registerVehicle(VehicleRequest request, String email) {
@@ -70,5 +76,50 @@ public class VehicleService {
                 .workshopName(vehicle.getCurrentWorkshop() != null ?
                         vehicle.getCurrentWorkshop().getCompanyName() : null)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleSearchDTO> searchVehicles(String licensePlate) {
+        return vehicleRepository.findByLicensePlate(licensePlate)
+                .stream()
+                .map(this::mapToSearchDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<VehicleSearchDTO> getVehiclesByClientId(UUID clientId) {
+        return vehicleRepository.findByClientId(clientId)
+                .stream()
+                .map(this::mapToSearchDTO)
+                .collect(Collectors.toList());
+    }
+
+    private VehicleSearchDTO mapToSearchDTO(Vehicle vehicle) {
+        return VehicleSearchDTO.builder()
+                .id(vehicle.getId())
+                .brand(vehicle.getBrand())
+                .model(vehicle.getModel())
+                .licensePlate(vehicle.getLicensePlate())
+                .clientId(vehicle.getClient().getId())
+                .build();
+    }
+
+    @Transactional
+    public VehicleSearchDTO registerVehicleForClient(UUID clientId, VehicleRequest request) {
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+
+        Vehicle vehicle = Vehicle.builder()
+                .brand(request.getBrand())
+                .model(request.getModel())
+                .licensePlate(request.getLicensePlate())
+                .year(request.getYear())
+                .vin(request.getVin())
+                .status("EN_CASA")
+                .client(client)
+                .build();
+
+        Vehicle saved = vehicleRepository.save(vehicle);
+        return mapToSearchDTO(saved);
     }
 }

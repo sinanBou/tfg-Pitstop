@@ -66,3 +66,20 @@ export interface AvailableSlotDTO {
   time: string;      // Viene como "09:00:00"
   available: boolean;
 }
+
+export interface ClientSearchDTO {
+  id: string;
+  firstname: string;
+  lastname: string;
+  email: string;
+  nif: string;
+  phoneNumber: string;
+}
+
+export interface VehicleSearchDTO {
+  id: string;
+  brand: string;
+  model: string;
+  licensePlate: string;
+  clientId: string;
+}

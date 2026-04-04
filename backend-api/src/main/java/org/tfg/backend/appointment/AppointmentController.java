@@ -35,6 +35,13 @@ public class AppointmentController {
         appointmentService.createAppointment(request, userDetails.getUsername());
         return ResponseEntity.ok("Cita reservada con éxito");
     }
+
+    @PostMapping("/staff")
+    public ResponseEntity<String> createManualAppointment(@RequestBody AppointmentRequest request) {
+        appointmentService.createManualAppointment(request);
+        return ResponseEntity.ok("Cita manual registrada con éxito");
+    }
+
     @GetMapping("/my-appointments")
     public ResponseEntity<List<AppointmentDTO>> getMyAppointments(
             @AuthenticationPrincipal UserDetails userDetails) {

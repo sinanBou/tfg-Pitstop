@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 import { BottomNav } from '../components/dashboard/BottomNav';
 import { API_BASE_URL } from '../config/api';
+import { StaffAppointmentModal } from '../components/dashboard/workshop/appointments/StaffAppointmentModal';
+
 
 const SECCIONES = ['RESUMEN', 'CITAS', 'AJUSTES', 'EQUIPO', 'FINANZAS'];
 
@@ -37,6 +39,8 @@ export default function WorkshopAdminDashboard() {
   const [workshopData, setWorkshopData] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
+  const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+
   
   const [settingsForm, setSettingsForm] = useState({
     openTime: '',
@@ -59,7 +63,15 @@ export default function WorkshopAdminDashboard() {
 
   const fetchWorkshopData = async () => {
     const token = localStorage.getItem('jwt_token');
+    const role = localStorage.getItem('role');
+
     if (!token) return navigate('/login');
+    
+    // Solo Dueños y Managers pueden acceder a este panel completo
+    if (role !== 'WORKSHOP_OWNER' && role !== 'WORKSHOP_MANAGER') {
+      alert("Acceso denegado: Solo el gerente o el dueño pueden acceder a este panel.");
+      return navigate(role === 'CLIENT' ? '/client-dashboard' : '/worker-dashboard');
+    }
 
     try {
       const res = await fetch(`${API_BASE_URL}/workshops/${id}`, {
@@ -109,6 +121,23 @@ export default function WorkshopAdminDashboard() {
       setLoading(false);
     }
   };
+
+  const fetchMakes = async () => {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch(`${API_BASE_URL}/vehicles/catalog/makes`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  };
+
+  const fetchModels = async (make: string) => {
+    const token = localStorage.getItem('jwt_token');
+    const res = await fetch(`${API_BASE_URL}/vehicles/catalog/models/${make}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return await res.json();
+  };
+
 
   const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,6 +232,17 @@ export default function WorkshopAdminDashboard() {
                      {SECCIONES[activeTab]}
                   </h1>
                </div>
+
+               <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setIsAppModalOpen(true)}
+                    className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                  >
+                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
+                    Nueva Cita
+                  </button>
+               </div>
+
 
                {activeTab === 1 && (
                   <div className="flex items-center gap-2 bg-neutral-900/40 p-2 rounded-2xl border border-neutral-800">
@@ -617,7 +657,34 @@ export default function WorkshopAdminDashboard() {
 
       {/* --- FLOATING BOTTOM NAV --- */}
       <BottomNav tabs={SECCIONES} activeTab={activeTab} onTabChange={setActiveTab} theme="workshop" />
+      
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #444; }
+        
+        @keyframes fade-in-up {
+           0% { opacity: 0; transform: translateY(20px); }
+           100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in-up {
+           animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+           opacity: 0;
+        }
+      `}</style>
 
+      {id && (
+        <StaffAppointmentModal 
+          isOpen={isAppModalOpen}
+          onClose={() => setIsAppModalOpen(false)}
+          workshopId={id}
+          onSuccess={() => { fetchWorkshopData(); setIsAppModalOpen(false); }}
+          fetchMakes={fetchMakes}
+          fetchModels={fetchModels}
+        />
+      )}
     </div>
+
   );
 }
