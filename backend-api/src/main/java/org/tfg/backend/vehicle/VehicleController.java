@@ -17,6 +17,18 @@ import java.util.List;
 public class VehicleController {
 
     private final VehicleService vehicleService;
+    private final VehicleCatalogService catalogService;
+
+    @GetMapping("/catalog/makes")
+    public ResponseEntity<List<String>> getCatalogMakes() {
+        return ResponseEntity.ok(catalogService.getMakes());
+    }
+
+    @GetMapping("/catalog/models/{make}")
+    public ResponseEntity<List<String>> getCatalogModels(@PathVariable String make) {
+        return ResponseEntity.ok(catalogService.getModels(make));
+    }
+
 
     // Recibe un REQUEST
     @PostMapping("/register")

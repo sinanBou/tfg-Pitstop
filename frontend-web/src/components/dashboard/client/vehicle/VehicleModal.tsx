@@ -1,16 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { type VehicleRequest } from '../../../../types/client.ts';
+import { SearchableSelect } from '../../../common/SearchableSelect';
 
 // 1. Definimos una interfaz clara para las props del Modal
 interface VehicleModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: VehicleRequest) => Promise<boolean>;
+  fetchMakes: () => Promise<string[]>;
+  fetchModels: (make: string) => Promise<string[]>;
 }
 
-export const VehicleModal = ({ isOpen, onClose, onSubmit }: VehicleModalProps) => {
+export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModels }: VehicleModalProps) => {
   const [loading, setLoading] = useState(false);
-  
+  const [makes, setMakes] = useState<string[]>([]);
+  const [models, setModels] = useState<string[]>([]);
+
   // 2. Inicializamos el estado asegurando que cumpla con el tipo VehicleRequest
   const [formData, setFormData] = useState<VehicleRequest>({
     brand: '',
@@ -20,6 +25,23 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit }: VehicleModalProps) =
     year: new Date().getFullYear(),
     color: ''
   });
+
+  // Cargar marcas iniciales
+  useEffect(() => {
+    if (isOpen) {
+      fetchMakes().then(setMakes);
+    }
+  }, [isOpen, fetchMakes]);
+
+  // Cargar modelos cuando cambie la marca
+  useEffect(() => {
+    if (formData.brand) {
+      fetchModels(formData.brand).then(setModels);
+    } else {
+      setModels([]);
+    }
+  }, [formData.brand, fetchModels]);
+
 
   // Si no está abierto, no renderizamos nada
   if (!isOpen) return null;
@@ -79,29 +101,23 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit }: VehicleModalProps) =
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="p-8 space-y-5 relative z-10">
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">Marca</label>
-              <input 
-                required
-                type="text" 
-                placeholder="Audi"
-                className="w-full bg-black/50 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-neutral-700"
-                value={formData.brand}
-                onChange={e => setFormData({...formData, brand: e.target.value})}
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">Modelo</label>
-              <input 
-                required
-                type="text" 
-                placeholder="A3 Sportback"
-                className="w-full bg-black/50 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:border-blue-500 focus:outline-none transition-all placeholder:text-neutral-700"
-                value={formData.model}
-                onChange={e => setFormData({...formData, model: e.target.value})}
-              />
-            </div>
+            <SearchableSelect 
+              label="Marca" 
+              placeholder="Seleccionar..." 
+              options={makes} 
+              value={formData.brand} 
+              onChange={val => setFormData({...formData, brand: val, model: ''})} 
+            />
+            <SearchableSelect 
+              label="Modelo" 
+              placeholder="Seleccionar..." 
+              options={models} 
+              value={formData.model} 
+              onChange={val => setFormData({...formData, model: val})} 
+              disabled={!formData.brand}
+            />
           </div>
+
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">

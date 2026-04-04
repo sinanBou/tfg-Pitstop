@@ -168,6 +168,29 @@ export const useClientDashboard = () => {
     }
   }, [loadDashboardData]);
 
+  const getCatalogMakes = useCallback(async (): Promise<string[]> => {
+    try {
+      const response = await fetchWithAuth('/vehicles/catalog/makes');
+      if (response.ok) return await response.json();
+      return [];
+    } catch (error) {
+      console.error("Error al obtener marcas:", error);
+      return [];
+    }
+  }, []);
+
+  const getCatalogModels = useCallback(async (make: string): Promise<string[]> => {
+    if (!make) return [];
+    try {
+      const response = await fetchWithAuth(`/vehicles/catalog/models/${make}`);
+      if (response.ok) return await response.json();
+      return [];
+    } catch (error) {
+      console.error("Error al obtener modelos:", error);
+      return [];
+    }
+  }, []);
+
   return {
     loading,
     userProfile,
@@ -179,7 +202,10 @@ export const useClientDashboard = () => {
     registerVehicle, 
     createAppointment,
     getAvailableSlots,
+    getCatalogMakes,
+    getCatalogModels,
     deleteAppointment,
     logout
   };
+
 };
