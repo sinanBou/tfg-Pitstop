@@ -1,6 +1,8 @@
 package org.tfg.backend.client;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.user.Role;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -55,18 +58,9 @@ public class ClientService {
     }
 
     @Transactional(readOnly = true)
-    public List<ClientSearchDTO> searchClients(String query) {
-        // Primero intentamos por NIF exacto
-        Optional<Client> byNif = clientRepository.findByNif(query);
-        if (byNif.isPresent()) {
-            return List.of(mapToSearchDTO(byNif.get()));
-        }
-
-        // Si no, por nombre/apellidos
-        return clientRepository.findByUserFirstnameContainingIgnoreCaseOrUserLastnameContainingIgnoreCase(query, query)
-                .stream()
-                .map(this::mapToSearchDTO)
-                .collect(Collectors.toList());
+    public Page<ClientSearchDTO> searchClientsPaginated(String query, int page, int size) {
+        return clientRepository.searchClients(query, PageRequest.of(page, size))
+                .map(this::mapToSearchDTO);
     }
 
     private ClientSearchDTO mapToSearchDTO(Client client) {

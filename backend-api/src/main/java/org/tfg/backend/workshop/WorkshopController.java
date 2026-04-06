@@ -1,6 +1,7 @@
 package org.tfg.backend.workshop;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +60,13 @@ public class WorkshopController {
             @PathVariable UUID id,
             @RequestBody WorkshopRequest request) {
         return ResponseEntity.ok(workshopService.updateWorkshopSettings(id, request));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<WorkshopDTO>> searchWorkshops(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(workshopService.searchWorkshops(query, page, size));
     }
 }

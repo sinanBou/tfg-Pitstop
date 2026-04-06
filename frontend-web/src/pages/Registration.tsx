@@ -1,31 +1,28 @@
 import { Link } from 'react-router-dom';
-import InputGroup from '../components/ui/InputGroup';
-import { useState } from 'react'; // Importamos useState
-import { useClientRegistration } from '../hooks/useClientRegistration'; // Importamos el hook de cliente
-import { useWorkshopRegistration } from '../hooks/useWorkshopRegistration'; // Importamos el hook de taller
-import { RoleSelector } from '../components/registration/RoleSelector';
+import InputGroup from '../components/common/Input/InputGroup';
+import { useState } from 'react';
+import { useClientRegistration } from '../hooks/useClientRegistration';
+import { useWorkshopRegistration } from '../hooks/useWorkshopRegistration';
+import { RoleSelector } from '../components/features/registration/RoleSelector';
+import AddressAutocomplete from '../components/common/AddressAutocomplete';
+
 export default function Registration() {
   const [role, setRole] = useState<'workshop' | 'client' | null>(null);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
-  // Inicializamos ambos hooks
   const clientReg = useClientRegistration();
   const workshopReg = useWorkshopRegistration();
 
-  // Determinamos qué estado de carga usar para el botón de envío
   const isLoading = role === 'client' ? clientReg.isLoading : workshopReg.isLoading;
 
-  // Función para manejar el envío del formulario de registro
   const handleRegistrationSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prevenimos el comportamiento por defecto del formulario
+    e.preventDefault();
 
     const newErrors: {[key: string]: string} = {};
     let isValid = true;
 
-    // Obtenemos los datos del formulario y el manejador de cambios del hook activo
     const currentFormData = role === 'client' ? clientReg.formData : workshopReg.formData;
 
-    // Validaciones comunes (nombre, apellidos, email, contraseña)
     if (!currentFormData.firstname) { newErrors.firstname = 'El nombre es obligatorio.'; isValid = false; }
     if (!currentFormData.lastname) { newErrors.lastname = 'Los apellidos son obligatorios.'; isValid = false; }
     if (!currentFormData.email) { newErrors.email = 'El correo electrónico es obligatorio.'; isValid = false; }
@@ -37,43 +34,35 @@ export default function Registration() {
       newErrors.password = 'Mín 8 car, 1 Mayús, 1 Núm.'; isValid = false;
     }
 
-    // Validaciones específicas según el rol
     if (role === 'client') {
-      const clientData = clientReg.formData; // Usamos los datos específicos del cliente
+      const clientData = clientReg.formData;
       if (!clientData.nif) { newErrors.nif = 'El DNI/NIF es obligatorio.'; isValid = false; }
       if (!clientData.phoneNumber) { newErrors.phoneNumber = 'El teléfono es obligatorio.'; isValid = false; }
-      // La dirección es opcional, no necesita validación aquí
     }
 
-    setErrors(newErrors); // Actualizamos el estado de errores
+    setErrors(newErrors);
 
     if (isValid) {
-      // Si la validación pasa, llamamos a la función de registro del hook correspondiente
       if (role === 'client') {
         await clientReg.registerClient(e);
       } else if (role === 'workshop') {
         await workshopReg.registerWorkshop(e);
       }
     }
-
-    // Validaciones de tiempo para taller fueron eliminadas ya que ahora se registran en el dashboard.
   };
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 relative bg-zinc-950 font-sans selection:bg-red-500/30 selection:text-white overflow-hidden">
       
-      {/* Fondo Glow Animado */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen animate-pulse z-0"></div>
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none z-0"></div>
 
       <div className="w-full max-w-4xl z-10">
         
-        {/* --- FASE 1: SELECCIÓN DE ROL --- */}
         {role === null && (
           <RoleSelector onSelectRole={setRole} />
         )}
 
-        {/* --- FASE 2: FORMULARIO --- */}
         {role !== null && (
           <div className="max-w-xl mx-auto animate-fade-in-up">
 
@@ -93,15 +82,23 @@ export default function Registration() {
 
               <form onSubmit={handleRegistrationSubmit} className="flex flex-col gap-6">
 
-                {/* --- CAMPOS PARA TALLER --- */}
                 {role === 'workshop' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <InputGroup label="Nombre" name="firstname" value={workshopReg.formData.firstname} onChange={workshopReg.handleChange} error={errors.firstname} placeholder="Juan" />
-                    <InputGroup label="Apellidos" name="lastname" value={workshopReg.formData.lastname} onChange={workshopReg.handleChange} error={errors.lastname} placeholder="Pérez" />
-                  </div>
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <InputGroup label="Nombre" name="firstname" value={workshopReg.formData.firstname} onChange={workshopReg.handleChange} error={errors.firstname} placeholder="Juan" />
+                      <InputGroup label="Apellidos" name="lastname" value={workshopReg.formData.lastname} onChange={workshopReg.handleChange} error={errors.lastname} placeholder="Pérez" />
+                    </div>
+                    <AddressAutocomplete 
+                        label="Dirección del Dueño" 
+                        name="address" 
+                        value={workshopReg.formData.address || ''} 
+                        onChange={(val: string) => workshopReg.handleChange({ target: { name: 'address', value: val } } as any)} 
+                        error={errors.address} 
+                        placeholder="Tu dirección personal..." 
+                    />
+                  </>
                 )}
 
-                {/* --- CAMPOS PARA CLIENTE --- */}
                 {role === 'client' && (
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -114,13 +111,18 @@ export default function Registration() {
                       <InputGroup label="Teléfono" name="phoneNumber" value={clientReg.formData.phoneNumber} onChange={clientReg.handleChange} error={errors.phoneNumber} placeholder="600123456" />
                     </div>
 
-                    <InputGroup label="Dirección (Opcional)" name="address" value={clientReg.formData.address} onChange={clientReg.handleChange} error={errors.address} placeholder="Madrid" />
+                    <AddressAutocomplete 
+                      label="Dirección (Opcional)" 
+                      name="address" 
+                      value={clientReg.formData.address || ''} 
+                      onChange={(val: string) => clientReg.handleChange({ target: { name: 'address', value: val } } as any)} 
+                      error={errors.address} 
+                      placeholder="Madrid, Calle..." 
+                    />
                   </>
                 )}
 
-                {/* --- CAMPOS COMUNES (Login) --- */}
                 <div className="border-t border-neutral-800/50 my-2 pt-6 flex flex-col gap-5 relative">
-                  
                   <InputGroup label="Correo Electrónico" name="email" type="email" value={role === 'client' ? clientReg.formData.email : workshopReg.formData.email} onChange={role === 'client' ? clientReg.handleChange : workshopReg.handleChange} error={errors.email} placeholder="tu@email.com" />
                   <InputGroup label="Contraseña" name="password" type="password" value={role === 'client' ? clientReg.formData.password : workshopReg.formData.password} onChange={role === 'client' ? clientReg.handleChange : workshopReg.handleChange} error={errors.password} placeholder="Mín 8 car, 1 Mayús, 1 Núm" />
                 </div>

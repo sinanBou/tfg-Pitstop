@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { useClientDashboard } from '../hooks/useClientDashboard';
-import { VehicleModal } from '../components/dashboard/client/vehicle/VehicleModal';
-import { AppointmentModal } from '../components/dashboard/client/appointments/AppoointmentModal';
-import { DashboardHeader } from '../components/dashboard/DashboardHeader';
-import { BottomNav } from '../components/dashboard/BottomNav';
-import { LoadingScreen } from '../components/dashboard/LoadingScreen';
-import { ClientOverviewTab } from '../components/dashboard/client/tabs/ClientOverviewTab';
-import { ClientVehiclesTab } from '../components/dashboard/client/tabs/ClientVehiclesTab';
-import { ClientAppointmentsTab } from '../components/dashboard/client/tabs/ClientAppointmentsTab';
-import { ClientHistoryTab } from '../components/dashboard/client/tabs/ClientHistoryTab';
+import { VehicleModal } from '../components/features/client/vehicle/VehicleModal';
+import { AppointmentModal } from '../components/features/client/appointments/AppointmentModal';
+import { DashboardHeader } from '../components/layout/DashboardHeader/index';
+import { BottomNav } from '../components/layout/BottomNav/index';
+import { LoadingScreen } from '../components/common/LoadingScreen/index';
+import { ClientOverviewTab } from '../components/features/client/ClientOverviewTab';
+import { ClientVehiclesTab } from '../components/features/client/ClientVehiclesTab';
+import { ClientAppointmentsTab } from '../components/features/client/ClientAppointmentsTab';
+import { ClientHistoryTab } from '../components/features/client/ClientHistoryTab';
 
 const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
 

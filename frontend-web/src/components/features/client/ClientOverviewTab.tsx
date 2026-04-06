@@ -1,6 +1,6 @@
 
 
-import type { UserDTO } from '../../../../types/client';
+import type { UserDTO } from '../../../types/client';
 
 interface ClientOverviewTabProps {
   vehicles: any[];

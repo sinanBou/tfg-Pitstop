@@ -1,11 +1,9 @@
 package org.tfg.backend.client;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.tfg.backend.user.User;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -27,8 +25,11 @@ public class ClientController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ClientSearchDTO>> search(@RequestParam String query) {
-        return ResponseEntity.ok(clientService.searchClients(query));
+    public ResponseEntity<Page<ClientSearchDTO>> search(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(clientService.searchClientsPaginated(query, page, size));
     }
 
     @PostMapping("/manual-register")

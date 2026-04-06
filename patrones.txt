@@ -1,0 +1,24 @@
+HISTORIAL DE PATRONES DE ARQUITECTURA - PITSTOP PRO
+
+1. REPOSITORY PATTERN (Frontend)
+   - Archivo: src/hooks/useVehicleCatalog.ts
+   - Propósito: Centraliza el acceso al catálogo de marcas y modelos (JSON externo) para que cualquier componente pueda consumirlo sin duplicar lógica de fetch o filtrado.
+
+2. FACADE PATTERN / CUSTOM HOOKS (Frontend)
+   - Archivos: src/hooks/useWorkshopAdmin.ts, src/hooks/useWorkerDashboard.ts, src/hooks/useOwnerDashboard.ts, src/hooks/useClientDashboard.ts
+   - Propósito: Oculta la complejidad de las llamadas a la API, el manejo de tokens JWT y la gestión de estados múltiples tras una interfaz simple de hooks. Permite que las páginas sean componentes de presentación puros.
+
+3. COMPOUND COMPONENTS (Frontend)
+   - Archivo: src/components/features/workshop/StaffAppointmentModal/index.tsx
+   - Propósito: El modal de citas se divide en sub-componentes (Step1, Step2, Step3) que comparten estado mediante el hook useStaffAppointment, permitiendo una orquestación limpia de flujos complejos multi-paso.
+
+4. CONTAINER / PRESENTER PATTERN (Frontend)
+   - Archivo: src/pages/WorkshopAdminDashboard.tsx + src/components/features/workshop/admin/tabs/
+   - Propósito: La página actúa como contenedor (Container) que obtiene datos del hook y los distribuye a componentes visuales puros (Presenters/Tabs) via props, aislando la UI de la lógica de negocio.
+
+5. ATOMIC DESIGN (Estructura de Carpetas)
+   - Archivo: src/components/common/, src/components/layout/
+   - Propósito: Organización jerárquica de componentes por responsabilidad (Átomos/Moléculas -> Layouts -> Features de Dominio).
+
+6. ADAPTER PATTERN (Backend - Simulado vía Hooks de Datos)
+   - Propósito: Las respuestas crudas de la API de marcas se adaptan al formato esperado por los componentes Select (SearchableSelect) mediante transformaciones en los hooks de catálogo.

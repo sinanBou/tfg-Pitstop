@@ -56,8 +56,9 @@ export interface AppointmentRequest {
 
 
 export interface WorkshopMinDTO {
-  id: string; // Cambiar de number a string para soportar UUID
+  id: string; 
   companyName: string;
+  cif?: string;
   address?: string;
   workingDays?: string;
 }

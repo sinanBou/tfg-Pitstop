@@ -16,4 +16,5 @@ public class AddEmployeeRequest {
     private String email;
     private String password;
     private Role role; // Permite mandar "WORKSHOP_STAFF" o "WORKSHOP_MANAGER"
+    private String address;
 }

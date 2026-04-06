@@ -1,0 +1,48 @@
+GUÍA DE ARQUITECTURA FRONTEND - PITSTOP PRO
+
+Este documento detalla la responsabilidad de cada carpeta y archivo clave tras la refactorización modular.
+
+--- ESTRUCTURA DE COMPONENTES (src/components) ---
+
+1. common/ (COMPONENTES ATÓMICOS)
+   - Button/: Botones con estilos predefinidos y efectos premium.
+   - Card/: Contenedores genéricos con glassmorphism (ej: FeatureCard).
+   - Icons/: Centralización de todos los SVGs del sistema para evitar duplicación.
+   - Input/: Grupos de entrada de datos (ej: InputGroup) con validación visual.
+   - LoadingScreen/: Pantallas de carga con marca animada para cada rol.
+   - SearchableSelect/: Selector inteligente con búsqueda en tiempo real para catálogos.
+
+2. layout/ (ESTRUCTURA GLOBAL)
+   - BottomNav/: Navegación inferior flotante, adaptativa al rol del usuario.
+   - DashboardHeader/: Cabecera principal con logo de PitStop y logout.
+   - HomeHeader/: Navegación para la landing page pública.
+
+3. features/ (LÓGICA DE DOMINIO)
+   - client/:
+     - ClientOverviewTab.tsx: Resumen del estado actual (coche en taller, próximas citas).
+     - ClientVehiclesTab.tsx: Listado de flota del cliente.
+     - ClientAppointmentsTab.tsx: Gestión de citas activas.
+     - vehicle/VehicleModal.tsx: Formulario complejo de alta de vehículo.
+   - workshop/
+     - admin/tabs/: Las 5 pestañas del panel de administración modularizadas.
+     - StaffAppointmentModal/: El componente más complejo de la app. Implementa el flujo guiado de 3 pasos para citas presenciales.
+     - WorkshopCreationModal.tsx: Modal para que el Owner dé de alta nuevos talleres.
+   - home/
+     - HeroSection.tsx: Primer impacto visual con mockup animado.
+     - FeaturesSection.tsx: Cuadrícula Bento con las ventajas del sistema.
+   - registration/
+     - RoleSelector.tsx: Selección visual de perfil (Taller o Conductor).
+
+--- LÓGICA DE NEGOCIO (src/hooks) ---
+
+- useWorkshopAdmin.ts: Cerebro del panel de control del taller. Maneja empleados, citas, calendario y ajustes.
+- useClientDashboard.ts: Orquestador de la experiencia del conductor.
+- useWorkerDashboard.ts: Lógica reducida para mecánicos centrada en su agenda diaria.
+- useVehicleCatalog.ts: Repositorio central de marcas y modelos para evitar redundancia de datos.
+- useStaffAppointment.ts: Facade para el flujo de alta de citas presenciales (peticiones API, validación de slots).
+
+--- OTROS ---
+
+- src/pages/: Actúan como coordinadores (Containers) que ensamblan los Custom Hooks con los componentes de la carpeta 'features'.
+- src/config/api.ts: Único punto de verdad para la URL base de la API backend.
+- src/types/: Definiciones de TypeScript compartidas para garantizar la integridad de datos entre el front y el back.

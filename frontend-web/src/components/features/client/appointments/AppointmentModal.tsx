@@ -4,6 +4,7 @@ import {
   type AppointmentRequest, 
   type WorkshopMinDTO 
 } from '../../../../types/client';
+import { API_BASE_URL } from '../../../../config/api';
 
 interface AppointmentModalProps {
   isOpen: boolean;
@@ -37,6 +38,47 @@ export const AppointmentModal = ({
     serviceType: '',
     description: ''
   });
+
+  // ESTADOS PARA BÚSQUEDA PAGINADA
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState<WorkshopMinDTO[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+
+  // EFECTO DE BÚSQUEDA CON DEBOUNCE
+  useEffect(() => {
+    if (step !== 2) return;
+
+    const delayDebounceFn = setTimeout(() => {
+      searchWorkshops(0, true);
+    }, 300);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, step]);
+
+  const searchWorkshops = async (pageIdx: number, isNewSearch: boolean) => {
+    setIsSearching(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const res = await fetch(
+        `${API_BASE_URL}/workshops/search?query=${encodeURIComponent(searchTerm)}&page=${pageIdx}&size=5`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      
+      if (res.ok) {
+        const data = await res.json();
+        const newResults = data.content;
+        setSearchResults(prev => isNewSearch ? newResults : [...prev, ...newResults]);
+        setHasMore(!data.last);
+        setCurrentPage(pageIdx);
+      }
+    } catch (err) {
+      console.error("Error buscando talleres:", err);
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   useEffect(() => {
     if (formData.workshopId && formData.date && step === 3) {
@@ -179,11 +221,24 @@ export const AppointmentModal = ({
               </div>
             )}
 
-            {/* PASO 2: SELECCIÓN DE TALLER */}
+            {/* PASO 2: SELECCIÓN DE TALLER (CON PAGINACIÓN EN SERVIDOR) */}
             {step === 2 && (
               <div className="animate-in fade-in slide-in-from-right-8 duration-500 flex-1 flex flex-col">
-                <div className="grid gap-3 flex-1 overflow-y-auto pr-1">
-                  {workshops.map(w => (
+                {/* BARRA DE BÚSQUEDA */}
+                <div className="relative mb-6">
+                  <input 
+                    type="text"
+                    autoFocus
+                    placeholder="Busca por nombre, CIF o dirección..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-white focus:outline-none focus:border-amber-600/50 focus:bg-black transition-all placeholder-neutral-600"
+                  />
+                  <svg className="w-5 h-5 text-neutral-600 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                </div>
+
+                <div className="grid gap-3 flex-1 overflow-y-auto pr-1 max-h-[350px] custom-scrollbar scroll-smooth">
+                  {searchResults.map(w => (
                     <button 
                       key={w.id}
                       onClick={() => { setFormData({...formData, workshopId: w.id}); nextStep(); }}
@@ -195,23 +250,43 @@ export const AppointmentModal = ({
                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
                       </div>
                       <div className="flex-1">
-                        <p className="text-lg text-white font-black uppercase tracking-wide group-hover:text-amber-400 transition-colors mb-1">{w.companyName}</p>
-                        {w.address ? (
+                        <div className="flex justify-between items-start mb-1">
+                           <p className="text-lg text-white font-black uppercase tracking-wide group-hover:text-amber-400 transition-colors">{w.companyName}</p>
+                           {w.cif && <span className="text-[9px] font-mono text-neutral-600 bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800">{w.cif}</span>}
+                        </div>
+                        {w.address && (
                            <p className="text-xs text-neutral-400 font-mono tracking-tight flex items-center gap-1.5 mb-2">
                              <svg className="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                              {w.address}
                            </p>
-                        ) : (
-                           <p className="text-xs text-neutral-500 font-mono tracking-tight flex items-center gap-1.5 mb-2">
-                             <svg className="w-3.5 h-3.5 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                             Dirección no disponible
-                           </p>
                         )}
-                        <p className="text-[10px] text-amber-500/60 font-black mt-0.5 uppercase tracking-widest inline-block px-2 py-1 bg-amber-500/10 rounded-md">Centro Autorizado</p>
                       </div>
                     </button>
                   ))}
+
+                  {isSearching && (
+                    <div className="py-8 flex flex-col items-center gap-2 opacity-50">
+                       <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
+                       <p className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-500">Buscando...</p>
+                    </div>
+                  )}
+
+                  {!isSearching && hasMore && searchResults.length > 0 && (
+                    <button 
+                      onClick={() => searchWorkshops(currentPage + 1, false)}
+                      className="w-full py-4 bg-neutral-900/50 hover:bg-neutral-900 border border-neutral-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:text-white transition-all shadow-sm"
+                    >
+                      Cargar más talleres
+                    </button>
+                  )}
+
+                  {!isSearching && searchResults.length === 0 && (
+                    <div className="py-12 text-center border-2 border-dashed border-neutral-800 rounded-3xl bg-neutral-900/20">
+                       <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest animate-pulse">Sin resultados</p>
+                    </div>
+                  )}
                 </div>
+
                 <div className="mt-8 pt-4 border-t border-neutral-800 flex justify-start">
                    <button onClick={prevStep} className="flex items-center gap-2 text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white transition-colors group">
                       <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>

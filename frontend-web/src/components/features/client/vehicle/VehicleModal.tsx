@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { type VehicleRequest } from '../../../../types/client.ts';
-import { SearchableSelect } from '../../../common/SearchableSelect';
+import { SearchableSelect } from '../../../common/SearchableSelect/index';
 
 // 1. Definimos una interfaz clara para las props del Modal
 interface VehicleModalProps {

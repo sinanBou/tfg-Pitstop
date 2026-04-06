@@ -1,7 +1,7 @@
 
 import { Link } from 'react-router-dom';
 import { useLogin } from '../hooks/useLogin'; 
-import InputGroup from '../components/ui/InputGroup'; 
+import InputGroup from '../components/common/Input/InputGroup'; 
 
 function Login() {
   const { formData, errors, isLoading, handleChange, handleLogin } = useLogin();

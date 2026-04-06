@@ -64,6 +64,7 @@ public class EmployeService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
+                .address(request.getAddress())
                 .build();
         userRepository.save(user);
 
@@ -72,6 +73,20 @@ public class EmployeService {
                 .workshop(workshop)
                 .build();
         employeeRepository.save(employee);
+    }
+
+    @Transactional
+    public void deleteEmployee(java.util.UUID employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+
+        User user = employee.getUser();
+        
+        // Eliminamos al empleado y al usuario asociado (Limpieza total)
+        employeeRepository.delete(employee);
+        if (user != null) {
+            userRepository.delete(user);
+        }
     }
 
     public EmployeeDTO mapToDTO(Employee employee) {
@@ -83,6 +98,7 @@ public class EmployeService {
                 .role(employee.getUser().getRole().name())
                 .workshopId(employee.getWorkshop() != null ? employee.getWorkshop().getId() : null)
                 .workshopName(employee.getWorkshop() != null ? employee.getWorkshop().getCompanyName() : "Sin taller")
+                .address(employee.getUser().getAddress())
                 .build();
     }
 }

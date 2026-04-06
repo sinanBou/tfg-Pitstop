@@ -1,6 +1,8 @@
 package org.tfg.backend.workshop;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.employee.Employee;
@@ -65,6 +67,12 @@ public class WorkshopService {
                 .stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<WorkshopDTO> searchWorkshops(String query, int page, int size) {
+        return workshopRepository.searchWorkshops(query, PageRequest.of(page, size))
+                .map(this::mapToDTO);
     }
 
     /**

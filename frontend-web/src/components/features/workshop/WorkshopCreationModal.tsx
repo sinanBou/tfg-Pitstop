@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import AddressAutocomplete from '../../common/AddressAutocomplete';
 
 const API_URL = 'http://localhost:9091/api';
 
@@ -150,8 +151,13 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
                   </div>
 
                   <div className="space-y-2">
-                     <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">Sede Física (Dirección) *</label>
-                     <input type="text" required value={form.address} onChange={e => setForm({...form, address: e.target.value})} className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-bold placeholder-neutral-700" placeholder="C/ Gran Vía 12, Madrid" />
+                     <AddressAutocomplete 
+                        label="Sede Física (Dirección) *" 
+                        name="address" 
+                        value={form.address} 
+                        onChange={(val: string) => setForm({...form, address: val})} 
+                        placeholder="Calle, Número, Ciudad..." 
+                     />
                   </div>
 
                   <div className="space-y-3">

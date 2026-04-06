@@ -28,13 +28,23 @@ public class EmployeeController {
         return ResponseEntity.ok(employeService.getEmployeesByWorkshopId(workshopId));
     }
 
-    @org.springframework.web.bind.annotation.PostMapping("/workshop/{workshopId}")
+    @org.springframework.web.bind.annotation.PostMapping("/register/{workshopId}")
     public ResponseEntity<String> addEmployeeToWorkshop(
             @org.springframework.web.bind.annotation.PathVariable java.util.UUID workshopId,
             @org.springframework.web.bind.annotation.RequestBody AddEmployeeRequest request) {
         try {
             employeService.addEmployeeToWorkshop(workshopId, request);
             return ResponseEntity.ok("Empleado añadido con éxito");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEmployee(@org.springframework.web.bind.annotation.PathVariable java.util.UUID id) {
+        try {
+            employeService.deleteEmployee(id);
+            return ResponseEntity.ok("Empleado eliminado con éxito");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

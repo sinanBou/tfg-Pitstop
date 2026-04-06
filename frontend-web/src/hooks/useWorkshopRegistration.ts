@@ -11,6 +11,7 @@ export function useWorkshopRegistration() {
     lastname: '',
     email: '',
     password: '',
+    address: '',
   });
 
   /**
