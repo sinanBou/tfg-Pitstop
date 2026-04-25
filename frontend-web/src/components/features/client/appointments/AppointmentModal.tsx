@@ -13,6 +13,7 @@ interface AppointmentModalProps {
   workshops: WorkshopMinDTO[];
   onSubmit: (data: AppointmentRequest) => Promise<boolean>;
   fetchSlots: (workshopId: string, date: string) => Promise<string[]>;
+  existingAppointments?: any[];
 }
 
 export const AppointmentModal = ({ 
@@ -21,10 +22,12 @@ export const AppointmentModal = ({
   vehicles, 
   workshops, 
   onSubmit, 
-  fetchSlots 
+  fetchSlots,
+  existingAppointments = [] 
 }: AppointmentModalProps) => {
   const [step, setStep] = useState(1);
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
   
   // Estado para el mes actual del calendario personalizado
@@ -45,6 +48,15 @@ export const AppointmentModal = ({
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  
+  const checkDuplicate = (vId: string, wId: string) => {
+    return (existingAppointments as any[]).some((app: any) => 
+      app.vehicleId && app.workshopId &&
+      String(app.vehicleId) === String(vId) && 
+      String(app.workshopId) === String(wId) &&
+      app.status !== 'CANCELLED'
+    );
+  };
 
   // EFECTO DE BÚSQUEDA CON DEBOUNCE
   useEffect(() => {
@@ -115,13 +127,32 @@ export const AppointmentModal = ({
 
   if (!isOpen) return null;
 
-  const nextStep = () => setStep(prev => prev + 1);
-  const prevStep = () => setStep(prev => prev - 1);
+  const nextStep = () => {
+    setError(null);
+    if (step === 2) {
+      if (checkDuplicate(formData.vehicleId, formData.workshopId)) {
+        setError("Ya tienes una cita asignada para este taller con este vehículo.");
+        return;
+      }
+    }
+    setStep(prev => prev + 1);
+  };
+  const prevStep = () => {
+    setError(null);
+    setStep(prev => prev - 1);
+  };
 
   const handleFinish = async () => {
+    setError(null);
+    if (checkDuplicate(formData.vehicleId, formData.workshopId)) {
+      setError("Ya tienes una cita asignada para este taller con este vehículo.");
+      setStep(2);
+      return;
+    }
     const success = await onSubmit(formData);
     if (success) {
       setStep(1);
+      setError(null);
       setAvailableSlots([]);
       setFormData({
         vehicleId: '', workshopId: '', date: '', 
@@ -169,6 +200,12 @@ export const AppointmentModal = ({
         </div>
 
         <div className="p-8 relative">
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
+              <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <p className="text-xs text-red-400 font-bold uppercase tracking-tight leading-tight">{error}</p>
+            </div>
+          )}
           {/* Fondo decorativo interno */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden">
              <div className="absolute -top-[40%] -right-[40%] w-full h-full bg-red-600/5 blur-[100px] rounded-full mix-blend-screen"></div>

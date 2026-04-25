@@ -17,6 +17,12 @@ public class AppointmentDTO {
     private LocalDateTime dateTime;
     private String description;
     private String serviceType;
+    private AppointmentStatus status;
+
+    // Control de tiempos
+    private Integer estimatedDuration;
+    private LocalDateTime actualStartTime;
+    private LocalDateTime actualEndTime;
 
     // Información del Cliente
     private String clientFullName;
@@ -28,4 +34,8 @@ public class AppointmentDTO {
     // Información del Taller
     private UUID workshopId;
     private String workshopName;
+
+    // Información del Empleado Asignado
+    private UUID assignedEmployeeId;
+    private String assignedEmployeeName;
 }

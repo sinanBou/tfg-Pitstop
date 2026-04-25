@@ -54,6 +54,32 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAppointmentsByWorkshop(workshopId));
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<String> updateStatus(
+            @PathVariable UUID id,
+            @RequestParam AppointmentStatus status) {
+        appointmentService.updateAppointmentStatus(id, status);
+        return ResponseEntity.ok("Estado actualizado: " + status);
+    }
+
+    @PatchMapping("/{id}/assign")
+    public ResponseEntity<String> assignEmployee(
+            @PathVariable UUID id,
+            @RequestParam(required = false) UUID employeeId) {
+        appointmentService.assignAppointment(id, employeeId);
+        return ResponseEntity.ok("Empleado asignado");
+    }
+
+    @PatchMapping("/{id}/reschedule")
+    public ResponseEntity<String> rescheduleAppointment(
+            @PathVariable UUID id,
+            @RequestParam(required = false) UUID employeeId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) java.time.LocalDateTime dateTime,
+            @RequestParam(required = false) Integer duration) {
+        appointmentService.rescheduleAppointment(id, employeeId, dateTime, duration);
+        return ResponseEntity.ok("Cita re-programada");
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {

@@ -68,7 +68,7 @@ export const useClientDashboard = () => {
             date: datePart,
             time: timePart ? timePart.substring(0, 5) : '',
             serviceType: app.serviceType || app.description,
-            status: app.status || 'CONFIRMADA'
+            status: app.status || 'CONFIRMED'
           };
         });
         setAppointments(formattedApps);

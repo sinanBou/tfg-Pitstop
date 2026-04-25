@@ -25,12 +25,11 @@ export default function OwnerDashboard() {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen animate-pulse pointer-events-none"></div>
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-neutral-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen animate-[pulse_4s_infinite] pointer-events-none"></div>
 
-      {/* Top Header */}
+      {/* Main Content Area */}
       <DashboardHeader type="workshop" />
 
-      {/* --- CONTENT AREA --- */}
-      <main className="flex-1 p-6 md:p-12 overflow-y-auto relative z-10 scrollbar-hide">
-         <div className="max-w-6xl mx-auto space-y-12 animate-fade-in-up">
+      <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
+        <div className="max-w-6xl mx-auto p-6 md:p-12 space-y-12 animate-fade-in-up">
             <header className="flex justify-between items-end border-b border-neutral-800/60 pb-6 mb-8">
                <div>
                   <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">

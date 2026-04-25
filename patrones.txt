@@ -1,24 +1,45 @@
-HISTORIAL DE PATRONES DE ARQUITECTURA - PITSTOP PRO
+======================================================================
+PITSTOP SOFTWARE ARCHITECTURE - DESIGN PATTERNS LOG
+======================================================================
 
-1. REPOSITORY PATTERN (Frontend)
-   - Archivo: src/hooks/useVehicleCatalog.ts
-   - Propósito: Centraliza el acceso al catálogo de marcas y modelos (JSON externo) para que cualquier componente pueda consumirlo sin duplicar lógica de fetch o filtrado.
+1.  REPOSITORY PATTERN (Backend - Spring Data JPA)
+    - Implementado en: EmployeeRepository, UserRepository, WorkshopRepository.
+    - Propósito: Abstracción total de la capa de datos. Permite cambiar el motor 
+      de BD sin afectar la lógica de negocio. Se han añadido consultas personalizadas 
+      (JPQL) para búsquedas avanzadas con paginación.
 
-2. FACADE PATTERN / CUSTOM HOOKS (Frontend)
-   - Archivos: src/hooks/useWorkshopAdmin.ts, src/hooks/useWorkerDashboard.ts, src/hooks/useOwnerDashboard.ts, src/hooks/useClientDashboard.ts
-   - Propósito: Oculta la complejidad de las llamadas a la API, el manejo de tokens JWT y la gestión de estados múltiples tras una interfaz simple de hooks. Permite que las páginas sean componentes de presentación puros.
+2.  SERVICE LAYER / BUSINESS LOGIC (Backend)
+    - Implementado en: EmployeService, WorkshopService.
+    - Propósito: Encapsulamiento de la lógica de negocio pura. Garantiza que los 
+      controladores solo manejen la comunicación HTTP, delegando la complejidad 
+      de las transacciones (@Transactional) y validaciones al servicio.
 
-3. COMPOUND COMPONENTS (Frontend)
-   - Archivo: src/components/features/workshop/StaffAppointmentModal/index.tsx
-   - Propósito: El modal de citas se divide en sub-componentes (Step1, Step2, Step3) que comparten estado mediante el hook useStaffAppointment, permitiendo una orquestación limpia de flujos complejos multi-paso.
+3.  DATA TRANSFER OBJECT (DTO) PATTERN
+    - Implementado en: EmployeeDTO, AddEmployeeRequest.
+    - Propósito: Desacoplamiento de las entidades de base de datos del contrato 
+      con el frontend. Permite enviar solo los datos necesarios y proteger la 
+      estructura interna de la base de datos (seguridad y rendimiento).
 
-4. CONTAINER / PRESENTER PATTERN (Frontend)
-   - Archivo: src/pages/WorkshopAdminDashboard.tsx + src/components/features/workshop/admin/tabs/
-   - Propósito: La página actúa como contenedor (Container) que obtiene datos del hook y los distribuye a componentes visuales puros (Presenters/Tabs) via props, aislando la UI de la lógica de negocio.
+4.  FACADE / CUSTOM HOOKS (Frontend - React)
+    - Implementado en: useWorkshopAdmin, useStaffAppointment.
+    - Propósito: Actúan como una "fachada" que simplifica la interacción de los 
+      componentes con la API. Los componentes (TeamTab, OverviewTab) no saben 
+      CÓMO se obtienen los datos, solo los consumen.
 
-5. ATOMIC DESIGN (Estructura de Carpetas)
-   - Archivo: src/components/common/, src/components/layout/
-   - Propósito: Organización jerárquica de componentes por responsabilidad (Átomos/Moléculas -> Layouts -> Features de Dominio).
+5.  BUILDER PATTERN (Lombok & Java)
+    - Implementado en: Construcción de entidades User y Employee.
+    - Propósito: Creación fluida y legible de objetos complejos. Especialmente útil 
+      en el registro de empleados para manejar múltiples atributos opcionales 
+      como 'address' de forma limpia.
 
-6. ADAPTER PATTERN (Backend - Simulado vía Hooks de Datos)
-   - Propósito: Las respuestas crudas de la API de marcas se adaptan al formato esperado por los componentes Select (SearchableSelect) mediante transformaciones en los hooks de catálogo.
+6.  ROLE-BASED ACCESS CONTROL (RBAC) / STRATEGY
+    - Implementado en: EmployeeController, TeamTab (Lógica de ascenso).
+    - Propósito: Estrategia de seguridad donde las acciones disponibles (borrar, 
+      ascender) cambian dinámicamente según el rol del usuario autenticado 
+      (OWNER vs MANAGER vs STAFF).
+
+7.  DEBOUNCING PATTERN (Event Handling)
+    - Implementado en: Búsqueda de clientes en el modal de citas.
+    - Propósito: Optimización de red para prevenir inundaciones de peticiones 
+      al servidor mientras el usuario escribe, mejorando drásticamente el rendimiento.
+

@@ -27,8 +27,14 @@ export default function AddressAutocomplete({ label, value, onChange, error, pla
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    if (addr.suggestions.length > 0) {
+      setIsOpen(true);
+    }
+  }, [addr.suggestions]);
+
   return (
-    <div className="w-full relative group" ref={containerRef}>
+    <div className="w-full relative group z-50" ref={containerRef}>
       <label className="block text-neutral-400 text-[10px] font-black uppercase tracking-widest mb-1.5 ml-1 group-hover:text-neutral-300">
         {label}
       </label>

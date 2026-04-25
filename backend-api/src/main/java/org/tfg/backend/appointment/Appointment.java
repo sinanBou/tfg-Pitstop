@@ -5,6 +5,7 @@ import lombok.*;
 import org.tfg.backend.client.Client;
 import org.tfg.backend.vehicle.Vehicle;
 import org.tfg.backend.workshop.Workshop;
+import org.tfg.backend.employee.Employee;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,13 +21,26 @@ public class Appointment {
     private UUID id;
 
     @Column(nullable = false)
-    private LocalDateTime dateTime; // Almacena fecha y hora #@
+    private LocalDateTime dateTime;
 
     @Column(nullable = false)
-    private String description; // El "motivo" detallado de la cita
+    private String description;
 
     @Column(name = "service_type")
-    private String serviceType; // El "título" corto de la cita
+    private String serviceType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private AppointmentStatus status = AppointmentStatus.PENDING;
+
+    @Column(name = "estimated_duration")
+    private Integer estimatedDuration; // Tiempo previsto en minutos
+
+    @Column(name = "actual_start_time")
+    private LocalDateTime actualStartTime;
+
+    @Column(name = "actual_end_time")
+    private LocalDateTime actualEndTime;
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
@@ -39,4 +53,8 @@ public class Appointment {
     @ManyToOne
     @JoinColumn(name = "workshop_id", nullable = false)
     private Workshop workshop;
+
+    @ManyToOne
+    @JoinColumn(name = "assigned_employee_id")
+    private Employee assignedEmployee;
 }

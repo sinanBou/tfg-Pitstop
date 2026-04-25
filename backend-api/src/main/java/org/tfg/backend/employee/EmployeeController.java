@@ -49,4 +49,24 @@ public class EmployeeController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @org.springframework.web.bind.annotation.PutMapping("/{id}/promote")
+    public ResponseEntity<String> promoteToManager(@org.springframework.web.bind.annotation.PathVariable java.util.UUID id) {
+        try {
+            employeService.promoteToManager(id);
+            return ResponseEntity.ok("Empleado ascendido a Gerente");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/{id}/demote")
+    public ResponseEntity<String> demoteToStaff(@org.springframework.web.bind.annotation.PathVariable java.util.UUID id) {
+        try {
+            employeService.demoteToStaff(id);
+            return ResponseEntity.ok("Empleado degradado a Mecánico");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

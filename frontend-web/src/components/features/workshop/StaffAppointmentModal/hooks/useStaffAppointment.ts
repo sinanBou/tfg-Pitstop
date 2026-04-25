@@ -60,12 +60,15 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     date: '',
     time: '',
     serviceType: '',
-    description: ''
+    description: '',
+    estimatedDuration: 60,
+    assignedEmployeeId: ''
   });
 
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [viewDate, setViewDate] = useState(new Date());
   const [workshopSettings, setWorkshopSettings] = useState<any>(null);
+  const [employees, setEmployees] = useState<any[]>([]);
 
   // Catalog state
   const [makes, setMakes] = useState<string[]>([]);
@@ -74,12 +77,22 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
   useEffect(() => {
     if (isOpen && workshopId) {
       const token = localStorage.getItem('jwt_token');
+      
+      // Fetch workshop settings
       fetch(`${API_BASE_URL}/workshops/${workshopId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       .then(res => res.json())
       .then(data => setWorkshopSettings(data))
       .catch(err => console.error("Error fetching workshop settings:", err));
+
+      // Fetch employees for assignment
+      fetch(`${API_BASE_URL}/employees/workshop/${workshopId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => setEmployees(data))
+      .catch(err => console.error("Error fetching employees:", err));
     }
   }, [isOpen, workshopId]);
 
@@ -260,7 +273,9 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
           vehicleId: selectedVehicle.id,
           dateTime,
           serviceType: appointmentForm.serviceType,
-          description: appointmentForm.description
+          description: appointmentForm.description,
+          estimatedDuration: appointmentForm.estimatedDuration,
+          assignedEmployeeId: appointmentForm.assignedEmployeeId || null
         })
       });
 
@@ -289,6 +304,14 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     setModels([]);
     setAvailableSlots([]);
     setClientForm({ firstname: '', lastname: '', nif: '', phoneNumber: '', email: '' });
+    setAppointmentForm({
+      date: '',
+      time: '',
+      serviceType: '',
+      description: '',
+      estimatedDuration: 60,
+      assignedEmployeeId: ''
+    });
   };
 
   return {
@@ -310,6 +333,7 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     workshopSettings,
     makes,
     models,
+    employees,
     handleSearch,
     handleSelectClient,
     handleSelectVehicle,

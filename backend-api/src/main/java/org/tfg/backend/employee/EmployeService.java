@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.tfg.backend.workshop.WorkshopRepository;
 import org.tfg.backend.workshop.Workshop;
+import org.tfg.backend.appointment.Appointment;
+import org.tfg.backend.appointment.AppointmentRepository;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +23,7 @@ public class EmployeService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final WorkshopRepository workshopRepository;
+    private final AppointmentRepository appointmentRepository;
 
     /**
      * Obtiene el perfil del empleado logueado.
@@ -80,12 +83,45 @@ public class EmployeService {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
+        // Preparamos citas asociadas para evitar el DataIntegrityViolation
+        List<Appointment> asigAppointments = appointmentRepository.findByAssignedEmployeeId(employeeId);
+        if (!asigAppointments.isEmpty()) {
+            for (Appointment app : asigAppointments) {
+                app.setAssignedEmployee(null);
+            }
+            appointmentRepository.saveAll(asigAppointments);
+        }
+
         User user = employee.getUser();
         
         // Eliminamos al empleado y al usuario asociado (Limpieza total)
         employeeRepository.delete(employee);
         if (user != null) {
             userRepository.delete(user);
+        }
+    }
+
+    @Transactional
+    public void promoteToManager(java.util.UUID employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+        
+        User user = employee.getUser();
+        if (user != null) {
+            user.setRole(org.tfg.backend.user.Role.WORKSHOP_MANAGER);
+            userRepository.save(user);
+        }
+    }
+
+    @Transactional
+    public void demoteToStaff(java.util.UUID employeeId) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+        
+        User user = employee.getUser();
+        if (user != null) {
+            user.setRole(org.tfg.backend.user.Role.WORKSHOP_STAFF);
+            userRepository.save(user);
         }
     }
 

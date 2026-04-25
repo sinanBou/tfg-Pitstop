@@ -6,11 +6,14 @@ interface TeamTabProps {
   setEmployeeForm: (f: any) => void;
   onSubmit: (e: React.FormEvent) => void;
   onDelete: (id: string) => void;
+  onPromote: (id: string) => void;
+  onDemote: (id: string) => void;
   employees: any[];
 }
 
-export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm, onSubmit, onDelete, employees }) => {
+export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm, onSubmit, onDelete, onPromote, onDemote, employees }) => {
   const [selectedEmp, setSelectedEmp] = React.useState<any>(null);
+  const userRole = localStorage.getItem('role');
 
   return (
     <div className="space-y-10 relative">
@@ -18,7 +21,6 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
       {selectedEmp && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
            <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] p-10 relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 overflow-hidden">
-              {/* Decoración de Fondo */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
 
               <button 
@@ -50,26 +52,45 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                        <p className="text-[10px] font-black uppercase tracking-widest text-neutral-600 italic">Dirección de Residencia</p>
                        <p className="text-sm font-bold text-neutral-300 leading-relaxed">{selectedEmp.address || 'No especificada'}</p>
                     </div>
-
-                    <div className="bg-black/40 border border-neutral-800 p-6 rounded-3xl text-left space-y-2">
-                       <p className="text-[10px] font-black uppercase tracking-widest text-neutral-600 italic">Identificador de Empleado</p>
-                       <p className="text-[10px] font-mono text-neutral-500">{selectedEmp.id}</p>
-                    </div>
                  </div>
 
-                 <button 
-                   onClick={() => { onDelete(selectedEmp.id); setSelectedEmp(null); }}
-                   className="mt-6 px-10 py-5 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all w-full md:w-auto"
-                 >
-                   Dar de baja permanente
-                 </button>
+                 <div className="w-full flex flex-col gap-3 mt-6">
+                    {/* Botón de Ascenso (Solo Dueño y si el empleado es mecánico) */}
+                    {userRole === 'WORKSHOP_OWNER' && selectedEmp.role === 'WORKSHOP_STAFF' && (
+                       <button 
+                         onClick={() => { onPromote(selectedEmp.id); setSelectedEmp(null); }}
+                         className="flex items-center justify-center gap-2 px-8 py-5 bg-white text-black hover:bg-neutral-200 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95"
+                       >
+                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 11l7-7 7 7M5 19l7-7 7 7" /></svg>
+                         Ascender a Gerente
+                       </button>
+                    )}
+
+                    {/* Botón de Degradación (Solo Dueño y si el empleado es Gerente) */}
+                    {userRole === 'WORKSHOP_OWNER' && selectedEmp.role === 'WORKSHOP_MANAGER' && (
+                       <button 
+                         onClick={() => { onDemote(selectedEmp.id); setSelectedEmp(null); }}
+                         className="flex items-center justify-center gap-2 px-8 py-5 bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95"
+                       >
+                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 13l-7 7-7-7M19 5l-7 7-7-7" /></svg>
+                         Degradar a Mecánico
+                       </button>
+                    )}
+
+                    <button 
+                      onClick={() => { onDelete(selectedEmp.id); setSelectedEmp(null); }}
+                      className="px-8 py-5 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+                    >
+                      Dar de baja permanente
+                    </button>
+                 </div>
               </div>
            </div>
         </div>
       )}
 
-      {/* FORMULARIO DE ALTA */}
-      <div className="bg-neutral-900/20 border border-neutral-800 p-10 rounded-[2.5rem] backdrop-blur-sm shadow-xl relative z-10 transition-opacity duration-300">
+      {/* FORMULARIO DE ALTA (Igual que antes) */}
+      <div className="bg-neutral-900/20 border border-neutral-800 p-10 rounded-[2.5rem] backdrop-blur-sm shadow-xl relative z-50">
         <h3 className="text-xl font-black uppercase tracking-widest text-white mb-8 flex items-center gap-3">
           <div className="p-2 bg-red-600/10 rounded-lg">
             <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
@@ -97,10 +118,16 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">Contraseña de Acceso</label>
-              <input required type="password" value={employeeForm.password} onChange={e => setEmployeeForm({...employeeForm, password: e.target.value})} className="w-full bg-black/40 border border-neutral-800 rounded-2xl px-5 py-4 text-white focus:border-red-600 outline-none transition-all font-bold placeholder:text-neutral-700" placeholder="••••••••" />
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">Contraseña Inicial</label>
+              <div className="relative group">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-red-500 transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                </div>
+                <input required type="text" value={employeeForm.password} onChange={e => setEmployeeForm({...employeeForm, password: e.target.value})} className="w-full bg-black/40 border border-neutral-800 rounded-2xl pl-12 pr-5 py-4 text-white focus:border-red-600 outline-none transition-all font-bold placeholder:text-neutral-700" placeholder="Contraseña de acceso" />
+              </div>
             </div>
-            <div className="space-y-2 md:col-span-2">
+            
+            <div className="md:col-span-2 space-y-2 mt-2">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-500 ml-1">Rango Organizativo</label>
               <div className="grid grid-cols-2 gap-4">
                 <button 
@@ -135,7 +162,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
         </form>
       </div>
 
-      {/* PLANTILLA ACTUAL */}
+      {/* PLANTILLA ACTUAL (Tarjetas Limpias) */}
       <div>
         <div className="flex items-center justify-between mb-8 px-2">
           <h3 className="text-sm font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
@@ -151,7 +178,6 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
               onClick={() => setSelectedEmp(emp)}
               className="group relative bg-neutral-900/40 border border-neutral-800 p-8 rounded-[2.5rem] hover:bg-neutral-900/60 hover:border-neutral-600 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl overflow-hidden"
             >
-              {/* Decoración de Hover */}
               <div className="absolute top-0 right-0 w-2 h-full bg-red-600 translate-x-full group-hover:translate-x-0 transition-transform"></div>
 
               <div className="flex items-start justify-between relative z-10">
@@ -166,12 +192,6 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                     </span>
                   </div>
                 </div>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); onDelete(emp.id); }}
-                  className="p-3 bg-black/40 hover:bg-red-600 text-neutral-600 hover:text-white rounded-xl transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
               </div>
 
               <div className="mt-8 pt-6 border-t border-neutral-800/50 space-y-5">

@@ -32,7 +32,7 @@ export function useAddressSuggestions() {
 
     try {
       const photonRes = await fetch(
-        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8&lang=es`,
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8&lang=es&lat=40.41&lon=-3.70`,
         { signal: abortControllerRef.current.signal }
       );
       

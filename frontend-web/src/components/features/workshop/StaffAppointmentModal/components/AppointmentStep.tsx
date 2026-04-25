@@ -3,12 +3,20 @@ import { type VehicleSearchDTO } from '../../../../../types/client';
 
 interface AppointmentStepProps {
   selectedVehicle: VehicleSearchDTO | null;
-  appointmentForm: { date: string, time: string, serviceType: string, description: string };
+  appointmentForm: { 
+    date: string, 
+    time: string, 
+    serviceType: string, 
+    description: string,
+    estimatedDuration: number,
+    assignedEmployeeId: string
+  };
   setAppointmentForm: (f: any) => void;
   availableSlots: string[];
   viewDate: Date;
   setViewDate: (d: Date) => void;
   workshopSettings: any;
+  employees: any[];
   onPrev: () => void;
   onFinish: () => void;
   loading: boolean;
@@ -17,7 +25,7 @@ interface AppointmentStepProps {
 
 export const AppointmentStep: React.FC<AppointmentStepProps> = ({
   selectedVehicle, appointmentForm, setAppointmentForm, availableSlots,
-  viewDate, setViewDate, workshopSettings, onPrev, onFinish, loading, onFetchSlots
+  viewDate, setViewDate, workshopSettings, employees, onPrev, onFinish, loading, onFetchSlots
 }) => {
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -33,6 +41,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Resumen Vehículo */}
       <div className="p-4 bg-red-600/10 border border-red-600/20 rounded-2xl flex items-center gap-4">
         <div className="shrink-0 w-10 h-10 bg-red-600 text-white rounded-xl flex items-center justify-center font-black">
           {selectedVehicle?.licensePlate.charAt(0)}
@@ -47,7 +56,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
       </div>
 
       <div className="space-y-6">
-        {/* CALENDARIO PERSONALIZADO */}
+        {/* CALENDARIO */}
         <div className="bg-neutral-900/50 border border-neutral-800 p-6 rounded-3xl">
           <div className="flex items-center justify-between mb-6 px-2">
             <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
@@ -86,8 +95,8 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
               let isClosed = false;
               if (workshopSettings?.workingDays) {
                  const workingDaysArr = workshopSettings.workingDays === 'LUNES-VIERNES' 
-                    ? ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
-                    : workshopSettings.workingDays.split(',').map((d:string) => d.trim());
+                     ? ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES']
+                     : workshopSettings.workingDays.split(',').map((d:string) => d.trim());
                  
                  if (!workingDaysArr.includes(dayName)) {
                     isClosed = true;
@@ -117,6 +126,20 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
               );
             })}
           </div>
+        </div>
+
+        {/* SLOTS Y ASIGNACIÓN */}
+        <div className="space-y-4">
+            <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 ml-2 italic">Duración Estimada</label>
+            <div className="flex items-center gap-4 bg-black/40 border border-neutral-800 p-4 rounded-2xl">
+                <input 
+                    type="range" min="15" max="240" step="15"
+                    className="flex-1 accent-red-600"
+                    value={appointmentForm.estimatedDuration}
+                    onChange={e => setAppointmentForm({...appointmentForm, estimatedDuration: parseInt(e.target.value)})}
+                />
+                <span className="text-white font-mono text-xs w-16 text-right">{appointmentForm.estimatedDuration}m</span>
+            </div>
         </div>
 
         {appointmentForm.date && (

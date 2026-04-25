@@ -18,7 +18,7 @@ export interface AppointmentDTO {
   id: string;
   dateTime: string;      // Viene del Backend (ISO string)
   description: string;   // Viene del Backend
-  status: 'PENDIENTE' | 'CONFIRMADA' | 'CANCELADA';
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED' | 'IN_PROGRESS';
   vehiclePlate?: string;  // Por compatibilidad
   vehicleDisplay?: string; // Ejemplo: "BMW Serie 3 (1234ABC)"
   workshopName?: string;

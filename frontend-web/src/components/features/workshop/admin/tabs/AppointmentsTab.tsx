@@ -1,39 +1,47 @@
 import React from 'react';
-import { AppointmentCard } from '../../../../common/Card/index';
+import { PlanningTimeline } from './PlanningTimeline';
 
 interface AppointmentsTabProps {
   appointments: any[];
   selectedDate: Date;
+  employees: any[];
+  openTime?: string;
+  closeTime?: string;
+  onRescheduleTask?: (appointmentId: string, employeeId: string | null, newDateTime: Date, newDuration?: number) => Promise<void>;
+  onUpdateStatus?: (id: string, status: string) => Promise<boolean | void>;
 }
 
-export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ appointments, selectedDate }) => {
-  const filteredAppointments = appointments.filter(app => {
-    const appDate = new Date(app.dateTime);
-    return appDate.getFullYear() === selectedDate.getFullYear() &&
-           appDate.getMonth() === selectedDate.getMonth() &&
-           appDate.getDate() === selectedDate.getDate();
-  });
+export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ 
+    appointments, 
+    selectedDate, 
+    employees, 
+    openTime = '09:00', 
+    closeTime = '18:00',
+    onRescheduleTask,
+    onUpdateStatus
+}) => {
+  // Preparamos las columnas para el Manager (todas)
+  const mechanics = employees.filter(e => e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER');
+  const columns = [
+    { id: 'unassigned', title: 'SIN ASIGNAR', employeeId: null },
+    ...mechanics.map(m => ({
+      id: m.id,
+      title: `${m.firstname} ${m.lastname}`.trim() || 'Mecánico',
+      employeeId: m.id as string
+    }))
+  ];
 
   return (
-    <div className="space-y-6">
-      {filteredAppointments.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4">
-          {filteredAppointments.map((app) => (
-            <AppointmentCard 
-              key={app.id} 
-              type={app.serviceType} 
-              dateTime={app.dateTime} 
-              description={app.description} 
-              status={app.status} 
-              variant="red" // Workshop Admin uses red
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="py-24 text-center bg-black/40 border border-neutral-900 rounded-[3rem] opacity-40">
-           <p className="text-neutral-500 font-black uppercase tracking-widest text-sm">No hay citas registradas para hoy</p>
-        </div>
-      )}
+    <div className="bg-neutral-900/20 p-6 rounded-[2rem] border border-neutral-800/60 overflow-hidden">
+      <PlanningTimeline 
+        columns={columns}
+        appointments={appointments}
+        selectedDate={selectedDate}
+        openTime={openTime}
+        closeTime={closeTime}
+        onRescheduleTask={onRescheduleTask}
+        onUpdateStatus={onUpdateStatus}
+      />
     </div>
   );
 };

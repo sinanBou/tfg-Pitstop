@@ -36,7 +36,7 @@ export function useAddressController(initialValue: string, onParentChange: (val:
     updateParent(val, floorDetail);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (val.length > 2) {
-      timeoutRef.current = setTimeout(() => fetchSuggestions(val), 500);
+      timeoutRef.current = setTimeout(() => fetchSuggestions(val), 200);
     } else {
       setSuggestions([]);
     }
