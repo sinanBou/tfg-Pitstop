@@ -189,6 +189,17 @@
       {"codigo": "11.24", "tarea": "Limpieza del tanque de combustible - plástico", "horas": 2.0},
       {"codigo": "11.25", "tarea": "Limpieza del depósito de combustible - metálico", "horas": 4.0},
       {"codigo": "11.26", "tarea": "Sellado de cabina (silicona/mastique)", "horas": 0.5}
+    ],
+    "neumaticos_y_ruedas": [
+      {"codigo": "12.1", "tarea": "Sustitución de neumático", "horas_1_rueda": 0.5},
+      {"codigo": "12.2", "tarea": "Equilibrado de rueda", "horas_1_rueda": 0.25},
+      {"codigo": "12.3", "tarea": "Cambio de rueda completa (llanta + neumático)", "horas_1_rueda": 1.0},
+      {"codigo": "12.4", "tarea": "Sustitución de llanta", "horas_1_rueda": 1.0},
+      {"codigo": "12.5", "tarea": "Reparación de pinchazo", "horas_1_rueda": 0.5},
+      {"codigo": "12.6", "tarea": "Rotación de neumático", "horas_1_rueda": 0.25},
+      {"codigo": "12.7", "tarea": "Sustitución de válvula de neumático", "horas_1_rueda": 0.25},
+      {"codigo": "12.8", "tarea": "Alineación de dirección (geometría)", "horas": 1.0},
+      {"codigo": "12.9", "tarea": "Sustitución de rueda de repuesto", "horas": 0.25}
     ]
   }
 }

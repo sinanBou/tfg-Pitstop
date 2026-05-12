@@ -10,17 +10,24 @@ import { AppointmentSearch } from '../components/features/workshop/admin/compone
 import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
 import { useWorkerDashboard } from '../hooks/useWorkerDashboard';
 import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
+import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
+import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
 
 export default function WorkerDashboard() {
   const navigate = useNavigate();
   const { 
     loading, 
     employeeProfile, 
-    appointments, 
+    appointments,
+    workshopTasks,
     employees, 
     fetchWorkerData, 
     updateAppointmentStatus, 
+    updateTaskStatus,
     handleRescheduleAppointment,
+    handleRescheduleTask,
+    handleDeleteTask,
+    handleDeleteAppointment,
     selectedDate,
     setSelectedDate,
     goToNextPendingDate,
@@ -28,6 +35,21 @@ export default function WorkerDashboard() {
   } = useWorkerDashboard();
   const [activeTab, setActiveTab] = useState(0);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [checklistItem, setChecklistItem] = useState<any>(null);
+
+  const handleUpdateStatus = (id: string, newStatus: string, isTask?: boolean) => {
+    if (isTask) return updateTaskStatus(id, newStatus);
+    return updateAppointmentStatus(id, newStatus);
+  };
+
+  const handleRescheduleAny = (id: string, employeeId: string | null, newDate: Date, duration?: number, isTask?: boolean) => {
+    if (isTask) return handleRescheduleTask(id, employeeId, newDate, duration);
+    return handleRescheduleAppointment(id, employeeId, newDate, duration);
+  };
+
+  const handleManageAppointment = (app: any) => setSelectedAppointment(app);
+  const handleViewChecklist = (app: any) => setChecklistItem(app);
 
   if (loading) {
     return <LoadingScreen message="Sincronizando panel..." theme="workshop" />;
@@ -50,16 +72,18 @@ export default function WorkerDashboard() {
   // Citas Pendientes de Confirmar (Solo Manager) filtradas por selectedDate
   const pendingAppointments = appointments.filter(a => a.status === 'PENDING' && isSameDate(a.dateTime));
   
-  // Citas Confirmadas o en Curso (Para el Kanban) filtradas por selectedDate - EXCLUIMOS PENDING
-  const planningAppointments = appointments.filter(a => 
-      a.status !== 'PENDING' && 
-      a.status !== 'COMPLETED' && 
-      a.status !== 'CANCELLED' && 
-      isSameDate(a.dateTime)
-  );
+  // MERGE appointments and workshopTasks for the timeline (Plannable Items)
+  // Excluimos IN_PROGRESS de appointments porque ya tienen tareas (WorkshopTasks) que las representan
+  const combinedPlanningItems = [
+      ...appointments.filter(a => a.status !== 'PENDING' && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && isSameDate(a.dateTime)),
+      ...workshopTasks.map(t => ({ ...t, isTask: true }))
+  ];
 
   // Mis Citas Activas (Para MechanicLiveTask) filtradas por selectedDate
-  const myAppointments = appointments.filter(a => a.assignedEmployeeId === employeeProfile?.id && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && isSameDate(a.dateTime));
+  const myWorkItems = [
+      ...appointments.filter(a => a.assignedEmployeeId === employeeProfile?.id && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && isSameDate(a.dateTime)),
+      ...workshopTasks.filter(t => t.assignedEmployeeId === employeeProfile?.id && t.status !== 'COMPLETED' && t.status !== 'CANCELLED')
+  ];
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-red-500/30 selection:text-white pb-32">
@@ -207,30 +231,33 @@ export default function WorkerDashboard() {
                     {/* Mis Tareas Hoy — solo para mecánicos, no para manager */}
                     {!isManager && (
                       <div>
-                          <div className="flex items-center gap-4 mb-6">
-                              <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                              <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full w-fit">
                                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                  <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">Mis Tareas Hoy</span>
+                                  <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">Mis Tareas</span>
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
                               </div>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                              {myAppointments.length > 0 ? (
-                                  myAppointments
+                              {myWorkItems.length > 0 ? (
+                                  myWorkItems
                                   .sort((a, b) => {
                                       if (a.status === 'IN_PROGRESS') return -1;
                                       if (b.status === 'IN_PROGRESS') return 1;
                                       return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
                                   })
-                                  .map((app: any) => (
+                                  .map((item: any) => (
                                         <MechanicLiveTask 
-                                            key={app.id} 
-                                            appointment={app} 
-                                            onUpdateStatus={updateAppointmentStatus} 
+                                            key={item.id} 
+                                            appointment={item} 
+                                            onUpdateStatus={(id, status) => handleUpdateStatus(id, status, item.isTask)} 
                                         />
                                   ))
                               ) : (
                                   <div className="col-span-full py-20 text-center bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                                      <p className="text-neutral-500 font-medium uppercase tracking-widest text-sm">No tienes citas activas asignadas a ti</p>
+                                      <p className="text-neutral-500 font-medium uppercase tracking-widest text-sm">No tienes tareas activas asignadas</p>
                                   </div>
                               )}
                           </div>
@@ -252,9 +279,14 @@ export default function WorkerDashboard() {
                     <div className="p-5">
                       <PlanningTimeline
                         columns={[{ id: employeeProfile?.id, title: `${employeeProfile?.firstname} ${employeeProfile?.lastname}`, employeeId: employeeProfile?.id }]}
-                        appointments={planningAppointments}
+                        appointments={combinedPlanningItems}
                         selectedDate={selectedDate}
-                        onUpdateStatus={updateAppointmentStatus}
+                        onUpdateStatus={handleUpdateStatus}
+                        onDeleteTask={handleDeleteTask}
+                        onDeleteAppointment={handleDeleteAppointment}
+                        onRescheduleTask={handleRescheduleAny}
+                        onManage={handleManageAppointment}
+                        onViewChecklist={handleViewChecklist}
                         fillContainer
                         readOnly
                       />
@@ -294,10 +326,14 @@ export default function WorkerDashboard() {
                             employeeId: m.id
                           }))
                         ]}
-                        appointments={planningAppointments}
+                        appointments={combinedPlanningItems}
                         selectedDate={selectedDate}
-                        onRescheduleTask={handleRescheduleAppointment}
-                        onUpdateStatus={updateAppointmentStatus}
+                        onRescheduleTask={handleRescheduleAny}
+                        onUpdateStatus={handleUpdateStatus}
+                        onDeleteTask={handleDeleteTask}
+                        onDeleteAppointment={handleDeleteAppointment}
+                        onManage={handleManageAppointment}
+                        onViewChecklist={handleViewChecklist}
                         columnWidth="260px"
                       />
                     </div>
@@ -314,14 +350,20 @@ export default function WorkerDashboard() {
                       </div>
                       <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
                     </div>
-                    <div className="p-5">
-                      <PlanningTimeline
-                        columns={[{ id: employeeProfile?.id, title: 'MI AGENDA', employeeId: employeeProfile?.id }]}
-                        appointments={planningAppointments}
-                        selectedDate={selectedDate}
-                        fillContainer
-                        readOnly
-                      />
+                    <div className="p-0">
+                       <PlanningTimeline
+                         columns={[{ id: employeeProfile?.id, title: 'MI AGENDA', employeeId: employeeProfile?.id }]}
+                         appointments={combinedPlanningItems}
+                         selectedDate={selectedDate}
+                         onUpdateStatus={handleUpdateStatus}
+                         onDeleteTask={handleDeleteTask}
+                         onDeleteAppointment={handleDeleteAppointment}
+                         onRescheduleTask={handleRescheduleAny}
+                         onManage={handleManageAppointment}
+                         onViewChecklist={handleViewChecklist}
+                         fillContainer
+                         readOnly
+                       />
                     </div>
                   </div>
               )}
@@ -339,6 +381,27 @@ export default function WorkerDashboard() {
         workshopId={employeeProfile?.workshopId}
         onSuccess={() => { fetchWorkerData(); setIsAppModalOpen(false); }}
       />
+
+      {/* Modal de Gestión de Tareas del Mecánico */}
+      {selectedAppointment && (
+        <MechanicTaskModal
+          isOpen={!!selectedAppointment}
+          onClose={() => setSelectedAppointment(null)}
+          appointment={selectedAppointment}
+          onSuccess={() => { fetchWorkerData(); setSelectedAppointment(null); }}
+        />
+      )}
+
+      {/* Modal de Checklist de Tareas */}
+      {checklistItem && (
+        <TaskChecklistModal
+          isOpen={!!checklistItem}
+          onClose={() => { setChecklistItem(null); fetchWorkerData(); }}
+          item={checklistItem}
+          onUpdateStatus={handleUpdateStatus}
+          onSuccess={() => { fetchWorkerData(); setChecklistItem(null); }}
+        />
+      )}
 
       <style>{`
         @keyframes fade-in-up {

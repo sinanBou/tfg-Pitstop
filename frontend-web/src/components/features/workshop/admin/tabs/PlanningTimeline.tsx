@@ -1,5 +1,6 @@
 import React from 'react';
 import { AppointmentBlock } from './AppointmentBlock';
+import { AppointmentStackGroup } from '../../appointments/AppointmentStackGroup';
 
 interface Column {
   id: string;
@@ -14,11 +15,15 @@ interface PlanningTimelineProps {
   selectedDate: Date;
   openTime?: string;
   closeTime?: string;
-  onRescheduleTask?: (appointmentId: string, employeeId: string | null, newDateTime: Date, newDuration?: number) => Promise<void>;
-  onUpdateStatus?: (id: string, status: string) => Promise<boolean | void>;
+  onRescheduleTask?: (id: string, employeeId: string | null, newDateTime: Date, newDuration?: number, isTask?: boolean) => Promise<void>;
+  onUpdateStatus?: (id: string, status: string, isTask?: boolean) => Promise<boolean | void>;
+  onDeleteTask?: (id: string) => Promise<boolean | void>;
+  onDeleteAppointment?: (id: string) => Promise<boolean | void>;
   columnWidth?: string;
   readOnly?: boolean;
   fillContainer?: boolean;
+  onManage?: (app: any) => void;
+  onViewChecklist?: (app: any) => void;
 }
 
 const ROW_HEIGHT = 80;
@@ -32,9 +37,13 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   closeTime = '18:00',
   onRescheduleTask,
   onUpdateStatus,
+  onDeleteTask,
+  onDeleteAppointment,
   columnWidth = '260px',
   readOnly = false,
-  fillContainer = false
+  fillContainer = false,
+  onManage,
+  onViewChecklist,
 }) => {
   const filteredAppointments = appointments.filter(app => {
     const appDate = new Date(app.dateTime);
@@ -59,6 +68,21 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
     e.preventDefault();
   };
 
+  /** Compute target time from the cursor Y offset within the column */
+  const computeDropTime = (e: React.DragEvent): Date => {
+    const colRect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const offsetY = e.clientY - colRect.top;
+    const totalMinutes = offsetY / MINUTE_HEIGHT;
+    // Snap to 30-minute grid
+    const snappedMinutes = Math.round(totalMinutes / 30) * 30;
+    const dropHour = startDisplay + Math.floor(snappedMinutes / 60);
+    const dropMinute = snappedMinutes % 60;
+
+    const target = new Date(selectedDate);
+    target.setHours(dropHour, dropMinute, 0, 0);
+    return target;
+  };
+
   const handleDropColumn = async (e: React.DragEvent, employeeId: string | null) => {
     e.preventDefault();
     if (readOnly) return;
@@ -67,11 +91,34 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
     if (!appId || !onRescheduleTask) return;
 
     const app = filteredAppointments.find(a => a.id === appId);
-    if (app) {
-      const duration = app.estimatedDuration || 60;
-      const targetDate = new Date(app.dateTime);
-      await onRescheduleTask(appId, employeeId, targetDate, duration);
+    if (!app) return;
+
+    const duration = app.estimatedDuration || 60;
+    const targetDate = app.isTask ? computeDropTime(e) : new Date(app.dateTime);
+
+    // ── Collision detection (only for assigned columns) ──
+    if (employeeId !== null) {
+      const dropStart = targetDate.getTime();
+      const dropEnd = dropStart + duration * 60000;
+
+      const colItems = filteredAppointments.filter(
+        a => a.assignedEmployeeId === employeeId && a.id !== appId
+      );
+
+      const collision = colItems.find(existing => {
+        const exStart = new Date(existing.dateTime).getTime();
+        const exEnd = exStart + (existing.estimatedDuration || 60) * 60000;
+        return dropStart < exEnd && dropEnd > exStart;
+      });
+
+      if (collision) {
+        const colTime = new Date(collision.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        alert(`No se puede colocar aquí: ya existe "${collision.vehicleDisplay || 'una cita'}" a las ${colTime} en esta columna.`);
+        return;
+      }
     }
+
+    await onRescheduleTask(appId, employeeId, targetDate, duration, app.isTask);
   };
 
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -103,9 +150,9 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
           </button>
         </div>
       )}
-      {/* Contenedor con scroll horizontal */}
-      <div ref={scrollRef} className={fillContainer ? 'w-full' : 'w-full overflow-x-auto custom-scrollbar pb-4'}>
-        <div className={fillContainer ? 'flex flex-col w-full border border-neutral-800/60 rounded-[2rem] overflow-hidden bg-neutral-900/30 backdrop-blur-sm shadow-2xl' : 'flex flex-col min-w-full w-max border border-neutral-800/60 rounded-[2rem] overflow-hidden bg-neutral-900/30 backdrop-blur-sm shadow-2xl'}>
+      {/* Contenedor con scroll horizontal — deshabilitado para mecánicos */}
+      <div ref={scrollRef} className={fillContainer ? 'w-full overflow-hidden' : 'w-full overflow-x-auto custom-scrollbar pb-4'}>
+        <div className={fillContainer ? 'flex flex-col w-full' : 'flex flex-col min-w-full w-max border border-neutral-800/60 rounded-[2rem] overflow-hidden bg-neutral-900/30 backdrop-blur-sm shadow-2xl'}>
 
           {/* ── Cabecera fija (sticky) con nombres de mecánicos ── */}
           <div className="flex border-b border-neutral-800/60 sticky top-0 z-30 bg-neutral-900/95 backdrop-blur-md rounded-t-[2rem]">
@@ -177,19 +224,82 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
                       onDragOver={handleDragOver}
                       onDrop={(e) => handleDropColumn(e, col.employeeId)}
                     >
-                      {colApps.map(app => (
-                        <AppointmentBlock
-                          key={app.id}
-                          appointment={app}
-                          minuteHeight={MINUTE_HEIGHT}
-                          startHour={startDisplay}
-                          columnId={col.employeeId}
-                          onReschedule={onRescheduleTask!}
-                          onUpdateStatus={onUpdateStatus}
-                          selectedDate={selectedDate}
-                          readOnly={readOnly}
-                        />
-                      ))}
+                      {(() => {
+                        const sortedApps = [...colApps].sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+
+                        // ── Group overlapping appointments into clusters ──
+                        const groups: any[][] = [];
+                        sortedApps.forEach(app => {
+                          const appStart = new Date(app.dateTime).getTime();
+                          if (groups.length === 0) {
+                            groups.push([app]);
+                            return;
+                          }
+                          const lastGroup = groups[groups.length - 1];
+                          const groupEnd = Math.max(
+                            ...lastGroup.map((a: any) => new Date(a.dateTime).getTime() + (a.estimatedDuration || 60) * 60000)
+                          );
+                          if (appStart < groupEnd) {
+                            lastGroup.push(app);
+                          } else {
+                            groups.push([app]);
+                          }
+                        });
+
+                        return groups.flatMap(group => {
+                          // Single appointment — render with original AppointmentBlock
+                          if (group.length === 1) {
+                            const app = group[0];
+                            return (
+                              <AppointmentBlock
+                                key={app.id}
+                                appointment={app}
+                                lane={0}
+                                totalLanes={1}
+                                minuteHeight={MINUTE_HEIGHT}
+                                startHour={startDisplay}
+                                columnId={col.employeeId}
+                                onReschedule={onRescheduleTask!}
+                                onUpdateStatus={onUpdateStatus}
+                                onDeleteTask={onDeleteTask}
+                                onDeleteAppointment={onDeleteAppointment}
+                                onManage={onManage}
+                                onViewChecklist={onViewChecklist}
+                                selectedDate={selectedDate}
+                                readOnly={readOnly}
+                              />
+                            );
+                          }
+
+                          // Multiple overlapping — Stack & Popover
+                          const earliestStart = Math.min(...group.map((a: any) => new Date(a.dateTime).getTime()));
+                          const latestEnd = Math.max(...group.map((a: any) => new Date(a.dateTime).getTime() + (a.estimatedDuration || 60) * 60000));
+                          const earliestDate = new Date(earliestStart);
+                          const minsFromStart = (earliestDate.getHours() - startDisplay) * 60 + earliestDate.getMinutes();
+                          const topPx = minsFromStart * MINUTE_HEIGHT;
+                          const spanMinutes = (latestEnd - earliestStart) / 60000;
+                          const heightPx = spanMinutes * MINUTE_HEIGHT;
+
+                          return (
+                            <AppointmentStackGroup
+                              key={`stack-${group[0].id}`}
+                              appointments={group}
+                              topPosition={topPx}
+                              height={heightPx}
+                              columnId={col.employeeId}
+                              minuteHeight={MINUTE_HEIGHT}
+                              startHour={startDisplay}
+                              readOnly={readOnly}
+                              onReschedule={onRescheduleTask!}
+                              onUpdateStatus={onUpdateStatus}
+                              onDeleteTask={onDeleteTask}
+                              onDeleteAppointment={onDeleteAppointment}
+                              onManage={onManage}
+                              selectedDate={selectedDate}
+                            />
+                          );
+                        });
+                      })()}
                     </div>
                   );
                 })}

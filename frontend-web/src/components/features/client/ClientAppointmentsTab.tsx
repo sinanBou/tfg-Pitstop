@@ -64,12 +64,22 @@ export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAp
                      </div>
                   </div>
                   
-                  <button onClick={() => { if(window.confirm("¿Cancelar cita?")) deleteAppointment(app.id); }} className="w-full py-4 bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm relative z-10 group/btn mt-auto overflow-hidden">
-                     <span className="flex items-center justify-center gap-2 relative z-10">
-                        Cancelar Cita
-                        <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                     </span>
-                  </button>
+                   {/* Solo permitimos cancelar si no está en curso, completada o ya cancelada */}
+                   {!['IN_PROGRESS', 'DELAYED', 'COMPLETED', 'CANCELLED'].includes(app.status) ? (
+                      <button 
+                        onClick={() => { if(window.confirm("¿Deseas cancelar esta cita de forma permanente?")) deleteAppointment(app.id); }} 
+                        className="w-full py-4 bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm relative z-10 group/btn mt-auto overflow-hidden"
+                      >
+                         <span className="flex items-center justify-center gap-2 relative z-10">
+                            Cancelar Cita
+                            <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                         </span>
+                      </button>
+                   ) : (
+                      <div className="w-full py-4 bg-neutral-900/20 border border-neutral-800/50 text-neutral-600 rounded-xl text-[10px] font-black uppercase tracking-widest text-center mt-auto cursor-not-allowed">
+                         {app.status === 'COMPLETED' ? 'Cita Finalizada' : app.status === 'CANCELLED' ? 'Cita Cancelada' : 'Cita en Proceso'}
+                      </div>
+                   )}
                </div>
             ))
          ) : (

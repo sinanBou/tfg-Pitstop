@@ -61,20 +61,32 @@ export const useClientDashboard = () => {
       
       if (resApps.ok) {
         const data: AppointmentDTO[] = await resApps.json();
-        const formattedApps = data.map((app) => {
+        
+        // 1. Citas Activas: PENDING, CONFIRMED, IN_PROGRESS, DELAYED
+        const active = data.filter(app => !['CANCELLED', 'COMPLETED'].includes(app.status || 'PENDING'));
+        
+        // 2. Historial: CANCELLED, COMPLETED
+        const historical = data.filter(app => ['CANCELLED', 'COMPLETED'].includes(app.status || 'PENDING'));
+
+        setAppointments(active.map((app) => {
           const [datePart, timePart] = app.dateTime.split('T');
           return {
             ...app,
             date: datePart,
             time: timePart ? timePart.substring(0, 5) : '',
             serviceType: app.serviceType || app.description,
-            status: app.status || 'CONFIRMED'
+            status: app.status || 'PENDING'
           };
-        });
-        setAppointments(formattedApps);
+        }));
+
+        setHistory(historical.map(app => ({
+          id: app.id,
+          finishDate: app.dateTime.split('T')[0],
+          vehicleName: app.vehicleDisplay || 'Vehículo',
+          description: `${app.serviceType || app.description} (${app.status})`,
+          totalCost: 0 // No tenemos coste aún
+        })));
       }
-      
-      setHistory([]);
 
     } catch (error) {
       console.error("Error cargando el dashboard:", error);

@@ -25,6 +25,7 @@ export default function ClientDashboard() {
 
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
 
+
   if (loading) {
     return <LoadingScreen message="Sincronizando con el taller..." theme="client" />;
   }

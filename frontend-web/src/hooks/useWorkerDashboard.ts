@@ -7,6 +7,7 @@ export function useWorkerDashboard() {
   const [loading, setLoading] = useState(true);
   const [employeeProfile, setEmployeeProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
+  const [workshopTasks, setWorkshopTasks] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
@@ -32,6 +33,12 @@ export function useWorkerDashboard() {
         });
         if(appRes.ok) setAppointments(await appRes.json());
         
+        const dateIso = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+        const taskRes = await fetch(`${API_BASE_URL}/workshop-tasks/workshop/${data.workshopId}?date=${dateIso}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(taskRes.ok) setWorkshopTasks(await taskRes.json());
+
         const empRes = await fetch(`${API_BASE_URL}/employees/workshop/${data.workshopId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -43,7 +50,7 @@ export function useWorkerDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, [navigate, selectedDate]);
 
   const handleAssignAppointment = async (appointmentId: string, employeeId: string | null) => {
     const token = localStorage.getItem('jwt_token');
@@ -107,6 +114,90 @@ export function useWorkerDashboard() {
     return false;
   };
 
+  const updateTaskStatus = async (id: string, newStatus: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${id}`, {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error actualizando estado tarea:", err);
+    }
+    return false;
+  };
+
+  const handleRescheduleTask = async (taskId: string, employeeId: string | null, newDateTime: Date, duration?: number) => {
+    const token = localStorage.getItem('jwt_token');
+    const localIso = new Date(newDateTime.getTime() - newDateTime.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          dateTime: localIso,
+          assignedEmployeeId: employeeId,
+          estimatedDuration: duration,
+          reassignEmployee: true
+        })
+      });
+      if (res.ok) {
+        fetchWorkerData();
+      } else {
+        const errorText = await res.text();
+        alert(`Error al reubicar tarea: ${res.status} - ${errorText}`);
+      }
+    } catch (err) {
+      alert(`Error de conexión: ${err}`);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error eliminando tarea:", err);
+    }
+    return false;
+  };
+
+  const handleDeleteAppointment = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error eliminando cita:", err);
+    }
+    return false;
+  };
+
   const goToNextUnassignedDate = useCallback(() => {
     if (!appointments.length) return;
 
@@ -161,11 +252,16 @@ export function useWorkerDashboard() {
     loading,
     employeeProfile,
     appointments,
+    workshopTasks,
     employees,
     fetchWorkerData,
     updateAppointmentStatus,
+    updateTaskStatus,
     handleAssignAppointment,
     handleRescheduleAppointment,
+    handleRescheduleTask,
+    handleDeleteTask,
+    handleDeleteAppointment,
     selectedDate,
     setSelectedDate,
     goToNextPendingDate,
