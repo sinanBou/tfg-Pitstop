@@ -24,7 +24,7 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ settingsForm, setSetti
       
       <form onSubmit={onSubmit} className="relative z-10 space-y-10">
         <div className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Hora Apertura</label>
               <input type="time" value={settingsForm.openTime} onChange={e => setSettingsForm({...settingsForm, openTime: e.target.value})} className="bg-black/40 border border-white/5 hover:border-white/10 text-white p-5 rounded-2xl focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all font-mono text-lg font-bold" />
@@ -36,6 +36,10 @@ export const SettingsTab: React.FC<SettingsTabProps> = ({ settingsForm, setSetti
             <div className="flex flex-col gap-2">
               <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Duración Cita (Min)</label>
               <input type="number" value={settingsForm.slotDurationMinutes} onChange={e => setSettingsForm({...settingsForm, slotDurationMinutes: e.target.value})} className="bg-black/40 border border-white/5 hover:border-white/10 text-white p-5 rounded-2xl focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all font-mono text-lg font-bold" />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Precio Mano de Obra (€/h)</label>
+              <input type="number" step="0.01" value={settingsForm.hourlyRate} onChange={e => setSettingsForm({...settingsForm, hourlyRate: e.target.value})} className="bg-black/40 border border-white/5 hover:border-white/10 text-white p-5 rounded-2xl focus:outline-none focus:border-red-500/50 focus:bg-black/60 transition-all font-mono text-lg font-bold" />
             </div>
           </div>
           <div className="flex flex-col gap-3">

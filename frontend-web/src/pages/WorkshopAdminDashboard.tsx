@@ -7,11 +7,13 @@ import { OverviewTab } from '../components/features/workshop/admin/tabs/Overview
 import { AppointmentsTab } from '../components/features/workshop/admin/tabs/AppointmentsTab';
 import { SettingsTab } from '../components/features/workshop/admin/tabs/SettingsTab';
 import { TeamTab } from '../components/features/workshop/admin/tabs/TeamTab';
+import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
+import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
 import { DateNavigator } from '../components/common/DateNavigator/index';
 import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
 import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
 
-const SECCIONES = ['RESUMEN', 'PLANIFICACIÓN', 'AJUSTES', 'EQUIPO'];
+const SECCIONES = ['RESUMEN', 'PLANIFICACIÓN', 'TRABAJOS', 'TAREAS', 'AJUSTES', 'EQUIPO'];
 
 const diasSemana = [
   { value: 'LUNES', label: 'Lunes' },
@@ -44,6 +46,10 @@ export default function WorkshopAdminDashboard() {
     handleDemoteEmployee,
     handleRescheduleAppointment,
     updateAppointmentStatus,
+    handleDeleteAppointment,
+    completeJob,
+    markPickedUp,
+    readyForCompletion,
     goToNextUnassignedDate,
     userRole
   } = useWorkshopAdmin();
@@ -115,19 +121,34 @@ export default function WorkshopAdminDashboard() {
                   </div>
                   <div className="p-5">
                     <AppointmentsTab
-                      appointments={appointments.filter(a => a.status !== 'PENDING')}
+                      appointments={appointments.filter(a => a.status !== 'PENDING' && a.status !== 'PICKED_UP')}
                       selectedDate={selectedDate}
                       employees={employees}
                       openTime={workshopData?.openTime}
                       closeTime={workshopData?.closeTime}
                       onRescheduleTask={handleRescheduleAppointment}
                       onUpdateStatus={updateAppointmentStatus}
+                      onDeleteAppointment={handleDeleteAppointment}
                     />
                   </div>
                 </div>
               )}
-              {activeTab === 2 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} />}
-              {activeTab === 3 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
+              {activeTab === 2 && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                  <CompletedJobsTab
+                    readyJobs={readyForCompletion}
+                    onCompleteJob={completeJob}
+                    onMarkPickedUp={markPickedUp}
+                  />
+                </div>
+              )}
+              {activeTab === 3 && id && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                  <TasksTab workshopId={id} />
+                </div>
+              )}
+              {activeTab === 4 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} />}
+              {activeTab === 5 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
             </div>
          </div>
       </main>

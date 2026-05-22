@@ -22,12 +22,14 @@ export function useWorkshopAdmin() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+  const [readyForCompletion, setReadyForCompletion] = useState<any[]>([]);
 
   const [settingsForm, setSettingsForm] = useState({
     openTime: '',
     closeTime: '',
     slotDurationMinutes: '',
-    workingDays: [] as string[]
+    workingDays: [] as string[],
+    hourlyRate: ''
   });
 
   const [employeeForm, setEmployeeForm] = useState({
@@ -70,7 +72,8 @@ export function useWorkshopAdmin() {
           openTime: data.openTime || '09:00',
           closeTime: data.closeTime || '18:00',
           slotDurationMinutes: data.slotDurationMinutes || '30',
-          workingDays: parsedDays
+          workingDays: parsedDays,
+          hourlyRate: data.hourlyRate !== undefined && data.hourlyRate !== null ? String(data.hourlyRate) : '50.0'
         });
       }
 
@@ -85,6 +88,12 @@ export function useWorkshopAdmin() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (eRes.ok) setEmployees(await eRes.json());
+
+      // Fetch appointments ready for manager sign-off
+      const rcRes = await fetch(`${API_BASE_URL}/appointments/workshop/${id}/ready-for-completion`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (rcRes.ok) setReadyForCompletion(await rcRes.json());
       
     } catch (err) {
       console.error(err);
@@ -103,7 +112,8 @@ export function useWorkshopAdmin() {
     try {
       const payload = {
         ...settingsForm,
-        workingDays: settingsForm.workingDays.join(', ')
+        workingDays: settingsForm.workingDays.join(', '),
+        hourlyRate: parseFloat(settingsForm.hourlyRate) || 50.0
       };
       const res = await fetch(`${API_BASE_URL}/workshops/${id}`, {
         method: 'PUT',
@@ -242,6 +252,32 @@ export function useWorkshopAdmin() {
     }
   };
 
+  const handleDeleteAppointment = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    
+    // Optimistic UI update
+    setAppointments(prev => prev.filter(app => app.id !== appointmentId));
+    
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkshopData();
+        return true;
+      } else {
+        // Revert on failure
+        await fetchWorkshopData();
+      }
+    } catch (err) {
+      console.error("Error eliminando cita:", err);
+      // Revert on failure
+      await fetchWorkshopData();
+    }
+    return false;
+  };
+
   const updateAppointmentStatus = async (id: string, newStatus: string) => {
     const token = localStorage.getItem('jwt_token');
     try {
@@ -255,6 +291,42 @@ export function useWorkshopAdmin() {
       }
     } catch (err) {
       console.error("Error actualizando estado:", err);
+    }
+    return false;
+  };
+
+  /** Mark a job as fully completed — client sees it as ready to pick up */
+  const completeJob = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/status?status=COMPLETED`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error completando trabajo:", err);
+    }
+    return false;
+  };
+
+  /** Mark vehicle as picked up by the client */
+  const markPickedUp = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/status?status=PICKED_UP`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error marcando recogida:", err);
     }
     return false;
   };
@@ -326,8 +398,12 @@ export function useWorkshopAdmin() {
     handleAssignAppointment,
     handleRescheduleAppointment,
     updateAppointmentStatus,
+    completeJob,
+    markPickedUp,
+    readyForCompletion,
     goToNextPendingDate,
     goToNextUnassignedDate,
+    handleDeleteAppointment,
     userRole: localStorage.getItem('role')
   };
 }

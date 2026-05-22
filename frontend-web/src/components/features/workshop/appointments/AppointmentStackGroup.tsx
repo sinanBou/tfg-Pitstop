@@ -210,7 +210,7 @@ export const AppointmentStackGroup: React.FC<AppointmentStackGroupProps> = ({
                 left: `${idx * 3}px`,
                 right: `${idx * 3}px`,
                 height: `${Math.max(40, height - (MAX_VISIBLE_CARDS - 1) * STACK_OFFSET - idx * STACK_OFFSET)}px`,
-                opacity: isTop ? 1 : 0.6,
+                opacity: 1,
                 filter: isTop ? 'none' : 'brightness(0.7)',
               }}
             >

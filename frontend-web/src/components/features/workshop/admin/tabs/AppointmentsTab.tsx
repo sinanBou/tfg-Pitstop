@@ -9,6 +9,7 @@ interface AppointmentsTabProps {
   closeTime?: string;
   onRescheduleTask?: (appointmentId: string, employeeId: string | null, newDateTime: Date, newDuration?: number) => Promise<void>;
   onUpdateStatus?: (id: string, status: string) => Promise<boolean | void>;
+  onDeleteAppointment?: (id: string) => Promise<boolean | void>;
 }
 
 export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ 
@@ -18,7 +19,8 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({
     openTime = '09:00', 
     closeTime = '18:00',
     onRescheduleTask,
-    onUpdateStatus
+    onUpdateStatus,
+    onDeleteAppointment
 }) => {
   // Preparamos las columnas para el Manager (todas)
   const mechanics = employees.filter(e => e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER');
@@ -41,6 +43,7 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({
         closeTime={closeTime}
         onRescheduleTask={onRescheduleTask}
         onUpdateStatus={onUpdateStatus}
+        onDeleteAppointment={onDeleteAppointment}
       />
     </div>
   );

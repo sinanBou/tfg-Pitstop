@@ -62,11 +62,11 @@ export const useClientDashboard = () => {
       if (resApps.ok) {
         const data: AppointmentDTO[] = await resApps.json();
         
-        // 1. Citas Activas: PENDING, CONFIRMED, IN_PROGRESS, DELAYED
-        const active = data.filter(app => !['CANCELLED', 'COMPLETED'].includes(app.status || 'PENDING'));
+        // 1. Citas Activas: PENDING, CONFIRMED, IN_PROGRESS, DELAYED + COMPLETED (para mostrar "Listo para recoger")
+        const active = data.filter(app => !['CANCELLED', 'PICKED_UP'].includes(app.status || 'PENDING'));
         
-        // 2. Historial: CANCELLED, COMPLETED
-        const historical = data.filter(app => ['CANCELLED', 'COMPLETED'].includes(app.status || 'PENDING'));
+        // 2. Historial: CANCELLED, COMPLETED, PICKED_UP
+        const historical = data.filter(app => ['CANCELLED', 'COMPLETED', 'PICKED_UP'].includes(app.status || 'PENDING'));
 
         setAppointments(active.map((app) => {
           const [datePart, timePart] = app.dateTime.split('T');
@@ -79,13 +79,18 @@ export const useClientDashboard = () => {
           };
         }));
 
-        setHistory(historical.map(app => ({
-          id: app.id,
-          finishDate: app.dateTime.split('T')[0],
-          vehicleName: app.vehicleDisplay || 'Vehículo',
-          description: `${app.serviceType || app.description} (${app.status})`,
-          totalCost: 0 // No tenemos coste aún
-        })));
+        setHistory(historical.map(app => {
+          const durationHours = (app.estimatedDuration || 0) / 60;
+          const rate = app.workshopHourlyRate || 50.0;
+          const cost = durationHours * rate;
+          return {
+            id: app.id,
+            finishDate: app.dateTime.split('T')[0],
+            vehicleName: app.vehicleDisplay || 'Vehículo',
+            description: `${app.serviceType || app.description} (${app.status})`,
+            totalCost: cost
+          };
+        }));
       }
 
     } catch (error) {

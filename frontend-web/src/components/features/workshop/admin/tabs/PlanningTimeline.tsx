@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppointmentBlock } from './AppointmentBlock';
-import { AppointmentStackGroup } from '../../appointments/AppointmentStackGroup';
+import { UnassignedColumn } from './UnassignedColumn';
 
 interface Column {
   id: string;
@@ -51,6 +51,11 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
            appDate.getMonth() === selectedDate.getMonth() &&
            appDate.getDate() === selectedDate.getDate();
   });
+
+  // ── Separar columna "Sin Asignar" de las columnas de mecánicos ──
+  const unassignedCol = columns.find(c => c.employeeId === null) || null;
+  const mechanicColumns = columns.filter(c => c.employeeId !== null);
+  const unassignedApps = filteredAppointments.filter(a => a.assignedEmployeeId === null || a.assignedEmployeeId === undefined);
 
   const workStart = parseInt(openTime.split(':')[0], 10) || 9;
   const workEnd = parseInt(closeTime.split(':')[0], 10) || 18;
@@ -156,24 +161,41 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
 
           {/* ── Cabecera fija (sticky) con nombres de mecánicos ── */}
           <div className="flex border-b border-neutral-800/60 sticky top-0 z-30 bg-neutral-900/95 backdrop-blur-md rounded-t-[2rem]">
-            <div className="w-20 shrink-0 p-4 border-r border-neutral-800/60 flex items-center justify-center">
-              <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            {columns.map(col => (
+            {/* Cabecera "Sin Asignar" — solo si existe */}
+            {unassignedCol && (
+              <div
+                id={`column-${unassignedCol.id}`}
+                style={!fillContainer ? { width: columnWidth } : undefined}
+                className={`${fillContainer ? 'flex-1' : ''} p-4 border-r border-neutral-800/60 flex items-center justify-between bg-neutral-800/20 transition-all duration-500`}
+              >
+                <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2 truncate">
+                  <svg className="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  {unassignedCol.title}
+                </h3>
+                {unassignedApps.length > 0 && (
+                  <span className="ml-2 px-2 py-0.5 bg-blue-500/15 border border-blue-500/20 rounded-full text-[9px] font-black text-blue-400">
+                    {unassignedApps.length}
+                  </span>
+                )}
+              </div>
+            )}
+            {/* Cabecera eje de horas (solo si hay columnas de mecánicos) */}
+            {mechanicColumns.length > 0 && (
+              <div className="w-20 shrink-0 p-4 border-r border-neutral-800/60 flex items-center justify-center">
+                <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            )}
+            {mechanicColumns.map(col => (
               <div
                 key={col.id}
                 id={`column-${col.id}`}
                 style={!fillContainer ? { width: columnWidth } : undefined}
-                className={`${fillContainer ? 'flex-1' : ''} p-4 border-r border-neutral-800/60 flex items-center justify-between transition-all duration-500 ${col.employeeId === null ? 'bg-neutral-800/20' : 'bg-red-900/5'}`}
+                className={`${fillContainer ? 'flex-1' : ''} p-4 border-r border-neutral-800/60 flex items-center justify-between transition-all duration-500 bg-red-900/5`}
               >
                 <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2 truncate">
-                  {col.employeeId === null ? (
-                    <svg className="w-4 h-4 text-neutral-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  ) : (
-                    <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  )}
+                  <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                   {col.title}
                 </h3>
               </div>
@@ -184,78 +206,100 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
           <div className="overflow-y-auto max-h-[65vh] custom-scrollbar">
             <div className="flex relative">
 
-              {/* Eje de Horas */}
-              <div className="w-20 shrink-0 border-r border-neutral-800/60 bg-neutral-900/40 relative z-0">
-                {slots.map((slot, idx) => {
-                  const isSpecial = slot.timeStr === `${workStart.toString().padStart(2, '0')}:00` ||
-                                    slot.timeStr === `${workEnd.toString().padStart(2, '0')}:00`;
-                  return (
-                    <div key={idx} style={{ height: ROW_HEIGHT }} className={`flex items-start justify-center p-2 border-b border-neutral-800/30 relative ${slot.isHour ? '' : 'opacity-50'}`}>
-                      {isSpecial && <div className="absolute top-0 left-0 right-0 border-t-2 border-red-500/60 z-10" />}
-                      <span className={`font-mono text-[16px] font-black z-20 tracking-tighter ${isSpecial ? 'text-red-500' : 'text-neutral-400'}`}>{slot.timeStr}</span>
-                    </div>
-                  );
-                })}
-              </div>
+              {/* ── Columna Sin Asignar (lista scrollable) ── */}
+              {unassignedCol && (
+                <div
+                  className="shrink-0 border-r border-neutral-800/60"
+                  style={{ width: columnWidth }}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDropColumn(e, null)}
+                >
+                  <UnassignedColumn
+                    appointments={unassignedApps}
+                    gridHeight={slots.length * ROW_HEIGHT}
+                    onManage={onManage}
+                    onViewChecklist={onViewChecklist}
+                    onDeleteTask={onDeleteTask}
+                    onDeleteAppointment={onDeleteAppointment}
+                    onUpdateStatus={onUpdateStatus}
+                    readOnly={readOnly}
+                    columnWidth="100%"
+                  />
+                </div>
+              )}
 
-              {/* Kanban */}
-              <div className="flex flex-1 relative z-10">
-                {/* Líneas de fondo */}
-                <div className="absolute inset-0 pointer-events-none flex flex-col z-0">
+              {/* Eje de Horas — solo si hay columnas de mecánicos */}
+              {mechanicColumns.length > 0 && (
+                <div className="w-20 shrink-0 border-r border-neutral-800/60 bg-neutral-900/40 relative z-0">
                   {slots.map((slot, idx) => {
                     const isSpecial = slot.timeStr === `${workStart.toString().padStart(2, '0')}:00` ||
                                       slot.timeStr === `${workEnd.toString().padStart(2, '0')}:00`;
                     return (
-                      <div key={`bg-${idx}`} style={{ height: ROW_HEIGHT }} className={`border-b relative ${slot.isHour ? 'border-neutral-800/60' : 'border-neutral-800/20 border-dashed'} w-full`}>
-                        {isSpecial && <div className="absolute top-0 left-0 right-0 border-t-2 border-red-500/40" />}
+                      <div key={idx} style={{ height: ROW_HEIGHT }} className={`flex items-start justify-center p-2 border-b border-neutral-800/30 relative ${slot.isHour ? '' : 'opacity-50'}`}>
+                        {isSpecial && <div className="absolute top-0 left-0 right-0 border-t-2 border-red-500/60 z-10" />}
+                        <span className={`font-mono text-[16px] font-black z-20 tracking-tighter ${isSpecial ? 'text-red-500' : 'text-neutral-400'}`}>{slot.timeStr}</span>
                       </div>
                     );
                   })}
                 </div>
+              )}
 
-                {/* Columnas de mecánicos */}
-                {columns.map(col => {
-                  const colApps = filteredAppointments.filter(a => a.assignedEmployeeId === col.employeeId);
-                  return (
-                    <div
-                      key={col.id}
-                      style={!fillContainer ? { width: columnWidth, height: slots.length * ROW_HEIGHT } : { height: slots.length * ROW_HEIGHT }}
-                      className={`${fillContainer ? 'flex-1' : 'shrink-0'} border-r border-neutral-800/60 relative z-10`}
-                      onDragOver={handleDragOver}
-                      onDrop={(e) => handleDropColumn(e, col.employeeId)}
-                    >
-                      {(() => {
-                        const sortedApps = [...colApps].sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
+              {/* Kanban — solo columnas de mecánicos */}
+              {mechanicColumns.length > 0 && (
+                <div className="flex flex-1 relative z-10">
+                  {/* Líneas de fondo */}
+                  <div className="absolute inset-0 pointer-events-none flex flex-col z-0">
+                    {slots.map((slot, idx) => {
+                      const isSpecial = slot.timeStr === `${workStart.toString().padStart(2, '0')}:00` ||
+                                        slot.timeStr === `${workEnd.toString().padStart(2, '0')}:00`;
+                      return (
+                        <div key={`bg-${idx}`} style={{ height: ROW_HEIGHT }} className={`border-b relative ${slot.isHour ? 'border-neutral-800/60' : 'border-neutral-800/20 border-dashed'} w-full`}>
+                          {isSpecial && <div className="absolute top-0 left-0 right-0 border-t-2 border-red-500/40" />}
+                        </div>
+                      );
+                    })}
+                  </div>
 
-                        // ── Group overlapping appointments into clusters ──
-                        const groups: any[][] = [];
-                        sortedApps.forEach(app => {
-                          const appStart = new Date(app.dateTime).getTime();
-                          if (groups.length === 0) {
-                            groups.push([app]);
-                            return;
-                          }
-                          const lastGroup = groups[groups.length - 1];
-                          const groupEnd = Math.max(
-                            ...lastGroup.map((a: any) => new Date(a.dateTime).getTime() + (a.estimatedDuration || 60) * 60000)
-                          );
-                          if (appStart < groupEnd) {
-                            lastGroup.push(app);
-                          } else {
-                            groups.push([app]);
-                          }
-                        });
+                  {/* Columnas de mecánicos (solo las asignadas) */}
+                  {mechanicColumns.map(col => {
+                    const colApps = filteredAppointments.filter(a => a.assignedEmployeeId === col.employeeId);
+                    return (
+                      <div
+                        key={col.id}
+                        style={!fillContainer ? { width: columnWidth, height: slots.length * ROW_HEIGHT } : { height: slots.length * ROW_HEIGHT }}
+                        className={`${fillContainer ? 'flex-1' : 'shrink-0'} border-r border-neutral-800/60 relative z-10`}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDropColumn(e, col.employeeId)}
+                      >
+                        {(() => {
+                          const sortedApps = [...colApps].sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime());
 
-                        return groups.flatMap(group => {
-                          // Single appointment — render with original AppointmentBlock
-                          if (group.length === 1) {
-                            const app = group[0];
-                            return (
+                          // ── Group overlapping appointments into clusters ──
+                          const groups: any[][] = [];
+                          sortedApps.forEach(app => {
+                            const appStart = new Date(app.dateTime).getTime();
+                            if (groups.length === 0) {
+                              groups.push([app]);
+                              return;
+                            }
+                            const lastGroup = groups[groups.length - 1];
+                            const groupEnd = Math.max(
+                              ...lastGroup.map((a: any) => new Date(a.dateTime).getTime() + (a.estimatedDuration || 60) * 60000)
+                            );
+                            if (appStart < groupEnd) {
+                              lastGroup.push(app);
+                            } else {
+                              groups.push([app]);
+                            }
+                          });
+
+                          return groups.flatMap(group => {
+                            return group.map((app, index) => (
                               <AppointmentBlock
                                 key={app.id}
                                 appointment={app}
-                                lane={0}
-                                totalLanes={1}
+                                lane={index}
+                                totalLanes={group.length}
                                 minuteHeight={MINUTE_HEIGHT}
                                 startHour={startDisplay}
                                 columnId={col.employeeId}
@@ -268,42 +312,14 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
                                 selectedDate={selectedDate}
                                 readOnly={readOnly}
                               />
-                            );
-                          }
-
-                          // Multiple overlapping — Stack & Popover
-                          const earliestStart = Math.min(...group.map((a: any) => new Date(a.dateTime).getTime()));
-                          const latestEnd = Math.max(...group.map((a: any) => new Date(a.dateTime).getTime() + (a.estimatedDuration || 60) * 60000));
-                          const earliestDate = new Date(earliestStart);
-                          const minsFromStart = (earliestDate.getHours() - startDisplay) * 60 + earliestDate.getMinutes();
-                          const topPx = minsFromStart * MINUTE_HEIGHT;
-                          const spanMinutes = (latestEnd - earliestStart) / 60000;
-                          const heightPx = spanMinutes * MINUTE_HEIGHT;
-
-                          return (
-                            <AppointmentStackGroup
-                              key={`stack-${group[0].id}`}
-                              appointments={group}
-                              topPosition={topPx}
-                              height={heightPx}
-                              columnId={col.employeeId}
-                              minuteHeight={MINUTE_HEIGHT}
-                              startHour={startDisplay}
-                              readOnly={readOnly}
-                              onReschedule={onRescheduleTask!}
-                              onUpdateStatus={onUpdateStatus}
-                              onDeleteTask={onDeleteTask}
-                              onDeleteAppointment={onDeleteAppointment}
-                              onManage={onManage}
-                              selectedDate={selectedDate}
-                            />
-                          );
-                        });
-                      })()}
-                    </div>
-                  );
-                })}
-              </div>
+                            ));
+                          });
+                        })()}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
             </div>
           </div>

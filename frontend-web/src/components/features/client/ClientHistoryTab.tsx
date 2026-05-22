@@ -1,4 +1,4 @@
-
+import React from 'react';
 
 const HistoryIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
 
@@ -16,10 +16,17 @@ export function ClientHistoryTab({ history }: ClientHistoryTabProps) {
                   <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-black bg-neutral-600 group-hover:bg-blue-500 text-neutral-500 group-hover:text-blue-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute top-0 left-[-27px] md:relative md:top-auto md:left-auto md:mx-auto transition-colors duration-300"></div>
                   <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-3xl bg-neutral-900/50 border border-neutral-800 group-hover:border-blue-900/50 transition-colors shadow">
                      <div className="flex items-center justify-between mb-2">
-                         <div className="font-bold text-white">{hist.vehicleName}</div>
-                         <time className="font-mono text-xs font-bold text-neutral-500">{hist.finishDate}</time>
+                        <div className="font-bold text-white">{hist.vehicleName}</div>
+                        <time className="font-mono text-xs font-bold text-neutral-500">{hist.finishDate}</time>
                      </div>
-                     <div className="text-neutral-400 text-sm">{hist.description}</div>
+                     <div className="text-neutral-400 text-sm flex justify-between items-center gap-4">
+                        <span>{hist.description}</span>
+                        {hist.totalCost > 0 && (
+                           <span className="font-mono font-bold text-blue-400 shrink-0 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 text-xs">
+                              {hist.totalCost.toFixed(2)}€
+                           </span>
+                        )}
+                     </div>
                   </div>
                </div>
             ))

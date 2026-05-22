@@ -18,6 +18,7 @@ public class WorkshopService {
 
     private final WorkshopRepository workshopRepository;
     private final EmployeeRepository employeeRepository;
+    private final org.tfg.backend.taskcatalog.CatalogInitializationService catalogInitializationService;
 
     /**
      * Registra un nuevo taller en el sistema.
@@ -42,11 +43,13 @@ public class WorkshopService {
                 .closeTime(request.getCloseTime()) // <-- NUEVO
                 .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60) // <-- NUEVO
                 .workingDays(request.getWorkingDays())
+                .hourlyRate(request.getHourlyRate() != null ? request.getHourlyRate() : 50.0)
                 .build();
 
         Workshop savedWorkshop = workshopRepository.save(workshop);
         owner.setWorkshop(savedWorkshop);
         employeeRepository.save(owner);
+        catalogInitializationService.initializeCatalogForWorkshop(savedWorkshop);
         return mapToDTO(savedWorkshop);
     }
 
@@ -98,13 +101,14 @@ public class WorkshopService {
         }
         if (request.getAddress() != null) workshop.setAddress(request.getAddress());
         if (request.getWorkingDays() != null) workshop.setWorkingDays(request.getWorkingDays());
+        if (request.getHourlyRate() != null) workshop.setHourlyRate(request.getHourlyRate());
 
         return mapToDTO(workshopRepository.save(workshop));
     }
 
     /**
      * Método privado para transformar la entidad Workshop al objeto de transferencia WorkshopDTO.
-     * Maneja la lógica de conteo de empleados y vehículos, así como la obtención del nombre del dueño.
+     * Maneja la lógic7a de conteo de empleados y vehículos, así como la obtención del nombre del dueño.
      */
     private WorkshopDTO mapToDTO(Workshop workshop) {
         // Obtenemos el nombre completo del dueño navegando desde Employee -> User
@@ -124,6 +128,7 @@ public class WorkshopService {
                 .closeTime(workshop.getCloseTime()) // Mapeo de hora cierre
                 .slotDurationMinutes(workshop.getSlotDurationMinutes())
                 .workingDays(workshop.getWorkingDays())
+                .hourlyRate(workshop.getHourlyRate())
                 // Calculamos el tamaño de las listas para las estadísticas del DTO
                 .totalEmployees(workshop.getEmployees() != null ? workshop.getEmployees().size() : 0)
                 .vehiclesCurrentCount(workshop.getVehiclesInside() != null ? workshop.getVehiclesInside().size() : 0)

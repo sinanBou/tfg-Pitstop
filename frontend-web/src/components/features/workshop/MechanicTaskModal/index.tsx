@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import cargaTrabajo from '../../../../assets/cargaTrabajo.json';
+import React, { useState, useMemo, useEffect } from 'react';
 import { API_BASE_URL } from '../../../../config/api';
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -86,28 +85,6 @@ function calcHoursForTask(task: CatalogTask, cylinders: number, wheels: number =
   return 0;
 }
 
-/** Flatten catalog into { category, tasks[] } list */
-function getCatalogSections(): { key: string; label: string; tasks: CatalogTask[] }[] {
-  const servicios = cargaTrabajo.servicios as any;
-  const result: { key: string; label: string; tasks: CatalogTask[] }[] = [];
-
-  // Motor sub-categories
-  const motores = servicios.motores as Record<string, CatalogTask[]>;
-  for (const [key, tasks] of Object.entries(motores)) {
-    result.push({ key, label: CATEGORY_LABELS[key] ?? key, tasks });
-  }
-
-  // Top-level categories
-  for (const [key, value] of Object.entries(servicios)) {
-    if (key === 'motores') continue;
-    result.push({ key, label: CATEGORY_LABELS[key] ?? key, tasks: value as CatalogTask[] });
-  }
-  return result;
-}
-
-// ──────────────────────────────────────────────────────────────────────────────
-// Component
-// ──────────────────────────────────────────────────────────────────────────────
 export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
   isOpen, onClose, appointment, onSuccess,
 }) => {
@@ -119,7 +96,93 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const sections = useMemo(() => getCatalogSections(), []);
+  const [catalogSections, setCatalogSections] = useState<{ key: string; label: string; tasks: CatalogTask[] }[]>([]);
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
+
+  const sections = catalogSections;
+
+  // Fetch dynamic catalog for this specific workshop
+  useEffect(() => {
+    if (!isOpen || !appointment?.workshopId) return;
+
+    setLoadingCatalog(true);
+    const token = localStorage.getItem('jwt_token');
+    fetch(`${API_BASE_URL}/catalog/workshop/${appointment.workshopId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then((data: any[]) => {
+        const mapped = data.map(cat => ({
+          key: cat.name,
+          label: cat.displayName,
+          tasks: (cat.tasks || []).map((t: any) => ({
+            codigo: t.code,
+            tarea: t.name,
+            horas: t.hours ?? undefined,
+            horas_4_cil: t.hours4Cil ?? undefined,
+            horas_cil_extra: t.hoursCilExtra ?? undefined,
+            horas_1_rueda: t.hours1Rueda ?? undefined
+          }))
+        }));
+        setCatalogSections(mapped);
+        if (mapped.length > 0) {
+          if (!mapped.some(s => s.key === activeCategory)) {
+            setActiveCategory(mapped[0].key);
+          }
+        }
+      })
+      .catch(err => console.error("Error loading task catalog:", err))
+      .finally(() => setLoadingCatalog(false));
+  }, [isOpen, appointment?.workshopId]);
+
+  // Pre-populate previously managed tasks and parameters
+  useEffect(() => {
+    if (isOpen && appointment && !loadingCatalog && sections.length > 0) {
+      if (appointment.serviceType) {
+        const savedCodes = appointment.serviceType
+          .split(',')
+          .map((s: string) => s.trim())
+          .filter(Boolean);
+
+        const loadedTasks: SelectedTask[] = [];
+        savedCodes.forEach((code: string) => {
+          for (const section of sections) {
+            const matchedTask = section.tasks.find(t => t.codigo === code);
+            if (matchedTask) {
+              loadedTasks.push({
+                task: matchedTask,
+                category: section.key
+              });
+              break;
+            }
+          }
+        });
+        setSelectedTasks(loadedTasks);
+      } else {
+        setSelectedTasks([]);
+      }
+
+      if (appointment.mechanicComments) {
+        // e.g. "Cilindros: 4 | Ruedas: 2"
+        const cylindersMatch = appointment.mechanicComments.match(/Cilindros:\s*(\d+)/i);
+        if (cylindersMatch) {
+          setCylinders(parseInt(cylindersMatch[1], 10));
+        } else {
+          setCylinders(0);
+        }
+
+        const wheelsMatch = appointment.mechanicComments.match(/Ruedas:\s*(\d+)/i);
+        if (wheelsMatch) {
+          setWheels(parseInt(wheelsMatch[1], 10));
+        } else {
+          setWheels(0);
+        }
+      } else {
+        setCylinders(0);
+        setWheels(0);
+      }
+    }
+  }, [isOpen, appointment, loadingCatalog, sections]);
 
   const filteredTasks = useMemo(() => {
     if (!searchQuery.trim()) {
@@ -289,75 +352,84 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
 
             {/* Task list */}
             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
-              {searchQuery.trim() && (
-                <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest pb-1">
-                  {filteredTasks.length} resultado{filteredTasks.length !== 1 ? 's' : ''} en todo el catálogo
-                </p>
-              )}
-              {filteredTasks.length === 0 && (
-                <p className="text-neutral-600 text-center py-12 text-sm">No se encontraron tareas</p>
-              )}
-              {(filteredTasks as any[]).map((task: any) => {
-                const hours = calcHoursForTask(task, cylinders, wheels);
-                const selected = isSelected(task.codigo);
-                const wheelBased = isWheelTask(task);
-                return (
-                  <button
-                    key={task.codigo}
-                    onClick={() => toggleTask(task)}
-                    className={`w-full text-left px-4 py-3 rounded-2xl border transition-all flex items-center justify-between gap-3 group ${
-                      selected
-                        ? 'border-blue-500/50 bg-blue-600/10 text-white'
-                        : 'border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:border-neutral-700 hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
-                        selected ? 'bg-blue-600 border-blue-600' : 'border-neutral-600 group-hover:border-neutral-400'
-                      }`}>
-                        {selected && (
-                          <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className={`text-[10px] font-black tracking-widest ${selected ? 'text-blue-400' : 'text-neutral-600'}`}>
-                            {task.codigo}
-                          </span>
-                          {/* Cylinder badge: shows count when task scales by cylinders */}
-                          {wheelBased === false && isCylinderTask(task) && (
-                            <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
-                              selected ? 'bg-neutral-600/40 text-neutral-300' : 'bg-neutral-800/60 text-neutral-500'
-                            }`}>
-                              {cylinders} cil.
-                            </span>
-                          )}
-                          {/* Wheel badge: shows multiplier when task scales by wheels */}
-                          {wheelBased && (
-                            <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
-                              selected ? 'bg-blue-600/30 text-blue-300' : 'bg-blue-900/30 text-blue-600'
-                            }`}>
-                              ×{wheels} rueda{wheels !== 1 ? 's' : ''}
-                            </span>
-                          )}
-                          {/* Category badge during global search */}
-                          {searchQuery.trim() && task._sectionLabel && (
-                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-neutral-800 text-neutral-500">
-                              {task._sectionLabel}
-                            </span>
-                          )}
+              {loadingCatalog ? (
+                <div className="text-center py-20 text-neutral-500 flex flex-col items-center justify-center gap-3">
+                  <div className="w-8 h-8 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
+                  <p className="text-xs uppercase tracking-widest font-black">Cargando catálogo dinámico...</p>
+                </div>
+              ) : (
+                <>
+                  {searchQuery.trim() && (
+                    <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest pb-1">
+                      {filteredTasks.length} resultado{filteredTasks.length !== 1 ? 's' : ''} en todo el catálogo
+                    </p>
+                  )}
+                  {filteredTasks.length === 0 && (
+                    <p className="text-neutral-600 text-center py-12 text-sm">No se encontraron tareas</p>
+                  )}
+                  {(filteredTasks as any[]).map((task: any) => {
+                    const hours = calcHoursForTask(task, cylinders, wheels);
+                    const selected = isSelected(task.codigo);
+                    const wheelBased = isWheelTask(task);
+                    return (
+                      <button
+                        key={task.codigo}
+                        onClick={() => toggleTask(task)}
+                        className={`w-full text-left px-4 py-3 rounded-2xl border transition-all flex items-center justify-between gap-3 group ${
+                          selected
+                            ? 'border-blue-500/50 bg-blue-600/10 text-white'
+                            : 'border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:border-neutral-700 hover:text-white'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
+                            selected ? 'bg-blue-600 border-blue-600' : 'border-neutral-600 group-hover:border-neutral-400'
+                          }`}>
+                            {selected && (
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className={`text-[10px] font-black tracking-widest ${selected ? 'text-blue-400' : 'text-neutral-600'}`}>
+                                {task.codigo}
+                              </span>
+                              {/* Cylinder badge: shows count when task scales by cylinders */}
+                              {wheelBased === false && isCylinderTask(task) && (
+                                <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
+                                  selected ? 'bg-neutral-600/40 text-neutral-300' : 'bg-neutral-800/60 text-neutral-500'
+                                }`}>
+                                  {cylinders} cil.
+                                </span>
+                              )}
+                              {/* Wheel badge: shows multiplier when task scales by wheels */}
+                              {wheelBased && (
+                                <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
+                                  selected ? 'bg-blue-600/30 text-blue-300' : 'bg-blue-900/30 text-blue-600'
+                                }`}>
+                                  ×{wheels} rueda{wheels !== 1 ? 's' : ''}
+                                </span>
+                              )}
+                              {/* Category badge during global search */}
+                              {searchQuery.trim() && task._sectionLabel && (
+                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-neutral-800 text-neutral-500">
+                                  {task._sectionLabel}
+                                </span>
+                              )}
+                            </div>
+                            <span className="text-xs font-medium truncate block">{task.tarea}</span>
+                          </div>
                         </div>
-                        <span className="text-xs font-medium truncate block">{task.tarea}</span>
-                      </div>
-                    </div>
-                    <span className={`text-xs font-black shrink-0 ${selected ? 'text-blue-400' : 'text-neutral-600'}`}>
-                      {hours.toFixed(1)} h
-                    </span>
-                  </button>
-                );
-              })}
+                        <span className={`text-xs font-black shrink-0 ${selected ? 'text-blue-400' : 'text-neutral-600'}`}>
+                          {hours.toFixed(1)} h
+                        </span>
+                      </button>
+                    );
+                  })}
+                </>
+              )}
             </div>
           </div>
 
@@ -368,10 +440,22 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
 
               {/* Hours summary */}
               <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 mb-4">
-                <div className="text-4xl font-black text-white mb-1">
-                  {totalHours.toFixed(1)}<span className="text-lg text-neutral-500 ml-1">h</span>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="text-4xl font-black text-white mb-1">
+                      {totalHours.toFixed(1)}<span className="text-lg text-neutral-500 ml-1">h</span>
+                    </div>
+                    <p className="text-[10px] text-neutral-500 uppercase tracking-widest">{totalMinutes} minutos estimados</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-3xl font-black text-blue-400 mb-1">
+                      {(totalHours * (appointment?.workshopHourlyRate ?? 50.0)).toFixed(2)}<span className="text-xs text-neutral-500 ml-1">€</span>
+                    </div>
+                    <p className="text-[9px] text-neutral-500 uppercase tracking-widest">
+                      Mano de Obra ({(appointment?.workshopHourlyRate ?? 50.0).toFixed(2)}€/h)
+                    </p>
+                  </div>
                 </div>
-                <p className="text-[10px] text-neutral-500 uppercase tracking-widest">{totalMinutes} minutos estimados</p>
                 {totalHours > 8 && (
                   <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
                     <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -27,6 +27,9 @@ export interface AppointmentDTO {
   date: string; 
   time: string;
   serviceType: string; 
+  workshopHourlyRate?: number;
+  mechanicComments?: string;
+  estimatedDuration?: number;
 }
 
 export interface HistoryDTO {

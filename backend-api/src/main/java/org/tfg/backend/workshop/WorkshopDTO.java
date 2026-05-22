@@ -26,4 +26,5 @@ public class WorkshopDTO {
     private LocalTime closeTime;
     private Integer slotDurationMinutes;
     private String workingDays;
+    private Double hourlyRate;
 }

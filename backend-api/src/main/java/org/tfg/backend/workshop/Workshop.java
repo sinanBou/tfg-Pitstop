@@ -59,4 +59,8 @@ public class Workshop {
 
     @Column(name = "working_days")
     private String workingDays;
+
+    @Column(name = "hourly_rate")
+    @Builder.Default
+    private Double hourlyRate = 50.0;
 }

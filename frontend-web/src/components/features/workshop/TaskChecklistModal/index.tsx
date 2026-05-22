@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import cargaTrabajo from '../../../../assets/cargaTrabajo.json';
 import { API_BASE_URL } from '../../../../config/api';
 
 /* ─────────────────────────────────────────────
@@ -11,12 +10,6 @@ import { API_BASE_URL } from '../../../../config/api';
  * ───────────────────────────────────────────── */
 
 // ── Types ──
-interface CatalogTask {
-  codigo: string;
-  tarea: string;
-  [key: string]: unknown;
-}
-
 interface ChecklistItem {
   code: string;
   label: string;
@@ -34,32 +27,12 @@ interface TaskChecklistModalProps {
   onSuccess?: () => void;
 }
 
-// ── Catalog resolution ──
-function buildCatalogMap(): Map<string, string> {
-  const map = new Map<string, string>();
-  const servicios = (cargaTrabajo as any).servicios;
-
-  const motores = servicios.motores as Record<string, CatalogTask[]>;
-  for (const tasks of Object.values(motores)) {
-    for (const t of tasks) {
-      map.set(t.codigo, t.tarea);
-    }
-  }
-
-  for (const [key, value] of Object.entries(servicios)) {
-    if (key === 'motores') continue;
-    for (const t of value as CatalogTask[]) {
-      map.set(t.codigo, t.tarea);
-    }
-  }
-
-  return map;
-}
-
-const CATALOG_MAP = buildCatalogMap();
-
 /** Parse service codes and mark completed ones from persisted data */
-function parseServiceCodes(serviceType: string | undefined, completedTasks: string | undefined): ChecklistItem[] {
+function parseServiceCodes(
+  serviceType: string | undefined, 
+  completedTasks: string | undefined, 
+  catalogMap: Map<string, string>
+): ChecklistItem[] {
   if (!serviceType) return [];
   const completedSet = new Set(
     (completedTasks || '').split(',').map(c => c.trim()).filter(Boolean)
@@ -70,7 +43,7 @@ function parseServiceCodes(serviceType: string | undefined, completedTasks: stri
     .filter(Boolean)
     .map(code => ({
       code,
-      label: CATALOG_MAP.get(code) ?? code,
+      label: catalogMap.get(code) ?? code,
       completed: completedSet.has(code),
     }));
 }
@@ -83,9 +56,35 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   onUpdateStatus,
   onSuccess,
 }) => {
+  const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+  const [loadingCatalog, setLoadingCatalog] = useState(true);
+
+  // Fetch catalog from database dynamically
+  React.useEffect(() => {
+    if (!isOpen || !item?.workshopId) return;
+
+    setLoadingCatalog(true);
+    const token = localStorage.getItem('jwt_token');
+    fetch(`${API_BASE_URL}/catalog/workshop/${item.workshopId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then((data: any[]) => {
+        const map = new Map<string, string>();
+        data.forEach(cat => {
+          (cat.tasks || []).forEach((t: any) => {
+            map.set(t.code, t.name);
+          });
+        });
+        setCatalogMap(map);
+      })
+      .catch(err => console.error("Error loading task catalog for checklist:", err))
+      .finally(() => setLoadingCatalog(false));
+  }, [isOpen, item?.workshopId]);
+
   const initialItems = useMemo(
-    () => parseServiceCodes(item?.serviceType, item?.completedTasks),
-    [item?.serviceType, item?.completedTasks]
+    () => parseServiceCodes(item?.serviceType, item?.completedTasks, catalogMap),
+    [item?.serviceType, item?.completedTasks, catalogMap]
   );
   const [checklist, setChecklist] = useState<ChecklistItem[]>(initialItems);
   const [completing, setCompleting] = useState(false);
@@ -93,8 +92,8 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
 
   // Reset checklist when item changes
   React.useEffect(() => {
-    setChecklist(parseServiceCodes(item?.serviceType, item?.completedTasks));
-  }, [item?.serviceType, item?.completedTasks]);
+    setChecklist(parseServiceCodes(item?.serviceType, item?.completedTasks, catalogMap));
+  }, [item?.serviceType, item?.completedTasks, catalogMap]);
 
   const completedCount = checklist.filter(i => i.completed).length;
   const totalCount = checklist.length;
@@ -227,7 +226,12 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
 
         {/* Checklist body */}
         <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-2">
-          {checklist.length === 0 ? (
+          {loadingCatalog ? (
+            <div className="text-center py-16 text-neutral-500 flex flex-col items-center justify-center gap-3">
+              <div className="w-8 h-8 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
+              <p className="text-xs uppercase tracking-widest font-black">Cargando catálogo dinámico...</p>
+            </div>
+          ) : checklist.length === 0 ? (
             <div className="text-center py-16">
               <svg className="w-12 h-12 text-neutral-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -236,7 +240,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
               <p className="text-neutral-700 text-xs mt-1">El campo serviceType está vacío o no contiene códigos válidos.</p>
             </div>
           ) : (
-            checklist.map((ci, idx) => (
+            checklist.map((ci) => (
               <button
                 key={ci.code}
                 onClick={() => toggleItem(ci.code)}

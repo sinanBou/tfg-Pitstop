@@ -1,10 +1,9 @@
-package org.tfg.backend.appointment;
+package org.tfg.backend.workshoptask;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -12,32 +11,35 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AppointmentDTO {
+public class WorkshopTaskDTO {
     private UUID id;
     private LocalDateTime dateTime;
     private String description;
     private String serviceType;
-    private String mechanicComments;
-    private AppointmentStatus status;
-
-    // Control de tiempos
+    private WorkshopTaskStatus status;
     private Integer estimatedDuration;
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
-
-    // Información del Cliente
-    private String clientFullName;
-
-    // Información del Vehículo
+    
     private UUID vehicleId;
-    private String vehicleDisplay; // Ejemplo: "BMW Serie 3 (1234ABC)"
-
-    // Información del Taller
+    private String vehicleDisplay;
+    
     private UUID workshopId;
     private String workshopName;
-    private Double workshopHourlyRate;
-
-    // Información del Empleado Asignado
+    
     private UUID assignedEmployeeId;
     private String assignedEmployeeName;
+    
+    private String clientFullName;
+    
+    private UUID originAppointmentId;
+
+    private String completedTasks;
+
+    /** Explicit flag: when true, the assignedEmployeeId value is applied (even if null = unassign) */
+    private Boolean reassignEmployee;
+
+    // Helper for frontend logic
+    @com.fasterxml.jackson.annotation.JsonProperty(access = com.fasterxml.jackson.annotation.JsonProperty.Access.READ_ONLY)
+    private Boolean isTask = true;
 }

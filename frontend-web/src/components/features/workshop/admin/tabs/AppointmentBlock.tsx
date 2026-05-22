@@ -173,8 +173,8 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                 </svg>
               </button>
 
-              {/* Checklist — Ver sub-tareas del vehículo */}
-              {appointment.serviceType && (
+              {/* Checklist — Ver sub-tareas del vehículo (solo para tareas) */}
+              {appointment.isTask && appointment.serviceType && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -189,19 +189,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                 </button>
               )}
 
-              {/* Confirmar si está PENDING */}
-              {appointment.status === 'PENDING' && onUpdateStatus && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUpdateStatus(appointment.id, 'CONFIRMED', appointment.isTask);
-                  }}
-                  className="w-7 h-7 bg-green-500/20 backdrop-blur-sm border border-green-500/30 text-green-400 rounded-full transition-all hover:bg-green-500 hover:text-white shadow-xl flex items-center justify-center active:scale-95"
-                  title="Confirmar"
-                >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
-                </button>
-              )}
+
 
              {/* Eliminar */}
              {!readOnly && onUpdateStatus && (

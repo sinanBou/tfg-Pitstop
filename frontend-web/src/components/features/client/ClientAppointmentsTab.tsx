@@ -47,11 +47,39 @@ export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAp
                             <h4 className="text-2xl font-black text-white tracking-widest mb-1">{formatDateToDDMMAA(app.date)}</h4>
                             <p className="text-neutral-400 font-mono text-sm">{app.time}</p>
                         </div>
-                        <span className={`shrink-0 text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest ${app.status === 'CONFIRMADA' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'}`}>
-                           {app.status}
+                        <span className={`shrink-0 text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest ${
+                          app.status === 'COMPLETED' 
+                            ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                            : app.status === 'IN_PROGRESS'
+                              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                              : app.status === 'CONFIRMED'
+                                ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                                : app.status === 'DELAYED'
+                                  ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                                  : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
+                        }`}>
+                           {app.status === 'COMPLETED' ? '✓ Listo' 
+                            : app.status === 'IN_PROGRESS' ? 'En Proceso'
+                            : app.status === 'CONFIRMED' ? 'Confirmada'
+                            : app.status === 'DELAYED' ? 'Retrasada'
+                            : app.status === 'CANCELLED' ? 'Cancelada'
+                            : 'Pendiente'}
                         </span>
                      </div>
                      
+                     {/* Ready for pickup banner */}
+                     {app.status === 'COMPLETED' && (
+                       <div className="flex items-center gap-3 px-5 py-4 bg-green-500/10 border border-green-500/20 rounded-2xl mb-4 animate-pulse">
+                         <svg className="w-6 h-6 text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                         </svg>
+                         <div>
+                           <p className="text-green-400 text-xs font-black uppercase tracking-widest">Vehículo Listo</p>
+                           <p className="text-green-300/70 text-[11px] mt-0.5">Tu coche está preparado. Ya puedes pasar a recogerlo.</p>
+                         </div>
+                       </div>
+                     )}
+
                      <div className="space-y-3 mb-8 mt-auto bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
                         <div className="flex justify-between items-center text-sm">
                            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">Vehículo</span>
@@ -76,8 +104,12 @@ export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAp
                          </span>
                       </button>
                    ) : (
-                      <div className="w-full py-4 bg-neutral-900/20 border border-neutral-800/50 text-neutral-600 rounded-xl text-[10px] font-black uppercase tracking-widest text-center mt-auto cursor-not-allowed">
-                         {app.status === 'COMPLETED' ? 'Cita Finalizada' : app.status === 'CANCELLED' ? 'Cita Cancelada' : 'Cita en Proceso'}
+                      <div className={`w-full py-4 border rounded-xl text-[10px] font-black uppercase tracking-widest text-center mt-auto cursor-not-allowed ${
+                        app.status === 'COMPLETED' 
+                          ? 'bg-green-500/5 border-green-500/20 text-green-400'
+                          : 'bg-neutral-900/20 border-neutral-800/50 text-neutral-600'
+                      }`}>
+                         {app.status === 'COMPLETED' ? '✓ Vehículo Listo para Recoger' : app.status === 'CANCELLED' ? 'Cita Cancelada' : 'Cita en Proceso'}
                       </div>
                    )}
                </div>

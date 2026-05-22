@@ -7,7 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.client.Client;
 import org.tfg.backend.user.UserRepository;
 import org.tfg.backend.vehicle.VehicleRepository;
+import org.tfg.backend.workshop.Workshop;
 import org.tfg.backend.workshop.WorkshopRepository;
+import org.tfg.backend.workshoptask.WorkshopTask;
+import org.tfg.backend.workshoptask.WorkshopTaskRepository;
+import org.tfg.backend.workshoptask.WorkshopTaskStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -26,6 +30,7 @@ public class AppointmentService {
     private final VehicleRepository vehicleRepository;
     private final WorkshopRepository workshopRepository;
     private final org.tfg.backend.employee.EmployeeRepository employeeRepository;
+    private final WorkshopTaskRepository workshopTaskRepository;
 
     // Configuración: Citas cada 1 hora, de 9 a 14 y 16 a 19
     private final List<LocalTime> WORKING_HOURS = List.of(
@@ -40,8 +45,13 @@ public class AppointmentService {
                 .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
         // Mecánicos activos del taller (capacidad real)
-        List<org.tfg.backend.employee.Employee> mechanics = workshop.getEmployees();
-        int totalMechanics = mechanics.isEmpty() ? 1 : mechanics.size();
+        long staffCount = workshop.getEmployees().stream()
+                .filter(e -> e.getUser() != null && 
+                    (e.getUser().getRole() == org.tfg.backend.user.Role.WORKSHOP_STAFF || 
+                     e.getUser().getRole() == org.tfg.backend.user.Role.WORKSHOP_MANAGER))
+                .count();
+        long totalMechanics = staffCount == 0 ? 1 : staffCount;
+        System.out.println("[DEBUG-CAPACITY] getAvailableSlots: workshop=" + workshop.getCompanyName() + ", employees=" + workshop.getEmployees().size() + ", staffCount=" + staffCount + " -> totalMechanics=" + totalMechanics);
 
         LocalTime open = (workshop.getOpenTime() != null) ? workshop.getOpenTime() : LocalTime.of(9, 0);
         LocalTime close = (workshop.getCloseTime() != null) ? workshop.getCloseTime() : LocalTime.of(18, 0);
@@ -148,8 +158,12 @@ public class AppointmentService {
                 .filter(a -> a.getAssignedEmployee() == null)
                 .count();
 
-        int totalMechanics = workshop.getEmployees().size();
-        if (totalMechanics == 0) totalMechanics = 1;
+        long staffCount = workshop.getEmployees().stream()
+                .filter(e -> e.getUser() != null && 
+                    (e.getUser().getRole() == org.tfg.backend.user.Role.WORKSHOP_STAFF || 
+                     e.getUser().getRole() == org.tfg.backend.user.Role.WORKSHOP_MANAGER))
+                .count();
+        long totalMechanics = staffCount == 0 ? 1 : staffCount;
 
         if ((busyMechanics + unassignedInSlot) >= totalMechanics) {
             throw new RuntimeException(
@@ -198,6 +212,7 @@ public class AppointmentService {
                 .dateTime(appointment.getDateTime())
                 .description(appointment.getDescription())
                 .serviceType(appointment.getServiceType())
+                .mechanicComments(appointment.getMechanicComments())
                 .status(appointment.getStatus())
                 .estimatedDuration(appointment.getEstimatedDuration())
                 .actualStartTime(appointment.getActualStartTime())
@@ -210,6 +225,7 @@ public class AppointmentService {
                         appointment.getVehicle().getLicensePlate() + ")")
                 .workshopId(appointment.getWorkshop().getId())
                 .workshopName(appointment.getWorkshop().getCompanyName())
+                .workshopHourlyRate(appointment.getWorkshop().getHourlyRate())
                 .assignedEmployeeId(appointment.getAssignedEmployee() != null ? appointment.getAssignedEmployee().getId() : null)
                 .assignedEmployeeName(appointment.getAssignedEmployee() != null ?
                         appointment.getAssignedEmployee().getUser().getFirstname() + " " +
@@ -221,6 +237,11 @@ public class AppointmentService {
     public void updateAppointmentStatus(UUID appointmentId, AppointmentStatus newStatus) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+
+        // Regla de Negocio: No se puede cancelar una cita que ya está en curso, retrasada o finalizada
+        if (newStatus == AppointmentStatus.CANCELLED && (appointment.getStatus() == AppointmentStatus.IN_PROGRESS || appointment.getStatus() == AppointmentStatus.DELAYED || appointment.getStatus() == AppointmentStatus.COMPLETED)) {
+            throw new RuntimeException("No se puede cancelar una cita en este estado.");
+        }
 
         // Lógica de "fichado" automático
         if (newStatus == AppointmentStatus.IN_PROGRESS && appointment.getActualStartTime() == null) {
@@ -271,7 +292,105 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
-    @Transactional(readOnly = true)
+    /**
+     * Mechanic selects tasks from the catalog -> store planned work as PENDING/unassigned.
+     * If the estimated minutes exceed the remaining minutes on the original day,
+     * the overflow is distributed across subsequent working days.
+     */
+    @Transactional
+    public void manageAppointmentTasks(UUID appointmentId, AppointmentManagementRequest request) {
+        if (appointmentId == null) {
+            throw new RuntimeException("ID de cita no proporcionado");
+        }
+        
+        Appointment original = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada con ID: " + appointmentId));
+
+        Integer totalMinsRequested = request.getCalculatedMinutes();
+        if (totalMinsRequested == null || totalMinsRequested <= 0) {
+            throw new RuntimeException("La duración estimada debe ser mayor a 0");
+        }
+        int totalMinsRemaining = totalMinsRequested;
+
+        Workshop ws = original.getWorkshop();
+        if (ws == null) {
+            throw new RuntimeException("La cita no tiene un taller asociado");
+        }
+        LocalTime closeTime = ws.getCloseTime() != null ? ws.getCloseTime() : LocalTime.of(18, 0);
+        LocalTime openTime = ws.getOpenTime() != null ? ws.getOpenTime() : LocalTime.of(9, 0);
+        
+        int dayCapacity = (int) java.time.Duration.between(openTime, closeTime).toMinutes();
+        if (dayCapacity <= 0) dayCapacity = 480;
+
+        LocalDateTime currentStart = original.getDateTime();
+        
+        // 1. Mark original appointment as IN_PROGRESS (meaning it's being handled in the workshop)
+        original.setStatus(AppointmentStatus.IN_PROGRESS);
+        original.setServiceType(request.getServiceType());
+        original.setMechanicComments(request.getMechanicComments());
+        original.setEstimatedDuration(request.getCalculatedMinutes());
+        
+        // Clear previous tasks if any to support re-managing the appointment without duplicating tasks
+        if (original.getTasks() != null) {
+            original.getTasks().clear();
+        }
+        appointmentRepository.saveAndFlush(original);
+
+        // 2. Calculate distribution
+        int minutesUntilClose = (int) java.time.Duration.between(currentStart.toLocalTime(), closeTime).toMinutes();
+        minutesUntilClose = Math.max(0, minutesUntilClose);
+        
+        int firstDayShare = Math.min(totalMinsRemaining, minutesUntilClose);
+        
+        // 3. Create WorkshopTasks instead of continuation appointments
+        // Task 1: Today's share
+        if (firstDayShare > 0) {
+            WorkshopTask firstTask = WorkshopTask.builder()
+                    .originAppointment(original)
+                    .vehicle(original.getVehicle())
+                    .workshop(ws)
+                    .dateTime(currentStart)
+                    .description(original.getDescription())
+                    .serviceType(request.getServiceType())
+                    .status(WorkshopTaskStatus.PENDING)
+                    .estimatedDuration(firstDayShare)
+                    .build();
+            workshopTaskRepository.save(firstTask);
+            totalMinsRemaining -= firstDayShare;
+        }
+
+        // Subsequent days
+        LocalDate nextDay = currentStart.toLocalDate().plusDays(1);
+        while (totalMinsRemaining > 0) {
+            while (nextDay.getDayOfWeek() == java.time.DayOfWeek.SATURDAY || 
+                   nextDay.getDayOfWeek() == java.time.DayOfWeek.SUNDAY) {
+                nextDay = nextDay.plusDays(1);
+            }
+
+            int dayMinutes = Math.min(totalMinsRemaining, dayCapacity);
+            
+            String desc = original.getDescription();
+            if (desc != null && desc.length() > 200) desc = desc.substring(0, 200);
+            desc = (desc != null ? desc : "Tarea") + " (Cont.)";
+
+            WorkshopTask continuation = WorkshopTask.builder()
+                    .originAppointment(original)
+                    .vehicle(original.getVehicle())
+                    .workshop(ws)
+                    .dateTime(nextDay.atTime(openTime))
+                    .description(desc)
+                    .serviceType(request.getServiceType())
+                    .status(WorkshopTaskStatus.PENDING)
+                    .estimatedDuration(dayMinutes)
+                    .build();
+            
+            workshopTaskRepository.save(continuation);
+            totalMinsRemaining -= dayMinutes;
+            nextDay = nextDay.plusDays(1);
+        }
+    }
+
+
     public List<AppointmentDTO> getAppointmentsByUser(String email) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -280,6 +399,25 @@ public class AppointmentService {
 
         return appointmentRepository.findByClientId(user.getClient().getId())
                 .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getAppointmentsReadyForCompletion(UUID workshopId) {
+        return appointmentRepository.findByWorkshopIdOrderByDateTimeAsc(workshopId)
+                .stream()
+                .filter(a -> {
+                    // COMPLETED: waiting for client pickup confirmation
+                    if (a.getStatus() == AppointmentStatus.COMPLETED) return true;
+                    // IN_PROGRESS with ALL tasks COMPLETED: ready for manager sign-off
+                    if (a.getStatus() == AppointmentStatus.IN_PROGRESS
+                            && a.getTasks() != null && !a.getTasks().isEmpty()
+                            && a.getTasks().stream().allMatch(t -> t.getStatus() == org.tfg.backend.workshoptask.WorkshopTaskStatus.COMPLETED)) {
+                        return true;
+                    }
+                    return false;
+                })
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -294,9 +432,14 @@ public class AppointmentService {
 
     public void deleteAppointment(UUID id) {
         // Verificamos si existe antes de borrar para evitar excepciones genéricas
-        if (!appointmentRepository.existsById(id)) {
-            throw new RuntimeException("La cita con ID " + id + " no existe");
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("La cita con ID " + id + " no existe"));
+
+        // Regla de Negocio: No se puede eliminar una cita que ya está retrasada o finalizada
+        if (appointment.getStatus() == AppointmentStatus.DELAYED || appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new RuntimeException("No se puede eliminar una cita en su estado actual.");
         }
-        appointmentRepository.deleteById(id);
+
+        appointmentRepository.delete(appointment);
     }
 }

@@ -54,6 +54,13 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAppointmentsByWorkshop(workshopId));
     }
 
+    /** Appointments that are IN_PROGRESS and have ALL their tasks COMPLETED */
+    @GetMapping("/workshop/{workshopId}/ready-for-completion")
+    public ResponseEntity<List<AppointmentDTO>> getReadyForCompletion(
+            @PathVariable UUID workshopId) {
+        return ResponseEntity.ok(appointmentService.getAppointmentsReadyForCompletion(workshopId));
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<String> updateStatus(
             @PathVariable UUID id,
@@ -78,6 +85,21 @@ public class AppointmentController {
             @RequestParam(required = false) Integer duration) {
         appointmentService.rescheduleAppointment(id, employeeId, dateTime, duration);
         return ResponseEntity.ok("Cita re-programada");
+    }
+
+    /** Mechanic submits selected tasks -> distributes work across calendar days */
+    @PatchMapping("/{id}/manage")
+    public ResponseEntity<?> manageAppointmentTasks(
+            @PathVariable UUID id,
+            @RequestBody AppointmentManagementRequest request) {
+        try {
+            appointmentService.manageAppointmentTasks(id, request);
+            return ResponseEntity.ok("Trabajo planificado y distribuido en el calendario");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al gestionar tareas: " + e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")

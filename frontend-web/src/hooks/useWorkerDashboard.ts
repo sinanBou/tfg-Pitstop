@@ -9,6 +9,7 @@ export function useWorkerDashboard() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [workshopTasks, setWorkshopTasks] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
+  const [readyForCompletion, setReadyForCompletion] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
     d.setHours(0,0,0,0);
@@ -43,6 +44,12 @@ export function useWorkerDashboard() {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if(empRes.ok) setEmployees(await empRes.json());
+
+        // Fetch completed jobs for manager panel
+        const rcRes = await fetch(`${API_BASE_URL}/appointments/workshop/${data.workshopId}/ready-for-completion`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(rcRes.ok) setReadyForCompletion(await rcRes.json());
       }
     } catch (err) {
       localStorage.clear();
@@ -164,6 +171,42 @@ export function useWorkerDashboard() {
     }
   };
 
+  /** Mark a job as fully completed — client sees it as ready to pick up */
+  const completeJob = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/status?status=COMPLETED`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error completando trabajo:", err);
+    }
+    return false;
+  };
+
+  /** Mark vehicle as picked up by the client — removed from all panels */
+  const markPickedUp = async (appointmentId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/status?status=PICKED_UP`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error marcando recogida:", err);
+    }
+    return false;
+  };
+
   const handleDeleteTask = async (taskId: string) => {
     const token = localStorage.getItem('jwt_token');
     try {
@@ -183,6 +226,10 @@ export function useWorkerDashboard() {
 
   const handleDeleteAppointment = async (appointmentId: string) => {
     const token = localStorage.getItem('jwt_token');
+    
+    // Optimistic UI update
+    setAppointments(prev => prev.filter(app => app.id !== appointmentId));
+    
     try {
       const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}`, {
         method: 'DELETE',
@@ -191,9 +238,14 @@ export function useWorkerDashboard() {
       if (res.ok) {
         await fetchWorkerData();
         return true;
+      } else {
+        // Revert on failure
+        await fetchWorkerData();
       }
     } catch (err) {
       console.error("Error eliminando cita:", err);
+      // Revert on failure
+      await fetchWorkerData();
     }
     return false;
   };
@@ -265,6 +317,9 @@ export function useWorkerDashboard() {
     selectedDate,
     setSelectedDate,
     goToNextPendingDate,
-    goToNextUnassignedDate
+    goToNextUnassignedDate,
+    readyForCompletion,
+    completeJob,
+    markPickedUp
   };
 }

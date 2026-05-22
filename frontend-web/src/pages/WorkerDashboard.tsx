@@ -5,6 +5,7 @@ import { BottomNav } from '../components/layout/BottomNav/index';
 import { LoadingScreen } from '../components/common/LoadingScreen/index';
 import { StaffAppointmentModal } from '../components/features/workshop/StaffAppointmentModal/index';
 import { MechanicLiveTask } from '../components/features/workshop/MechanicLiveTask/index';
+import { ConfirmedAppointmentsList } from '../components/features/workshop/admin/components/ConfirmedAppointmentsList';
 import { DateNavigator } from '../components/common/DateNavigator/index';
 import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
 import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
@@ -12,6 +13,7 @@ import { useWorkerDashboard } from '../hooks/useWorkerDashboard';
 import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
 import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
 import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
+import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
 
 export default function WorkerDashboard() {
   const navigate = useNavigate();
@@ -31,7 +33,10 @@ export default function WorkerDashboard() {
     selectedDate,
     setSelectedDate,
     goToNextPendingDate,
-    goToNextUnassignedDate
+    goToNextUnassignedDate,
+    readyForCompletion,
+    completeJob,
+    markPickedUp
   } = useWorkerDashboard();
   const [activeTab, setActiveTab] = useState(0);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
@@ -58,7 +63,7 @@ export default function WorkerDashboard() {
   const isManager = employeeProfile?.role === 'WORKSHOP_MANAGER';
   // Manager tiene acceso a su agenda personal + la planificación del taller
   const SECCIONES = isManager
-    ? ['RESUMEN', 'CITAS', 'PLANIFICACIÓN', 'AGENDA']
+    ? ['RESUMEN', 'CITAS', 'PLANIFICACIÓN', 'TRABAJOS', 'AGENDA']
     : ['RESUMEN', 'CITAS', 'AGENDA'];
 
   // Función para chequear si una fecha coindice con selectedDate
@@ -75,14 +80,14 @@ export default function WorkerDashboard() {
   // MERGE appointments and workshopTasks for the timeline (Plannable Items)
   // Excluimos IN_PROGRESS de appointments porque ya tienen tareas (WorkshopTasks) que las representan
   const combinedPlanningItems = [
-      ...appointments.filter(a => a.status !== 'PENDING' && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && isSameDate(a.dateTime)),
-      ...workshopTasks.map(t => ({ ...t, isTask: true }))
+      ...appointments.filter(a => a.status !== 'PENDING' && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && a.status !== 'PICKED_UP' && isSameDate(a.dateTime)),
+      ...workshopTasks.filter(t => t.status !== 'COMPLETED' && t.status !== 'CANCELLED' && t.status !== 'PICKED_UP').map(t => ({ ...t, isTask: true }))
   ];
 
   // Mis Citas Activas (Para MechanicLiveTask) filtradas por selectedDate
   const myWorkItems = [
-      ...appointments.filter(a => a.assignedEmployeeId === employeeProfile?.id && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && isSameDate(a.dateTime)),
-      ...workshopTasks.filter(t => t.assignedEmployeeId === employeeProfile?.id && t.status !== 'COMPLETED' && t.status !== 'CANCELLED')
+      ...appointments.filter(a => a.assignedEmployeeId === employeeProfile?.id && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && a.status !== 'PICKED_UP' && isSameDate(a.dateTime)),
+      ...workshopTasks.filter(t => t.assignedEmployeeId === employeeProfile?.id && t.status !== 'COMPLETED' && t.status !== 'CANCELLED' && t.status !== 'PICKED_UP')
   ];
 
   return (
@@ -225,6 +230,11 @@ export default function WorkerDashboard() {
                                   Las citas confirmadas se moverán a la pestaña "Planificación" para ser asignadas.
                               </p>
                             )}
+                            
+                            <ConfirmedAppointmentsList 
+                                appointments={appointments} 
+                                onDeleteAppointment={handleDeleteAppointment} 
+                            />
                         </div>
                     )}
 
@@ -266,8 +276,19 @@ export default function WorkerDashboard() {
                   </div>
               )}
 
-              {/* TAB 3 (Manager): AGENDA PERSONAL */}
+              {/* TAB 3 (Manager): TRABAJOS COMPLETADOS */}
               {isManager && activeTab === 3 && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                  <CompletedJobsTab
+                    readyJobs={readyForCompletion}
+                    onCompleteJob={completeJob}
+                    onMarkPickedUp={markPickedUp}
+                  />
+                </div>
+              )}
+
+              {/* TAB 4 (Manager): AGENDA PERSONAL */}
+              {isManager && activeTab === 4 && (
                   <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden">
                     <div className="flex items-center justify-between p-5 border-b border-neutral-800/60">
                       <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
