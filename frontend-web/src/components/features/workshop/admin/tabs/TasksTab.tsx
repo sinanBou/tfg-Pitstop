@@ -30,6 +30,26 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   // Expanded categories state
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
 
+  // Search filter state
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filtered categories based on search term
+  const filteredCategories = categories.map(cat => {
+    const catMatches = cat.displayName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchedTasks = cat.tasks.filter(task => 
+      task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.code.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    if (catMatches || matchedTasks.length > 0) {
+      return {
+        ...cat,
+        tasks: catMatches && matchedTasks.length === 0 ? cat.tasks : matchedTasks
+      };
+    }
+    return null;
+  }).filter((cat): cat is CatalogCategory => cat !== null);
+
   // Adding Category Form State
   const [showAddCat, setShowAddCat] = useState(false);
   const [newCatName, setNewCatName] = useState('');
@@ -258,6 +278,32 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
         </button>
       </div>
 
+      {/* Search Input Bar */}
+      <div className="relative">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+          <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </span>
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+          placeholder="Buscar servicios por descripción o código (ej: alternador, 1.10, frenos)..."
+          className="w-full bg-neutral-900/40 border border-neutral-800/80 rounded-2xl pl-12 pr-12 py-3.5 text-white text-sm focus:outline-none focus:border-blue-500 transition-all placeholder-neutral-500 backdrop-blur-md"
+        />
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm('')}
+            className="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-500 hover:text-white"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        )}
+      </div>
+
       {/* Add Category Form Panel */}
       {showAddCat && (
         <form onSubmit={handleCreateCategory} className="bg-neutral-900/60 border border-neutral-800 rounded-3xl p-6 space-y-4 animate-in fade-in slide-in-from-top-4 duration-300">
@@ -297,9 +343,13 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
           <div className="text-center py-20 bg-neutral-900/10 border border-neutral-800/40 rounded-[2rem]">
             <p className="text-neutral-500 text-sm font-medium">No hay categorías configuradas para tu taller.</p>
           </div>
+        ) : filteredCategories.length === 0 ? (
+          <div className="text-center py-20 bg-neutral-900/10 border border-neutral-800/40 rounded-[2rem]">
+            <p className="text-neutral-500 text-sm font-medium">No se encontraron resultados para la búsqueda "{searchTerm}".</p>
+          </div>
         ) : (
-          categories.map(cat => {
-            const isExpanded = expandedCategories[cat.id] ?? false;
+          filteredCategories.map(cat => {
+            const isExpanded = searchTerm ? true : (expandedCategories[cat.id] ?? false);
             const isAddingTask = addingTaskCatId === cat.id;
 
             return (
@@ -318,7 +368,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                     <div>
                       <h3 className="font-bold text-white tracking-tight">{cat.displayName}</h3>
                       <span className="text-[10px] text-neutral-500 font-mono tracking-widest uppercase block mt-0.5">
-                        {cat.tasks.length} Tarea{cat.tasks.length !== 1 ? 's' : ''} • clave: {cat.name}
+                        {cat.tasks.length} Tarea{cat.tasks.length !== 1 ? 's' : ''}
                       </span>
                     </div>
                   </div>
