@@ -87,8 +87,9 @@ export const useClientDashboard = () => {
             id: app.id,
             finishDate: app.dateTime.split('T')[0],
             vehicleName: app.vehicleDisplay || 'Vehículo',
-            description: `${app.serviceType || app.description} (${app.status})`,
-            totalCost: cost
+            description: app.serviceType || app.description || 'Mantenimiento General',
+            status: app.status || 'PENDING',
+            totalCost: app.totalPrice !== undefined && app.totalPrice !== null ? app.totalPrice : cost
           };
         }));
       }

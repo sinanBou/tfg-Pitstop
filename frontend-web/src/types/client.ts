@@ -30,6 +30,7 @@ export interface AppointmentDTO {
   workshopHourlyRate?: number;
   mechanicComments?: string;
   estimatedDuration?: number;
+  totalPrice?: number;
 }
 
 export interface HistoryDTO {

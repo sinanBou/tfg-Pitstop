@@ -14,6 +14,7 @@ import { PlanningTimeline } from '../components/features/workshop/admin/tabs/Pla
 import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
 import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
 import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
+import { GenerateInvoiceModal } from '../components/features/workshop/GenerateInvoiceModal/index';
 
 export default function WorkerDashboard() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ export default function WorkerDashboard() {
     markPickedUp
   } = useWorkerDashboard();
   const [activeTab, setActiveTab] = useState(0);
+  const [invoicingJob, setInvoicingJob] = useState<any | null>(null);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [checklistItem, setChecklistItem] = useState<any>(null);
@@ -262,7 +264,8 @@ export default function WorkerDashboard() {
                                         <MechanicLiveTask 
                                             key={item.id} 
                                             appointment={item} 
-                                            onUpdateStatus={(id, status) => handleUpdateStatus(id, status, item.isTask)} 
+                                            onUpdateStatus={(id, status) => handleUpdateStatus(id, status, item.isTask)}
+                                            onViewChecklist={handleViewChecklist}
                                         />
                                   ))
                               ) : (
@@ -281,7 +284,7 @@ export default function WorkerDashboard() {
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
-                    onCompleteJob={completeJob}
+                    onCompleteJob={(job) => setInvoicingJob(job)}
                     onMarkPickedUp={markPickedUp}
                   />
                 </div>
@@ -421,6 +424,18 @@ export default function WorkerDashboard() {
           item={checklistItem}
           onUpdateStatus={handleUpdateStatus}
           onSuccess={() => { fetchWorkerData(); setChecklistItem(null); }}
+        />
+      )}
+
+      {invoicingJob && (
+        <GenerateInvoiceModal
+          isOpen={invoicingJob !== null}
+          onClose={() => setInvoicingJob(null)}
+          job={invoicingJob}
+          onSuccess={async () => {
+            await completeJob(invoicingJob.id);
+            setInvoicingJob(null);
+          }}
         />
       )}
 

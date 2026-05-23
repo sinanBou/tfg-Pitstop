@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 
 interface CompletedJobsTabProps {
   readyJobs: any[];
-  onCompleteJob: (appointmentId: string) => Promise<boolean>;
+  onCompleteJob: (job: any) => void;
   onMarkPickedUp: (appointmentId: string) => Promise<boolean>;
 }
 
@@ -22,11 +22,8 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
   // Optimistic removal — hide cards instantly while API runs
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
 
-  const handleComplete = async (id: string) => {
-    if (!window.confirm('¿Confirmar que este trabajo está finalizado? El cliente será notificado de que su vehículo está listo para recoger.')) return;
-    setProcessingId(id);
-    await onCompleteJob(id);
-    setProcessingId(null);
+  const handleComplete = (job: any) => {
+    onCompleteJob(job);
   };
 
   const handlePickedUp = async (id: string) => {
@@ -78,7 +75,7 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
                 job={job}
                 phase="approve"
                 isProcessing={processingId === job.id}
-                onAction={() => handleComplete(job.id)}
+                onAction={() => handleComplete(job)}
               />
             ))}
           </div>

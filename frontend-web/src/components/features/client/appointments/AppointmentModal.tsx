@@ -1,10 +1,7 @@
 import { useState, useEffect } from 'react';
-import { 
-  type VehicleDTO, 
-  type AppointmentRequest, 
-  type WorkshopMinDTO 
-} from '../../../../types/client';
+import { type VehicleDTO, type AppointmentRequest, type WorkshopMinDTO } from '../../../../types/client';
 import { API_BASE_URL } from '../../../../config/api';
+import { BaseModal } from '../../../common/BaseModal/index';
 
 interface AppointmentModalProps {
   isOpen: boolean;
@@ -163,56 +160,23 @@ export const AppointmentModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      {/* Overlay con desenfoque */}
-      <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300" 
-        onClick={onClose} 
-      />
-      
-      <div className="relative bg-gradient-to-br from-neutral-900 to-black border border-neutral-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-300">
-        
-        {/* Barra de progreso visual con brillo */}
-        <div className="flex h-1.5 w-full bg-neutral-900 relative z-20">
-          <div 
-            className="bg-red-600 transition-all duration-700 ease-out relative" 
-            style={{ width: `${(step / 4) * 100}%` }}
-          >
-             <div className="absolute top-0 right-0 h-full w-8 bg-gradient-to-r from-transparent to-white/40 blur-[2px]"></div>
-          </div>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Nueva Cita"
+      subtitle="Sincronización en tiempo real"
+      theme="red"
+      progressBarWidth={`${(step / 4) * 100}%`}
+    >
+      {error && (
+        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 shrink-0">
+          <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <p className="text-xs text-red-400 font-bold uppercase tracking-tight leading-tight">{error}</p>
         </div>
+      )}
 
-        {/* Cabecera del Modal */}
-        <div className="relative p-6 px-8 border-b border-neutral-800/50 bg-neutral-950/50 flex justify-between items-center z-10">
-          <div>
-            <h2 className="text-white text-2xl font-black uppercase tracking-widest flex items-center gap-3">
-              Nueva Cita
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-              </span>
-            </h2>
-            <p className="text-[10px] text-neutral-500 font-mono mt-1 uppercase">Sincronización en tiempo real</p>
-          </div>
-          <button onClick={onClose} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-
-        <div className="p-8 relative">
-          {error && (
-            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4">
-              <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              <p className="text-xs text-red-400 font-bold uppercase tracking-tight leading-tight">{error}</p>
-            </div>
-          )}
-          {/* Fondo decorativo interno */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-             <div className="absolute -top-[40%] -right-[40%] w-full h-full bg-red-600/5 blur-[100px] rounded-full mix-blend-screen"></div>
-          </div>
-          
-          {/* Contenido principal con animación para cada paso */}
-          <div className="relative z-10 min-h-[300px] flex flex-col">
+      {/* Contenido principal con animación para cada paso */}
+      <div className="relative z-10 min-h-[300px] flex flex-col flex-1">
             
             {/* ENCABEZADOS DE PASOS COMUNES */}
             <div className="mb-8 flex items-end justify-between">
@@ -361,139 +325,154 @@ export const AppointmentModal = ({
                 <div className="animate-in fade-in slide-in-from-right-8 duration-500 flex-1 flex flex-col">
                   <div className="space-y-6 flex-1">
                     
-                    {/* CALENDARIO PERSONALIZADO */}
-                    <div className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-3xl">
-                      <div className="flex items-center justify-between mb-4 px-2">
-                        <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
-                          {monthNames[month]} <span className="text-red-600">{year}</span>
-                        </h3>
-                        <div className="flex gap-1">
-                          <button onClick={prevMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                          </button>
-                          <button onClick={nextMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-7 gap-1 mb-1">
-                        {daysOfWeek.map(d => (
-                          <div key={d} className="text-center text-[10px] font-black text-neutral-500 py-2">{d}</div>
-                        ))}
-                      </div>
-
-                      <div className="grid grid-cols-7 gap-1">
-                        {Array.from({ length: startingDay }).map((_, i) => (
-                          <div key={`empty-${i}`} className="aspect-square" />
-                        ))}
-                        {Array.from({ length: daysInMonth }).map((_, i) => {
-                          const day = i + 1;
-                          const dateObj = new Date(year, month, day);
-                          const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                          const isSelected = formData.date === dateStr;
-                          const isPast = dateObj < today;
-                          
-                          // Verificar si el taller abre este día
-                          const dayName = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"][dateObj.getDay()];
-                          const isClosedManual = selectedWorkshop?.workingDays && !selectedWorkshop.workingDays.includes(dayName);
-
-                          return (
-                            <button
-                              key={day}
-                              disabled={isPast}
-                              onClick={() => setFormData({...formData, date: dateStr, time: ''})}
-                              className={`
-                                aspect-square rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center relative group
-                                ${isPast ? 'text-neutral-700 cursor-not-allowed' : 
-                                  isSelected ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 
-                                  isClosedManual ? 'bg-neutral-900/30 text-neutral-600 hover:bg-neutral-800' :
-                                  'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:border-red-500/50 hover:text-white'}
-                              `}
-                            >
-                              {day}
-                              {isClosedManual && !isPast && !isSelected && (
-                                <div className="absolute bottom-1 w-1 h-1 bg-red-500/40 rounded-full" />
-                              )}
+                    <div className="flex flex-col md:flex-row gap-6 items-start flex-1">
+                      
+                      {/* CALENDARIO PERSONALIZADO (Izquierda) */}
+                      <div className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-3xl w-full md:w-[450px] shrink-0">
+                        <div className="flex items-center justify-between mb-4 px-2">
+                          <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
+                            {monthNames[month]} <span className="text-red-600">{year}</span>
+                          </h3>
+                          <div className="flex gap-1">
+                            <button onClick={prevMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                             </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                  {formData.date && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4">
-                      {isLoadingSlots ? (
-                        <div className="flex flex-col items-center justify-center py-8 opacity-70">
-                           <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-                           <p className="text-[10px] font-black text-white uppercase tracking-widest animate-pulse">Sincronizando agenda...</p>
-                        </div>
-                      ) : (
-                        <div>
-                          <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block mb-3 ml-1">
-                            Horarios Disponibles
-                          </label>
-                          <div className="grid grid-cols-4 gap-2.5">
-                            {availableSlots.length > 0 ? (
-                              availableSlots.map(hora => (
-                                <button
-                                  key={hora}
-                                  onClick={() => { setFormData({...formData, time: hora}); nextStep(); }}
-                                  className={`p-3 rounded-xl text-sm font-mono font-bold transition-all relative overflow-hidden group ${
-                                    formData.time === hora 
-                                      ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] border border-red-500' 
-                                      : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-red-500/50 hover:bg-neutral-800 hover:text-white'
-                                  }`}
-                                >
-                                  {formData.time !== hora && <div className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 transition-colors"></div>}
-                                  <span className="relative z-10">{hora}</span>
-                                </button>
-                              ))
-                            ) : (
-                              (() => {
-                                let isClosed = false;
-                                if (formData.date && formData.workshopId) {
-                                  const selectedWorkshop = workshops.find(w => w.id === formData.workshopId);
-                                  if (selectedWorkshop && selectedWorkshop.workingDays) {
-                                    const [year, month, day] = formData.date.split('-').map(Number);
-                                    const dateObj = new Date(year, month - 1, day);
-                                    const dias = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
-                                    const dayName = dias[dateObj.getDay()];
-                                    if (!selectedWorkshop.workingDays.includes(dayName)) {
-                                      isClosed = true;
-                                    }
-                                  }
-                                }
-
-                                return isClosed ? (
-                                  <div className="col-span-4 py-8 text-center border border-dashed border-red-900/50 bg-red-900/10 rounded-2xl flex flex-col items-center justify-center gap-2">
-                                    <svg className="w-8 h-8 text-red-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    <p className="text-red-400/80 text-[10px] font-black uppercase tracking-widest">Taller cerrado este día</p>
-                                  </div>
-                                ) : (
-                                  <div className="col-span-4 py-8 text-center border border-dashed border-neutral-800 bg-neutral-900/30 rounded-2xl flex flex-col items-center justify-center gap-2">
-                                    <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                    <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Sin huecos disponibles</p>
-                                  </div>
-                                );
-                              })()
-                            )}
+                            <button onClick={nextMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                            </button>
                           </div>
                         </div>
-                      )}
+
+                        <div className="grid grid-cols-7 gap-1 mb-1">
+                          {daysOfWeek.map(d => (
+                            <div key={d} className="text-center text-[10px] font-black text-neutral-500 py-2">{d}</div>
+                          ))}
+                        </div>
+
+                        <div className="grid grid-cols-7 gap-1">
+                          {Array.from({ length: startingDay }).map((_, i) => (
+                            <div key={`empty-${i}`} className="aspect-square" />
+                          ))}
+                          {Array.from({ length: daysInMonth }).map((_, i) => {
+                            const day = i + 1;
+                            const dateObj = new Date(year, month, day);
+                            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            const isSelected = formData.date === dateStr;
+                            const isPast = dateObj < today;
+                            
+                            // Verificar si el taller abre este día
+                            const dayName = ["DOMINGO", "LUNES", "MARTES", "MIERCOLES", "JUEVES", "VIERNES", "SABADO"][dateObj.getDay()];
+                            const isClosedManual = selectedWorkshop?.workingDays && !selectedWorkshop.workingDays.includes(dayName);
+
+                            return (
+                              <button
+                                key={day}
+                                disabled={isPast}
+                                onClick={() => setFormData({...formData, date: dateStr, time: ''})}
+                                className={`
+                                  aspect-square rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center relative group
+                                  ${isPast ? 'text-neutral-700 cursor-not-allowed' : 
+                                    isSelected ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 
+                                    isClosedManual ? 'bg-neutral-900/30 text-neutral-600 hover:bg-neutral-800' :
+                                    'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:border-red-500/50 hover:text-white'}
+                                `}
+                              >
+                                {day}
+                                {isClosedManual && !isPast && !isSelected && (
+                                  <div className="absolute bottom-1 w-1 h-1 bg-red-500/40 rounded-full" />
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* HORAS DISPONIBLES (Derecha) */}
+                      <div className="flex-1 w-full min-h-[250px] bg-neutral-900/30 border border-neutral-800/50 rounded-3xl p-6">
+                        {!formData.date ? (
+                          <div className="h-full flex flex-col items-center justify-center text-center py-12">
+                            <svg className="w-12 h-12 text-neutral-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <p className="text-neutral-500 text-xs font-black uppercase tracking-widest leading-relaxed">
+                              Selecciona un día del calendario<br/>para ver las horas disponibles
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col">
+                            {isLoadingSlots ? (
+                              <div className="flex-1 flex flex-col items-center justify-center py-12 opacity-70">
+                                 <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                                 <p className="text-[10px] font-black text-white uppercase tracking-widest animate-pulse">Sincronizando agenda...</p>
+                              </div>
+                            ) : (
+                              <div className="flex-1 flex flex-col">
+                                <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block mb-4 ml-1">
+                                  Horarios Disponibles para el {formData.date.split('-').reverse().join('/')}
+                                </label>
+                                <div className="grid grid-cols-3 gap-2.5 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
+                                  {availableSlots.length > 0 ? (
+                                    availableSlots.map(hora => (
+                                      <button
+                                        key={hora}
+                                        onClick={() => { setFormData({...formData, time: hora}); nextStep(); }}
+                                        className={`p-3 rounded-xl text-sm font-mono font-bold transition-all relative overflow-hidden group ${
+                                          formData.time === hora 
+                                            ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] border border-red-500' 
+                                            : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-red-500/50 hover:bg-neutral-800 hover:text-white'
+                                        }`}
+                                      >
+                                        {formData.time !== hora && <div className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 transition-colors"></div>}
+                                        <span className="relative z-10">{hora}</span>
+                                      </button>
+                                    ))
+                                  ) : (
+                                    (() => {
+                                      let isClosed = false;
+                                      if (formData.date && formData.workshopId) {
+                                        const selectedWorkshop = workshops.find(w => w.id === formData.workshopId);
+                                        if (selectedWorkshop && selectedWorkshop.workingDays) {
+                                          const [year, month, day] = formData.date.split('-').map(Number);
+                                          const dateObj = new Date(year, month - 1, day);
+                                          const dias = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
+                                          const dayName = dias[dateObj.getDay()];
+                                          if (!selectedWorkshop.workingDays.includes(dayName)) {
+                                            isClosed = true;
+                                          }
+                                        }
+                                      }
+
+                                      return isClosed ? (
+                                        <div className="col-span-3 py-12 text-center border border-dashed border-red-900/50 bg-red-900/10 rounded-2xl flex flex-col items-center justify-center gap-2">
+                                          <svg className="w-8 h-8 text-red-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                          <p className="text-red-400/80 text-[10px] font-black uppercase tracking-widest">Taller cerrado este día</p>
+                                        </div>
+                                      ) : (
+                                        <div className="col-span-3 py-12 text-center border border-dashed border-neutral-800 bg-neutral-900/30 rounded-2xl flex flex-col items-center justify-center gap-2">
+                                          <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                          <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Sin huecos disponibles</p>
+                                        </div>
+                                      );
+                                    })()
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
+                  </div>
+                  
+                  <div className="mt-8 pt-4 border-t border-neutral-800 flex justify-start">
+                     <button onClick={prevStep} className="flex items-center gap-2 text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white transition-colors group">
+                        <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        Atrás
+                     </button>
+                  </div>
                 </div>
-                
-                <div className="mt-8 pt-4 border-t border-neutral-800 flex justify-start">
-                   <button onClick={prevStep} className="flex items-center gap-2 text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white transition-colors group">
-                      <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                      Atrás
-                   </button>
-                </div>
-              </div>
-            )
-          })()}
+              )
+            })()}
 
             {/* PASO 4: DETALLES Y FINALIZACIÓN */}
             {step === 4 && (
@@ -554,9 +533,7 @@ export const AppointmentModal = ({
                 </div>
               </div>
             )}
-          </div>
-        </div>
       </div>
-    </div>
+    </BaseModal>
   );
 };

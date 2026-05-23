@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { GenerateInvoiceModal } from '../components/features/workshop/GenerateInvoiceModal/index';
 import { DashboardHeader } from '../components/layout/DashboardHeader/index';
 import { BottomNav } from '../components/layout/BottomNav/index';
 import { StaffAppointmentModal } from '../components/features/workshop/StaffAppointmentModal/index';
@@ -9,11 +11,12 @@ import { SettingsTab } from '../components/features/workshop/admin/tabs/Settings
 import { TeamTab } from '../components/features/workshop/admin/tabs/TeamTab';
 import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
 import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
+import { ReportsTab } from '../components/features/workshop/admin/tabs/ReportsTab';
 import { DateNavigator } from '../components/common/DateNavigator/index';
 import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
 import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
 
-const SECCIONES = ['RESUMEN', 'PLANIFICACIÓN', 'TRABAJOS', 'TAREAS', 'AJUSTES', 'EQUIPO'];
+const SECCIONES = ['RESUMEN', 'PLANIFICACIÓN', 'TRABAJOS', 'TAREAS', 'INFORMES', 'AJUSTES', 'EQUIPO'];
 
 const diasSemana = [
   { value: 'LUNES', label: 'Lunes' },
@@ -26,6 +29,7 @@ const diasSemana = [
 ];
 
 export default function WorkshopAdminDashboard() {
+  const [invoicingJob, setInvoicingJob] = useState<any | null>(null);
   const {
     id,
     activeTab, setActiveTab,
@@ -137,7 +141,7 @@ export default function WorkshopAdminDashboard() {
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
-                    onCompleteJob={completeJob}
+                    onCompleteJob={(job) => setInvoicingJob(job)}
                     onMarkPickedUp={markPickedUp}
                   />
                 </div>
@@ -147,8 +151,13 @@ export default function WorkshopAdminDashboard() {
                   <TasksTab workshopId={id} />
                 </div>
               )}
-              {activeTab === 4 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} />}
-              {activeTab === 5 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
+              {activeTab === 4 && id && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                  <ReportsTab workshopId={id} />
+                </div>
+              )}
+              {activeTab === 5 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} />}
+              {activeTab === 6 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
             </div>
          </div>
       </main>
@@ -161,6 +170,18 @@ export default function WorkshopAdminDashboard() {
           onClose={() => setIsAppModalOpen(false)}
           workshopId={id}
           onSuccess={() => { fetchWorkshopData(); setIsAppModalOpen(false); }}
+        />
+      )}
+
+      {invoicingJob && (
+        <GenerateInvoiceModal
+          isOpen={invoicingJob !== null}
+          onClose={() => setInvoicingJob(null)}
+          job={invoicingJob}
+          onSuccess={async () => {
+            await completeJob(invoicingJob.id);
+            setInvoicingJob(null);
+          }}
         />
       )}
 

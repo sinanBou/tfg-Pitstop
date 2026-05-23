@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 interface MechanicLiveTaskProps {
   appointment: any;
   onUpdateStatus: (id: string, status: string) => Promise<boolean>;
+  onViewChecklist?: (item: any) => void;
 }
 
-export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment, onUpdateStatus }) => {
+export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment, onUpdateStatus, onViewChecklist }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [elapsed, setElapsed] = useState<string>('00:00');
 
@@ -122,6 +123,17 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
                appointment.status === 'CONFIRMED' ? 'Iniciar Trabajo' :
                appointment.status === 'DELAYED' ? 'Reanudar' :
                'Finalizar'}
+            </button>
+          )}
+
+          {/* Botón Gestionar: abre el checklist de tareas y piezas */}
+          {onViewChecklist && (appointment.status === 'IN_PROGRESS' || appointment.status === 'CONFIRMED') && (
+            <button
+              onClick={() => onViewChecklist(appointment)}
+              className="px-4 py-4 bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white rounded-2xl border border-blue-600/20 hover:border-blue-500 transition-all"
+              title="Gestionar Tareas y Piezas"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
             </button>
           )}
 

@@ -1,5 +1,6 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { API_BASE_URL } from '../../../../config/api';
+import { BaseModal } from '../../../common/BaseModal/index';
 
 /* ─────────────────────────────────────────────
  *  TASK CHECKLIST MODAL
@@ -7,6 +8,7 @@ import { API_BASE_URL } from '../../../../config/api';
  *  for a vehicle appointment/task. The mechanic can check them
  *  off one by one; state is persisted via the completedTasks field.
  *  When all are completed the item can be marked as COMPLETED.
+ *  It also allows registering parts to buy, persisting them dynamically.
  * ───────────────────────────────────────────── */
 
 // ── Types ──
@@ -60,7 +62,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   const [loadingCatalog, setLoadingCatalog] = useState(true);
 
   // Fetch catalog from database dynamically
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isOpen || !item?.workshopId) return;
 
     setLoadingCatalog(true);
@@ -88,10 +90,9 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   );
   const [checklist, setChecklist] = useState<ChecklistItem[]>(initialItems);
   const [completing, setCompleting] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   // Reset checklist when item changes
-  React.useEffect(() => {
+  useEffect(() => {
     setChecklist(parseServiceCodes(item?.serviceType, item?.completedTasks, catalogMap));
   }, [item?.serviceType, item?.completedTasks, catalogMap]);
 
@@ -103,7 +104,6 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   /** Persist completedTasks to the backend via PATCH */
   const persistCompletedTasks = useCallback(async (updatedList: ChecklistItem[]) => {
     if (!item?.isTask) return; // Only persist for WorkshopTasks (not plain appointments)
-    setSaving(true);
     try {
       const completedCodes = updatedList
         .filter(i => i.completed)
@@ -120,8 +120,6 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
       });
     } catch {
       // Silent — non-critical, state is still in React
-    } finally {
-      setSaving(false);
     }
   }, [item?.id, item?.isTask]);
 
@@ -147,177 +145,264 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     }
   };
 
+  // Load/save parts associated with this job via API
+  const [parts, setParts] = useState<{ name: string; price: number | null }[]>([]);
+  const [newPartName, setNewPartName] = useState('');
+  const [newPartPrice, setNewPartPrice] = useState('');
+
+  const jobId = item?.originAppointmentId || item?.id;
+
+  // Load parts from the appointment's partsJson field
+  useEffect(() => {
+    if (isOpen && jobId) {
+      const token = localStorage.getItem('jwt_token');
+      fetch(`${API_BASE_URL}/appointments/workshop/${item.workshopId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then((appointments: any[]) => {
+          const target = appointments.find((a: any) => a.id === jobId);
+          if (target?.partsJson) {
+            try {
+              setParts(JSON.parse(target.partsJson));
+            } catch {
+              setParts([]);
+            }
+          } else {
+            setParts([]);
+          }
+        })
+        .catch(() => setParts([]));
+    }
+  }, [isOpen, jobId, item?.workshopId]);
+
+  /** Persist parts to the backend */
+  const persistPartsToApi = useCallback(async (updatedParts: { name: string; price: number | null }[]) => {
+    if (!jobId) return;
+    try {
+      const token = localStorage.getItem('jwt_token');
+      await fetch(`${API_BASE_URL}/appointments/${jobId}/parts`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ partsJson: JSON.stringify(updatedParts) }),
+      });
+    } catch {
+      // Silent — non-critical
+    }
+  }, [jobId]);
+
+  const handleAddPart = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPartName.trim()) return;
+    
+    // Price is optional for the mechanic
+    const price = newPartPrice.trim() !== '' ? parseFloat(newPartPrice) : null;
+    if (price !== null && price < 0) return;
+
+    const updated = [...parts, { name: newPartName.trim(), price }];
+    setParts(updated);
+    persistPartsToApi(updated);
+    setNewPartName('');
+    setNewPartPrice('');
+  };
+
+  const handleRemovePart = (index: number) => {
+    const updated = parts.filter((_, i) => i !== index);
+    setParts(updated);
+    persistPartsToApi(updated);
+  };
+
   if (!isOpen || !item) return null;
 
-  const dateObj = new Date(item.dateTime);
-
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-md" onClick={onClose} />
-
-      <div className="relative bg-gradient-to-br from-neutral-900 via-neutral-950 to-black border border-neutral-800 rounded-[2.5rem] w-full max-w-lg overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.9)] flex flex-col max-h-[85vh] animate-in fade-in zoom-in-95 duration-300">
-
-        {/* Progress bar */}
-        <div className="h-1.5 w-full bg-neutral-900 shrink-0">
-          <div
-            className={`h-full transition-all duration-500 ease-out rounded-r-full ${
-              allDone
-                ? 'bg-gradient-to-r from-green-600 to-green-400'
-                : 'bg-gradient-to-r from-blue-600 to-blue-400'
-            }`}
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-
-        {/* Header */}
-        <div className="p-6 pb-4 border-b border-neutral-800/50 bg-neutral-950/20 shrink-0">
-          <div className="flex justify-between items-start">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <div className={`w-2 h-2 rounded-full animate-pulse ${item.isTask ? 'bg-blue-500' : 'bg-red-500'}`} />
-                <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest">
-                  {item.isTask ? 'Tarea' : 'Cita'} — Checklist
-                </p>
-              </div>
-              <h2 className="text-xl font-black uppercase tracking-tight text-white truncate">
-                {item.vehicleDisplay}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">
-                  {item.clientFullName}
-                </span>
-                <span className="text-neutral-700">•</span>
-                <span className="text-red-500 text-[11px] font-mono font-bold">
-                  {dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={onClose}
-              className="p-2.5 text-neutral-500 hover:text-white hover:bg-neutral-800/50 rounded-xl transition-all"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={item.isTask ? 'Gestión de Tarea' : 'Gestión de Cita'}
+      subtitle={item.vehicleDisplay}
+      theme={item.isTask ? 'blue' : 'red'}
+      progressBarWidth={`${progress}%`}
+    >
+      <div className="space-y-6 flex-1 flex flex-col justify-between h-full">
+        {/* Info cabecera rápida */}
+        <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-4 flex justify-between items-center text-xs shrink-0">
+          <div className="flex gap-4">
+            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">Cliente:</span> <span className="text-white font-extrabold">{item.clientFullName}</span></div>
+            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">Duración:</span> <span className="text-white font-extrabold font-mono">{item.estimatedDuration || '--'} min</span></div>
           </div>
-
-          {/* Stats */}
-          <div className="flex items-center gap-3 mt-4">
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl">
-              <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Tareas</span>
-              <span className="text-white text-sm font-black">{completedCount}/{totalCount}</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/5 border border-white/10 rounded-xl">
-              <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Duración</span>
-              <span className="text-white text-sm font-black">{item.estimatedDuration || '--'} min</span>
-            </div>
-            {allDone && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-xl animate-pulse">
-                <svg className="w-3.5 h-3.5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-[10px] font-black uppercase tracking-widest text-green-400">Listo</span>
-              </div>
-            )}
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg">
+            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Progreso:</span>
+            <span className="text-white text-xs font-black">{completedCount}/{totalCount}</span>
           </div>
         </div>
 
-        {/* Checklist body */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-2">
-          {loadingCatalog ? (
-            <div className="text-center py-16 text-neutral-500 flex flex-col items-center justify-center gap-3">
-              <div className="w-8 h-8 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
-              <p className="text-xs uppercase tracking-widest font-black">Cargando catálogo dinámico...</p>
+        {/* Columnas Paralelas */}
+        <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-0">
+          {/* TAREAS (Izquierda) */}
+          <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[320px]">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+              Operaciones del Servicio
+            </h4>
+            
+            <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-2">
+              {loadingCatalog ? (
+                <div className="text-center py-12 text-neutral-500 flex flex-col items-center justify-center gap-2">
+                  <div className="w-6 h-6 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
+                  <p className="text-[9px] uppercase tracking-widest font-black">Mapeando tareas del catálogo...</p>
+                </div>
+              ) : checklist.length === 0 ? (
+                <div className="text-center py-12 bg-neutral-900/10 border border-neutral-800/40 rounded-2xl p-4">
+                  <p className="text-neutral-500 text-xs">No hay operaciones asignadas.</p>
+                </div>
+              ) : (
+                checklist.map((ci) => (
+                  <button
+                    key={ci.code}
+                    onClick={() => toggleItem(ci.code)}
+                    className={`w-full text-left px-4 py-3 rounded-2xl border transition-all flex items-center gap-3 group/check ${
+                      ci.completed
+                        ? 'border-green-500/20 bg-green-600/5'
+                        : 'border-neutral-800 bg-neutral-900/20 hover:border-neutral-700'
+                    }`}
+                  >
+                    {/* Checkbox */}
+                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
+                      ci.completed
+                        ? 'bg-green-600 border-green-600'
+                        : 'border-neutral-600 group-hover/check:border-neutral-400'
+                    }`}>
+                      {ci.completed && (
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+
+                    {/* Task info */}
+                    <div className="flex-1 min-w-0">
+                      <span className={`text-[8px] font-black tracking-widest block leading-none ${
+                        ci.completed ? 'text-green-500' : 'text-neutral-600'
+                      }`}>
+                        {ci.code}
+                      </span>
+                      <span className={`text-xs font-semibold block truncate transition-all ${
+                        ci.completed ? 'text-green-400/60 line-through opacity-50' : 'text-white'
+                      }`}>
+                        {ci.label}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              )}
             </div>
-          ) : checklist.length === 0 ? (
-            <div className="text-center py-16">
-              <svg className="w-12 h-12 text-neutral-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              <p className="text-neutral-600 text-sm">No se encontraron sub-tareas para esta cita.</p>
-              <p className="text-neutral-700 text-xs mt-1">El campo serviceType está vacío o no contiene códigos válidos.</p>
-            </div>
-          ) : (
-            checklist.map((ci) => (
+          </div>
+
+          {/* PIEZAS Y REPUESTOS (Derecha) */}
+          <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[320px]">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Materiales y Repuestos Requeridos
+            </h4>
+
+            {/* Formulario rápido de piezas (el precio ya NO tiene required) */}
+            <form onSubmit={handleAddPart} className="flex gap-2 shrink-0">
+              <input 
+                type="text"
+                required
+                value={newPartName}
+                onChange={e => setNewPartName(e.target.value)}
+                placeholder="Repuesto (ej: Pastillas de freno)"
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all flex-1 min-w-0 font-medium"
+              />
+              <input 
+                type="number"
+                step="0.01"
+                value={newPartPrice}
+                onChange={e => setNewPartPrice(e.target.value)}
+                placeholder="Precio (€)"
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-20 shrink-0 font-mono font-medium text-center"
+              />
               <button
-                key={ci.code}
-                onClick={() => toggleItem(ci.code)}
-                className={`w-full text-left px-4 py-3.5 rounded-2xl border transition-all flex items-center gap-3 group/check ${
-                  ci.completed
-                    ? 'border-green-500/30 bg-green-600/10'
-                    : 'border-neutral-800 bg-neutral-900/40 hover:border-neutral-700'
-                }`}
+                type="submit"
+                className="px-2.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(220,38,38,0.2)] active:scale-95"
               >
-                {/* Checkbox */}
-                <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
-                  ci.completed
-                    ? 'bg-green-600 border-green-600'
-                    : 'border-neutral-600 group-hover/check:border-neutral-400'
-                }`}>
-                  {ci.completed && (
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-
-                {/* Task info */}
-                <div className="flex-1 min-w-0">
-                  <span className={`text-[10px] font-black tracking-widest block ${
-                    ci.completed ? 'text-green-500' : 'text-neutral-600'
-                  }`}>
-                    {ci.code}
-                  </span>
-                  <span className={`text-sm font-medium block truncate transition-all ${
-                    ci.completed ? 'text-green-300 line-through opacity-60' : 'text-white'
-                  }`}>
-                    {ci.label}
-                  </span>
-                </div>
-
-                {/* Status indicator */}
-                <div className={`w-2 h-2 rounded-full shrink-0 transition-all ${
-                  ci.completed ? 'bg-green-500' : 'bg-neutral-700'
-                }`} />
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
+                </svg>
               </button>
-            ))
-          )}
+            </form>
+
+            {/* Lista de repuestos */}
+            <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 bg-neutral-950/20">
+              {parts.length === 0 ? (
+                <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center p-4">
+                  <svg className="w-8 h-8 text-neutral-800 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  <p className="text-[10px] font-bold uppercase tracking-wider">No se han registrado piezas</p>
+                </div>
+              ) : (
+                parts.map((p, idx) => (
+                  <div key={idx} className="bg-neutral-900/10 px-4 py-2.5 flex justify-between items-center text-xs">
+                    <span className="text-white font-semibold truncate max-w-[150px]">{p.name}</span>
+                    <div className="flex items-center gap-3 shrink-0">
+                      {p.price === null || p.price === undefined ? (
+                        <span className="bg-yellow-600/10 border border-yellow-500/20 text-yellow-500 font-bold px-2 py-0.5 rounded-lg text-[9px] uppercase tracking-wider">Pte. Precio</span>
+                      ) : (
+                        <span className="text-neutral-400 font-mono">{p.price.toFixed(2)}€</span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => handleRemovePart(idx)}
+                        className="text-neutral-500 hover:text-red-400 transition-all"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-5 border-t border-neutral-800/50 shrink-0 space-y-3">
-          {/* Completion button */}
+        {/* Footer / Botones */}
+        <div className="mt-auto pt-6 border-t border-neutral-800/50 flex justify-end gap-3 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
+          >
+            Cerrar
+          </button>
           <button
             onClick={handleCompleteAll}
             disabled={!allDone || completing}
-            className={`w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+            className={`px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 ${
               allDone
-                ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)]'
+                ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]'
                 : 'bg-neutral-800 text-neutral-600 cursor-not-allowed'
             }`}
           >
             {completing ? (
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : allDone ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
               <>
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
                 Marcar como Completado
               </>
-            ) : (
-              <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-                Completa todas las tareas ({completedCount}/{totalCount})
-              </>
             )}
           </button>
         </div>
       </div>
-    </div>
+    </BaseModal>
   );
 };

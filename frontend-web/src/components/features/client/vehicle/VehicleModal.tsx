@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { type VehicleRequest } from '../../../../types/client.ts';
 import { SearchableSelect } from '../../../common/SearchableSelect/index';
+import { BaseModal } from '../../../common/BaseModal/index';
 
 // 1. Definimos una interfaz clara para las props del Modal
 interface VehicleModalProps {
@@ -67,39 +68,14 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Fondo oscuro con desenfoque */}
-      <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
-        onClick={onClose}
-      ></div>
-
-      <div className="relative bg-gradient-to-br from-neutral-900 to-black border border-neutral-800 rounded-3xl w-full max-w-md overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-300">
-        
-        {/* Cabecera del Modal */}
-        <div className="relative p-6 px-8 border-b border-neutral-800/50 bg-neutral-950/50 flex justify-between items-center z-10">
-          <div>
-            <h2 className="text-white text-2xl font-black uppercase tracking-widest flex items-center gap-3">
-              Nuevo Vehículo
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-              </span>
-            </h2>
-            <p className="text-[10px] text-neutral-500 font-mono mt-1 uppercase">Añade a tu garaje</p>
-          </div>
-          <button onClick={onClose} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-
-        {/* Fondo decorativo interno */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-           <div className="absolute -top-[40%] -left-[40%] w-full h-full bg-blue-600/5 blur-[100px] rounded-full mix-blend-screen"></div>
-        </div>
-
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-5 relative z-10">
+    <BaseModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Nuevo Vehículo"
+      subtitle="Añade a tu garaje"
+      theme="blue"
+    >
+      <form onSubmit={handleSubmit} className="space-y-5 flex-1 flex flex-col justify-between h-full">
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect 
               label="Marca" 
@@ -182,7 +158,6 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
             </button>
           </div>
         </form>
-      </div>
-    </div>
+    </BaseModal>
   );
 };
