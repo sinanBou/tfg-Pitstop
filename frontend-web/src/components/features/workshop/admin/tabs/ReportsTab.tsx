@@ -41,7 +41,8 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
     })
       .then(res => res.json())
       .then((data: Invoice[]) => {
-        setInvoices(data);
+        const sorted = [...data].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setInvoices(sorted);
       })
       .catch(err => console.error("Error loading invoices history:", err))
       .finally(() => setLoading(false));

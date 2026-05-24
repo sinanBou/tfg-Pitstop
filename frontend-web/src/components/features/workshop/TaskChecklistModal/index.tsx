@@ -110,7 +110,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         .map(i => i.code)
         .join(', ');
       const token = localStorage.getItem('jwt_token');
-      await fetch(`${API_BASE_URL}/workshop-tasks/${item.id}`, {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${item.id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -118,6 +118,9 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         },
         body: JSON.stringify({ completedTasks: completedCodes }),
       });
+      if (res.ok) {
+        onSuccess?.();
+      }
     } catch {
       // Silent — non-critical, state is still in React
     }
@@ -181,7 +184,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     if (!jobId) return;
     try {
       const token = localStorage.getItem('jwt_token');
-      await fetch(`${API_BASE_URL}/appointments/${jobId}/parts`, {
+      const res = await fetch(`${API_BASE_URL}/appointments/${jobId}/parts`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -189,6 +192,9 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         },
         body: JSON.stringify({ partsJson: JSON.stringify(updatedParts) }),
       });
+      if (res.ok) {
+        onSuccess?.();
+      }
     } catch {
       // Silent — non-critical
     }
@@ -242,7 +248,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         {/* Columnas Paralelas */}
         <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-0">
           {/* TAREAS (Izquierda) */}
-          <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[320px]">
+          <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
               Operaciones del Servicio
@@ -302,7 +308,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
           </div>
 
           {/* PIEZAS Y REPUESTOS (Derecha) */}
-          <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[320px]">
+          <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               Materiales y Repuestos Requeridos

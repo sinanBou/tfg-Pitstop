@@ -243,7 +243,8 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
       const token = localStorage.getItem('jwt_token');
       const serviceLabel = selectedTasks.map(s => s.task.codigo).join(', ');
       const comments = `Cilindros: ${cylinders}${selectedTasks.some(s => isWheelTask(s.task)) ? ` | Ruedas: ${wheels}` : ''}`;
-      const res = await fetch(`${API_BASE_URL}/appointments/${appointment.id}/manage`, {
+      const targetAppointmentId = appointment.originAppointmentId || appointment.id;
+      const res = await fetch(`${API_BASE_URL}/appointments/${targetAppointmentId}/manage`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

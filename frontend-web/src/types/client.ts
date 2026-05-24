@@ -31,6 +31,9 @@ export interface AppointmentDTO {
   mechanicComments?: string;
   estimatedDuration?: number;
   totalPrice?: number;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  confirmedAt?: string;
 }
 
 export interface HistoryDTO {
@@ -39,6 +42,10 @@ export interface HistoryDTO {
   vehicleName: string;
   description: string;
   totalCost: number;
+  dateTime?: string;
+  actualStartTime?: string;
+  actualEndTime?: string;
+  confirmedAt?: string;
 }
 export interface VehicleRequest {
   brand: string;

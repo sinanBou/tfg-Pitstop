@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { API_BASE_URL } from '../../../config/api';
 
 const HistoryIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
@@ -24,12 +24,100 @@ interface Invoice {
   description: string;
 }
 
-interface ClientHistoryTabProps {
-  history: any[];
+interface NotificationItem {
+  id: string;
+  type: 'confirm' | 'complete' | 'invoice';
+  title: string;
+  message: string;
+  dateTime: Date;
+  appointmentId: string;
 }
 
-export function ClientHistoryTab({ history }: ClientHistoryTabProps) {
+interface ClientHistoryTabProps {
+  history: any[];
+  appointments: any[];
+}
+
+export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  // Generar notificaciones dinámicas en base a citas y facturas
+  const notifications = useMemo(() => {
+    const list: NotificationItem[] = [];
+    const all = [...(appointments || []), ...(history || [])];
+    
+    const seen = new Set<string>();
+    const uniqueApps = all.filter(app => {
+      if (!app?.id || seen.has(app.id)) return false;
+      seen.add(app.id);
+      return true;
+    });
+
+    uniqueApps.forEach(app => {
+      const vehicleDisplay = app.vehicleDisplay || app.vehicleName || 'Vehículo';
+      const appDate = app.dateTime ? new Date(app.dateTime) : null;
+      if (!appDate) return;
+
+      // 1. Cita Confirmada (siempre que esté en CONFIRMED, IN_PROGRESS, COMPLETED, PICKED_UP)
+      if (['CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'PICKED_UP'].includes(app.status)) {
+        // Usar la fecha de confirmación real guardada en la base de datos si existe, de lo contrario estimar 24h antes
+        const confirmDate = app.confirmedAt 
+          ? new Date(app.confirmedAt) 
+          : new Date(appDate.getTime() - 24 * 3600 * 1000);
+
+        list.push({
+          id: `${app.id}-confirm`,
+          type: 'confirm',
+          title: 'Cita Confirmada',
+          message: `Su cita para el vehículo ${vehicleDisplay} ha sido confirmada y programada.`,
+          dateTime: confirmDate,
+          appointmentId: app.id
+        });
+      }
+
+      // 2. Trabajo Finalizado (si está COMPLETED, PICKED_UP)
+      if (['COMPLETED', 'PICKED_UP'].includes(app.status)) {
+        // Usamos el fin real registrado en el backend, o estimamos 2 horas después de la cita programada
+        const completeDate = app.actualEndTime 
+          ? new Date(app.actualEndTime) 
+          : new Date(appDate.getTime() + 2 * 3600 * 1000);
+
+        list.push({
+          id: `${app.id}-complete`,
+          type: 'complete',
+          title: 'Trabajo Finalizado',
+          message: `Se ha finalizado el trabajo en su vehículo ${vehicleDisplay}. Puede acudir a recogerlo.`,
+          dateTime: completeDate,
+          appointmentId: app.id
+        });
+      }
+
+      // 3. Factura Generada (si está COMPLETED, PICKED_UP)
+      if (['COMPLETED', 'PICKED_UP'].includes(app.status)) {
+        // Usamos el fin real + 1 minuto, o estimamos 2 horas + 1 minuto después de la cita programada
+        const invoiceDate = app.actualEndTime
+          ? new Date(new Date(app.actualEndTime).getTime() + 60 * 1000)
+          : new Date(appDate.getTime() + 2 * 3600 * 1000 + 60 * 1000);
+
+        list.push({
+          id: `${app.id}-invoice`,
+          type: 'invoice',
+          title: 'Factura Generada',
+          message: `Se ha generado la factura de su vehículo ${vehicleDisplay}.`,
+          dateTime: invoiceDate,
+          appointmentId: app.id
+        });
+      }
+    });
+
+    // Ordenar notificaciones por fecha de más reciente a más antigua y por prioridad si la hora coincide
+    return list.sort((a, b) => {
+      const diff = b.dateTime.getTime() - a.dateTime.getTime();
+      if (diff !== 0) return diff;
+      const weights = { invoice: 3, complete: 2, confirm: 1 };
+      return weights[b.type] - weights[a.type];
+    });
+  }, [appointments, history]);
 
   const printInvoicePDF = (inv: Invoice) => {
     const parsedParts: PartItem[] = JSON.parse(inv.partsJson || '[]');
@@ -78,7 +166,7 @@ export function ClientHistoryTab({ history }: ClientHistoryTabProps) {
             font-weight: 900;
             letter-spacing: -1px;
             margin: 0;
-            color: #3b82f6; /* Client theme - blue */
+            color: #3b82f6;
           }
           .logo-area p {
             margin: 4px 0 0 0;
@@ -190,7 +278,7 @@ export function ClientHistoryTab({ history }: ClientHistoryTabProps) {
             padding-top: 14px;
             font-size: 16px;
             font-weight: 900;
-            color: #3b82f6; /* Client theme - blue */
+            color: #3b82f6;
           }
           footer {
             margin-top: 60px;
@@ -329,64 +417,203 @@ export function ClientHistoryTab({ history }: ClientHistoryTabProps) {
   };
 
   return (
-    <div className="max-w-3xl">
-      <div className="relative pl-8 space-y-8 before:absolute before:inset-0 before:ml-[11px] before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-neutral-800 before:to-transparent">
-         {history.length > 0 ? (
-            history.map(hist => {
+    <div className="space-y-12">
+      {/* ── NOTIFICACIONES DE ESTADO ── */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
+            Actividad y Notificaciones
+          </h3>
+        </div>
+
+        {notifications.length === 0 ? (
+          <div className="p-6 bg-neutral-900/10 border border-neutral-900 rounded-[2rem] text-center text-neutral-600 text-xs py-10">
+            No tienes notificaciones o actividad registrada en tus citas.
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {notifications.map(notif => {
+              const formattedTime = notif.dateTime.toLocaleDateString('es-ES', {
+                day: '2-digit',
+                month: 'short',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+              });
+
+              // Determinar icono y colores premium según tipo de notificación
+              let borderClass = 'border-neutral-800 bg-neutral-900/20';
+              let badgeColor = 'bg-blue-600/10 border-blue-500/20 text-blue-400';
+              let icon = (
+                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              );
+
+              if (notif.type === 'complete') {
+                borderClass = 'border-green-500/10 bg-green-500/5';
+                badgeColor = 'bg-green-600/10 border-green-500/20 text-green-400';
+                icon = (
+                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                );
+              } else if (notif.type === 'invoice') {
+                borderClass = 'border-emerald-500/10 bg-emerald-500/5';
+                badgeColor = 'bg-emerald-600/10 border-emerald-500/20 text-emerald-400';
+                icon = (
+                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                );
+              }
+
+              return (
+                <div
+                  key={notif.id}
+                  className={`border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300 ${borderClass}`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Icon Circle */}
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${badgeColor}`}>
+                      {icon}
+                    </div>
+
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-black uppercase tracking-wider text-white">
+                          {notif.title}
+                        </span>
+                        <span className="text-[10px] font-mono text-neutral-500">
+                          {formattedTime}
+                        </span>
+                      </div>
+                      <p className="text-xs text-neutral-400 leading-relaxed font-medium">
+                        {notif.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Factura Download Button */}
+                  {notif.type === 'invoice' && (
+                    <button
+                      onClick={() => handleDownloadInvoice(notif.appointmentId)}
+                      disabled={downloadingId === notif.appointmentId}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[9px] rounded-xl transition-all flex items-center gap-1.5 shrink-0 active:scale-95 disabled:opacity-50"
+                    >
+                      {downloadingId === notif.appointmentId ? (
+                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                          Descargar PDF
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* ── HISTORIAL DE TRABAJOS COMPLETADOS ── */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-neutral-500 animate-pulse" />
+          <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
+            Historial de Trabajos Realizados (Vista Taller)
+          </h3>
+        </div>
+
+        {history.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 opacity-30">
+            <HistoryIcon />
+            <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-500 font-mono mt-4">Log Vacío</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {history.map(hist => {
               const isFinished = hist.status === 'COMPLETED' || hist.status === 'PICKED_UP';
               const isDownloading = downloadingId === hist.id;
 
               return (
-                <div key={hist.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active animate-in fade-in slide-in-from-bottom-2 duration-300">
-                   <div className="flex items-center justify-center w-6 h-6 rounded-full border-4 border-black bg-neutral-600 group-hover:bg-blue-500 text-neutral-500 group-hover:text-blue-100 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 absolute top-0 left-[-27px] md:relative md:top-auto md:left-auto md:mx-auto transition-colors duration-300"></div>
-                   <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-6 rounded-3xl bg-neutral-900/50 border border-neutral-800 group-hover:border-blue-900/50 transition-colors shadow flex flex-col gap-4">
-                      
-                      {/* Cabecera */}
-                      <div className="flex items-center justify-between">
-                         <div className="font-bold text-white text-sm md:text-base">{hist.vehicleName}</div>
-                         <time className="font-mono text-[10px] md:text-xs font-bold text-neutral-500">{hist.finishDate}</time>
-                      </div>
+                <div
+                  key={hist.id}
+                  className={`bg-neutral-900/40 border rounded-[2rem] p-6 relative overflow-hidden group transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.05)] ${
+                    hist.status === 'CANCELLED'
+                      ? 'border-red-500/20 hover:border-red-500/40'
+                      : 'border-green-500/20 hover:border-green-500/40'
+                  }`}
+                >
+                  {/* Background glow */}
+                  <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none ${
+                    hist.status === 'CANCELLED' ? 'bg-red-500/5' : 'bg-green-500/5'
+                  }`} />
 
-                      {/* Detalles y Coste */}
-                      <div className="text-neutral-400 text-sm flex justify-between items-center gap-4">
-                         <span>{hist.status === 'CANCELLED' ? 'Cita cancelada' : 'Cita finalizada'}</span>
-                         {hist.totalCost > 0 && (
-                            <span className="font-mono font-bold text-blue-400 shrink-0 bg-blue-500/10 px-2.5 py-1 rounded-lg border border-blue-500/20 text-xs">
-                               {hist.totalCost.toFixed(2)}€
-                            </span>
-                         )}
+                  <div className="relative z-10 space-y-4">
+                    {/* Header */}
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`px-2.5 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                            hist.status === 'CANCELLED'
+                              ? 'bg-red-500/10 border-red-500/20 text-red-400'
+                              : 'bg-green-500/10 border-green-500/20 text-green-400'
+                          }`}>
+                            {hist.status === 'CANCELLED' ? '✕ Cancelado' : '✓ Finalizado'}
+                          </span>
+                        </div>
+                        <h4 className="text-lg font-black uppercase tracking-tight text-white truncate">
+                          {hist.vehicleName}
+                        </h4>
+                        <p className="text-neutral-500 text-xs font-bold mt-0.5">{hist.description}</p>
                       </div>
+                    </div>
 
-                      {/* Botón Factura condicional para trabajos terminados */}
-                      {isFinished && (
-                        <div className="pt-2 border-t border-neutral-800 flex justify-center">
-                          <button
-                            onClick={() => handleDownloadInvoice(hist.id)}
-                            disabled={isDownloading}
-                            className="px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-600/20 hover:border-blue-600/30 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 disabled:opacity-50 active:scale-95 shadow-[0_0_15px_rgba(59,130,246,0.05)]"
-                          >
-                            {isDownloading ? (
-                              <div className="w-3.5 h-3.5 border-2 border-blue-400/30 border-t-blue-400 rounded-full animate-spin" />
-                            ) : (
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                            )}
-                            Descargar Factura PDF
-                          </button>
+                    {/* Details Box */}
+                    <div className="bg-black/30 rounded-xl p-4 border border-white/5 space-y-2">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Fecha</span>
+                        <span className="text-white text-xs font-mono">{hist.finishDate}</span>
+                      </div>
+                      {hist.totalCost > 0 && (
+                        <div className="flex justify-between items-center text-sm">
+                          <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Costo total</span>
+                          <span className="text-blue-400 text-xs font-mono font-bold">{hist.totalCost.toFixed(2)}€</span>
                         </div>
                       )}
-                      
-                   </div>
+                    </div>
+
+                    {/* Action button */}
+                    {isFinished && (
+                      <button
+                        onClick={() => handleDownloadInvoice(hist.id)}
+                        disabled={isDownloading}
+                        className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.98] shadow-[0_0_20px_rgba(59,130,246,0.15)] disabled:opacity-50"
+                      >
+                        {isDownloading ? (
+                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        ) : (
+                          <>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Descargar Factura PDF
+                          </>
+                        )}
+                      </button>
+                    )}
+                  </div>
                 </div>
               );
-            })
-         ) : (
-            <div className="py-20 flex flex-col items-center justify-center text-center opacity-30">
-               <HistoryIcon />
-               <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-500 font-mono mt-4">Log Vacío</p>
-            </div>
-         )}
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

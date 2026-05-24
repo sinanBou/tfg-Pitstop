@@ -11,10 +11,13 @@ interface AppointmentCardProps {
   clientName?: string;
   onClick?: () => void;
   isCompact?: boolean;
+  serviceType?: string;
+  completedTasks?: string;
 }
 
 export const AppointmentCard: React.FC<AppointmentCardProps> = ({ 
-  type, dateTime, description, status, variant = 'red', vehicleDisplay, clientName, onClick, isCompact = false
+  type, dateTime, description, status, variant = 'red', vehicleDisplay, clientName, onClick, isCompact = false,
+  serviceType, completedTasks
 }) => {
   const dateObj = new Date(dateTime);
   
@@ -55,6 +58,25 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
                  {vehicleDisplay}
                </div>
             )}
+
+            {(() => {
+              const totalTasksList = (serviceType || '').split(',').map(c => c.trim()).filter(Boolean);
+              const completedTasksList = (completedTasks || '').split(',').map(c => c.trim()).filter(Boolean);
+              const hasTasks = totalTasksList.length > 0;
+              if (!hasTasks) return null;
+              
+              return (
+                <div className="mt-2 flex items-center gap-1.5">
+                  <span className={`text-[9px] font-black px-2 py-0.5 rounded-full ${
+                    completedTasksList.length === totalTasksList.length 
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                      : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
+                  }`}>
+                    {completedTasksList.length}/{totalTasksList.length} Tareas
+                  </span>
+                </div>
+              );
+            })()}
 
             {!isCompact && (
                 <div className="text-white font-black text-xl tracking-tight uppercase mt-1">

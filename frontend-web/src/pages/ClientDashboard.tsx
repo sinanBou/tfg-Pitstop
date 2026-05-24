@@ -54,7 +54,7 @@ export default function ClientDashboard() {
             {activeTab === 0 && <ClientOverviewTab vehicles={vehicles} appointments={appointments} cocheEnTaller={cocheEnTaller} userProfile={userProfile} />}
             {activeTab === 1 && <ClientVehiclesTab vehicles={vehicles} onAddVehicle={() => setIsModalOpen(true)} />}
             {activeTab === 2 && <ClientAppointmentsTab appointments={appointments} onAddAppointment={() => setIsAppModalOpen(true)} deleteAppointment={deleteAppointment} />}
-            {activeTab === 3 && <ClientHistoryTab history={history} />}
+            {activeTab === 3 && <ClientHistoryTab history={history} appointments={appointments} />}
          </div>
       </main>
 

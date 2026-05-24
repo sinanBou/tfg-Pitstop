@@ -217,6 +217,8 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                    vehicleDisplay={appointment.vehicleDisplay}
                    clientName={appointment.clientFullName}
                    isCompact={true}
+                   serviceType={appointment.serviceType}
+                   completedTasks={appointment.completedTasks}
                />
            </div>
 

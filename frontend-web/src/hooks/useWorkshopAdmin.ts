@@ -23,6 +23,8 @@ export function useWorkshopAdmin() {
   const [employees, setEmployees] = useState<any[]>([]);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [readyForCompletion, setReadyForCompletion] = useState<any[]>([]);
+  const [employeeProfile, setEmployeeProfile] = useState<any>(null);
+  const [workshopTasks, setWorkshopTasks] = useState<any[]>([]);
 
   const [settingsForm, setSettingsForm] = useState({
     openTime: '',
@@ -77,11 +79,24 @@ export function useWorkshopAdmin() {
         });
       }
 
+      // Fetch current employee profile
+      const meRes = await fetch(`${API_BASE_URL}/employees/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (meRes.ok) setEmployeeProfile(await meRes.json());
+
       // Fetch appointments
       const aRes = await fetch(`${API_BASE_URL}/appointments/workshop/${id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (aRes.ok) setAppointments(await aRes.json());
+
+      // Fetch workshop tasks for selectedDate
+      const dateIso = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
+      const taskRes = await fetch(`${API_BASE_URL}/workshop-tasks/workshop/${id}?date=${dateIso}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (taskRes.ok) setWorkshopTasks(await taskRes.json());
 
       // Fetch employees
       const eRes = await fetch(`${API_BASE_URL}/employees/workshop/${id}`, {
@@ -100,7 +115,7 @@ export function useWorkshopAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [id, navigate]);
+  }, [id, navigate, selectedDate]);
 
   useEffect(() => {
     fetchWorkshopData();
@@ -278,6 +293,73 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  const updateTaskStatus = async (taskId: string, newStatus: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      if (res.ok) {
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error actualizando estado tarea:", err);
+    }
+    return false;
+  };
+
+  const handleRescheduleTask = async (taskId: string, employeeId: string | null, newDateTime: Date, duration?: number) => {
+    const token = localStorage.getItem('jwt_token');
+    const localIso = new Date(newDateTime.getTime() - newDateTime.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          dateTime: localIso,
+          assignedEmployeeId: employeeId,
+          estimatedDuration: duration,
+          reassignEmployee: true
+        })
+      });
+      if (res.ok) {
+        fetchWorkshopData();
+      } else {
+        const errorText = await res.text();
+        alert(`Error al reubicar tarea: ${res.status} - ${errorText}`);
+      }
+    } catch (err) {
+      alert(`Error de conexión: ${err}`);
+    }
+  };
+
+  const handleDeleteTask = async (taskId: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshop-tasks/${taskId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error eliminando tarea:", err);
+    }
+    return false;
+  };
+
   const updateAppointmentStatus = async (id: string, newStatus: string) => {
     const token = localStorage.getItem('jwt_token');
     try {
@@ -398,12 +480,17 @@ export function useWorkshopAdmin() {
     handleAssignAppointment,
     handleRescheduleAppointment,
     updateAppointmentStatus,
+    updateTaskStatus,
+    handleRescheduleTask,
+    handleDeleteTask,
     completeJob,
     markPickedUp,
     readyForCompletion,
     goToNextPendingDate,
     goToNextUnassignedDate,
     handleDeleteAppointment,
+    employeeProfile,
+    workshopTasks,
     userRole: localStorage.getItem('role')
   };
 }

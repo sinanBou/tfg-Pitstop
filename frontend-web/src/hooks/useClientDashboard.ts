@@ -68,6 +68,8 @@ export const useClientDashboard = () => {
         // 2. Historial: CANCELLED, COMPLETED, PICKED_UP
         const historical = data.filter(app => ['CANCELLED', 'COMPLETED', 'PICKED_UP'].includes(app.status || 'PENDING'));
 
+        const sortedHistorical = [...historical].sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
+
         setAppointments(active.map((app) => {
           const [datePart, timePart] = app.dateTime.split('T');
           return {
@@ -79,7 +81,7 @@ export const useClientDashboard = () => {
           };
         }));
 
-        setHistory(historical.map(app => {
+        setHistory(sortedHistorical.map(app => {
           const durationHours = (app.estimatedDuration || 0) / 60;
           const rate = app.workshopHourlyRate || 50.0;
           const cost = durationHours * rate;
@@ -89,7 +91,11 @@ export const useClientDashboard = () => {
             vehicleName: app.vehicleDisplay || 'Vehículo',
             description: app.serviceType || app.description || 'Mantenimiento General',
             status: app.status || 'PENDING',
-            totalCost: app.totalPrice !== undefined && app.totalPrice !== null ? app.totalPrice : cost
+            totalCost: app.totalPrice !== undefined && app.totalPrice !== null ? app.totalPrice : cost,
+            dateTime: app.dateTime,
+            actualStartTime: app.actualStartTime,
+            actualEndTime: app.actualEndTime,
+            confirmedAt: app.confirmedAt
           };
         }));
       }
