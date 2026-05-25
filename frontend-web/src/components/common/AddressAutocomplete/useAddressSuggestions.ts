@@ -1,16 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
 
-interface PhotonFeature {
-  properties: {
-    name?: string;
-    street?: string;
-    housenumber?: string;
-    postcode?: string;
-    city?: string;
-    state?: string;
-    country?: string;
-  };
-}
 
 export function useAddressSuggestions() {
   const [suggestions, setSuggestions] = useState<string[]>([]);

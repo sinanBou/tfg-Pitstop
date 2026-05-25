@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { API_BASE_URL } from '../../../../config/api';
 import { BaseModal } from '../../../common/BaseModal/index';
+import type { WorkshopInventory } from '../../../../types/client';
 
 /* ─────────────────────────────────────────────
  *  TASK CHECKLIST MODAL
@@ -148,77 +149,140 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     }
   };
 
-  // Load/save parts associated with this job via API
-  const [parts, setParts] = useState<{ name: string; price: number | null }[]>([]);
-  const [newPartName, setNewPartName] = useState('');
-  const [newPartPrice, setNewPartPrice] = useState('');
+  // Load/save parts associated with this job via relational API
+  interface LocalPart {
+    id: string;
+    partId: string;
+    name: string;
+    price: number;
+    quantityUsed: number;
+  }
+
+  const [parts, setParts] = useState<LocalPart[]>([]);
+  const [inventory, setInventory] = useState<WorkshopInventory[]>([]);
+  const [selectedInvId, setSelectedInvId] = useState('');
+  const [partQuery, setPartQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [quantityToUse, setQuantityToUse] = useState(1);
+  const [addingPart, setAddingPart] = useState(false);
 
   const jobId = item?.originAppointmentId || item?.id;
 
-  // Load parts from the appointment's partsJson field
+  const filteredInventory = useMemo(() => {
+    if (!partQuery.trim()) return inventory;
+    const q = partQuery.toLowerCase();
+    return inventory.filter(inv => 
+      inv.part.name.toLowerCase().includes(q) || 
+      (inv.part.oemReference && inv.part.oemReference.toLowerCase().includes(q))
+    );
+  }, [inventory, partQuery]);
+
+  const loadInventory = useCallback(() => {
+    const token = localStorage.getItem('jwt_token');
+    fetch(`${API_BASE_URL}/parts/inventory`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then((data: WorkshopInventory[]) => {
+        setInventory(data || []);
+      })
+      .catch(err => console.error("Error loading inventory:", err));
+  }, []);
+
+  const loadAssignedParts = useCallback(() => {
+    if (!jobId) return;
+    const token = localStorage.getItem('jwt_token');
+    fetch(`${API_BASE_URL}/parts/appointments/${jobId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then((data: any[]) => {
+        setParts((data || []).map(p => ({
+          id: p.id,
+          partId: p.part.id,
+          name: p.part.name,
+          price: p.appliedPrice,
+          quantityUsed: p.quantityUsed
+        })));
+      })
+      .catch(() => setParts([]));
+  }, [jobId]);
+
   useEffect(() => {
     if (isOpen && jobId) {
-      const token = localStorage.getItem('jwt_token');
-      fetch(`${API_BASE_URL}/appointments/workshop/${item.workshopId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-        .then(res => res.json())
-        .then((appointments: any[]) => {
-          const target = appointments.find((a: any) => a.id === jobId);
-          if (target?.partsJson) {
-            try {
-              setParts(JSON.parse(target.partsJson));
-            } catch {
-              setParts([]);
-            }
-          } else {
-            setParts([]);
-          }
-        })
-        .catch(() => setParts([]));
+      loadInventory();
+      loadAssignedParts();
     }
-  }, [isOpen, jobId, item?.workshopId]);
+  }, [isOpen, jobId, loadInventory, loadAssignedParts]);
 
-  /** Persist parts to the backend */
-  const persistPartsToApi = useCallback(async (updatedParts: { name: string; price: number | null }[]) => {
+  const handleAddPart = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!jobId || !partQuery.trim()) return;
+
+    const matchedInv = inventory.find(i => i.id === selectedInvId || i.part.name.toLowerCase() === partQuery.trim().toLowerCase());
+
+    if (quantityToUse <= 0) return;
+
+    let payload: any = { quantity: quantityToUse };
+    if (matchedInv) {
+      if (matchedInv.stockQuantity < quantityToUse) {
+        alert(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
+        return;
+      }
+      payload.partId = matchedInv.part.id;
+    } else {
+      payload.customName = partQuery.trim();
+    }
+
+    setAddingPart(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const res = await fetch(`${API_BASE_URL}/parts/appointments/${jobId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errMsg = await res.text();
+        throw new Error(errMsg || 'Error al asignar repuesto');
+      }
+
+      loadInventory();
+      loadAssignedParts();
+      setSelectedInvId('');
+      setPartQuery('');
+      setQuantityToUse(1);
+      setShowDropdown(false);
+      onSuccess?.();
+    } catch (err: any) {
+      alert(err.message || 'Error al guardar repuesto.');
+    } finally {
+      setAddingPart(false);
+    }
+  };
+
+  const handleRemovePart = async (partId: string) => {
     if (!jobId) return;
     try {
       const token = localStorage.getItem('jwt_token');
-      const res = await fetch(`${API_BASE_URL}/appointments/${jobId}/parts`, {
-        method: 'PATCH',
+      const res = await fetch(`${API_BASE_URL}/parts/appointments/${jobId}/parts/${partId}`, {
+        method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ partsJson: JSON.stringify(updatedParts) }),
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (res.ok) {
+        loadInventory();
+        loadAssignedParts();
         onSuccess?.();
       }
-    } catch {
-      // Silent — non-critical
+    } catch (err) {
+      console.error("Error removing part:", err);
     }
-  }, [jobId]);
-
-  const handleAddPart = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPartName.trim()) return;
-    
-    // Price is optional for the mechanic
-    const price = newPartPrice.trim() !== '' ? parseFloat(newPartPrice) : null;
-    if (price !== null && price < 0) return;
-
-    const updated = [...parts, { name: newPartName.trim(), price }];
-    setParts(updated);
-    persistPartsToApi(updated);
-    setNewPartName('');
-    setNewPartPrice('');
-  };
-
-  const handleRemovePart = (index: number) => {
-    const updated = parts.filter((_, i) => i !== index);
-    setParts(updated);
-    persistPartsToApi(updated);
   };
 
   if (!isOpen || !item) return null;
@@ -314,27 +378,86 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
               Materiales y Repuestos Requeridos
             </h4>
 
-            {/* Formulario rápido de piezas (el precio ya NO tiene required) */}
-            <form onSubmit={handleAddPart} className="flex gap-2 shrink-0">
-              <input 
-                type="text"
-                required
-                value={newPartName}
-                onChange={e => setNewPartName(e.target.value)}
-                placeholder="Repuesto (ej: Pastillas de freno)"
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all flex-1 min-w-0 font-medium"
-              />
+
+
+            {/* Formulario rápido con buscador de autocompletado */}
+            <form onSubmit={handleAddPart} className="flex gap-2 shrink-0 relative">
+              <div className="relative flex-1 min-w-0">
+                <input 
+                  type="text"
+                  required
+                  value={partQuery}
+                  onChange={e => {
+                    setPartQuery(e.target.value);
+                    setShowDropdown(true);
+                    if (selectedInvId !== 'custom') setSelectedInvId('');
+                  }}
+                  onFocus={() => setShowDropdown(true)}
+                  placeholder="Buscar o escribir repuesto..."
+                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all font-semibold text-white"
+                />
+                
+                {showDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+                    <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 divide-y divide-neutral-900 custom-scrollbar">
+                      {filteredInventory.map(inv => (
+                        <button
+                          key={inv.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedInvId(inv.id);
+                            setPartQuery(inv.part.name);
+                            setShowDropdown(false);
+                          }}
+                          disabled={inv.stockQuantity === 0}
+                          className="w-full text-left px-3 py-2.5 text-xs hover:bg-neutral-900 flex justify-between items-center transition-all disabled:opacity-50"
+                        >
+                          <span className="text-white font-semibold">{inv.part.name}</span>
+                          <span className="text-[10px] text-neutral-400 font-mono">
+                            {inv.stockQuantity} uds. - {inv.retailPrice.toFixed(2)}€
+                          </span>
+                        </button>
+                      ))}
+                      
+                      {partQuery.trim().length > 0 && (
+                        <button
+                          key="custom-part-btn"
+                          type="button"
+                          onClick={() => {
+                            setSelectedInvId('custom');
+                            setShowDropdown(false);
+                          }}
+                          className="w-full text-left px-3 py-2.5 text-xs bg-red-950/20 hover:bg-red-900/20 text-red-400 font-bold flex items-center gap-1.5 transition-all"
+                        >
+                          <span>Usar repuesto personalizado:</span>
+                          <span className="text-white italic font-normal">"{partQuery.trim()}"</span>
+                        </button>
+                      )}
+                      
+                      {filteredInventory.length === 0 && partQuery.trim().length === 0 && (
+                        <div className="px-3 py-3 text-center text-xs text-neutral-500 font-medium">
+                          Escribe para buscar o añadir personalizado
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
               <input 
                 type="number"
-                step="0.01"
-                value={newPartPrice}
-                onChange={e => setNewPartPrice(e.target.value)}
-                placeholder="Precio (€)"
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-20 shrink-0 font-mono font-medium text-center"
+                required
+                min="1"
+                value={quantityToUse}
+                onChange={e => setQuantityToUse(parseInt(e.target.value) || 1)}
+                placeholder="Cant."
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
               />
               <button
                 type="submit"
-                className="px-2.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(220,38,38,0.2)] active:scale-95"
+                disabled={addingPart || !partQuery.trim()}
+                className="px-2.5 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(220,38,38,0.2)] active:scale-95 disabled:opacity-50"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
@@ -342,7 +465,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
               </button>
             </form>
 
-            {/* Lista de repuestos */}
+            {/* Lista de repuestos consumidos */}
             <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 bg-neutral-950/20">
               {parts.length === 0 ? (
                 <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center p-4">
@@ -354,16 +477,19 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
               ) : (
                 parts.map((p, idx) => (
                   <div key={idx} className="bg-neutral-900/10 px-4 py-2.5 flex justify-between items-center text-xs">
-                    <span className="text-white font-semibold truncate max-w-[150px]">{p.name}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-white font-semibold truncate max-w-[170px]">{p.name}</span>
+                      <span className="text-[10px] text-neutral-500 font-semibold">Cantidad: {p.quantityUsed} uds.</span>
+                    </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      {p.price === null || p.price === undefined ? (
-                        <span className="bg-yellow-600/10 border border-yellow-500/20 text-yellow-500 font-bold px-2 py-0.5 rounded-lg text-[9px] uppercase tracking-wider">Pte. Precio</span>
+                      {p.price <= 0 ? (
+                        <span className="text-amber-500 font-black uppercase tracking-wider text-[9px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Precio Pendiente</span>
                       ) : (
-                        <span className="text-neutral-400 font-mono">{p.price.toFixed(2)}€</span>
+                        <span className="text-neutral-400 font-mono">{(p.price * p.quantityUsed).toFixed(2)}€</span>
                       )}
                       <button
                         type="button"
-                        onClick={() => handleRemovePart(idx)}
+                        onClick={() => handleRemovePart(p.partId)}
                         className="text-neutral-500 hover:text-red-400 transition-all"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

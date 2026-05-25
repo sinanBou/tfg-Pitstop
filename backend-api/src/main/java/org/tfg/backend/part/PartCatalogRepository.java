@@ -1,0 +1,13 @@
+package org.tfg.backend.part;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import java.util.UUID;
+import java.util.Optional;
+import java.util.List;
+
+@Repository
+public interface PartCatalogRepository extends JpaRepository<PartCatalog, UUID> {
+    Optional<PartCatalog> findByOemReference(String oemReference);
+    List<PartCatalog> findByName(String name);
+}

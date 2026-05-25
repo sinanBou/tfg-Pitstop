@@ -16,7 +16,6 @@ interface AppointmentStepProps {
   viewDate: Date;
   setViewDate: (d: Date) => void;
   workshopSettings: any;
-  employees: any[];
   onPrev: () => void;
   onFinish: () => void;
   loading: boolean;
@@ -25,7 +24,7 @@ interface AppointmentStepProps {
 
 export const AppointmentStep: React.FC<AppointmentStepProps> = ({
   selectedVehicle, appointmentForm, setAppointmentForm, availableSlots,
-  viewDate, setViewDate, workshopSettings, employees, onPrev, onFinish, loading, onFetchSlots
+  viewDate, setViewDate, workshopSettings, onPrev, onFinish, loading, onFetchSlots
 }) => {
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -40,7 +39,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
   today.setHours(0, 0, 0, 0);
 
   return (
-    <div className="space-y-6 flex-1 flex flex-col justify-between h-full">
+    <div className="space-y-6 flex flex-col">
       {/* Resumen Vehículo */}
       <div className="p-4 bg-red-600/10 border border-red-600/20 rounded-2xl flex items-center gap-4 shrink-0">
         <div className="shrink-0 w-10 h-10 bg-red-600 text-white rounded-xl flex items-center justify-center font-black">
@@ -130,7 +129,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
         </div>
 
         {/* DETALLES DE CITA (Derecha) */}
-        <div className="flex-1 w-full space-y-4 max-h-[350px] overflow-y-auto pr-1 custom-scrollbar">
+        <div className="flex-1 w-full space-y-4">
           {/* Duración Estimada */}
           <div className="space-y-2">
             <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 ml-1 italic">Duración Estimada</label>
@@ -204,7 +203,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
       </div>
 
       {/* Footer / Registrar Cita */}
-      <div className="mt-auto pt-6 border-t border-neutral-800/50 flex justify-end gap-3 shrink-0">
+      <div className="mt-8 pt-6 border-t border-neutral-800 flex justify-end gap-3 shrink-0">
         <button
           type="button"
           onClick={onPrev}

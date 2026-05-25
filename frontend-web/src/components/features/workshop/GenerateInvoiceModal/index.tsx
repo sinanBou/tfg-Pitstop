@@ -5,6 +5,7 @@ import { BaseModal } from '../../../common/BaseModal/index';
 interface PartItem {
   name: string;
   price: number | null;
+  quantityUsed?: number;
 }
 
 interface ResolvedTask {
@@ -56,23 +57,22 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
       .finally(() => setLoadingCatalog(false));
   }, [isOpen, job?.workshopId]);
 
-  // Cargar piezas desde el campo partsJson de la cita (servidor)
+  // Cargar piezas desde el campo parts (relacional) de la cita (servidor)
   useEffect(() => {
     if (isOpen && job?.id) {
-      // partsJson ya viene en el DTO del job
-      if (job.partsJson) {
-        try {
-          setParts(JSON.parse(job.partsJson));
-        } catch {
-          setParts([]);
-        }
+      if (job.parts) {
+        setParts(job.parts.map((p: any) => ({
+          name: p.name,
+          price: p.appliedPrice,
+          quantityUsed: p.quantityUsed
+        })));
       } else {
         setParts([]);
       }
       setNewPartName('');
       setNewPartPrice('');
     }
-  }, [isOpen, job?.id, job?.partsJson]);
+  }, [isOpen, job?.id, job?.parts]);
 
   // Traducir los códigos del servicio de la cita
   const resolvedTasks = useMemo<ResolvedTask[]>(() => {
@@ -102,11 +102,11 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   }, [totalLaborHours, laborRate]);
 
   const totalPartsCost = useMemo(() => {
-    return parts.reduce((sum, p) => sum + (p.price ?? 0), 0);
+    return parts.reduce((sum, p) => sum + ((p.price ?? 0) * (p.quantityUsed ?? 1)), 0);
   }, [parts]);
 
   const hasMissingPrices = useMemo(() => {
-    return parts.some(p => p.price === null || p.price === undefined);
+    return parts.some(p => p.price === null || p.price === undefined || p.price <= 0);
   }, [parts]);
 
   /** Persist parts to the backend */
@@ -308,13 +308,16 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                 )}
                 {parts.map((p, idx) => (
                   <div key={idx} className={`px-4 py-3 flex justify-between items-center text-xs ${
-                    p.price === null || p.price === undefined
+                    p.price === null || p.price === undefined || p.price <= 0
                       ? 'bg-yellow-600/5 border-l-2 border-l-yellow-500'
                       : 'bg-neutral-900/10'
                   }`}>
-                    <span className="text-white font-medium truncate max-w-[130px]">{p.name}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-white font-medium truncate max-w-[130px]">{p.name}</span>
+                      <span className="text-[10px] text-neutral-500 font-semibold">Cant: {p.quantityUsed ?? 1} uds.</span>
+                    </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      {p.price === null || p.price === undefined ? (
+                      {p.price === null || p.price === undefined || p.price <= 0 ? (
                         <div className="flex items-center gap-1">
                           <input
                             type="number"

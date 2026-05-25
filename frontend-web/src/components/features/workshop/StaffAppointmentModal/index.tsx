@@ -34,7 +34,6 @@ export const StaffAppointmentModal: React.FC<StaffAppointmentModalProps> = ({
     workshopSettings,
     makes,
     models,
-    employees,
     handleSearch,
     handleSelectClient,
     handleSelectVehicle,
@@ -59,7 +58,7 @@ export const StaffAppointmentModal: React.FC<StaffAppointmentModalProps> = ({
       theme="red"
       progressBarWidth={`${(step / 3) * 100}%`}
     >
-      <div className="flex-1 flex flex-col h-full">
+      <div className="flex-1 flex flex-col">
         {step === 1 && (
           <ClientStep 
             searchQuery={searchQuery}
@@ -105,7 +104,6 @@ export const StaffAppointmentModal: React.FC<StaffAppointmentModalProps> = ({
             viewDate={viewDate}
             setViewDate={setViewDate}
             workshopSettings={workshopSettings}
-            employees={employees}
             onPrev={() => setStep(2)}
             onFinish={handleFinish}
             loading={loading}

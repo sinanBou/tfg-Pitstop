@@ -39,9 +39,13 @@ public class User implements UserDetails {
     // --- CORRECCIÓN: Las relaciones inversas van AQUÍ ---
     @OneToOne(mappedBy = "user")
     @JsonManagedReference
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Client client;
 
     @OneToOne(mappedBy = "user")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Employee employee;
 
     @Override

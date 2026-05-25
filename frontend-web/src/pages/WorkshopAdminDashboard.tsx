@@ -11,7 +11,9 @@ import { SettingsTab } from '../components/features/workshop/admin/tabs/Settings
 import { TeamTab } from '../components/features/workshop/admin/tabs/TeamTab';
 import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
 import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
+import { PartsTab } from '../components/features/workshop/admin/tabs/PartsTab';
 import { ReportsTab } from '../components/features/workshop/admin/tabs/ReportsTab';
+import { AvisosTab } from '../components/features/workshop/admin/tabs/AvisosTab';
 import { DateNavigator } from '../components/common/DateNavigator/index';
 import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
 import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
@@ -66,6 +68,7 @@ export default function WorkshopAdminDashboard() {
     goToNextPendingDate,
     employeeProfile,
     workshopTasks,
+    handleProfileUpdate,
     userRole
   } = useWorkshopAdmin();
 
@@ -82,9 +85,7 @@ export default function WorkshopAdminDashboard() {
   );
 
   const isOwner = userRole === 'WORKSHOP_OWNER';
-  const SECCIONES = isOwner
-    ? ['RESUMEN', 'CITAS', 'PLANIFICACIÓN', 'TRABAJOS', 'AGENDA', 'TAREAS', 'INFORMES', 'AJUSTES', 'EQUIPO']
-    : ['RESUMEN', 'CITAS', 'PLANIFICACIÓN', 'TRABAJOS', 'AGENDA', 'TAREAS', 'INFORMES', 'AJUSTES'];
+  const SECCIONES = ['RESUMEN', 'AVISOS', 'CITAS', 'PLANIFICACIÓN', 'FINALIZADOS', 'AGENDA', 'TAREAS', 'ALMACÉN', 'FACTURAS', 'EQUIPO', 'AJUSTES'];
 
   const isSameDate = (isoString: string) => {
       const appDate = new Date(isoString);
@@ -168,8 +169,20 @@ export default function WorkshopAdminDashboard() {
             <div className="relative z-0">
               {activeTab === 0 && <OverviewTab workshopData={workshopData} diasSemana={diasSemana} />}
               
-              {/* TAB 1: CITAS (Pendientes y Confirmadas) */}
-              {activeTab === 1 && (
+              {/* TAB 1: AVISOS */}
+              {activeTab === 1 && id && (
+                <AvisosTab
+                  workshopId={id}
+                  appointments={appointments}
+                  readyJobs={readyForCompletion}
+                  fetchWorkshopData={fetchWorkshopData}
+                  onCompleteJob={(job) => setInvoicingJob(job)}
+                  onMarkPickedUp={markPickedUp}
+                />
+              )}
+
+              {/* TAB 2: CITAS (Pendientes y Confirmadas) */}
+              {activeTab === 2 && (
                 <div className="space-y-12 animate-fade-in-up">
                   <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-[2rem] p-8">
                     {/* Toolbar: Pendientes + Calendario */}
@@ -229,15 +242,19 @@ export default function WorkshopAdminDashboard() {
                 </div>
               )}
 
-              {/* TAB 2: PLANIFICACIÓN */}
-              {activeTab === 2 && (
+              {/* TAB 3: PLANIFICACIÓN */}
+              {activeTab === 3 && (
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden">
                   {/* Toolbar dentro del contenedor */}
                   <div className="flex flex-wrap items-center gap-4 p-5 border-b border-neutral-800/60">
                     <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
                     <div className="h-10 w-[1px] bg-neutral-800/60 mx-1 hidden md:block"></div>
                     <MechanicSearch
-                      mechanics={employees.filter(e => e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER')}
+                      mechanics={employees.filter(e => {
+                        if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
+                        if (e.role === 'WORKSHOP_OWNER' && workshopData?.includeOwnerInPlanning) return true;
+                        return false;
+                      })}
                       onSelectMechanic={() => {}}
                     />
                     <button
@@ -261,15 +278,17 @@ export default function WorkshopAdminDashboard() {
                       onRescheduleTask={handleRescheduleAny}
                       onUpdateStatus={handleUpdateStatus}
                       onDeleteAppointment={handleDeleteAppointment}
+                      onDeleteTask={handleDeleteTask}
                       onManage={setSelectedAppointment}
                       onViewChecklist={setChecklistItem}
+                      includeOwnerInPlanning={workshopData?.includeOwnerInPlanning}
                     />
                   </div>
                 </div>
               )}
 
-              {/* TAB 3: TRABAJOS */}
-              {activeTab === 3 && (
+              {/* TAB 4: TRABAJOS */}
+              {activeTab === 4 && (
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
@@ -279,8 +298,8 @@ export default function WorkshopAdminDashboard() {
                 </div>
               )}
 
-              {/* TAB 4: AGENDA (Timeline Individual de cualquier empleado) */}
-              {activeTab === 4 && (
+              {/* TAB 5: AGENDA (Timeline Individual de cualquier empleado) */}
+              {activeTab === 5 && (
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
                   <div className="flex flex-col md:flex-row md:items-center justify-between p-5 border-b border-neutral-800/60 gap-4">
                     <div className="flex flex-wrap items-center gap-3">
@@ -297,11 +316,19 @@ export default function WorkshopAdminDashboard() {
                           className="bg-transparent text-white text-xs font-black uppercase tracking-wider focus:outline-none cursor-pointer border-none p-0 pr-6"
                         >
                           <option value={employeeProfile?.id || ''} className="bg-neutral-950 text-white">Mía ({employeeProfile?.firstname || 'Yo'})</option>
-                          {employees.filter(e => e.id !== employeeProfile?.id).map((emp: any) => (
-                            <option key={emp.id} value={emp.id} className="bg-neutral-950 text-white">
-                              {emp.firstname} {emp.lastname} ({emp.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico'})
-                            </option>
-                          ))}
+                          {employees
+                            .filter(e => e.id !== employeeProfile?.id)
+                            .filter(e => {
+                              if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
+                              if (e.role === 'WORKSHOP_OWNER' && workshopData?.includeOwnerInPlanning) return true;
+                              return false;
+                            })
+                            .map((emp: any) => (
+                              <option key={emp.id} value={emp.id} className="bg-neutral-950 text-white">
+                                {emp.firstname} {emp.lastname} ({emp.role === 'WORKSHOP_MANAGER' ? 'Gerente' : emp.role === 'WORKSHOP_OWNER' ? 'Propietario' : 'Mecánico'})
+                              </option>
+                            ))
+                          }
                         </select>
                       </div>
                     </div>
@@ -310,7 +337,12 @@ export default function WorkshopAdminDashboard() {
                   </div>
                   <div className="p-5">
                     <PlanningTimeline
-                      columns={[{ id: selectedAgendaEmployeeId || '', title: selectedEmpObj ? `${selectedEmpObj.firstname} ${selectedEmpObj.lastname}` : 'Sin Asignar', employeeId: selectedAgendaEmployeeId }]}
+                      columns={[{ 
+                        id: selectedAgendaEmployeeId || '', 
+                        title: selectedEmpObj ? `${selectedEmpObj.firstname} ${selectedEmpObj.lastname}` : 'Sin Asignar', 
+                        employeeId: selectedAgendaEmployeeId,
+                        role: selectedEmpObj ? (selectedEmpObj.role === 'WORKSHOP_OWNER' ? 'Dueño' : selectedEmpObj.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico') : undefined
+                      }]}
                       appointments={agendaItems}
                       selectedDate={selectedDate}
                       openTime={workshopData?.openTime}
@@ -328,25 +360,32 @@ export default function WorkshopAdminDashboard() {
                 </div>
               )}
 
-              {/* TAB 5: TAREAS */}
-              {activeTab === 5 && id && (
+              {/* TAB 6: TAREAS */}
+              {activeTab === 6 && id && (
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
                   <TasksTab workshopId={id} />
                 </div>
               )}
 
-              {/* TAB 6: INFORMES */}
-              {activeTab === 6 && id && (
+              {/* TAB 7: ALMACÉN */}
+              {activeTab === 7 && id && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                  <PartsTab workshopId={id} />
+                </div>
+              )}
+
+              {/* TAB 8: INFORMES */}
+              {activeTab === 8 && id && (
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
                   <ReportsTab workshopId={id} />
                 </div>
               )}
 
-              {/* TAB 7: AJUSTES */}
-              {activeTab === 7 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} />}
+              {/* TAB 9: EQUIPO */}
+              {activeTab === 9 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
 
-              {/* TAB 8: EQUIPO */}
-              {activeTab === 8 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
+              {/* TAB 10: AJUSTES */}
+              {activeTab === 10 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} employeeProfile={employeeProfile} onProfileUpdate={handleProfileUpdate} showProfileSection={true} employees={employees} onRefreshEmployees={fetchWorkshopData} />}
             </div>
          </div>
       </main>

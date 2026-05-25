@@ -25,7 +25,6 @@ interface TasksTabProps {
 export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   // Expanded categories state
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
@@ -78,7 +77,6 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   const fetchCatalog = async () => {
     try {
       setLoading(true);
-      setError(null);
       const token = localStorage.getItem('jwt_token');
       const res = await fetch(`${API_BASE_URL}/catalog/workshop/${workshopId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -87,7 +85,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       const data = await res.json();
       setCategories(data);
     } catch (err: any) {
-      setError(err.message || 'Error de conexión');
+      console.error(err.message || 'Error de conexión');
     } finally {
       setLoading(false);
     }

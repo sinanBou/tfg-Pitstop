@@ -27,4 +27,5 @@ public class WorkshopDTO {
     private Integer slotDurationMinutes;
     private String workingDays;
     private Double hourlyRate;
+    private Boolean includeOwnerInPlanning;
 }

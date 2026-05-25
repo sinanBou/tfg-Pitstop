@@ -10,6 +10,17 @@ import { useWorkerDashboard } from '../hooks/useWorkerDashboard';
 import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
 import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
 import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
+import { SettingsTab } from '../components/features/workshop/admin/tabs/SettingsTab';
+import { PartsTab } from '../components/features/workshop/admin/tabs/PartsTab';
+import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
+import { AvisosTab } from '../components/features/workshop/admin/tabs/AvisosTab';
+import { AppointmentsTab } from '../components/features/workshop/admin/tabs/AppointmentsTab';
+import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
+import { ConfirmedAppointmentsList } from '../components/features/workshop/admin/components/ConfirmedAppointmentsList';
+import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
+import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
+import { GenerateInvoiceModal } from '../components/features/workshop/GenerateInvoiceModal/index';
+
 
 export default function WorkerDashboard() {
   const navigate = useNavigate();
@@ -18,20 +29,45 @@ export default function WorkerDashboard() {
     employeeProfile, 
     appointments,
     workshopTasks,
+    employees,
     fetchWorkerData, 
     updateAppointmentStatus, 
     updateTaskStatus,
+    handleAssignAppointment,
     handleRescheduleAppointment,
     handleRescheduleTask,
     handleDeleteTask,
     handleDeleteAppointment,
     selectedDate,
-    setSelectedDate
+    setSelectedDate,
+    goToNextPendingDate,
+    goToNextUnassignedDate,
+    readyForCompletion,
+    completeJob,
+    markPickedUp,
+    workshopData,
+    handleProfileUpdate
   } = useWorkerDashboard();
   const [activeTab, setActiveTab] = useState(0);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [checklistItem, setChecklistItem] = useState<any>(null);
+  const [invoicingJob, setInvoicingJob] = useState<any>(null);
+
+  const SECCIONES = ['RESUMEN', 'AGENDA'];
+  const allowedSectionsStr = employeeProfile?.allowedSections;
+  const allowed = allowedSectionsStr
+    ? allowedSectionsStr.split(',').map((s: string) => s.trim()).filter(Boolean)
+    : [];
+
+  if (allowed.includes('PLANIFICACIÓN')) SECCIONES.push('PLANIFICACIÓN');
+  if (allowed.includes('AVISOS')) SECCIONES.push('AVISOS');
+  if (allowed.includes('CITAS')) SECCIONES.push('CITAS');
+  if (allowed.includes('TAREAS')) SECCIONES.push('TAREAS');
+  if (allowed.includes('ALMACÉN')) SECCIONES.push('ALMACÉN');
+  if (allowed.includes('FACTURAS')) SECCIONES.push('FACTURAS');
+
+  SECCIONES.push('AJUSTES');
 
   useEffect(() => {
     if (!loading && employeeProfile?.role === 'WORKSHOP_MANAGER') {
@@ -43,7 +79,7 @@ export default function WorkerDashboard() {
     return <LoadingScreen message="Sincronizando panel..." theme="workshop" />;
   }
 
-  const SECCIONES = ['RESUMEN', 'CITAS', 'AGENDA'];
+
 
   // Función para chequear si una fecha coincide con selectedDate
   const isSameDate = (isoString: string) => {
@@ -117,8 +153,8 @@ export default function WorkerDashboard() {
             </header>
 
             <div className="relative z-0">
-              {/* TAB 0: RESUMEN */}
-              {activeTab === 0 && (
+              {/* TAB: RESUMEN (Siempre fijo para Mecánicos) */}
+              {SECCIONES[activeTab] === 'RESUMEN' && (
                   <div className="space-y-8">
                     {/* Tarjeta de Bienvenida */}
                     <div className="bg-neutral-900/40 border border-neutral-800 rounded-[2rem] p-8 backdrop-blur-sm relative overflow-hidden">
@@ -160,47 +196,8 @@ export default function WorkerDashboard() {
                   </div>
               )}
 
-              {/* TAB 1: CITAS (Mis Tareas) */}
-              {activeTab === 1 && (
-                  <div className="space-y-12 animate-fade-in-up">
-                      <div>
-                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-                              <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full w-fit">
-                                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                                  <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">Mis Tareas Hoy</span>
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
-                              </div>
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                              {myWorkItems.length > 0 ? (
-                                  myWorkItems
-                                  .sort((a, b) => {
-                                      if (a.status === 'IN_PROGRESS') return -1;
-                                      if (b.status === 'IN_PROGRESS') return 1;
-                                      return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
-                                  })
-                                  .map((item: any) => (
-                                        <MechanicLiveTask 
-                                            key={item.id} 
-                                            appointment={item} 
-                                            onUpdateStatus={(id, status) => handleUpdateStatus(id, status, item.isTask)}
-                                            onViewChecklist={handleViewChecklist}
-                                        />
-                                  ))
-                              ) : (
-                                  <div className="col-span-full py-20 text-center bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                                      <p className="text-neutral-500 font-medium uppercase tracking-widest text-sm">No tienes tareas activas asignadas para hoy</p>
-                                  </div>
-                              )}
-                          </div>
-                      </div>
-                  </div>
-              )}
-
-              {/* TAB 2: MI AGENDA PERSONAL (Timeline) */}
-              {activeTab === 2 && (
+              {/* TAB: AGENDA (Mi Agenda Personal / Timeline - Siempre fija para Mecánicos) */}
+              {SECCIONES[activeTab] === 'AGENDA' && (
                   <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
                     <div className="flex items-center justify-between p-5 border-b border-neutral-800/60">
                       <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
@@ -211,7 +208,12 @@ export default function WorkerDashboard() {
                     </div>
                     <div className="p-0">
                        <PlanningTimeline
-                         columns={[{ id: employeeProfile?.id || '', title: 'MI AGENDA', employeeId: employeeProfile?.id || '' }]}
+                         columns={[{ 
+                           id: employeeProfile?.id || '', 
+                           title: 'MI AGENDA', 
+                           employeeId: employeeProfile?.id || '',
+                           role: employeeProfile?.role === 'WORKSHOP_OWNER' ? 'Dueño' : employeeProfile?.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico'
+                         }]}
                          appointments={combinedPlanningItems}
                          selectedDate={selectedDate}
                          onUpdateStatus={handleUpdateStatus}
@@ -225,6 +227,163 @@ export default function WorkerDashboard() {
                        />
                     </div>
                   </div>
+              )}
+
+              {/* TAB: PLANIFICACIÓN (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'PLANIFICACIÓN' && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
+                  {/* Toolbar dentro del contenedor */}
+                  <div className="flex flex-wrap items-center gap-4 p-5 border-b border-neutral-800/60">
+                    <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
+                    <div className="h-10 w-[1px] bg-neutral-800/60 mx-1 hidden md:block"></div>
+                    <MechanicSearch
+                      mechanics={employees.filter(e => {
+                        if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
+                        if (e.role === 'WORKSHOP_OWNER' && workshopData?.includeOwnerInPlanning) return true;
+                        return false;
+                      })}
+                      onSelectMechanic={() => {}}
+                    />
+                    <button
+                      onClick={goToNextUnassignedDate}
+                      className="px-5 h-[46px] bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 border border-blue-600/20 hover:border-blue-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn"
+                    >
+                      <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                      Sin Asignar
+                    </button>
+                    <div className="ml-auto">
+                      <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
+                    </div>
+                  </div>
+                  <div className="p-5">
+                    <AppointmentsTab
+                      appointments={combinedPlanningItems}
+                      selectedDate={selectedDate}
+                      employees={employees}
+                      openTime={workshopData?.openTime}
+                      closeTime={workshopData?.closeTime}
+                      onRescheduleTask={handleRescheduleAny}
+                      onUpdateStatus={handleUpdateStatus}
+                      onDeleteAppointment={handleDeleteAppointment}
+                      onDeleteTask={handleDeleteTask}
+                      onManage={setSelectedAppointment}
+                      onViewChecklist={setChecklistItem}
+                      includeOwnerInPlanning={workshopData?.includeOwnerInPlanning}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: AVISOS (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'AVISOS' && employeeProfile?.workshopId && (
+                <AvisosTab
+                  workshopId={employeeProfile.workshopId}
+                  appointments={appointments}
+                  readyJobs={readyForCompletion}
+                  fetchWorkshopData={fetchWorkerData}
+                  onCompleteJob={(job) => setInvoicingJob(job)}
+                  onMarkPickedUp={markPickedUp}
+                />
+              )}
+
+              {/* TAB: CITAS (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'CITAS' && (
+                <div className="space-y-12 animate-fade-in-up">
+                  <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-[2rem] p-8">
+                    {/* Toolbar: Pendientes + Calendario */}
+                    <div className="flex flex-wrap items-center gap-4 mb-8">
+                      <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
+                      <button
+                        onClick={goToNextPendingDate}
+                        className="px-5 h-[46px] bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 border border-yellow-600/20 hover:border-yellow-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn"
+                      >
+                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
+                        Pendientes
+                      </button>
+                      <div className="ml-auto">
+                        <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
+                      </div>
+                    </div>
+
+                    <h3 className="text-white font-black uppercase tracking-widest text-sm mb-6 flex items-center gap-3">
+                      <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                      Pendientes de Confirmar
+                      <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">{appointments.filter(a => a.status === 'PENDING').length}</span>
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {appointments.filter(a => a.status === 'PENDING').length > 0 ? appointments.filter(a => a.status === 'PENDING').map((app: any) => (
+                        <div key={app.id} className="bg-black/40 p-5 rounded-2xl border border-neutral-800 flex flex-col justify-between">
+                          <div>
+                            <div className="text-[10px] font-black uppercase text-yellow-500 tracking-widest mb-1">{app.serviceType}</div>
+                            <div className="text-lg font-black text-white">{app.vehicleDisplay}</div>
+                            <div className="text-neutral-400 text-xs font-mono mb-4">{new Date(app.dateTime).toLocaleDateString([], { day: '2-digit', month: '2-digit' })} {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h</div>
+                          </div>
+                          <button 
+                            onClick={() => updateAppointmentStatus(app.id, 'CONFIRMED')}
+                            className="w-full py-2.5 bg-white text-black hover:bg-neutral-200 rounded-xl font-black uppercase tracking-widest text-[10px] transition-colors"
+                          >
+                            Confirmar Cita
+                          </button>
+                        </div>
+                      )) : (
+                        <div className="col-span-full py-8 text-center text-neutral-500 text-xs uppercase tracking-widest font-bold">
+                          Todo al día. No hay citas por confirmar.
+                        </div>
+                      )}
+                    </div>
+                    
+                    {appointments.filter(a => a.status === 'PENDING').length > 0 && (
+                      <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-6 text-center">
+                        Las citas confirmadas se moverán a la pestaña "Planificación" para ser asignadas.
+                      </p>
+                    )}
+                    
+                    <ConfirmedAppointmentsList 
+                      appointments={appointments} 
+                      onDeleteAppointment={handleDeleteAppointment} 
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB: TAREAS (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'TAREAS' && employeeProfile?.workshopId && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                  <TasksTab workshopId={employeeProfile.workshopId} />
+                </div>
+              )}
+
+              {/* TAB: ALMACÉN (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'ALMACÉN' && employeeProfile?.workshopId && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                  <PartsTab workshopId={employeeProfile.workshopId} />
+                </div>
+              )}
+
+              {/* TAB: FACTURAS (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'FACTURAS' && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                  <CompletedJobsTab
+                    readyJobs={readyForCompletion}
+                    onCompleteJob={(job) => setInvoicingJob(job)}
+                    onMarkPickedUp={markPickedUp}
+                  />
+                </div>
+              )}
+
+              {/* TAB: AJUSTES (Siempre fijo para Mecánicos) */}
+              {SECCIONES[activeTab] === 'AJUSTES' && (
+                <SettingsTab 
+                  settingsForm={{}} 
+                  setSettingsForm={() => {}}
+                  onSubmit={(e) => e.preventDefault()}
+                  diasSemana={[]}
+                  showWorkshopSection={false}
+                  showProfileSection={true}
+                  employeeProfile={employeeProfile}
+                  onProfileUpdate={handleProfileUpdate}
+                />
               )}
             </div>
             
@@ -261,6 +420,19 @@ export default function WorkerDashboard() {
           onSuccess={() => { fetchWorkerData(); }}
         />
       )}
+
+      {invoicingJob && (
+        <GenerateInvoiceModal
+          isOpen={invoicingJob !== null}
+          onClose={() => setInvoicingJob(null)}
+          job={invoicingJob}
+          onSuccess={async () => {
+            await completeJob(invoicingJob.id);
+            setInvoicingJob(null);
+          }}
+        />
+      )}
+
 
       <style>{`
         @keyframes fade-in-up {

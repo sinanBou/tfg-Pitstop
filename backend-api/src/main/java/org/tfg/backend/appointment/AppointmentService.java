@@ -12,6 +12,8 @@ import org.tfg.backend.workshop.WorkshopRepository;
 import org.tfg.backend.workshoptask.WorkshopTask;
 import org.tfg.backend.workshoptask.WorkshopTaskRepository;
 import org.tfg.backend.workshoptask.WorkshopTaskStatus;
+import org.tfg.backend.invoice.Invoice;
+import org.tfg.backend.invoice.InvoiceRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -31,6 +33,7 @@ public class AppointmentService {
     private final WorkshopRepository workshopRepository;
     private final org.tfg.backend.employee.EmployeeRepository employeeRepository;
     private final WorkshopTaskRepository workshopTaskRepository;
+    private final InvoiceRepository invoiceRepository;
 
     // Configuración: Citas cada 1 hora, de 9 a 14 y 16 a 19
     private final List<LocalTime> WORKING_HOURS = List.of(
@@ -207,16 +210,38 @@ public class AppointmentService {
 
 
     public AppointmentDTO mapToDTO(Appointment appointment) {
+        Double price = null;
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED || appointment.getStatus() == AppointmentStatus.PICKED_UP) {
+            price = invoiceRepository.findByAppointmentId(appointment.getId())
+                    .map(Invoice::getTotalPrice)
+                    .orElse(null);
+        }
+        if (price == null) {
+            double durationHours = (appointment.getEstimatedDuration() != null ? appointment.getEstimatedDuration() : 0) / 60.0;
+            double rate = appointment.getWorkshop() != null && appointment.getWorkshop().getHourlyRate() != null ? appointment.getWorkshop().getHourlyRate() : 50.0;
+            price = durationHours * rate;
+        }
+
         return AppointmentDTO.builder()
                 .id(appointment.getId())
                 .dateTime(appointment.getDateTime())
                 .description(appointment.getDescription())
                 .serviceType(appointment.getServiceType())
                 .mechanicComments(appointment.getMechanicComments())
+                .parts(appointment.getParts() != null ? appointment.getParts().stream()
+                        .map(p -> org.tfg.backend.part.AppointmentPartDTO.builder()
+                                .id(p.getId())
+                                .partId(p.getPart().getId())
+                                .name(p.getPart().getName())
+                                .quantityUsed(p.getQuantityUsed())
+                                .appliedPrice(p.getAppliedPrice())
+                                .build())
+                        .collect(java.util.stream.Collectors.toList()) : java.util.Collections.emptyList())
                 .status(appointment.getStatus())
                 .estimatedDuration(appointment.getEstimatedDuration())
                 .actualStartTime(appointment.getActualStartTime())
                 .actualEndTime(appointment.getActualEndTime())
+                .confirmedAt(appointment.getConfirmedAt())
                 .clientFullName(appointment.getClient().getUser().getFirstname() + " " +
                         appointment.getClient().getUser().getLastname())
                 .vehicleId(appointment.getVehicle().getId())
@@ -230,6 +255,7 @@ public class AppointmentService {
                 .assignedEmployeeName(appointment.getAssignedEmployee() != null ?
                         appointment.getAssignedEmployee().getUser().getFirstname() + " " +
                         appointment.getAssignedEmployee().getUser().getLastname() : "Sin asignar")
+                .totalPrice(price)
                 .build();
     }
 
@@ -244,6 +270,10 @@ public class AppointmentService {
         }
 
         // Lógica de "fichado" automático
+        if ((newStatus == AppointmentStatus.CONFIRMED || newStatus == AppointmentStatus.IN_PROGRESS || newStatus == AppointmentStatus.COMPLETED) && appointment.getConfirmedAt() == null) {
+            appointment.setConfirmedAt(LocalDateTime.now());
+        }
+
         if (newStatus == AppointmentStatus.IN_PROGRESS && appointment.getActualStartTime() == null) {
             appointment.setActualStartTime(LocalDateTime.now());
         } else if (newStatus == AppointmentStatus.COMPLETED) {

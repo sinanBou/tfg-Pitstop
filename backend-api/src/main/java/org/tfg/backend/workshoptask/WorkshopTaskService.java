@@ -16,8 +16,23 @@ public class WorkshopTaskService {
     private final org.tfg.backend.appointment.AppointmentRepository appointmentRepository;
 
     public List<WorkshopTaskDTO> getTasksByWorkshopAndDate(UUID workshopId, LocalDateTime start, LocalDateTime end) {
-        return taskRepository.findByWorkshopIdAndDateTimeBetween(workshopId, start, end)
-                .stream()
+        List<WorkshopTask> list = new java.util.ArrayList<>(taskRepository.findByWorkshopIdAndDateTimeBetween(workshopId, start, end));
+        List<WorkshopTask> allTasks = taskRepository.findByWorkshopId(workshopId);
+        
+        java.util.Set<UUID> existingIds = list.stream().map(WorkshopTask::getId).collect(Collectors.toSet());
+        
+        for (WorkshopTask t : allTasks) {
+            if (t.getAssignedEmployee() == null && 
+                t.getStatus() != WorkshopTaskStatus.COMPLETED && 
+                t.getStatus() != WorkshopTaskStatus.CANCELLED) {
+                if (!existingIds.contains(t.getId())) {
+                    list.add(t);
+                    existingIds.add(t.getId());
+                }
+            }
+        }
+        
+        return list.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
@@ -56,14 +71,31 @@ public class WorkshopTaskService {
         WorkshopTask task = taskRepository.findById(taskId).orElse(null);
         if (task != null) {
             org.tfg.backend.appointment.Appointment origin = task.getOriginAppointment();
-            if (origin != null && origin.getTasks() != null) {
-                origin.getTasks().remove(task);
-            }
-            taskRepository.delete(task);
             
-            if (origin != null && (origin.getTasks() == null || origin.getTasks().isEmpty())) {
-                origin.setStatus(org.tfg.backend.appointment.AppointmentStatus.CONFIRMED);
-                appointmentRepository.save(origin);
+            // Si tiene una cita origen, vemos cuántas tareas activas (no canceladas) tiene esa cita
+            long activeTasksCount = 0;
+            if (origin != null && origin.getTasks() != null) {
+                activeTasksCount = origin.getTasks().stream()
+                        .filter(t -> t.getStatus() != WorkshopTaskStatus.CANCELLED)
+                        .count();
+            }
+
+            if (activeTasksCount > 1) {
+                // "si esta dividida que se cancele la tarea ese period del dia"
+                task.setStatus(WorkshopTaskStatus.CANCELLED);
+                taskRepository.save(task);
+            } else {
+                // "si esta en solo un dia que se elimine la tarea por completa y vuelva la cita a sin asignar"
+                if (origin != null && origin.getTasks() != null) {
+                    origin.getTasks().remove(task);
+                }
+                taskRepository.delete(task);
+                
+                if (origin != null) {
+                    origin.setAssignedEmployee(null); // Vuelve la cita a sin asignar (unassigned)
+                    origin.setStatus(org.tfg.backend.appointment.AppointmentStatus.CONFIRMED); // Vuelve a estado confirmado pero sin asignar
+                    appointmentRepository.save(origin);
+                }
             }
         }
     }
@@ -87,6 +119,7 @@ public class WorkshopTaskService {
                 .clientFullName(task.getOriginAppointment() != null && task.getOriginAppointment().getClient() != null && task.getOriginAppointment().getClient().getUser() != null ? task.getOriginAppointment().getClient().getUser().getFirstname() + " " + task.getOriginAppointment().getClient().getUser().getLastname() : "N/A")
                 .originAppointmentId(task.getOriginAppointment() != null ? task.getOriginAppointment().getId() : null)
                 .completedTasks(task.getCompletedTasks())
+                .mechanicComments(task.getOriginAppointment() != null ? task.getOriginAppointment().getMechanicComments() : null)
                 .isTask(true)
                 .build();
     }

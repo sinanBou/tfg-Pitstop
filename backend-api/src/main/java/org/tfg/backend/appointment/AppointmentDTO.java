@@ -18,12 +18,14 @@ public class AppointmentDTO {
     private String description;
     private String serviceType;
     private String mechanicComments;
+    private java.util.List<org.tfg.backend.part.AppointmentPartDTO> parts;
     private AppointmentStatus status;
 
     // Control de tiempos
     private Integer estimatedDuration;
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
+    private LocalDateTime confirmedAt;
 
     // Información del Cliente
     private String clientFullName;
@@ -40,4 +42,7 @@ public class AppointmentDTO {
     // Información del Empleado Asignado
     private UUID assignedEmployeeId;
     private String assignedEmployeeName;
+
+    // Coste total real/estimado
+    private Double totalPrice;
 }

@@ -56,21 +56,18 @@ const MAX_VISIBLE_CARDS = 2;
 /** Visual offset (px) between stacked cards */
 const STACK_OFFSET = 5;
 
-export const AppointmentStackGroup: React.FC<AppointmentStackGroupProps> = ({
-  appointments,
-  topPosition,
-  height,
-  columnId,
-  minuteHeight,
-  startHour,
-  readOnly = false,
-  onReschedule,
-  onUpdateStatus,
-  onDeleteTask,
-  onDeleteAppointment,
-  onManage,
-  selectedDate,
-}) => {
+export const AppointmentStackGroup: React.FC<AppointmentStackGroupProps> = (props) => {
+  const {
+    appointments,
+    topPosition,
+    height,
+    columnId,
+    readOnly = false,
+    onUpdateStatus,
+    onDeleteTask,
+    onDeleteAppointment,
+    onManage,
+  } = props;
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
@@ -195,7 +192,6 @@ export const AppointmentStackGroup: React.FC<AppointmentStackGroupProps> = ({
       >
         {/* Stacked card shadows — visual depth */}
         {visibleCards.map((app, idx) => {
-          const dateObj = new Date(app.dateTime);
           const isTop = idx === 0;
           return (
             <div

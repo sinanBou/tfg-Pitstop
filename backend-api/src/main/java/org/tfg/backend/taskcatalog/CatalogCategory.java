@@ -30,6 +30,7 @@ public class CatalogCategory {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workshop_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Workshop workshop;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

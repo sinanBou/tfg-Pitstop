@@ -9,6 +9,7 @@ export function useWorkerDashboard() {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [workshopTasks, setWorkshopTasks] = useState<any[]>([]);
   const [employees, setEmployees] = useState<any[]>([]);
+  const [workshopData, setWorkshopData] = useState<any>(null);
   const [readyForCompletion, setReadyForCompletion] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date();
@@ -44,6 +45,12 @@ export function useWorkerDashboard() {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if(empRes.ok) setEmployees(await empRes.json());
+
+        // Fetch workshop settings
+        const wsRes = await fetch(`${API_BASE_URL}/workshops/${data.workshopId}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (wsRes.ok) setWorkshopData(await wsRes.json());
 
         // Fetch completed jobs for manager panel
         const rcRes = await fetch(`${API_BASE_URL}/appointments/workshop/${data.workshopId}/ready-for-completion`, {
@@ -300,6 +307,29 @@ export function useWorkerDashboard() {
     fetchWorkerData();
   }, [fetchWorkerData]);
 
+  const handleProfileUpdate = async (profileData: { firstname: string; lastname: string; address: string }) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/me`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profileData)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEmployeeProfile(updated);
+      } else {
+        alert('Error al actualizar el perfil');
+      }
+    } catch (err) {
+      console.error('Error actualizando perfil:', err);
+      alert('Error de conexión al actualizar el perfil');
+    }
+  };
+
   return {
     loading,
     employeeProfile,
@@ -320,6 +350,8 @@ export function useWorkerDashboard() {
     goToNextUnassignedDate,
     readyForCompletion,
     completeJob,
-    markPickedUp
+    markPickedUp,
+    workshopData,
+    handleProfileUpdate
   };
 }

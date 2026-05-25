@@ -20,9 +20,16 @@ public class Employee {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workshop_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Workshop workshop;
+
+    @Column(name = "allowed_sections")
+    private String allowedSections;
 }

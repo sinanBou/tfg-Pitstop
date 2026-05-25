@@ -42,12 +42,51 @@ public class EmployeService {
     }
 
     /**
-     * Lista todos los empleados de un taller específico por su ID.
+     * Actualiza el perfil del empleado autenticado (solo campos seguros).
      */
-    @Transactional(readOnly = true)
+    @Transactional
+    public EmployeeDTO updateProfile(String email, UpdateProfileRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (request.getFirstname() != null && !request.getFirstname().isBlank()) {
+            user.setFirstname(request.getFirstname().trim());
+        }
+        if (request.getLastname() != null && !request.getLastname().isBlank()) {
+            user.setLastname(request.getLastname().trim());
+        }
+        if (request.getAddress() != null) {
+            user.setAddress(request.getAddress().trim());
+        }
+
+        userRepository.save(user);
+        return mapToDTO(user.getEmployee());
+    }
+
+    /**
+     * Lista todos los empleados de un taller específico por su ID.
+     * Incluye una lógica de autocuración para asegurar que el propietario (Owner) siempre esté en la lista.
+     */
+    @Transactional
     public List<EmployeeDTO> getEmployeesByWorkshopId(java.util.UUID workshopId) {
-        return employeeRepository.findAll().stream()
+        Workshop workshop = workshopRepository.findById(workshopId).orElse(null);
+        Employee owner = (workshop != null) ? workshop.getOwner() : null;
+
+        // Auto-curación de base de datos: si el propietario no tiene el taller asignado en su registro, lo corregimos
+        if (owner != null && owner.getWorkshop() == null && workshop != null) {
+            owner.setWorkshop(workshop);
+            employeeRepository.save(owner);
+        }
+
+        java.util.Set<Employee> employees = employeeRepository.findAll().stream()
                 .filter(e -> e.getWorkshop() != null && e.getWorkshop().getId().equals(workshopId))
+                .collect(Collectors.toSet());
+
+        if (owner != null) {
+            employees.add(owner);
+        }
+
+        return employees.stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -125,6 +164,14 @@ public class EmployeService {
         }
     }
 
+    @Transactional
+    public void updateAllowedSections(java.util.UUID employeeId, String allowedSections) {
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
+        employee.setAllowedSections(allowedSections);
+        employeeRepository.save(employee);
+    }
+
     public EmployeeDTO mapToDTO(Employee employee) {
         return EmployeeDTO.builder()
                 .id(employee.getId())
@@ -135,6 +182,7 @@ public class EmployeService {
                 .workshopId(employee.getWorkshop() != null ? employee.getWorkshop().getId() : null)
                 .workshopName(employee.getWorkshop() != null ? employee.getWorkshop().getCompanyName() : "Sin taller")
                 .address(employee.getUser().getAddress())
+                .allowedSections(employee.getAllowedSections())
                 .build();
     }
 }

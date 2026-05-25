@@ -63,4 +63,8 @@ public class Workshop {
     @Column(name = "hourly_rate")
     @Builder.Default
     private Double hourlyRate = 50.0;
+
+    @Column(name = "include_owner_in_planning")
+    @Builder.Default
+    private Boolean includeOwnerInPlanning = false;
 }

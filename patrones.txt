@@ -1,134 +1,60 @@
-======================================================================
-PITSTOP SOFTWARE ARCHITECTURE - DESIGN PATTERNS LOG
-======================================================================
+========================================================================
+PATRONES DE DISEÑO APLICADOS - PITSTOP PARTS & INVENTORY REFACTOR
+========================================================================
 
-1.  REPOSITORY PATTERN (Backend - Spring Data JPA)
-    - Implementado en: EmployeeRepository, UserRepository, WorkshopRepository.
-    - Propósito: Abstracción total de la capa de datos. Permite cambiar el motor 
-      de BD sin afectar la lógica de negocio. Se han añadido consultas personalizadas 
-      (JPQL) para búsquedas avanzadas con paginación.
+En esta refactorización integral del sistema de repuestos y control de almacén, se han integrado y documentado de forma activa cuatro patrones de diseño de la banda de los cuatro (GoF):
 
-2.  SERVICE LAYER / BUSINESS LOGIC (Backend)
-    - Implementado en: EmployeService, WorkshopService.
-    - Propósito: Encapsulamiento de la lógica de negocio pura. Garantiza que los 
-      controladores solo manejen la comunicación HTTP, delegando la complejidad 
-      de las transacciones (@Transactional) y validaciones al servicio.
+1. BUILDER PATTERN (Creación)
+-----------------------------
+- Cómo se creó: Se aplicó la anotación Lombok `@Builder` en todas las nuevas entidades JPA (`PartCatalog`, `WorkshopInventory`, `AppointmentPart`) y sus DTOs correspondientes.
+- Propósito: Facilita la creación fluida y segura de objetos del dominio complejos evitando constructores monolíticos cargados de parámetros difíciles de seguir y controlando la inmutabilidad de los datos.
 
-3.  DATA TRANSFER OBJECT (DTO) PATTERN
-    - Implementado en: EmployeeDTO, AddEmployeeRequest.
-    - Propósito: Desacoplamiento de las entidades de base de datos del contrato 
-      con el frontend. Permite enviar solo los datos necesarios y proteger la 
-      estructura interna de la base de datos (seguridad y rendimiento).
+2. STRATEGY PATTERN (Comportamiento)
+-----------------------------------
+- Cómo se creó: 
+  - Se definió la interfaz común `PartPricingStrategy` con el método `double calculatePrice(double baseRetailPrice);`.
+  - Se crearon las clases concretas de estrategia:
+    - `StandardPricingStrategy`: Aplica el precio de venta sugerido original del inventario.
+    - `DiscountPricingStrategy`: Permite fijar un descuento variable (ej. 10% promocional) al precio del repuesto al asignarlo a la cita.
+- Propósito: Desacopla la lógica comercial de facturación y cálculo de precios del repuesto. La capa de servicio puede recibir dinámicamente cualquier estrategia en el futuro sin modificar la lógica principal.
 
-4.  FACADE / CUSTOM HOOKS (Frontend - React)
-    - Implementado en: useWorkshopAdmin, useStaffAppointment.
-    - Propósito: Actúan como una "fachada" que simplifica la interacción de los 
-      componentes con la API. Los componentes (TeamTab, OverviewTab) no saben 
-      CÓMO se obtienen los datos, solo los consumen.
+3. OBSERVER PATTERN (Comportamiento)
+-----------------------------------
+- Cómo se creó: 
+  - Se creó el evento Spring `LowStockEvent` que transporta los detalles del stock mínimo.
+  - Se implementó el observador `InventoryStockObserver` anotado con `@Component` que escucha estos eventos mediante `@EventListener`.
+  - En `PartService.java`, cuando las existencias descienden por debajo de `avisoThreshold`, el publicador de eventos de Spring despacha el evento.
+- Propósito: Permite que el control de stock notifique alarmas de forma asíncrona y totalmente desacoplada del hilo de guardado transaccional principal, facilitando la futura adición de pasarelas de email o SMS.
 
-5.  BUILDER PATTERN (Lombok & Java)
-    - Implementado en: Construcción de entidades User y Employee.
-    - Propósito: Creación fluida y legible de objetos complejos. Especialmente útil 
-      en el registro de empleados para manejar múltiples atributos opcionales 
-      como 'address' de forma limpia.
+4. FACADE PATTERN (Estructura)
+------------------------------
+- Cómo se creó: Se implementó la clase `PartInventoryFacade` para encapsular las llamadas cruzadas complejas del servicio de piezas (descontar stock, disparar observadores, instanciar estrategias de precios, calcular costes).
+- Propósito: Ofrece una interfaz unificada y ultra-simplificada para el controlador de la API (`PartController`), de modo que éste no requiera conocer las interioridades transaccionales complejas de la gestión de existencias y facturación.
 
-6.  ROLE-BASED ACCESS CONTROL (RBAC) / STRATEGY
-    - Implementado en: EmployeeController, TeamTab (Lógica de ascenso).
-    - Propósito: Estrategia de seguridad donde las acciones disponibles (borrar, 
-      ascender) cambian dinámicamente según el rol del usuario autenticado 
-      (OWNER vs MANAGER vs STAFF).
+5. REPOSITORY PATTERN (Estructura)
+----------------------------------
+- Cómo se creó: Se crearon las interfaces `PartCategoryRepository` y `PartCatalogRepository` extendiendo `JpaRepository<T, UUID>`.
+- Propósito: Aísla la capa del dominio y la lógica de negocio pura de la infraestructura física de acceso a datos (base de datos relacional H2/PostgreSQL). Permite realizar consultas seguras, tipos fuertemente tipados y operaciones CRUD atómicas sin escribir SQL manual o acoplar la base de datos a los servicios.
 
-7.  DEBOUNCING PATTERN (Event Handling)
-    - Implementado en: Búsqueda de clientes en el modal de citas.
-    - Propósito: Optimización de red para prevenir inundaciones de peticiones 
-      al servidor mientras el usuario escribe, mejorando drásticamente el rendimiento.
+6. BUILDER PATTERN (Creación) - Extensión PartCategory
+------------------------------------------------------
+- Cómo se creó: Se aplicó la anotación Lombok `@Builder` en la nueva entidad relacional `PartCategory`.
+- Propósito: Permite instanciar de forma fluida y clara las nuevas categorías con sus slugs dinámicos e inicializar colecciones internas de forma inmutable a través de `@Builder.Default`.
 
-8.  COMMAND PATTERN (MechanicTaskModal -> API)
-    - Implementado en: MechanicTaskModal (frontend) + AppointmentService.manageAppointmentTasks (backend).
-    - Propósito: El mecánico compone un "comando" de tareas del catálogo (cargaTrabajo.json)
-      con los cilindros del vehículo. Este payload (AppointmentManagementRequest) se envía
-      al backend que lo ejecuta y distribuye el trabajo en el calendario.
+7. ADAPTER PATTERN (Estructura) - SettingsTab Dual-Mode
+--------------------------------------------------------
+- Cómo se creó: Se refactorizó `SettingsTab.tsx` para soportar múltiples modos de renderizado mediante props condicionales (`readOnlyWorkshop`, `showProfileSection`).
+  - Modo Owner/Manager: Formulario editable de taller + sección de edición de perfil personal.
+  - Modo Mecánico: Vista de solo lectura de la configuración del taller (sin perfil).
+- Backend: Se creó `PUT /api/employees/me` con `UpdateProfileRequest` que solo permite campos seguros (nombre, apellido, dirección).
+- Propósito: Un único componente se adapta a diferentes roles y contextos de usuario sin duplicación de código, respetando el principio de responsabilidad única y la seguridad por diseño.
 
-9.  CHAIN OF RESPONSIBILITY / DAY-OVERFLOW SCHEDULING
-    - Implementado en: AppointmentService.manageAppointmentTasks.
-    - Propósito: Si el trabajo excede el tiempo disponible en el día de la cita, el algoritmo
-      encadena continuaciones en días laborables sucesivos (saltando fines de semana) hasta
-      completar la planificación total. Cada bloque aparece como SIN ASIGNAR en la PLANIFICACIÓN.
-
-10. STACK & POPOVER PATTERN (Frontend - UI/UX)
-    - Implementado en: AppointmentStackGroup (componente), PlanningTimeline (integración).
-    - Propósito: Resolver el solapamiento visual de citas en celdas del timeline sin usar
-      scroll interno ni alterar las dimensiones fijas del grid. Las citas superpuestas se
-      colapsan en un "stack" visual (máx. 2 visibles + badge "+X más") y al pasar el ratón
-      o hacer clic se despliega un Popover flotante con todas las citas a tamaño completo,
-      preservando la capacidad de drag-and-drop, confirmación y eliminación.
-
-11. TASK CHECKLIST / PROGRESS TRACKING (Frontend - UI/UX)
-    - Implementado en: TaskChecklistModal (componente), AppointmentBlock (botón), WorkerDashboard (integración).
-    - Propósito: Permite al mecánico ver la lista de sub-tareas (códigos del catálogo) que
-      corresponden a cada vehículo/cita. Cada tarea se puede marcar individualmente como
-      completada. Cuando TODAS las sub-tareas están completadas, se habilita el botón para
-      marcar el item completo como COMPLETED a través de la API existente.
-
-12. MANAGER JOB COMPLETION WORKFLOW (Full-Stack)
-    - Backend: AppointmentController GET /workshop/{id}/ready-for-completion
-      + AppointmentService.getAppointmentsReadyForCompletion() filtra citas IN_PROGRESS
-        con TODAS sus WorkshopTasks en estado COMPLETED.
-    - Frontend Admin: CompletedJobsTab (nueva pestaña "TRABAJOS") muestra estas citas
-      al gerente con un botón "Completar Trabajo — Avisar al Cliente".
-    - Frontend Cliente: ClientAppointmentsTab muestra un banner verde "Vehículo Listo"
-      y badge "✓ Listo" cuando el status de la cita es COMPLETED.
-    - Flujo: Mecánico completa tareas → Gerente aprueba → Cliente ve "Listo para recoger".
-
-13. SPECIALIZED COLUMN / ADAPTIVE LAYOUT (Frontend - UI/UX)
-    - Implementado en: UnassignedColumn (componente), PlanningTimeline (integración).
-    - Propósito: La columna "Sin Asignar" no necesita posicionamiento temporal como las
-      columnas de mecánicos. Se reemplazó el grid basado en horas por una lista scrollable
-      de tarjetas compactas, evitando que muchas citas se subdividan horizontalmente
-      hasta ser ilegibles. Cada tarjeta mantiene drag-and-drop para asignar mecánicos,
-      acciones de gestionar/eliminar, y un conteo de citas en la cabecera. PlanningTimeline
-      ahora separa dinámicamente las columnas (unassigned vs mechanic) y renderiza
-      cada tipo con su layout óptimo (Strategy Pattern de renderizado).
-
-14. VEHICLE PARTS COMPATIBILITY ENGINE & DYNAMIC CATALOG GENERATOR (Full-Stack)
-    - Backend: PartsCatalogService, VehicleController.
-    - Frontend: CatalogTab (nueva pestaña de consulta de recambios).
-    - Propósito: Permitir a los mecánicos y administradores consultar instantáneamente
-      las piezas de sustitución necesarias para cualquier marca y modelo de coche. El backend
-      genera dinámicamente un catálogo completo y coherente de 15 piezas de alta calidad
-      específicas para el vehículo buscado, calculando códigos OE y precios realistas.
-    - Flujo: El usuario ingresa Marca y Modelo → El frontend realiza consultas con debouncing
-      al endpoint `/api/vehicles/parts` → El backend aplica hashing consistente para devolver
-      piezas y precios específicos del coche, listas para ser reservadas o compradas.
-
-15. RE-MANAGEABLE TASK WORKFLOW & JPA ORPHAN ALIGNMENT (Full-Stack)
-    - Implementado en: MechanicTaskModal (Frontend React), AppointmentService.java (Backend Spring Boot).
-    - Propósito: Permitir a los gerentes y mecánicos gestionar/editar una cita que ya había sido planificada
-      previamente sin duplicar tareas y pre-populando automáticamente los valores anteriores.
-    - Flujo: 
-      1. El frontend lee `serviceType` (códigos de tareas guardados) y `mechanicComments` (para cilindros/ruedas),
-         pre-populando el estado al abrir el modal.
-      2. Al enviar el formulario modificado, el backend marca la cita, limpia la colección `@OneToMany` (`tasks.clear()`)
-         provocando que JPA elimine los "huérfanos" anteriores y re-distribuye las nuevas tareas de forma limpia en el calendario.
-
-16. DYNAMIC LABOR VALUATION & CENTRALIZED WORKSHOP RATE PATTERN (Full-Stack)
-    - Implementado en: Workshop.java, WorkshopDTO.java, WorkshopRequest.java, WorkshopService.java (Backend); SettingsTab.tsx, useWorkshopAdmin.ts, MechanicTaskModal.tsx, ClientHistoryTab.tsx (Frontend).
-    - Propósito: Proveer al dueño del taller la capacidad de configurar y modificar el precio por hora de la mano de obra (€/h),
-      propagando este costo constante dinámicamente tanto en la planificación interna de mecánicos (presupuestación al vuelo de horas planificadas)
-      como en la facturación del historial del cliente.
-    - Flujo:
-      1. El dueño edita el campo de mano de obra (€/h) en Ajustes del Taller, actualizando `hourlyRate` en base de datos.
-      2. Cuando el mecánico planifica tareas en `MechanicTaskModal`, se calcula el coste estimado de mano de obra al vuelo (`totalHours * hourlyRate`).
-      3. Al completarse la cita, el coste final estimado se muestra de forma transparente e interactiva en la línea de tiempo del historial del cliente.
-
-17. DYNAMIC MULTI-TENANT TASK CATALOG BLUEPRINT PATTERN (Full-Stack)
-    - Implementado en: CatalogCategory.java, CatalogTask.java, CatalogService.java, CatalogController.java, CatalogInitializationService.java, CatalogDataSeeder.java (Backend); TasksTab.tsx, MechanicTaskModal/index.tsx, TaskChecklistModal/index.tsx (Frontend).
-    - Propósito: Permitir a múltiples talleres (inquilinos) tener sus propios catálogos de servicios mecánicos personalizados, iniciados con un conjunto de más de 120 tareas predeterminadas copiadas dinámicamente de un JSON maestro en el registro, y permitiendo al dueño editarlos, borrarlos o ampliarlos libremente sin interferir con otros talleres.
-    - Flujo:
-      1. En el registro de taller (`WorkshopService`), `CatalogInitializationService` lee `cargaTrabajo.json` y clona la semilla para ese taller.
-      2. En el arranque de la app, `CatalogDataSeeder` asegura que cualquier taller preexistente tenga su catálogo iniciado de forma defensiva.
-      3. El dueño gestiona categorías y tareas en tiempo real desde la nueva pestaña premium `TasksTab` en su panel de administración.
-      4. Los mecánicos consultan el catálogo específico de su taller dinámicamente al planificar (`MechanicTaskModal`) o realizar tareas (`TaskChecklistModal`), asegurando consistencia inmediata y aislamiento total.
-
+8. CAPABILITY / DYNAMIC TAB AUTHORIZATION PATTERN (Comportamiento)
+-----------------------------------------------------------------
+- Cómo se creó:
+  - En la entidad `Employee`, se introdujo un campo de texto `allowedSections` que persiste los permisos granulares concedidos.
+  - En el controlador `EmployeeController`, se expuso el endpoint seguro `PUT /api/employees/{id}/allowed-sections` para gestionar estos accesos desde la interfaz de ajustes de Owners/Managers.
+  - En el frontend, el panel de mecánicos `WorkerDashboard.tsx` lee las capacidades dinámicamente y computa la barra de navegación `SECCIONES` basándose en este claim.
+- Propósito: Desacopla los menús e interfaces del rol estático tradicional, permitiendo una asignación fluida y granular de responsabilidades a nivel de base de datos que se refleja de inmediato en caliente en el cliente sin requerir relogueo completo.
 
 

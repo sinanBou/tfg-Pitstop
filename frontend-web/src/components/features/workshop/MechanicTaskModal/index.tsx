@@ -28,20 +28,6 @@ interface MechanicTaskModalProps {
 // ──────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────────────────────────────
-const CATEGORY_LABELS: Record<string, string> = {
-  '1_consumibles': 'Consumibles',
-  '2_sistema_refrigeracion': 'Sistema Refrigeración',
-  '3_sistema_lubrificacion': 'Sistema Lubricación',
-  '4_sistema_aire_y_escape': 'Sistema Aire y Escape',
-  '5_sistema_combustible': 'Sistema Combustible',
-  '6_sistema_electrico': 'Sistema Eléctrico',
-  '7_sistema_mecanico': 'Sistema Mecánico',
-  '8_sistema_gas': 'Sistema Gas',
-  'alternadores': 'Alternadores',
-  'controlador': 'Controlador',
-  'tareas_diversas': 'Tareas Diversas',
-  'neumaticos_y_ruedas': 'Neumáticos y Ruedas',
-};
 
 /** Detect if a task scales by number of wheels */
 function isWheelTask(task: CatalogTask): boolean {

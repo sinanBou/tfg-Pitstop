@@ -95,7 +95,8 @@ export const useClientDashboard = () => {
             dateTime: app.dateTime,
             actualStartTime: app.actualStartTime,
             actualEndTime: app.actualEndTime,
-            confirmedAt: app.confirmedAt
+            confirmedAt: app.confirmedAt,
+            parts: app.parts
           };
         }));
       }

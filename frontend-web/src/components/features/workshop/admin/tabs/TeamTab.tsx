@@ -38,7 +38,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                  <div>
                     <h2 className="text-3xl font-black uppercase tracking-widest text-white">{selectedEmp.firstname} {selectedEmp.lastname}</h2>
                     <div className="mt-2 text-red-500 font-black uppercase text-xs tracking-[0.3em]">
-                       {selectedEmp.role === 'WORKSHOP_MANAGER' ? 'Gerente General' : 'Mecánico de Plantilla'}
+                       {selectedEmp.role === 'WORKSHOP_OWNER' ? 'Propietario del Taller' : selectedEmp.role === 'WORKSHOP_MANAGER' ? 'Gerente General' : 'Mecánico de Plantilla'}
                     </div>
                  </div>
 
@@ -77,12 +77,14 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                        </button>
                     )}
 
-                    <button 
-                      onClick={() => { onDelete(selectedEmp.id); setSelectedEmp(null); }}
-                      className="px-8 py-5 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
-                    >
-                      Dar de baja permanente
-                    </button>
+                    {selectedEmp.role !== 'WORKSHOP_OWNER' && (
+                      <button 
+                        onClick={() => { onDelete(selectedEmp.id); setSelectedEmp(null); }}
+                        className="px-8 py-5 bg-red-600/10 hover:bg-red-600 text-red-600 hover:text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+                      >
+                        Dar de baja permanente
+                      </button>
+                    )}
                  </div>
               </div>
            </div>
@@ -187,8 +189,12 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                   </div>
                   <div>
                     <h4 className="text-white font-black uppercase text-base tracking-widest leading-none mb-2">{emp.firstname} {emp.lastname}</h4>
-                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${emp.role === 'WORKSHOP_MANAGER' ? 'bg-white text-black' : 'bg-red-600/10 text-red-500'}`}>
-                      {emp.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico'}
+                    <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-tighter ${
+                      emp.role === 'WORKSHOP_OWNER' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
+                      emp.role === 'WORKSHOP_MANAGER' ? 'bg-white text-black' : 
+                      'bg-red-600/10 text-red-500'
+                    }`}>
+                      {emp.role === 'WORKSHOP_OWNER' ? 'Propietario' : emp.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico'}
                     </span>
                   </div>
                 </div>

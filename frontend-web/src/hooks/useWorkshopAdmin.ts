@@ -31,7 +31,8 @@ export function useWorkshopAdmin() {
     closeTime: '',
     slotDurationMinutes: '',
     workingDays: [] as string[],
-    hourlyRate: ''
+    hourlyRate: '',
+    includeOwnerInPlanning: false
   });
 
   const [employeeForm, setEmployeeForm] = useState({
@@ -75,7 +76,8 @@ export function useWorkshopAdmin() {
           closeTime: data.closeTime || '18:00',
           slotDurationMinutes: data.slotDurationMinutes || '30',
           workingDays: parsedDays,
-          hourlyRate: data.hourlyRate !== undefined && data.hourlyRate !== null ? String(data.hourlyRate) : '50.0'
+          hourlyRate: data.hourlyRate !== undefined && data.hourlyRate !== null ? String(data.hourlyRate) : '50.0',
+          includeOwnerInPlanning: data.includeOwnerInPlanning || false
         });
       }
 
@@ -130,7 +132,7 @@ export function useWorkshopAdmin() {
         workingDays: settingsForm.workingDays.join(', '),
         hourlyRate: parseFloat(settingsForm.hourlyRate) || 50.0
       };
-      const res = await fetch(`${API_BASE_URL}/workshops/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/workshops/${id}/settings`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -141,6 +143,9 @@ export function useWorkshopAdmin() {
       if (res.ok) {
         alert("Ajustes actualizados correctamente");
         fetchWorkshopData();
+      } else {
+        const errorText = await res.text();
+        alert("Error al guardar ajustes: " + errorText);
       }
     } catch (err) { alert("Error al guardar ajustes"); }
   };
@@ -459,6 +464,30 @@ export function useWorkshopAdmin() {
     }
   }, [appointments, selectedDate, setSelectedDate]);
 
+  const handleProfileUpdate = async (profileData: { firstname: string; lastname: string; address: string }) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/me`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(profileData)
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEmployeeProfile(updated);
+        await fetchWorkshopData();
+      } else {
+        alert('Error al actualizar el perfil');
+      }
+    } catch (err) {
+      console.error('Error actualizando perfil:', err);
+      alert('Error de conexión al actualizar el perfil');
+    }
+  };
+
   return {
     id,
     activeTab, setActiveTab,
@@ -491,6 +520,7 @@ export function useWorkshopAdmin() {
     handleDeleteAppointment,
     employeeProfile,
     workshopTasks,
+    handleProfileUpdate,
     userRole: localStorage.getItem('role')
   };
 }

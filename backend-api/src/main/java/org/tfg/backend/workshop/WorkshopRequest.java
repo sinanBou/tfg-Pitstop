@@ -17,4 +17,5 @@ public class WorkshopRequest {
     private Integer slotDurationMinutes;
     private String workingDays;
     private Double hourlyRate;
+    private Boolean includeOwnerInPlanning;
 }

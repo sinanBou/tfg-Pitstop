@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.tfg.backend.user.User;
@@ -21,6 +23,16 @@ public class EmployeeController {
     @GetMapping("/me")
     public ResponseEntity<EmployeeDTO> getMe(@AuthenticationPrincipal User user) {
         return ResponseEntity.ok(employeService.getEmployeeProfile(user.getEmail()));
+    }
+
+    /**
+     * Actualiza el perfil del empleado autenticado (campos seguros).
+     */
+    @PutMapping("/me")
+    public ResponseEntity<EmployeeDTO> updateMe(
+            @AuthenticationPrincipal User user,
+            @RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(employeService.updateProfile(user.getEmail(), request));
     }
 
     @GetMapping("/workshop/{workshopId}")
@@ -65,6 +77,18 @@ public class EmployeeController {
         try {
             employeService.demoteToStaff(id);
             return ResponseEntity.ok("Empleado degradado a Mecánico");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @org.springframework.web.bind.annotation.PutMapping("/{id}/allowed-sections")
+    public ResponseEntity<String> updateAllowedSections(
+            @org.springframework.web.bind.annotation.PathVariable java.util.UUID id,
+            @org.springframework.web.bind.annotation.RequestParam String allowedSections) {
+        try {
+            employeService.updateAllowedSections(id, allowedSections);
+            return ResponseEntity.ok("Permisos actualizados con éxito");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

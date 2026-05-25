@@ -6,6 +6,7 @@ interface Column {
   id: string;
   title: string;
   employeeId: string | null;
+  role?: string;
   isUnassigned?: boolean;
 }
 
@@ -46,6 +47,11 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   onViewChecklist,
 }) => {
   const filteredAppointments = appointments.filter(app => {
+    // Las tareas de taller (isTask === true) que están sin asignar son globales/comunes a todas las fechas.
+    if (app.isTask && (app.assignedEmployeeId === null || app.assignedEmployeeId === undefined)) {
+      return true;
+    }
+
     const appDate = new Date(app.dateTime);
     return appDate.getFullYear() === selectedDate.getFullYear() &&
            appDate.getMonth() === selectedDate.getMonth() &&
@@ -99,7 +105,9 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
     if (!app) return;
 
     const duration = app.estimatedDuration || 60;
-    const targetDate = app.isTask ? computeDropTime(e) : new Date(app.dateTime);
+    // Si se suelta sobre un mecánico, calculamos el día y la hora exactos del drop (que está en selectedDate).
+    // Si se suelta de vuelta a "SIN ASIGNAR" (employeeId === null), mantenemos su hora original.
+    const targetDate = employeeId !== null ? computeDropTime(e) : new Date(app.dateTime);
 
     // ── Collision detection (only for assigned columns) ──
     if (employeeId !== null) {
@@ -194,9 +202,16 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
                 style={!fillContainer ? { width: columnWidth } : undefined}
                 className={`${fillContainer ? 'flex-1' : ''} p-4 border-r border-neutral-800/60 flex items-center justify-between transition-all duration-500 bg-red-900/5`}
               >
-                <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2 truncate">
-                  <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                  {col.title}
+                <h3 className="text-white font-black uppercase tracking-widest text-xs flex flex-col sm:flex-row sm:items-center gap-2 truncate">
+                  <span className="flex items-center gap-2 truncate">
+                    <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    {col.title}
+                  </span>
+                  {col.role && (
+                    <span className="px-2 py-0.5 border border-white text-white rounded-md text-[9px] font-black tracking-widest uppercase shrink-0">
+                      {col.role}
+                    </span>
+                  )}
                 </h3>
               </div>
             ))}

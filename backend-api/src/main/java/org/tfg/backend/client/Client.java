@@ -25,6 +25,8 @@ public class Client {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonBackReference
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private User user;
 
     @Column(unique = true)
@@ -34,6 +36,8 @@ public class Client {
     private String address;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private List<Vehicle> vehicles = new ArrayList<>();
 
 }

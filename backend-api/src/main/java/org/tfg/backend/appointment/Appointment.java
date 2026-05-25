@@ -32,6 +32,8 @@ public class Appointment {
     @Column(name = "mechanic_comments")
     private String mechanicComments;
 
+
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AppointmentStatus status = AppointmentStatus.PENDING;
@@ -44,6 +46,9 @@ public class Appointment {
 
     @Column(name = "actual_end_time")
     private LocalDateTime actualEndTime;
+
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
@@ -63,4 +68,7 @@ public class Appointment {
 
     @OneToMany(mappedBy = "originAppointment", cascade = CascadeType.ALL, orphanRemoval = true)
     private java.util.List<org.tfg.backend.workshoptask.WorkshopTask> tasks;
+
+    @OneToMany(mappedBy = "appointment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<org.tfg.backend.part.AppointmentPart> parts;
 }

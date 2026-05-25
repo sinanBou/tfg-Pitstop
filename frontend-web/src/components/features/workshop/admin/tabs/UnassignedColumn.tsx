@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { AppointmentCard } from '../../../../common/Card/index';
 
 /**
  * Columna "Sin Asignar" — renderiza las citas como una lista vertical

@@ -34,6 +34,7 @@ export interface AppointmentDTO {
   actualStartTime?: string;
   actualEndTime?: string;
   confirmedAt?: string;
+  parts?: AppointmentPartDTO[];
 }
 
 export interface HistoryDTO {
@@ -46,6 +47,7 @@ export interface HistoryDTO {
   actualStartTime?: string;
   actualEndTime?: string;
   confirmedAt?: string;
+  parts?: AppointmentPartDTO[];
 }
 export interface VehicleRequest {
   brand: string;
@@ -94,4 +96,36 @@ export interface VehicleSearchDTO {
   model: string;
   licensePlate: string;
   clientId: string;
+}
+
+export interface AppointmentPartDTO {
+  id: string;
+  partId: string;
+  name: string;
+  quantityUsed: number;
+  appliedPrice: number;
+}
+
+export interface PartCategory {
+  id: string;
+  name: string;
+  displayName: string;
+}
+
+export interface PartCatalog {
+  id: string;
+  oemReference: string;
+  name: string;
+  manufacturer: string;
+  technicalSpecs?: string;
+  category: PartCategory;
+}
+
+export interface WorkshopInventory {
+  id: string;
+  part: PartCatalog;
+  stockQuantity: number;
+  costPrice: number;
+  retailPrice: number;
+  avisoThreshold: number;
 }

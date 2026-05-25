@@ -11,7 +11,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/catalog")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CatalogController {
 
     private final CatalogService catalogService;

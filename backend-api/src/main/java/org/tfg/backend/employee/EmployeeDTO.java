@@ -19,4 +19,5 @@ public class EmployeeDTO {
     private String workshopName;
     private UUID workshopId;
     private String address;
+    private String allowedSections;
 }

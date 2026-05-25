@@ -44,6 +44,7 @@ public class WorkshopService {
                 .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60) // <-- NUEVO
                 .workingDays(request.getWorkingDays())
                 .hourlyRate(request.getHourlyRate() != null ? request.getHourlyRate() : 50.0)
+                .includeOwnerInPlanning(request.getIncludeOwnerInPlanning() != null ? request.getIncludeOwnerInPlanning() : false)
                 .build();
 
         Workshop savedWorkshop = workshopRepository.save(workshop);
@@ -102,6 +103,7 @@ public class WorkshopService {
         if (request.getAddress() != null) workshop.setAddress(request.getAddress());
         if (request.getWorkingDays() != null) workshop.setWorkingDays(request.getWorkingDays());
         if (request.getHourlyRate() != null) workshop.setHourlyRate(request.getHourlyRate());
+        if (request.getIncludeOwnerInPlanning() != null) workshop.setIncludeOwnerInPlanning(request.getIncludeOwnerInPlanning());
 
         return mapToDTO(workshopRepository.save(workshop));
     }
@@ -129,6 +131,7 @@ public class WorkshopService {
                 .slotDurationMinutes(workshop.getSlotDurationMinutes())
                 .workingDays(workshop.getWorkingDays())
                 .hourlyRate(workshop.getHourlyRate())
+                .includeOwnerInPlanning(workshop.getIncludeOwnerInPlanning() != null ? workshop.getIncludeOwnerInPlanning() : false)
                 // Calculamos el tamaño de las listas para las estadísticas del DTO
                 .totalEmployees(workshop.getEmployees() != null ? workshop.getEmployees().size() : 0)
                 .vehiclesCurrentCount(workshop.getVehiclesInside() != null ? workshop.getVehiclesInside().size() : 0)

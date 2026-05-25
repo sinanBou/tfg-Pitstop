@@ -36,6 +36,8 @@ public class WorkshopTaskDTO {
 
     private String completedTasks;
 
+    private String mechanicComments;
+
     /** Explicit flag: when true, the assignedEmployeeId value is applied (even if null = unassign) */
     private Boolean reassignEmployee;
 
