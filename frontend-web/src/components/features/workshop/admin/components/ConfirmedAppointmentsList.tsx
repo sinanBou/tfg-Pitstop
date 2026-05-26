@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { getBrandLogo } from '../../../../common/SearchableSelect/BrandLogos';
 
 interface ConfirmedAppointmentsListProps {
   appointments: any[];
@@ -112,7 +113,12 @@ export const ConfirmedAppointmentsList = ({
                   )}
                 </div>
               </div>
-              <div className="text-lg font-black text-white">{app.vehicleDisplay}</div>
+              <div className="flex items-center gap-2 mt-1.5 mb-1">
+                <div className="w-6 h-6 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-emerald-500 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px] flex-shrink-0">
+                  {getBrandLogo(app.vehicleDisplay ? app.vehicleDisplay.split(' ')[0] : '')}
+                </div>
+                <div className="text-lg font-black text-white leading-none">{app.vehicleDisplay}</div>
+              </div>
               {app.clientFullName && (
                 <div className="text-neutral-400 text-xs font-bold mt-0.5">Cliente: <span className="text-neutral-200">{app.clientFullName}</span></div>
               )}

@@ -19,6 +19,7 @@ public class WorkshopService {
     private final WorkshopRepository workshopRepository;
     private final EmployeeRepository employeeRepository;
     private final org.tfg.backend.taskcatalog.CatalogInitializationService catalogInitializationService;
+    private final org.tfg.backend.storage.StorageService storageService;
 
     /**
      * Registra un nuevo taller en el sistema.
@@ -132,9 +133,46 @@ public class WorkshopService {
                 .workingDays(workshop.getWorkingDays())
                 .hourlyRate(workshop.getHourlyRate())
                 .includeOwnerInPlanning(workshop.getIncludeOwnerInPlanning() != null ? workshop.getIncludeOwnerInPlanning() : false)
+                .logoPictureUrl(storageService.generatePresignedUrl(workshop.getLogoPictureUrl()))
                 // Calculamos el tamaño de las listas para las estadísticas del DTO
                 .totalEmployees(workshop.getEmployees() != null ? workshop.getEmployees().size() : 0)
                 .vehiclesCurrentCount(workshop.getVehiclesInside() != null ? workshop.getVehiclesInside().size() : 0)
                 .build();
+    }
+
+    /**
+     * Sube un logo para el taller a S3 y guarda la referencia en la BD.
+     */
+    @Transactional
+    public WorkshopDTO uploadLogo(UUID workshopId, org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
+        Workshop workshop = workshopRepository.findById(workshopId)
+                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+
+        if (workshop.getLogoPictureUrl() != null) {
+            storageService.deleteFile(workshop.getLogoPictureUrl());
+        }
+
+        String fileUrl = storageService.uploadFile(file, "workshop-logos");
+        workshop.setLogoPictureUrl(fileUrl);
+        workshopRepository.save(workshop);
+
+        return mapToDTO(workshop);
+    }
+
+    /**
+     * Elimina el logo del taller de S3 y de la BD.
+     */
+    @Transactional
+    public WorkshopDTO deleteLogo(UUID workshopId) {
+        Workshop workshop = workshopRepository.findById(workshopId)
+                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+
+        if (workshop.getLogoPictureUrl() != null) {
+            storageService.deleteFile(workshop.getLogoPictureUrl());
+            workshop.setLogoPictureUrl(null);
+            workshopRepository.save(workshop);
+        }
+
+        return mapToDTO(workshop);
     }
 }

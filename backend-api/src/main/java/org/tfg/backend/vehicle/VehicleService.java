@@ -6,6 +6,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.client.Client;
 import org.tfg.backend.client.ClientRepository;
 import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.appointment.AppointmentRepository;
+
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +22,8 @@ public class VehicleService {
     private final VehicleRepository vehicleRepository;
     private final UserRepository userRepository;
     private final ClientRepository clientRepository;
+    private final AppointmentRepository appointmentRepository;
+
 
 
     @Transactional
@@ -121,5 +125,27 @@ public class VehicleService {
 
         Vehicle saved = vehicleRepository.save(vehicle);
         return mapToSearchDTO(saved);
+    }
+
+    @Transactional
+    public void deleteVehicle(UUID id, String email) {
+        var user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vehículo no encontrado"));
+
+        if (user.getClient() == null || !vehicle.getClient().getId().equals(user.getClient().getId())) {
+            throw new RuntimeException("No autorizado a eliminar este vehículo");
+        }
+
+        // 1. Buscamos todas las citas asociadas a este vehículo
+        var appointments = appointmentRepository.findByVehicleId(id);
+
+        // 2. Las eliminamos en cascada (JPA eliminará tareas y partes automáticamente)
+        appointmentRepository.deleteAll(appointments);
+
+        // 3. Finalmente, eliminamos el vehículo
+        vehicleRepository.delete(vehicle);
     }
 }

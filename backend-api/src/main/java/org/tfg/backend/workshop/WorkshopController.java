@@ -69,4 +69,26 @@ public class WorkshopController {
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(workshopService.searchWorkshops(query, page, size));
     }
+
+    /**
+     * Sube un logo/imagen de perfil para el taller.
+     */
+    @PostMapping("/{id}/logo")
+    public ResponseEntity<WorkshopDTO> uploadLogo(
+            @PathVariable UUID id,
+            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            return ResponseEntity.ok(workshopService.uploadLogo(id, file));
+        } catch (Exception e) {
+            throw new RuntimeException("Error al subir el logo del taller: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Elimina el logo del taller.
+     */
+    @DeleteMapping("/{id}/logo")
+    public ResponseEntity<WorkshopDTO> deleteLogo(@PathVariable UUID id) {
+        return ResponseEntity.ok(workshopService.deleteLogo(id));
+    }
 }

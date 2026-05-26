@@ -4,9 +4,10 @@ import { VehicleCard } from '../../common/Card/index';
 interface ClientVehiclesTabProps {
   vehicles: any[];
   onAddVehicle: () => void;
+  onDeleteVehicle: (id: string) => void;
 }
 
-export function ClientVehiclesTab({ vehicles, onAddVehicle }: ClientVehiclesTabProps) {
+export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: ClientVehiclesTabProps) {
   return (
     <div>
       <div className="flex justify-between items-center mb-10 animate-fade-in">
@@ -32,6 +33,11 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle }: ClientVehiclesTabP
                   plate={v.licensePlate} 
                   index={index} 
                   variant="blue"
+                  onDelete={() => {
+                     if (window.confirm(`¿Estás seguro de que deseas eliminar tu ${v.brand} ${v.model}? Esta acción también eliminará de forma permanente todas sus citas y tareas asociadas.`)) {
+                        onDeleteVehicle(v.id);
+                     }
+                  }}
                />
             ))}
          </div>

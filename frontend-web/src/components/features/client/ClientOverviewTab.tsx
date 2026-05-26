@@ -1,6 +1,8 @@
 
 
 import type { UserDTO } from '../../../types/client';
+import { getBrandLogo } from '../../common/SearchableSelect/BrandLogos';
+
 
 interface ClientOverviewTabProps {
   vehicles: any[];
@@ -86,7 +88,12 @@ export function ClientOverviewTab({ vehicles, appointments, cocheEnTaller, userP
                             </span>
                             <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">{cocheEnTaller.status.replace('_', ' ')}</p>
                          </div>
-                         <h4 className="text-3xl lg:text-4xl text-white font-black uppercase leading-none mb-1">{cocheEnTaller.brand}</h4>
+                         <h4 className="text-3xl lg:text-4xl text-white font-black uppercase leading-none mb-1 flex items-center gap-2">
+                         <span className="shrink-0 flex items-center justify-center [&_svg]:w-7 [&_svg]:h-7 [&_div]:w-7 [&_div]:h-7 [&_div]:text-sm">
+                            {getBrandLogo((cocheEnTaller.brand || '').split(' ')[0])}
+                         </span>
+                        <span>{cocheEnTaller.brand}</span>
+                      </h4>
                          <h5 className="text-lg lg:text-xl text-neutral-400 font-bold uppercase">{cocheEnTaller.model}</h5>
                         <p className="text-neutral-500 text-xs font-mono mt-3 bg-black/50 inline-block px-3 py-1.5 rounded-lg border border-neutral-800 shadow-inner">{cocheEnTaller.licensePlate}</p>
                      </div>

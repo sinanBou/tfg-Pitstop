@@ -1,5 +1,7 @@
 import { useState, useMemo } from 'react';
 import { API_BASE_URL } from '../../../config/api';
+import { getBrandLogo } from '../../common/SearchableSelect/BrandLogos';
+
 
 const HistoryIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
 
@@ -568,8 +570,11 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
                             {hist.status === 'CANCELLED' ? '✕ Cancelado' : '✓ Finalizado'}
                           </span>
                         </div>
-                        <h4 className="text-lg font-black uppercase tracking-tight text-white truncate">
-                          {hist.vehicleName}
+                        <h4 className="text-lg font-black uppercase tracking-tight text-white truncate flex items-center gap-1.5">
+                          <span className="shrink-0 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]">
+                            {getBrandLogo((hist.vehicleName || '').split(' ')[0])}
+                          </span>
+                          <span>{hist.vehicleName}</span>
                         </h4>
                         <p className="text-neutral-500 text-xs font-bold mt-0.5">{hist.description}</p>
                       </div>

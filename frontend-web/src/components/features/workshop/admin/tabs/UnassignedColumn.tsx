@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getBrandLogo } from '../../../../common/SearchableSelect/BrandLogos';
 
 /**
  * Columna "Sin Asignar" — renderiza las citas como una lista vertical
@@ -110,6 +111,9 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
           sorted.map((app) => {
             const dateObj = new Date(app.dateTime);
             const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            const day = dateObj.getDate().toString().padStart(2, '0');
+            const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+            const dateStr = `${day} - ${month}`;
             const isDragging = draggedId === app.id;
 
             return (
@@ -136,17 +140,22 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                         {app.isTask ? 'Tarea' : 'Cita'}
                       </span>
                     </div>
-                    <span className="text-white text-[11px] font-black font-mono">
-                      {timeStr}
-                    </span>
+                    <div className="flex items-center gap-1.5 text-white text-[11px] font-black font-mono">
+                      <span>{dateStr}</span>
+                      <span className="text-neutral-700 font-normal">|</span>
+                      <span>{timeStr}</span>
+                    </div>
                   </div>
 
                   {/* Body */}
                   <div className="px-3 py-2.5 space-y-1">
                     {/* Vehículo */}
                     {app.vehicleDisplay && (
-                      <div className="text-white font-black text-[13px] uppercase tracking-tight leading-tight truncate">
-                        {app.vehicleDisplay}
+                      <div className="text-white font-black text-[13px] uppercase tracking-tight leading-tight truncate flex items-center gap-2">
+                        <span className="shrink-0 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]">
+                          {getBrandLogo(app.vehicleDisplay.split(' ')[0])}
+                        </span>
+                        <span>{app.vehicleDisplay}</span>
                       </div>
                     )}
 

@@ -1,6 +1,9 @@
 
 
+import { getBrandLogo } from '../../common/SearchableSelect/BrandLogos';
+
 const CalendarIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>);
+
 
 const formatDateToDDMMAA = (dateString: string) => {
    if (!dateString) return '';
@@ -83,7 +86,12 @@ export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAp
                      <div className="space-y-3 mb-8 mt-auto bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
                         <div className="flex justify-between items-center text-sm">
                            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">Vehículo</span>
-                           <span className="text-white font-mono">{app.vehicleDisplay || app.vehiclePlate}</span>
+                           <span className="text-white font-mono flex items-center gap-1.5">
+                             <span className="shrink-0 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]">
+                               {getBrandLogo((app.vehicleDisplay || app.vehiclePlate || '').split(' ')[0])}
+                             </span>
+                             <span>{app.vehicleDisplay || app.vehiclePlate}</span>
+                           </span>
                         </div>
                         <div className="flex justify-between items-center text-sm">
                            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">Taller</span>

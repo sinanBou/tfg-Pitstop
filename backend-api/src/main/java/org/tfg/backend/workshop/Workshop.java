@@ -67,4 +67,7 @@ public class Workshop {
     @Column(name = "include_owner_in_planning")
     @Builder.Default
     private Boolean includeOwnerInPlanning = false;
+
+    @Column(name = "logo_picture_url")
+    private String logoPictureUrl;
 }

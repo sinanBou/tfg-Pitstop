@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { type VehicleDTO, type AppointmentRequest, type WorkshopMinDTO } from '../../../../types/client';
 import { API_BASE_URL } from '../../../../config/api';
 import { BaseModal } from '../../../common/BaseModal/index';
+import { ImagePreviewModal } from '../../../common/ImagePreviewModal/index';
 
 interface AppointmentModalProps {
   isOpen: boolean;
@@ -26,6 +27,10 @@ export const AppointmentModal = ({
   const [availableSlots, setAvailableSlots] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingSlots, setIsLoadingSlots] = useState(false);
+  
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
   
   // Estado para el mes actual del calendario personalizado
   const [viewDate, setViewDate] = useState(new Date());
@@ -165,13 +170,13 @@ export const AppointmentModal = ({
       onClose={onClose}
       title="Nueva Cita"
       subtitle="Sincronización en tiempo real"
-      theme="red"
+      theme="blue"
       progressBarWidth={`${(step / 4) * 100}%`}
     >
       {error && (
-        <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 shrink-0">
-          <svg className="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          <p className="text-xs text-red-400 font-bold uppercase tracking-tight leading-tight">{error}</p>
+        <div className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 shrink-0">
+          <svg className="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <p className="text-xs text-blue-400 font-bold uppercase tracking-tight leading-tight">{error}</p>
         </div>
       )}
 
@@ -181,7 +186,7 @@ export const AppointmentModal = ({
             {/* ENCABEZADOS DE PASOS COMUNES */}
             <div className="mb-8 flex items-end justify-between">
               <div>
-                <p className="text-red-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{`Paso 0${step} / 04`}</p>
+                <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{`Paso 0${step} / 04`}</p>
                 <h3 className="text-2xl font-black uppercase italic text-white leading-none">
                   {step === 1 && "Tu Vehículo"}
                   {step === 2 && "El Taller"}
@@ -233,7 +238,7 @@ export const AppointmentModal = ({
                     placeholder="Busca por nombre, CIF o dirección..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-white focus:outline-none focus:border-amber-600/50 focus:bg-black transition-all placeholder-neutral-600"
+                    className="w-full bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-white focus:outline-none focus:border-blue-600/50 focus:bg-black transition-all placeholder-neutral-600"
                   />
                   <svg className="w-5 h-5 text-neutral-600 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                 </div>
@@ -244,15 +249,29 @@ export const AppointmentModal = ({
                       key={w.id}
                       onClick={() => { setFormData({...formData, workshopId: w.id}); nextStep(); }}
                       className={`p-5 rounded-2xl border transition-all text-left flex items-start gap-4 group ${
-                        formData.workshopId === w.id ? 'border-amber-500 bg-amber-500/10 shadow-[0_0_20px_rgba(245,158,11,0.15)]' : 'border-neutral-800 bg-black/40 hover:border-amber-500/50 hover:bg-neutral-900/60'
+                        formData.workshopId === w.id ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-neutral-800 bg-black/40 hover:border-blue-500/50 hover:bg-neutral-900/60'
                       }`}
                     >
-                      <div className={`p-3 rounded-xl transition-colors ${formData.workshopId === w.id ? 'bg-amber-500/20 text-amber-500' : 'bg-neutral-800 text-neutral-400 group-hover:text-amber-500'}`}>
-                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                      <div className={`w-12 h-12 shrink-0 rounded-xl overflow-hidden flex items-center justify-center transition-colors ${formData.workshopId === w.id ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-neutral-800 text-neutral-400 group-hover:text-blue-400 border border-neutral-700/50'}`}>
+                         {w.logoPictureUrl ? (
+                            <img 
+                               src={w.logoPictureUrl} 
+                               alt="Logo" 
+                               onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPreviewUrl(w.logoPictureUrl!);
+                                  setPreviewTitle(w.companyName);
+                                  setPreviewOpen(true);
+                                }}
+                               className="w-full h-full object-cover cursor-zoom-in hover:scale-110 transition-transform duration-300"
+                            />
+                         ) : (
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                         )}
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between items-start mb-1">
-                           <p className="text-lg text-white font-black uppercase tracking-wide group-hover:text-amber-400 transition-colors">{w.companyName}</p>
+                           <p className="text-lg text-white font-black uppercase tracking-wide group-hover:text-blue-400 transition-colors">{w.companyName}</p>
                            {w.cif && <span className="text-[9px] font-mono text-neutral-600 bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800">{w.cif}</span>}
                         </div>
                         {w.address && (
@@ -267,8 +286,8 @@ export const AppointmentModal = ({
 
                   {isSearching && (
                     <div className="py-8 flex flex-col items-center gap-2 opacity-50">
-                       <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
-                       <p className="text-[9px] font-black uppercase tracking-[0.2em] text-amber-500">Buscando...</p>
+                       <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                       <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500">Buscando...</p>
                     </div>
                   )}
 
@@ -331,7 +350,7 @@ export const AppointmentModal = ({
                       <div className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-3xl w-full md:w-[450px] shrink-0">
                         <div className="flex items-center justify-between mb-4 px-2">
                           <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
-                            {monthNames[month]} <span className="text-red-600">{year}</span>
+                            {monthNames[month]} <span className="text-blue-600">{year}</span>
                           </h3>
                           <div className="flex gap-1">
                             <button onClick={prevMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
@@ -372,14 +391,14 @@ export const AppointmentModal = ({
                                 className={`
                                   aspect-square rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center relative group
                                   ${isPast ? 'text-neutral-700 cursor-not-allowed' : 
-                                    isSelected ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)]' : 
+                                    isSelected ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)]' : 
                                     isClosedManual ? 'bg-neutral-900/30 text-neutral-600 hover:bg-neutral-800' :
-                                    'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:border-red-500/50 hover:text-white'}
+                                    'bg-neutral-900 border border-neutral-800 text-neutral-300 hover:border-blue-500/50 hover:text-white'}
                                 `}
                               >
                                 {day}
                                 {isClosedManual && !isPast && !isSelected && (
-                                  <div className="absolute bottom-1 w-1 h-1 bg-red-500/40 rounded-full" />
+                                  <div className="absolute bottom-1 w-1 h-1 bg-blue-500/40 rounded-full" />
                                 )}
                               </button>
                             );
@@ -402,7 +421,7 @@ export const AppointmentModal = ({
                           <div className="animate-in fade-in slide-in-from-right-4 duration-300 h-full flex flex-col">
                             {isLoadingSlots ? (
                               <div className="flex-1 flex flex-col items-center justify-center py-12 opacity-70">
-                                 <div className="w-8 h-8 border-2 border-red-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+                                 <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
                                  <p className="text-[10px] font-black text-white uppercase tracking-widest animate-pulse">Sincronizando agenda...</p>
                               </div>
                             ) : (
@@ -418,11 +437,11 @@ export const AppointmentModal = ({
                                         onClick={() => { setFormData({...formData, time: hora}); nextStep(); }}
                                         className={`p-3 rounded-xl text-sm font-mono font-bold transition-all relative overflow-hidden group ${
                                           formData.time === hora 
-                                            ? 'bg-red-600 text-white shadow-[0_0_15px_rgba(220,38,38,0.4)] border border-red-500' 
-                                            : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-red-500/50 hover:bg-neutral-800 hover:text-white'
+                                            ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(59,130,246,0.4)] border border-blue-500' 
+                                            : 'bg-neutral-900 border border-neutral-800 text-neutral-400 hover:border-blue-500/50 hover:bg-neutral-800 hover:text-white'
                                         }`}
                                       >
-                                        {formData.time !== hora && <div className="absolute inset-0 bg-red-500/0 group-hover:bg-red-500/10 transition-colors"></div>}
+                                        {formData.time !== hora && <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/10 transition-colors"></div>}
                                         <span className="relative z-10">{hora}</span>
                                       </button>
                                     ))
@@ -443,9 +462,9 @@ export const AppointmentModal = ({
                                       }
 
                                       return isClosed ? (
-                                        <div className="col-span-3 py-12 text-center border border-dashed border-red-900/50 bg-red-900/10 rounded-2xl flex flex-col items-center justify-center gap-2">
-                                          <svg className="w-8 h-8 text-red-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                          <p className="text-red-400/80 text-[10px] font-black uppercase tracking-widest">Taller cerrado este día</p>
+                                        <div className="col-span-3 py-12 text-center border border-dashed border-blue-900/50 bg-blue-900/10 rounded-2xl flex flex-col items-center justify-center gap-2">
+                                          <svg className="w-8 h-8 text-blue-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                          <p className="text-blue-400/80 text-[10px] font-black uppercase tracking-widest">Taller cerrado este día</p>
                                         </div>
                                       ) : (
                                         <div className="col-span-3 py-12 text-center border border-dashed border-neutral-800 bg-neutral-900/30 rounded-2xl flex flex-col items-center justify-center gap-2">
@@ -499,7 +518,7 @@ export const AppointmentModal = ({
                     <input 
                       type="text" 
                       placeholder="Ej: Mantenimiento anual, Revisión..."
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-4 text-white font-medium outline-none focus:border-red-600 focus:bg-black transition-all placeholder-neutral-600"
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-4 text-white font-medium outline-none focus:border-blue-600 focus:bg-black transition-all placeholder-neutral-600"
                       onChange={(e) => setFormData({...formData, serviceType: e.target.value})}
                     />
                   </div>
@@ -510,7 +529,7 @@ export const AppointmentModal = ({
                     </label>
                     <textarea 
                       placeholder="Describe síntomas o notas para el mecánico..."
-                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-4 text-white text-sm outline-none focus:border-red-600 focus:bg-black transition-all h-28 resize-none placeholder-neutral-600"
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-4 text-white text-sm outline-none focus:border-blue-600 focus:bg-black transition-all h-28 resize-none placeholder-neutral-600"
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
                     />
                   </div>
@@ -525,7 +544,7 @@ export const AppointmentModal = ({
                    <button 
                     onClick={handleFinish}
                     disabled={!formData.serviceType}
-                    className="flex items-center gap-3 px-8 py-4 bg-red-600 text-white font-black rounded-xl uppercase tracking-widest shadow-[0_0_25px_rgba(220,38,38,0.4)] hover:bg-red-500 hover:shadow-[0_0_35px_rgba(220,38,38,0.6)] transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none disabled:hover:bg-red-600 group"
+                    className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white font-black rounded-xl uppercase tracking-widest shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(59,130,246,0.6)] transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none disabled:hover:bg-blue-600 group"
                   >
                     Confirmar
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
@@ -534,6 +553,15 @@ export const AppointmentModal = ({
               </div>
             )}
       </div>
+
+      {previewOpen && (
+        <ImagePreviewModal
+          isOpen={previewOpen}
+          onClose={() => setPreviewOpen(false)}
+          imageUrl={previewUrl}
+          title={previewTitle}
+        />
+      )}
     </BaseModal>
   );
 };

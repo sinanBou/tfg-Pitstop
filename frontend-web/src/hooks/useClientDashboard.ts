@@ -193,6 +193,23 @@ export const useClientDashboard = () => {
     }
   }, [loadDashboardData]);
 
+  const deleteVehicle = useCallback(async (vehicleId: string) => {
+    try {
+      const response = await fetchWithAuth(`/vehicles/${vehicleId}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await loadDashboardData();
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error al eliminar el vehículo:", error);
+      return false;
+    }
+  }, [loadDashboardData]);
+
   const getCatalogMakes = useCallback(async (): Promise<string[]> => {
     try {
       const response = await fetchWithAuth('/vehicles/catalog/makes');
@@ -230,7 +247,7 @@ export const useClientDashboard = () => {
     getCatalogMakes,
     getCatalogModels,
     deleteAppointment,
+    deleteVehicle,
     logout
   };
-
 };

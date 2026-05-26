@@ -28,4 +28,5 @@ public class WorkshopDTO {
     private String workingDays;
     private Double hourlyRate;
     private Boolean includeOwnerInPlanning;
+    private String logoPictureUrl;
 }

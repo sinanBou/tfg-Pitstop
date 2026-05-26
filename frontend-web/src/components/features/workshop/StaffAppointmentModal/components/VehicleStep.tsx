@@ -2,6 +2,12 @@ import React from 'react';
 import { SearchableSelect } from '../../../../common/SearchableSelect/index';
 import { type ClientSearchDTO, type VehicleSearchDTO, type VehicleRequest } from '../../../../../types/client';
 
+const POPULAR_BRANDS = [
+  "AUDI", "BMW", "CITROEN", "FORD", "HYUNDAI", "KIA", 
+  "MERCEDES-BENZ", "NISSAN", "OPEL", "PEUGEOT", "RENAULT", 
+  "SEAT", "TOYOTA", "VOLKSWAGEN"
+];
+
 interface VehicleStepProps {
   selectedClient: ClientSearchDTO | null;
   searchResults: { vehicles: VehicleSearchDTO[] };
@@ -73,6 +79,7 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
                 value={vehicleForm.brand} 
                 onChange={v => setVehicleForm({...vehicleForm, brand: v, model: ''})} 
                 placeholder="-- Seleccione --" 
+                popularOptions={POPULAR_BRANDS}
               />
               <SearchableSelect 
                 label="Modelo" 

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ImagePreviewModal } from '../../common/ImagePreviewModal/index';
 
 interface WorkshopManagementTabProps {
   workshops: any[];
@@ -13,6 +15,9 @@ const WorkshopIcon = () => (
 
 export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopManagementTabProps) {
   const navigate = useNavigate();
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewTitle, setPreviewTitle] = useState('');
 
   return (
     <div>
@@ -36,8 +41,22 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
                
                <div className="relative z-10 flex-1">
                   <div className="flex items-center gap-4 mb-6">
-                      <div className="w-14 h-14 shrink-0 rounded-2xl bg-gradient-to-br from-red-500/20 to-red-900/20 border border-red-500/20 text-red-500 flex items-center justify-center shadow-inner">
-                         <WorkshopIcon />
+                      <div className="w-14 h-14 shrink-0 rounded-2xl bg-neutral-950 border border-neutral-800 text-red-500 flex items-center justify-center shadow-inner overflow-hidden">
+                         {workshop.logoPictureUrl ? (
+                            <img 
+                               src={workshop.logoPictureUrl} 
+                               alt="Logo" 
+                               onClick={(e) => {
+                                  e.stopPropagation();
+                                  setPreviewUrl(workshop.logoPictureUrl);
+                                  setPreviewTitle(workshop.companyName);
+                                  setPreviewOpen(true);
+                               }}
+                               className="w-full h-full object-cover cursor-zoom-in hover:scale-110 transition-transform duration-300"
+                            />
+                         ) : (
+                            <WorkshopIcon />
+                         )}
                       </div>
                       <h3 className="text-xl font-black uppercase text-white leading-tight tracking-tighter flex-1">{workshop.companyName}</h3>
                   </div>
@@ -67,6 +86,15 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
             </div>
          ))}
       </div>
+
+      {previewOpen && (
+         <ImagePreviewModal
+            isOpen={previewOpen}
+            onClose={() => setPreviewOpen(false)}
+            imageUrl={previewUrl}
+            title={previewTitle}
+         />
+      )}
     </div>
   );
 }

@@ -552,6 +552,49 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  const handleUploadWorkshopLogo = async (file: File) => {
+    const token = localStorage.getItem('jwt_token');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshops/${id}/logo`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setWorkshopData(updated);
+        return true;
+      }
+    } catch (err) {
+      console.error('Error al subir el logo del taller:', err);
+    }
+    return false;
+  };
+
+  const handleDeleteWorkshopLogo = async () => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/workshops/${id}/logo`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setWorkshopData(updated);
+        return true;
+      }
+    } catch (err) {
+      console.error('Error al eliminar el logo del taller:', err);
+    }
+    return false;
+  };
+
   return {
     id,
     activeTab, setActiveTab,
@@ -589,6 +632,8 @@ export function useWorkshopAdmin() {
     handleProfileUpdate,
     handleUploadAvatar,
     handleDeleteAvatar,
+    handleUploadWorkshopLogo,
+    handleDeleteWorkshopLogo,
     userRole: localStorage.getItem('role')
   };
 }

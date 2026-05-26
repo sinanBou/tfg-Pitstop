@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from './Card';
+import { getBrandLogo } from '../SearchableSelect/BrandLogos';
 
 interface AppointmentCardProps {
   type: string;
@@ -54,8 +55,11 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             </div>
 
             {vehicleDisplay && (
-               <div className={`text-white font-black tracking-tight uppercase leading-none truncate ${isCompact ? 'text-[14px] mt-1' : 'text-lg mb-1'}`}>
-                 {vehicleDisplay}
+               <div className={`text-white font-black tracking-tight uppercase leading-none truncate flex items-center gap-2 ${isCompact ? 'text-[14px] mt-1' : 'text-lg mb-1'}`}>
+                 <span className={`shrink-0 flex items-center justify-center ${isCompact ? '[&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]' : '[&_svg]:w-5 [&_svg]:h-5 [&_div]:w-5 [&_div]:h-5 [&_div]:text-[9px]'}`}>
+                   {getBrandLogo(vehicleDisplay.split(' ')[0])}
+                 </span>
+                 <span>{vehicleDisplay}</span>
                </div>
             )}
 

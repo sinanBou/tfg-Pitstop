@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PerfilTallerProps {
@@ -14,6 +14,11 @@ interface PerfilTallerProps {
   };
   setSettingsForm: (form: any) => void;
   onSubmit: (e: React.FormEvent) => void;
+  // Props añadidas para gestión de foto de taller
+  workshopLogoUrl?: string;
+  onUploadLogo?: (file: File) => Promise<boolean | void>;
+  onDeleteLogo?: () => Promise<boolean | void>;
+  onPreviewLogo?: () => void;
 }
 
 const diasSemana = [
@@ -36,8 +41,31 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
   settingsForm,
   setSettingsForm,
   onSubmit,
+  workshopLogoUrl,
+  onUploadLogo,
+  onDeleteLogo,
+  onPreviewLogo,
 }) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
   if (!isOpen) return null;
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0] && onUploadLogo) {
+      setUploadingLogo(true);
+      await onUploadLogo(e.target.files[0]);
+      setUploadingLogo(false);
+    }
+  };
+
+  const handleDeleteClick = async () => {
+    if (confirm('¿Estás seguro de que deseas eliminar la foto de perfil del taller?') && onDeleteLogo) {
+      setUploadingLogo(true);
+      await onDeleteLogo();
+      setUploadingLogo(false);
+    }
+  };
 
   return createPortal(
     <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
@@ -69,6 +97,81 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
           </header>
 
           <form onSubmit={onSubmit} className="relative z-10 space-y-8">
+            {/* Contenedor de subida de Logo del Taller */}
+            {onUploadLogo && onDeleteLogo && onPreviewLogo && (
+              <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+
+                <div
+                  onClick={() => {
+                    if (workshopLogoUrl) {
+                      onPreviewLogo();
+                    } else {
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  className="w-20 h-20 bg-neutral-950 border border-neutral-800 rounded-[2rem] flex items-center justify-center text-white font-black text-3xl shadow-2xl relative overflow-hidden group/avatar cursor-pointer shrink-0"
+                >
+                  {uploadingLogo ? (
+                    <div className="w-6 h-6 border-t-2 border-red-600 rounded-full animate-spin"></div>
+                  ) : workshopLogoUrl ? (
+                    <img
+                      src={workshopLogoUrl}
+                      alt="Logo del Taller"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  )}
+                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    </svg>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 items-center sm:items-start">
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploadingLogo}
+                      className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                    >
+                      {workshopLogoUrl ? 'Cambiar Imagen' : 'Añadir Imagen'}
+                    </button>
+                    {workshopLogoUrl && (
+                      <button
+                        type="button"
+                        onClick={onPreviewLogo}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white border border-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all"
+                      >
+                        Ver Foto
+                      </button>
+                    )}
+                    {workshopLogoUrl && (
+                      <button
+                        type="button"
+                        onClick={handleDeleteClick}
+                        disabled={uploadingLogo}
+                        className="px-3 py-1.5 bg-red-950/20 hover:bg-red-900/40 text-red-400 hover:text-red-300 border border-red-500/20 hover:border-red-500/40 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all disabled:opacity-50"
+                      >
+                        Eliminar
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-neutral-500 font-medium">PNG, JPG de hasta 5MB. Almacenamiento seguro en la nube.</p>
+                </div>
+              </div>
+            )}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Hora Apertura</label>

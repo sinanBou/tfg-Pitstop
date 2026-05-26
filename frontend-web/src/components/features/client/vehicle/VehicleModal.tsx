@@ -12,6 +12,12 @@ interface VehicleModalProps {
   fetchModels: (make: string) => Promise<string[]>;
 }
 
+const POPULAR_BRANDS = [
+  "AUDI", "BMW", "CITROEN", "FORD", "HYUNDAI", "KIA", 
+  "MERCEDES-BENZ", "NISSAN", "OPEL", "PEUGEOT", "RENAULT", 
+  "SEAT", "TOYOTA", "VOLKSWAGEN"
+];
+
 export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModels }: VehicleModalProps) => {
   const [loading, setLoading] = useState(false);
   const [makes, setMakes] = useState<string[]>([]);
@@ -83,6 +89,7 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
               options={makes} 
               value={formData.brand} 
               onChange={val => setFormData({...formData, brand: val, model: ''})} 
+              popularOptions={POPULAR_BRANDS}
             />
             <SearchableSelect 
               label="Modelo" 

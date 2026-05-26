@@ -44,6 +44,7 @@ export default function WorkshopAdminDashboard() {
   const [isWorkshopSettingsOpen, setIsWorkshopSettingsOpen] = useState(false);
   const [profileForm, setProfileForm] = useState({ firstname: '', lastname: '', address: '' });
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [isLogoPreviewOpen, setIsLogoPreviewOpen] = useState(false);
 
   const {
     id,
@@ -79,6 +80,8 @@ export default function WorkshopAdminDashboard() {
     handleProfileUpdate,
     handleUploadAvatar,
     handleDeleteAvatar,
+    handleUploadWorkshopLogo,
+    handleDeleteWorkshopLogo,
     userRole
   } = useWorkshopAdmin();
 
@@ -511,6 +514,10 @@ export default function WorkshopAdminDashboard() {
           await handleSettingsSubmit(e);
           setIsWorkshopSettingsOpen(false);
         }}
+        workshopLogoUrl={workshopData?.logoPictureUrl}
+        onUploadLogo={handleUploadWorkshopLogo}
+        onDeleteLogo={handleDeleteWorkshopLogo}
+        onPreviewLogo={() => setIsLogoPreviewOpen(true)}
       />
 
       {isPreviewOpen && employeeProfile?.profilePictureUrl && (
@@ -519,6 +526,15 @@ export default function WorkshopAdminDashboard() {
           imageUrl={employeeProfile.profilePictureUrl}
           title={`${employeeProfile.firstname} ${employeeProfile.lastname}`}
           onClose={() => setIsPreviewOpen(false)}
+        />
+      )}
+
+      {isLogoPreviewOpen && workshopData?.logoPictureUrl && (
+        <ImagePreviewModal
+          isOpen={isLogoPreviewOpen}
+          imageUrl={workshopData.logoPictureUrl}
+          title={workshopData.companyName}
+          onClose={() => setIsLogoPreviewOpen(false)}
         />
       )}
 

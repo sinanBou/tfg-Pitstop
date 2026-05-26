@@ -74,6 +74,7 @@ export interface WorkshopMinDTO {
   cif?: string;
   address?: string;
   workingDays?: string;
+  logoPictureUrl?: string;
 }
 
 export interface AvailableSlotDTO {

@@ -59,4 +59,11 @@ public class VehicleController {
     public ResponseEntity<VehicleSearchDTO> registerForClient(@PathVariable UUID clientId, @RequestBody VehicleRequest request) {
         return ResponseEntity.ok(vehicleService.registerVehicleForClient(clientId, request));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteVehicle(@PathVariable UUID id,
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        vehicleService.deleteVehicle(id, userDetails.getUsername());
+        return ResponseEntity.noContent().build();
+    }
 }
