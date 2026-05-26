@@ -32,9 +32,13 @@ public class User implements UserDetails {
 
     private String password;
     private String address;
+    
+    @Column(name = "profile_picture_url")
+    private String profilePictureUrl;
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
 
     // --- CORRECCIÓN: Las relaciones inversas van AQUÍ ---
     @OneToOne(mappedBy = "user")

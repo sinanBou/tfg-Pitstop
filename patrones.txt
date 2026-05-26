@@ -57,4 +57,20 @@ En esta refactorización integral del sistema de repuestos y control de almacén
   - En el frontend, el panel de mecánicos `WorkerDashboard.tsx` lee las capacidades dinámicamente y computa la barra de navegación `SECCIONES` basándose en este claim.
 - Propósito: Desacopla los menús e interfaces del rol estático tradicional, permitiendo una asignación fluida y granular de responsabilidades a nivel de base de datos que se refleja de inmediato en caliente en el cliente sin requerir relogueo completo.
 
+9. STRATEGY PATTERN & DEPENDENCY INVERSION PRINCIPLE (DIP) - Storage Provider
+-----------------------------------------------------------------------------
+- Cómo se creó:
+  - Se creó la interfaz de desacoplamiento `StorageService` con métodos estandarizados para subir y eliminar archivos (`uploadFile`, `deleteFile`).
+  - Se implementó de forma modular la clase concreta `S3StorageService` conectada a un cliente `S3Client` de AWS SDK v2, cuyas credenciales seguras e inyecciones dinámicas se resuelven en la clase de configuración `S3Config` mediante properties.
+- Propósito: Sigue estrictamente la inversión de dependencias (DIP) del Clean Code. La capa de negocio interactúa únicamente con la abstracción `StorageService`, lo que permite que el taller pueda migrar en caliente de AWS S3 a Azure Blob Storage, Google Cloud Storage, o almacenamiento local en desarrollo con tan solo inyectar una clase alternativa sin romper ni modificar una sola línea de código en los servicios o controladores.
+
+10. PORTAL MODAL PATTERN (Estructura) - MiPerfil & PerfilTaller
+-----------------------------------------------------------------
+- Cómo se creó:
+  - Se extrajeron los modales inline de "Mi Perfil" y "Perfil del Taller" desde `WorkshopAdminDashboard.tsx` y `WorkerDashboard.tsx` a componentes independientes: `MiPerfil.tsx` y `PerfilTaller.tsx`.
+  - Ambos componentes utilizan `ReactDOM.createPortal(…, document.body)` para renderizarse fuera del stacking context del DOM padre, resolviendo el bug del botón X que no respondía al estar atrapado dentro de un contenedor `overflow-y-auto` con `z-index` relativo.
+  - El botón de cierre se posiciona `absolute` sobre el contenedor modal principal (fuera del scroll wrapper), garantizando que siempre sea accesible y clicable independientemente del scroll.
+  - `MiPerfil` internaliza su propio estado local (`uploadingAvatar`, `profileSaved`, `fileInputRef`) reduciendo la complejidad del componente padre.
+- Propósito: Aplica el principio de responsabilidad única (SRP) extrayendo la lógica de UI modal a componentes reutilizables, y utiliza portales de React para evitar conflictos de stacking context en modales con scroll.
+
 

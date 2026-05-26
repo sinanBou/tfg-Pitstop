@@ -242,6 +242,10 @@ public class AppointmentService {
                 .actualStartTime(appointment.getActualStartTime())
                 .actualEndTime(appointment.getActualEndTime())
                 .confirmedAt(appointment.getConfirmedAt())
+                .receptionKilometers(appointment.getReceptionKilometers())
+                .receptionNotes(appointment.getReceptionNotes())
+                .vehicleReceived(appointment.getVehicleReceived() != null ? appointment.getVehicleReceived() : false)
+
                 .clientFullName(appointment.getClient().getUser().getFirstname() + " " +
                         appointment.getClient().getUser().getLastname())
                 .vehicleId(appointment.getVehicle().getId())
@@ -280,11 +284,46 @@ public class AppointmentService {
             appointment.setActualEndTime(LocalDateTime.now());
         }
 
+        if (newStatus == AppointmentStatus.PICKED_UP) {
+            org.tfg.backend.vehicle.Vehicle vehicle = appointment.getVehicle();
+            if (vehicle != null) {
+                vehicle.setCurrentWorkshop(null);
+                vehicle.setStatus("ENTREGADO");
+                vehicleRepository.save(vehicle);
+            }
+        } else if (newStatus == AppointmentStatus.CANCELLED) {
+            org.tfg.backend.vehicle.Vehicle vehicle = appointment.getVehicle();
+            if (vehicle != null) {
+                vehicle.setCurrentWorkshop(null);
+                vehicle.setStatus("CANCELADO");
+                vehicleRepository.save(vehicle);
+            }
+        }
+
         appointment.setStatus(newStatus);
         appointmentRepository.save(appointment);
-
         // Aquí se podría disparar la lógica de notificación al cliente si el estado es DELAYED
     }
+
+    @Transactional
+    public void checkInVehicle(UUID appointmentId, Integer kilometers, String notes) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
+        
+        appointment.setVehicleReceived(true);
+        appointment.setReceptionKilometers(kilometers);
+        appointment.setReceptionNotes(notes);
+        
+        org.tfg.backend.vehicle.Vehicle vehicle = appointment.getVehicle();
+        if (vehicle != null) {
+            vehicle.setCurrentWorkshop(appointment.getWorkshop());
+            vehicle.setStatus("RECIBIDO");
+            vehicleRepository.save(vehicle);
+        }
+        
+        appointmentRepository.save(appointment);
+    }
+
 
     @Transactional
     public void assignAppointment(UUID appointmentId, UUID employeeId) {

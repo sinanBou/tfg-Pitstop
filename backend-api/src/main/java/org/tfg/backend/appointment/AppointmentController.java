@@ -69,6 +69,21 @@ public class AppointmentController {
         return ResponseEntity.ok("Estado actualizado: " + status);
     }
 
+    @PatchMapping("/{id}/check-in")
+    public ResponseEntity<?> checkInVehicle(
+            @PathVariable UUID id,
+            @RequestParam Integer kilometers,
+            @RequestParam(required = false) String notes) {
+        try {
+            appointmentService.checkInVehicle(id, kilometers, notes);
+            return ResponseEntity.ok("Vehículo recepcionado correctamente");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al recepcionar el vehículo: " + e.getMessage());
+        }
+    }
+
+
     @PatchMapping("/{id}/assign")
     public ResponseEntity<String> assignEmployee(
             @PathVariable UUID id,

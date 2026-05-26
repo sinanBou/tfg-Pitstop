@@ -26,6 +26,10 @@ public class AppointmentDTO {
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
     private LocalDateTime confirmedAt;
+    private Integer receptionKilometers;
+    private String receptionNotes;
+    private Boolean vehicleReceived;
+
 
     // Información del Cliente
     private String clientFullName;

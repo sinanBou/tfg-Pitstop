@@ -24,6 +24,8 @@ public class EmployeService {
     private final PasswordEncoder passwordEncoder;
     private final WorkshopRepository workshopRepository;
     private final AppointmentRepository appointmentRepository;
+    private final org.tfg.backend.storage.StorageService storageService;
+
 
     /**
      * Obtiene el perfil del empleado logueado.
@@ -62,6 +64,43 @@ public class EmployeService {
         userRepository.save(user);
         return mapToDTO(user.getEmployee());
     }
+
+    /**
+     * Sube una imagen de perfil a S3 y la asocia al empleado autenticado.
+     */
+    @Transactional
+    public EmployeeDTO uploadProfilePicture(String email, org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getProfilePictureUrl() != null) {
+            storageService.deleteFile(user.getProfilePictureUrl());
+        }
+
+        String fileUrl = storageService.uploadFile(file, "profile-pictures");
+        user.setProfilePictureUrl(fileUrl);
+        userRepository.save(user);
+
+        return mapToDTO(user.getEmployee());
+    }
+
+    /**
+     * Elimina la imagen de perfil de un empleado de S3 y de la base de datos.
+     */
+    @Transactional
+    public EmployeeDTO deleteProfilePicture(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (user.getProfilePictureUrl() != null) {
+            storageService.deleteFile(user.getProfilePictureUrl());
+            user.setProfilePictureUrl(null);
+            userRepository.save(user);
+        }
+
+        return mapToDTO(user.getEmployee());
+    }
+
 
     /**
      * Lista todos los empleados de un taller específico por su ID.
@@ -183,6 +222,7 @@ public class EmployeService {
                 .workshopName(employee.getWorkshop() != null ? employee.getWorkshop().getCompanyName() : "Sin taller")
                 .address(employee.getUser().getAddress())
                 .allowedSections(employee.getAllowedSections())
+                .profilePictureUrl(storageService.generatePresignedUrl(employee.getUser().getProfilePictureUrl()))
                 .build();
     }
 }

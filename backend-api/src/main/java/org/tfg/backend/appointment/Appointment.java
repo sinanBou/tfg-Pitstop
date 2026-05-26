@@ -50,6 +50,17 @@ public class Appointment {
     @Column(name = "confirmed_at")
     private LocalDateTime confirmedAt;
 
+    @Column(name = "reception_kilometers")
+    private Integer receptionKilometers;
+
+    @Column(name = "reception_notes", length = 1000)
+    private String receptionNotes;
+
+    @Column(name = "vehicle_received")
+    @Builder.Default
+    private Boolean vehicleReceived = false;
+
+
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     private Client client;

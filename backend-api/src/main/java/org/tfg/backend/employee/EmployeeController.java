@@ -35,6 +35,29 @@ public class EmployeeController {
         return ResponseEntity.ok(employeService.updateProfile(user.getEmail(), request));
     }
 
+    /**
+     * Sube una imagen de perfil y la asocia al empleado logueado.
+     */
+    @org.springframework.web.bind.annotation.PostMapping("/me/avatar")
+    public ResponseEntity<EmployeeDTO> uploadAvatar(
+            @AuthenticationPrincipal User user,
+            @org.springframework.web.bind.annotation.RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+        try {
+            return ResponseEntity.ok(employeService.uploadProfilePicture(user.getEmail(), file));
+        } catch (Exception e) {
+            throw new RuntimeException("Error al subir la imagen de perfil: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Elimina la imagen de perfil del empleado logueado.
+     */
+    @org.springframework.web.bind.annotation.DeleteMapping("/me/avatar")
+    public ResponseEntity<EmployeeDTO> deleteAvatar(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(employeService.deleteProfilePicture(user.getEmail()));
+    }
+
+
     @GetMapping("/workshop/{workshopId}")
     public ResponseEntity<java.util.List<EmployeeDTO>> getEmployeesByWorkshop(@org.springframework.web.bind.annotation.PathVariable java.util.UUID workshopId) {
         return ResponseEntity.ok(employeService.getEmployeesByWorkshopId(workshopId));

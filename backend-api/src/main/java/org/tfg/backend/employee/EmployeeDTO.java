@@ -20,4 +20,5 @@ public class EmployeeDTO {
     private UUID workshopId;
     private String address;
     private String allowedSections;
+    private String profilePictureUrl;
 }
