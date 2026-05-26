@@ -418,6 +418,25 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  /** Check-in vehicle (register kilometers and notes) */
+  const checkInVehicle = async (appointmentId: string, kilometers: number, notes: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/check-in?kilometers=${kilometers}&notes=${encodeURIComponent(notes)}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error al recepcionar el vehículo:", err);
+    }
+    return false;
+  };
+
+
   const goToNextUnassignedDate = useCallback(() => {
     if (!appointments.length) return;
 
@@ -488,6 +507,51 @@ export function useWorkshopAdmin() {
     }
   };
 
+  const handleUploadAvatar = async (file: File) => {
+    const token = localStorage.getItem('jwt_token');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/me/avatar`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEmployeeProfile(updated);
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error('Error al subir la foto de perfil:', err);
+    }
+    return false;
+  };
+
+  const handleDeleteAvatar = async () => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/me/avatar`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEmployeeProfile(updated);
+        await fetchWorkshopData();
+        return true;
+      }
+    } catch (err) {
+      console.error('Error al eliminar la foto de perfil:', err);
+    }
+    return false;
+  };
+
   return {
     id,
     activeTab, setActiveTab,
@@ -514,13 +578,17 @@ export function useWorkshopAdmin() {
     handleDeleteTask,
     completeJob,
     markPickedUp,
+    checkInVehicle,
     readyForCompletion,
+
     goToNextPendingDate,
     goToNextUnassignedDate,
     handleDeleteAppointment,
     employeeProfile,
     workshopTasks,
     handleProfileUpdate,
+    handleUploadAvatar,
+    handleDeleteAvatar,
     userRole: localStorage.getItem('role')
   };
 }

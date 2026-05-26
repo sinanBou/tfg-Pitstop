@@ -1,5 +1,8 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import AddressAutocomplete from '../../../../common/AddressAutocomplete';
+import { ImagePreviewModal } from '../../../../common/ImagePreviewModal/index';
+import { API_BASE_URL } from '../../../../../config/api';
 
 interface TeamTabProps {
   employeeForm: any;
@@ -9,31 +12,83 @@ interface TeamTabProps {
   onPromote: (id: string) => void;
   onDemote: (id: string) => void;
   employees: any[];
+  onRefreshEmployees?: () => void;
 }
 
-export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm, onSubmit, onDelete, onPromote, onDemote, employees }) => {
+export const TeamTab: React.FC<TeamTabProps> = ({ 
+  employeeForm, 
+  setEmployeeForm, 
+  onSubmit, 
+  onDelete, 
+  onPromote, 
+  onDemote, 
+  employees,
+  onRefreshEmployees 
+}) => {
   const [selectedEmp, setSelectedEmp] = React.useState<any>(null);
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
+  const [previewTitle, setPreviewTitle] = React.useState<string>('');
   const userRole = localStorage.getItem('role');
+
+  const handleTogglePermission = async (empId: string, currentAllowed: string[], tabValue: string) => {
+    let newAllowed: string[];
+    if (currentAllowed.includes(tabValue)) {
+      newAllowed = currentAllowed.filter(t => t !== tabValue);
+    } else {
+      newAllowed = [...currentAllowed, tabValue];
+    }
+    
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/${empId}/allowed-sections?allowedSections=${newAllowed.join(',')}`, {
+        method: 'PUT',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        if (onRefreshEmployees) onRefreshEmployees();
+        const updatedEmp = { ...selectedEmp, allowedSections: newAllowed.join(',') };
+        setSelectedEmp(updatedEmp);
+      } else {
+        alert("Error al actualizar permisos");
+      }
+    } catch (err) {
+      console.error("Error updating permissions:", err);
+    }
+  };
 
   return (
     <div className="space-y-10 relative">
-      {/* PANEL DE DETALLE (MODAL OVERLAY) */}
-      {selectedEmp && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
-           <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] p-10 relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 overflow-hidden">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+      {/* PANEL DE DETALLE (MODAL OVERLAY VIA PORTAL) */}
+      {selectedEmp && createPortal(
+        <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
+           <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+              {/* Glow decorativo */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
 
+              {/* Botón cerrar — fuera del scroll container */}
               <button 
+                type="button"
                 onClick={() => setSelectedEmp(null)}
-                className="absolute top-8 right-8 p-3 bg-black/40 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-2xl transition-all z-10"
+                className="absolute top-8 right-8 p-3 bg-black/40 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
 
+              {/* Contenido con scroll */}
+              <div className="p-10 overflow-y-auto flex-1">
               <div className="flex flex-col items-center text-center space-y-6 relative">
-                 <div className="w-24 h-24 bg-neutral-950 border-2 border-red-600/20 rounded-[2.5rem] flex items-center justify-center text-white font-black text-4xl shadow-2xl">
-                    {selectedEmp.firstname.charAt(0)}
-                 </div>
+                  <div 
+                    className={`w-24 h-24 bg-neutral-950 border-2 border-red-600/20 rounded-[2.5rem] flex items-center justify-center text-white font-black text-4xl shadow-2xl overflow-hidden shrink-0 ${selectedEmp.profilePictureUrl ? 'cursor-zoom-in hover:scale-105 active:scale-95 transition-all duration-300' : ''}`}
+                    onClick={selectedEmp.profilePictureUrl ? () => { setPreviewUrl(selectedEmp.profilePictureUrl); setPreviewTitle(`${selectedEmp.firstname} ${selectedEmp.lastname}`); } : undefined}
+                  >
+                     {selectedEmp.profilePictureUrl ? (
+                       <img src={selectedEmp.profilePictureUrl} alt="Avatar" className="w-full h-full object-cover" />
+                     ) : (
+                       selectedEmp.firstname.charAt(0)
+                     )}
+                  </div>
                  
                  <div>
                     <h2 className="text-3xl font-black uppercase tracking-widest text-white">{selectedEmp.firstname} {selectedEmp.lastname}</h2>
@@ -52,6 +107,49 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                        <p className="text-[10px] font-black uppercase tracking-widest text-neutral-600 italic">Dirección de Residencia</p>
                        <p className="text-sm font-bold text-neutral-300 leading-relaxed">{selectedEmp.address || 'No especificada'}</p>
                     </div>
+
+                    {/* Permisos de Acceso al Dashboard (Solo Mecánicos, no para Gerentes ni Propietarios) */}
+                    {selectedEmp.role === 'WORKSHOP_STAFF' && (
+                      <div className="bg-black/40 border border-neutral-800 p-6 rounded-3xl text-left space-y-4">
+                         <p className="text-[10px] font-black uppercase tracking-widest text-neutral-600 italic">Permisos de Acceso al Dashboard</p>
+                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                           {[
+                             { value: 'PLANIFICACIÓN', label: 'Planificación' },
+                             { value: 'AVISOS', label: 'Avisos' },
+                             { value: 'CITAS', label: 'Citas' },
+                             { value: 'TAREAS', label: 'Tareas' },
+                             { value: 'ALMACÉN', label: 'Almacén' },
+                             { value: 'FACTURAS', label: 'Facturas' }
+                           ].map((tab) => {
+                             const allowedString = selectedEmp.allowedSections || '';
+                             const currentAllowed = allowedString
+                               ? allowedString.split(',').map((s: string) => s.trim()).filter(Boolean)
+                               : [];
+                             const isAllowed = currentAllowed.includes(tab.value);
+
+                             return (
+                               <button
+                                 key={tab.value}
+                                 type="button"
+                                 onClick={() => handleTogglePermission(selectedEmp.id, currentAllowed, tab.value)}
+                                 className={`px-3 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-1 border ${
+                                   isAllowed
+                                     ? 'bg-red-600/20 border-red-500 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
+                                     : 'bg-neutral-900/50 border-neutral-800 text-neutral-500 hover:text-white hover:border-neutral-700'
+                                 }`}
+                               >
+                                 {isAllowed ? (
+                                   <svg className="w-3 h-3 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                 ) : (
+                                   <svg className="w-3 h-3 text-neutral-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                                 )}
+                                 {tab.label}
+                               </button>
+                             );
+                           })}
+                         </div>
+                      </div>
+                    )}
                  </div>
 
                  <div className="w-full flex flex-col gap-3 mt-6">
@@ -87,8 +185,10 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
                     )}
                  </div>
               </div>
+              </div>
            </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* FORMULARIO DE ALTA (Igual que antes) */}
@@ -184,8 +284,19 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
 
               <div className="flex items-start justify-between relative z-10">
                 <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-center text-white font-black text-2xl shadow-inner group-hover:scale-110 transition-transform">
-                    {emp.firstname.charAt(0)}
+                  <div 
+                    className="w-16 h-16 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-center text-white font-black text-2xl shadow-inner group-hover:scale-110 transition-transform overflow-hidden shrink-0"
+                    onClick={emp.profilePictureUrl ? (e) => {
+                      e.stopPropagation();
+                      setPreviewUrl(emp.profilePictureUrl);
+                      setPreviewTitle(`${emp.firstname} ${emp.lastname}`);
+                    } : undefined}
+                  >
+                    {emp.profilePictureUrl ? (
+                      <img src={emp.profilePictureUrl} alt="Avatar" className="w-full h-full object-cover cursor-zoom-in" />
+                    ) : (
+                      emp.firstname.charAt(0)
+                    )}
                   </div>
                   <div>
                     <h4 className="text-white font-black uppercase text-base tracking-widest leading-none mb-2">{emp.firstname} {emp.lastname}</h4>
@@ -216,6 +327,12 @@ export const TeamTab: React.FC<TeamTabProps> = ({ employeeForm, setEmployeeForm,
           ))}
         </div>
       </div>
+      <ImagePreviewModal
+        isOpen={!!previewUrl}
+        onClose={() => setPreviewUrl(null)}
+        imageUrl={previewUrl || ''}
+        title={previewTitle}
+      />
     </div>
   );
 };

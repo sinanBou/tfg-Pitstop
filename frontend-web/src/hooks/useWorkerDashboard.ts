@@ -214,6 +214,25 @@ export function useWorkerDashboard() {
     return false;
   };
 
+  /** Check-in vehicle (register kilometers and notes) */
+  const checkInVehicle = async (appointmentId: string, kilometers: number, notes: string) => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/check-in?kilometers=${kilometers}&notes=${encodeURIComponent(notes)}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error("Error al recepcionar el vehículo:", err);
+    }
+    return false;
+  };
+
+
   const handleDeleteTask = async (taskId: string) => {
     const token = localStorage.getItem('jwt_token');
     try {
@@ -330,6 +349,51 @@ export function useWorkerDashboard() {
     }
   };
 
+  const handleUploadAvatar = async (file: File) => {
+    const token = localStorage.getItem('jwt_token');
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/me/avatar`, {
+        method: 'POST',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEmployeeProfile(updated);
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error('Error al subir la foto de perfil:', err);
+    }
+    return false;
+  };
+
+  const handleDeleteAvatar = async () => {
+    const token = localStorage.getItem('jwt_token');
+    try {
+      const res = await fetch(`${API_BASE_URL}/employees/me/avatar`, {
+        method: 'DELETE',
+        headers: { 
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        const updated = await res.json();
+        setEmployeeProfile(updated);
+        await fetchWorkerData();
+        return true;
+      }
+    } catch (err) {
+      console.error('Error al eliminar la foto de perfil:', err);
+    }
+    return false;
+  };
+
   return {
     loading,
     employeeProfile,
@@ -351,7 +415,11 @@ export function useWorkerDashboard() {
     readyForCompletion,
     completeJob,
     markPickedUp,
+    checkInVehicle,
     workshopData,
-    handleProfileUpdate
+
+    handleProfileUpdate,
+    handleUploadAvatar,
+    handleDeleteAvatar
   };
 }

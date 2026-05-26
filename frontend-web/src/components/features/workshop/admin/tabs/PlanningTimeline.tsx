@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { AppointmentBlock } from './AppointmentBlock';
 import { UnassignedColumn } from './UnassignedColumn';
+import { ImagePreviewModal } from '../../../../common/ImagePreviewModal/index';
 
 interface Column {
   id: string;
@@ -8,6 +9,7 @@ interface Column {
   employeeId: string | null;
   role?: string;
   isUnassigned?: boolean;
+  profilePictureUrl?: string;
 }
 
 interface PlanningTimelineProps {
@@ -46,6 +48,8 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   onManage,
   onViewChecklist,
 }) => {
+  const [activePreview, setActivePreview] = useState<{ url: string; title: string } | null>(null);
+
   const filteredAppointments = appointments.filter(app => {
     // Las tareas de taller (isTask === true) que están sin asignar son globales/comunes a todas las fechas.
     if (app.isTask && (app.assignedEmployeeId === null || app.assignedEmployeeId === undefined)) {
@@ -204,11 +208,20 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
               >
                 <h3 className="text-white font-black uppercase tracking-widest text-xs flex flex-col sm:flex-row sm:items-center gap-2 truncate">
                   <span className="flex items-center gap-2 truncate">
-                    <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    {col.profilePictureUrl ? (
+                      <div 
+                        className="w-6 h-6 rounded-md overflow-hidden border border-white/10 shrink-0 cursor-zoom-in hover:scale-105 active:scale-95 transition-all duration-300"
+                        onClick={() => setActivePreview({ url: col.profilePictureUrl!, title: col.title })}
+                      >
+                        <img src={col.profilePictureUrl} alt={col.title} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                    )}
                     {col.title}
                   </span>
                   {col.role && (
-                    <span className="px-2 py-0.5 border border-white text-white rounded-md text-[9px] font-black tracking-widest uppercase shrink-0">
+                    <span className="px-2 py-0.5 border border-white/20 text-neutral-400 rounded-md text-[9px] font-black tracking-widest uppercase shrink-0">
                       {col.role}
                     </span>
                   )}
@@ -342,6 +355,14 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
         </div>
       </div>
 
+      {activePreview && (
+        <ImagePreviewModal
+          isOpen={!!activePreview}
+          onClose={() => setActivePreview(null)}
+          imageUrl={activePreview.url}
+          title={activePreview.title}
+        />
+      )}
     </div>
   );
 };

@@ -42,7 +42,8 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({
       id: m.id,
       title: `${m.firstname} ${m.lastname}`.trim() || 'Mecánico',
       employeeId: m.id as string,
-      role: m.role === 'WORKSHOP_OWNER' ? 'Dueño' : m.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico'
+      role: m.role === 'WORKSHOP_OWNER' ? 'Dueño' : m.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico',
+      profilePictureUrl: m.profilePictureUrl
     }))
   ];
 

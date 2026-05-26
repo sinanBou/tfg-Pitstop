@@ -162,7 +162,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
           <div className="flex justify-between items-center text-sm">
             <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Fecha entrada</span>
             <span className="text-white text-xs font-mono">
-              {dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}
+              {dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}
             </span>
           </div>
           {job.assignedEmployeeName && (

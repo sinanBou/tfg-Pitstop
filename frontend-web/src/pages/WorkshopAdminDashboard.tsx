@@ -7,12 +7,12 @@ import { StaffAppointmentModal } from '../components/features/workshop/StaffAppo
 import { useWorkshopAdmin } from '../hooks/useWorkshopAdmin';
 import { OverviewTab } from '../components/features/workshop/admin/tabs/OverviewTab';
 import { AppointmentsTab } from '../components/features/workshop/admin/tabs/AppointmentsTab';
-import { SettingsTab } from '../components/features/workshop/admin/tabs/SettingsTab';
 import { TeamTab } from '../components/features/workshop/admin/tabs/TeamTab';
 import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
 import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
 import { PartsTab } from '../components/features/workshop/admin/tabs/PartsTab';
 import { ReportsTab } from '../components/features/workshop/admin/tabs/ReportsTab';
+import { ImagePreviewModal } from '../components/common/ImagePreviewModal/index';
 import { AvisosTab } from '../components/features/workshop/admin/tabs/AvisosTab';
 import { DateNavigator } from '../components/common/DateNavigator/index';
 import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
@@ -21,6 +21,8 @@ import { ConfirmedAppointmentsList } from '../components/features/workshop/admin
 import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
 import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
 import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
+import { PerfilTaller } from '../components/features/workshop/admin/components/PerfilTaller';
+import { MiPerfil } from '../components/features/workshop/admin/components/MiPerfil';
 
 const diasSemana = [
   { value: 'LUNES', label: 'Lunes' },
@@ -37,6 +39,11 @@ export default function WorkshopAdminDashboard() {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [checklistItem, setChecklistItem] = useState<any>(null);
   const [selectedAgendaEmployeeId, setSelectedAgendaEmployeeId] = useState<string | null>(null);
+
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isWorkshopSettingsOpen, setIsWorkshopSettingsOpen] = useState(false);
+  const [profileForm, setProfileForm] = useState({ firstname: '', lastname: '', address: '' });
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const {
     id,
@@ -63,20 +70,35 @@ export default function WorkshopAdminDashboard() {
     handleDeleteAppointment,
     completeJob,
     markPickedUp,
+    checkInVehicle,
     readyForCompletion,
     goToNextUnassignedDate,
     goToNextPendingDate,
     employeeProfile,
     workshopTasks,
     handleProfileUpdate,
+    handleUploadAvatar,
+    handleDeleteAvatar,
     userRole
   } = useWorkshopAdmin();
+
+
 
   useEffect(() => {
     if (employeeProfile?.id && !selectedAgendaEmployeeId) {
       setSelectedAgendaEmployeeId(employeeProfile.id);
     }
   }, [employeeProfile, selectedAgendaEmployeeId]);
+
+  useEffect(() => {
+    if (employeeProfile) {
+      setProfileForm({
+        firstname: employeeProfile.firstname || '',
+        lastname: employeeProfile.lastname || '',
+        address: employeeProfile.address || ''
+      });
+    }
+  }, [employeeProfile]);
 
   if (loading) return (
     <div className="min-h-screen bg-black flex items-center justify-center">
@@ -85,7 +107,7 @@ export default function WorkshopAdminDashboard() {
   );
 
   const isOwner = userRole === 'WORKSHOP_OWNER';
-  const SECCIONES = ['RESUMEN', 'AVISOS', 'CITAS', 'PLANIFICACIÓN', 'FINALIZADOS', 'AGENDA', 'TAREAS', 'ALMACÉN', 'FACTURAS', 'EQUIPO', 'AJUSTES'];
+  const SECCIONES = ['RESUMEN', 'AVISOS', 'CITAS', 'PLANIFICACIÓN', 'FINALIZADOS', 'AGENDA', 'TAREAS', 'ALMACÉN', 'FACTURAS', 'EQUIPO'];
 
   const isSameDate = (isoString: string) => {
       const appDate = new Date(isoString);
@@ -130,7 +152,12 @@ export default function WorkshopAdminDashboard() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-red-500/30 selection:text-white pb-32">
-      <DashboardHeader type="workshop" />
+      <DashboardHeader 
+        type="workshop" 
+        profilePictureUrl={employeeProfile?.profilePictureUrl}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenWorkshopSettings={() => setIsWorkshopSettingsOpen(true)}
+      />
       <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
          
          <div className="max-w-7xl mx-auto p-6 md:p-12 space-y-8 animate-fade-in-up">
@@ -167,7 +194,14 @@ export default function WorkshopAdminDashboard() {
             </header>
 
             <div className="relative z-0">
-              {activeTab === 0 && <OverviewTab workshopData={workshopData} diasSemana={diasSemana} />}
+              {activeTab === 0 && (
+                <OverviewTab 
+                  workshopData={workshopData} 
+                  diasSemana={diasSemana} 
+                  employeeProfile={employeeProfile}
+                  userRole={userRole || undefined}
+                />
+              )}
               
               {/* TAB 1: AVISOS */}
               {activeTab === 1 && id && (
@@ -176,8 +210,6 @@ export default function WorkshopAdminDashboard() {
                   appointments={appointments}
                   readyJobs={readyForCompletion}
                   fetchWorkshopData={fetchWorkshopData}
-                  onCompleteJob={(job) => setInvoicingJob(job)}
-                  onMarkPickedUp={markPickedUp}
                 />
               )}
 
@@ -237,7 +269,9 @@ export default function WorkshopAdminDashboard() {
                     <ConfirmedAppointmentsList 
                       appointments={appointments} 
                       onDeleteAppointment={handleDeleteAppointment} 
+                      onCheckInAppointment={checkInVehicle}
                     />
+
                   </div>
                 </div>
               )}
@@ -341,7 +375,8 @@ export default function WorkshopAdminDashboard() {
                         id: selectedAgendaEmployeeId || '', 
                         title: selectedEmpObj ? `${selectedEmpObj.firstname} ${selectedEmpObj.lastname}` : 'Sin Asignar', 
                         employeeId: selectedAgendaEmployeeId,
-                        role: selectedEmpObj ? (selectedEmpObj.role === 'WORKSHOP_OWNER' ? 'Dueño' : selectedEmpObj.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico') : undefined
+                        role: selectedEmpObj ? (selectedEmpObj.role === 'WORKSHOP_OWNER' ? 'Dueño' : selectedEmpObj.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico') : undefined,
+                        profilePictureUrl: selectedEmpObj?.profilePictureUrl
                       }]}
                       appointments={agendaItems}
                       selectedDate={selectedDate}
@@ -382,11 +417,20 @@ export default function WorkshopAdminDashboard() {
               )}
 
               {/* TAB 9: EQUIPO */}
-              {activeTab === 9 && <TeamTab employeeForm={employeeForm} setEmployeeForm={setEmployeeForm} onSubmit={handleEmployeeSubmit} onDelete={handleDeleteEmployee} onPromote={handlePromoteEmployee} onDemote={handleDemoteEmployee} employees={employees} />}
-
-              {/* TAB 10: AJUSTES */}
-              {activeTab === 10 && <SettingsTab settingsForm={settingsForm} setSettingsForm={setSettingsForm} onSubmit={handleSettingsSubmit} diasSemana={diasSemana} employeeProfile={employeeProfile} onProfileUpdate={handleProfileUpdate} showProfileSection={true} employees={employees} onRefreshEmployees={fetchWorkshopData} />}
+              {activeTab === 9 && (
+                <TeamTab 
+                  employeeForm={employeeForm} 
+                  setEmployeeForm={setEmployeeForm} 
+                  onSubmit={handleEmployeeSubmit} 
+                  onDelete={handleDeleteEmployee} 
+                  onPromote={handlePromoteEmployee} 
+                  onDemote={handleDemoteEmployee} 
+                  employees={employees} 
+                  onRefreshEmployees={fetchWorkshopData} 
+                />
+              )}
             </div>
+
          </div>
       </main>
 
@@ -436,6 +480,45 @@ export default function WorkshopAdminDashboard() {
           onSuccess={async () => {
             await fetchWorkshopData();
           }}
+        />
+      )}
+
+      {/* MODAL DE MI PERFIL */}
+      {employeeProfile && (
+        <MiPerfil
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          employeeProfile={employeeProfile}
+          profileForm={profileForm}
+          setProfileForm={setProfileForm}
+          onSubmit={async (form) => {
+            await handleProfileUpdate(form);
+          }}
+          onUploadAvatar={handleUploadAvatar}
+          onDeleteAvatar={handleDeleteAvatar}
+          onPreviewImage={() => setIsPreviewOpen(true)}
+        />
+      )}
+
+      {/* MODAL DE AJUSTES DEL TALLER */}
+      <PerfilTaller
+        isOpen={isWorkshopSettingsOpen && !!workshopData}
+        onClose={() => setIsWorkshopSettingsOpen(false)}
+        settingsForm={settingsForm}
+        setSettingsForm={setSettingsForm}
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await handleSettingsSubmit(e);
+          setIsWorkshopSettingsOpen(false);
+        }}
+      />
+
+      {isPreviewOpen && employeeProfile?.profilePictureUrl && (
+        <ImagePreviewModal
+          isOpen={isPreviewOpen}
+          imageUrl={employeeProfile.profilePictureUrl}
+          title={`${employeeProfile.firstname} ${employeeProfile.lastname}`}
+          onClose={() => setIsPreviewOpen(false)}
         />
       )}
 

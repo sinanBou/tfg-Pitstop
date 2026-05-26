@@ -4,13 +4,11 @@ import { DashboardHeader } from '../components/layout/DashboardHeader/index';
 import { BottomNav } from '../components/layout/BottomNav/index';
 import { LoadingScreen } from '../components/common/LoadingScreen/index';
 import { StaffAppointmentModal } from '../components/features/workshop/StaffAppointmentModal/index';
-import { MechanicLiveTask } from '../components/features/workshop/MechanicLiveTask/index';
 import { DateNavigator } from '../components/common/DateNavigator/index';
 import { useWorkerDashboard } from '../hooks/useWorkerDashboard';
 import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
 import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
 import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
-import { SettingsTab } from '../components/features/workshop/admin/tabs/SettingsTab';
 import { PartsTab } from '../components/features/workshop/admin/tabs/PartsTab';
 import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
 import { AvisosTab } from '../components/features/workshop/admin/tabs/AvisosTab';
@@ -20,7 +18,19 @@ import { ConfirmedAppointmentsList } from '../components/features/workshop/admin
 import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
 import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
 import { GenerateInvoiceModal } from '../components/features/workshop/GenerateInvoiceModal/index';
+import { OverviewTab } from '../components/features/workshop/admin/tabs/OverviewTab';
+import { ImagePreviewModal } from '../components/common/ImagePreviewModal/index';
+import { MiPerfil } from '../components/features/workshop/admin/components/MiPerfil';
 
+const diasSemana = [
+  { value: 'LUNES', label: 'Lunes' },
+  { value: 'MARTES', label: 'Martes' },
+  { value: 'MIERCOLES', label: 'Miércoles' },
+  { value: 'JUEVES', label: 'Jueves' },
+  { value: 'VIERNES', label: 'Viernes' },
+  { value: 'SABADO', label: 'Sábado' },
+  { value: 'DOMINGO', label: 'Domingo' },
+];
 
 export default function WorkerDashboard() {
   const navigate = useNavigate();
@@ -33,7 +43,6 @@ export default function WorkerDashboard() {
     fetchWorkerData, 
     updateAppointmentStatus, 
     updateTaskStatus,
-    handleAssignAppointment,
     handleRescheduleAppointment,
     handleRescheduleTask,
     handleDeleteTask,
@@ -45,14 +54,34 @@ export default function WorkerDashboard() {
     readyForCompletion,
     completeJob,
     markPickedUp,
+    checkInVehicle,
     workshopData,
-    handleProfileUpdate
+    handleProfileUpdate,
+    handleUploadAvatar,
+    handleDeleteAvatar
   } = useWorkerDashboard();
+
+
   const [activeTab, setActiveTab] = useState(0);
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [checklistItem, setChecklistItem] = useState<any>(null);
   const [invoicingJob, setInvoicingJob] = useState<any>(null);
+
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileForm, setProfileForm] = useState({ firstname: '', lastname: '', address: '' });
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  // Sync profile form when employeeProfile loads
+  useEffect(() => {
+    if (employeeProfile) {
+      setProfileForm({
+        firstname: employeeProfile.firstname || '',
+        lastname: employeeProfile.lastname || '',
+        address: employeeProfile.address || ''
+      });
+    }
+  }, [employeeProfile]);
 
   const SECCIONES = ['RESUMEN', 'AGENDA'];
   const allowedSectionsStr = employeeProfile?.allowedSections;
@@ -66,8 +95,6 @@ export default function WorkerDashboard() {
   if (allowed.includes('TAREAS')) SECCIONES.push('TAREAS');
   if (allowed.includes('ALMACÉN')) SECCIONES.push('ALMACÉN');
   if (allowed.includes('FACTURAS')) SECCIONES.push('FACTURAS');
-
-  SECCIONES.push('AJUSTES');
 
   useEffect(() => {
     if (!loading && employeeProfile?.role === 'WORKSHOP_MANAGER') {
@@ -95,11 +122,7 @@ export default function WorkerDashboard() {
       ...workshopTasks.filter(t => t.status !== 'COMPLETED' && t.status !== 'CANCELLED' && t.status !== 'PICKED_UP').map(t => ({ ...t, isTask: true }))
   ];
 
-  // Mis Citas Activas (Para MechanicLiveTask)
-  const myWorkItems = [
-      ...appointments.filter(a => a.assignedEmployeeId === employeeProfile?.id && a.status !== 'IN_PROGRESS' && a.status !== 'COMPLETED' && a.status !== 'CANCELLED' && a.status !== 'PICKED_UP' && isSameDate(a.dateTime)),
-      ...workshopTasks.filter(t => t.assignedEmployeeId === employeeProfile?.id && t.status !== 'COMPLETED' && t.status !== 'CANCELLED' && t.status !== 'PICKED_UP')
-  ];
+
 
   const handleUpdateStatus = (id: string, newStatus: string, isTask?: boolean) => {
     if (isTask) return updateTaskStatus(id, newStatus);
@@ -125,7 +148,11 @@ export default function WorkerDashboard() {
       <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen animate-pulse pointer-events-none"></div>
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-neutral-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen animate-[pulse_4s_infinite] pointer-events-none"></div>
 
-      <DashboardHeader type="workshop" />
+      <DashboardHeader 
+        type="workshop" 
+        profilePictureUrl={employeeProfile?.profilePictureUrl}
+        onOpenProfile={() => setIsProfileOpen(true)}
+      />
       <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
 
          <div className="max-w-7xl mx-auto p-6 md:p-12 space-y-8 animate-fade-in-up">
@@ -155,45 +182,12 @@ export default function WorkerDashboard() {
             <div className="relative z-0">
               {/* TAB: RESUMEN (Siempre fijo para Mecánicos) */}
               {SECCIONES[activeTab] === 'RESUMEN' && (
-                  <div className="space-y-8">
-                    {/* Tarjeta de Bienvenida */}
-                    <div className="bg-neutral-900/40 border border-neutral-800 rounded-[2rem] p-8 backdrop-blur-sm relative overflow-hidden">
-                      <div className="absolute top-0 right-0 p-8 opacity-5">
-                        <svg className="w-32 h-32 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                      </div>
-                      <p className="text-neutral-500 text-[10px] font-black uppercase tracking-widest mb-2">Bienvenido de nuevo</p>
-                      <h2 className="text-3xl font-black text-white mb-1">
-                        {employeeProfile?.firstname} {employeeProfile?.lastname}
-                      </h2>
-                      <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mt-2 bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                        Mecánico de Plantilla
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      <div className="bg-neutral-900/40 border border-neutral-800 rounded-[2rem] p-8 hover:border-red-500/30 transition-all group relative overflow-hidden backdrop-blur-sm">
-                        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
-                          <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                        </div>
-                        <h3 className="text-white font-black uppercase text-sm tracking-widest mb-6 flex items-center gap-3">
-                          <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
-                          Próximas Citas
-                        </h3>
-                        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                          {appointments.length > 0 ? appointments.filter((a: any) => a.status === 'PENDING' || a.status === 'CONFIRMED').map((app: any) => (
-                              <div key={app.id} className="p-4 bg-black/40 border border-neutral-800 rounded-2xl hover:border-neutral-700 transition-colors">
-                                <p className="text-white font-black text-xs uppercase mb-1">{app.serviceType}</p>
-                                <div className="flex justify-between items-center text-[10px] font-mono text-neutral-500">
-                                    <span>{new Date(app.dateTime).toLocaleDateString()}</span>
-                                    <span className="text-red-500">{new Date(app.dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false})} h</span>
-                                </div>
-                              </div>
-                          )) : <p className="text-neutral-500 text-xs italic">No hay citas pendientes.</p>}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+                <OverviewTab 
+                  workshopData={workshopData} 
+                  diasSemana={diasSemana} 
+                  employeeProfile={employeeProfile}
+                  userRole={employeeProfile?.role}
+                />
               )}
 
               {/* TAB: AGENDA (Mi Agenda Personal / Timeline - Siempre fija para Mecánicos) */}
@@ -212,7 +206,8 @@ export default function WorkerDashboard() {
                            id: employeeProfile?.id || '', 
                            title: 'MI AGENDA', 
                            employeeId: employeeProfile?.id || '',
-                           role: employeeProfile?.role === 'WORKSHOP_OWNER' ? 'Dueño' : employeeProfile?.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico'
+                           role: employeeProfile?.role === 'WORKSHOP_OWNER' ? 'Dueño' : employeeProfile?.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico',
+                           profilePictureUrl: employeeProfile?.profilePictureUrl
                          }]}
                          appointments={combinedPlanningItems}
                          selectedDate={selectedDate}
@@ -281,8 +276,6 @@ export default function WorkerDashboard() {
                   appointments={appointments}
                   readyJobs={readyForCompletion}
                   fetchWorkshopData={fetchWorkerData}
-                  onCompleteJob={(job) => setInvoicingJob(job)}
-                  onMarkPickedUp={markPickedUp}
                 />
               )}
 
@@ -342,7 +335,9 @@ export default function WorkerDashboard() {
                     <ConfirmedAppointmentsList 
                       appointments={appointments} 
                       onDeleteAppointment={handleDeleteAppointment} 
+                      onCheckInAppointment={checkInVehicle}
                     />
+
                   </div>
                 </div>
               )}
@@ -372,19 +367,8 @@ export default function WorkerDashboard() {
                 </div>
               )}
 
-              {/* TAB: AJUSTES (Siempre fijo para Mecánicos) */}
-              {SECCIONES[activeTab] === 'AJUSTES' && (
-                <SettingsTab 
-                  settingsForm={{}} 
-                  setSettingsForm={() => {}}
-                  onSubmit={(e) => e.preventDefault()}
-                  diasSemana={[]}
-                  showWorkshopSection={false}
-                  showProfileSection={true}
-                  employeeProfile={employeeProfile}
-                  onProfileUpdate={handleProfileUpdate}
-                />
-              )}
+
+
             </div>
             
          </div>
@@ -418,6 +402,32 @@ export default function WorkerDashboard() {
           item={currentChecklistItem}
           onUpdateStatus={handleUpdateStatus}
           onSuccess={() => { fetchWorkerData(); }}
+        />
+      )}
+
+      {/* MODAL DE MI PERFIL */}
+      {employeeProfile && (
+        <MiPerfil
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          employeeProfile={employeeProfile}
+          profileForm={profileForm}
+          setProfileForm={setProfileForm}
+          onSubmit={async (form) => {
+            await handleProfileUpdate(form);
+          }}
+          onUploadAvatar={handleUploadAvatar}
+          onDeleteAvatar={handleDeleteAvatar}
+          onPreviewImage={() => setIsPreviewOpen(true)}
+        />
+      )}
+
+      {isPreviewOpen && employeeProfile?.profilePictureUrl && (
+        <ImagePreviewModal
+          isOpen={isPreviewOpen}
+          imageUrl={employeeProfile.profilePictureUrl}
+          title={`${employeeProfile.firstname} ${employeeProfile.lastname}`}
+          onClose={() => setIsPreviewOpen(false)}
         />
       )}
 
