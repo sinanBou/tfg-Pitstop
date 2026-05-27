@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card } from './Card';
-import { getBrandLogo } from '../SearchableSelect/BrandLogos';
+import { Card } from '@/components/common/Card/Card';
+import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
 
 interface AppointmentCardProps {
   type: string;
@@ -14,11 +14,13 @@ interface AppointmentCardProps {
   isCompact?: boolean;
   serviceType?: string;
   completedTasks?: string;
+  estimatedDuration?: number;
+  vehicleReceived?: boolean;
 }
 
 export const AppointmentCard: React.FC<AppointmentCardProps> = ({ 
   type, dateTime, description, status, variant = 'red', vehicleDisplay, clientName, onClick, isCompact = false,
-  serviceType, completedTasks
+  serviceType, completedTasks, estimatedDuration, vehicleReceived
 }) => {
   const dateObj = new Date(dateTime);
   
@@ -27,6 +29,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
       variant={variant} 
       padding="none" 
       onClick={onClick}
+      rounded="2xl"
       className={`w-full h-full hover:border-red-500/40 group relative overflow-hidden flex flex-col justify-start ${isCompact ? 'p-4 pt-5' : 'p-6 justify-center'}`}
     >
       <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
@@ -37,12 +40,12 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
         <div className="flex justify-between items-start gap-2">
           <div className="flex-1 min-w-0">
             <div className={`flex items-center justify-between gap-2 ${isCompact ? 'mb-0' : 'mb-1'}`}>
-                <div className="flex items-center gap-2 overflow-hidden">
-                   <div className={`text-[11px] font-black uppercase tracking-[0.2em] shrink-0 truncate ${variant === 'red' ? 'text-red-500' : 'text-blue-400'}`}>
+                <div className={`flex items-center gap-2 overflow-hidden ${isCompact ? 'flex-wrap' : ''}`}>
+                   <div className={`text-[11px] font-black uppercase tracking-[0.2em] shrink-0 ${variant === 'red' ? 'text-red-500' : 'text-blue-400'}`}>
                       {type}
                    </div>
                    {clientName && (
-                      <div className="text-[11px] text-neutral-300 font-black uppercase truncate shrink border-l border-neutral-700 pl-2">
+                      <div className="text-[10px] text-neutral-400 font-bold uppercase truncate min-w-0 border-l border-neutral-700 pl-2" title={clientName}>
                         {clientName}
                       </div>
                    )}
@@ -95,6 +98,34 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             </div>
           )}
         </div>
+
+        {/* Compact: info row with duration + reception status + description */}
+        {isCompact && (
+          <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            {estimatedDuration && (
+              <span className="text-[8px] font-black px-1.5 py-0.5 rounded-md bg-white/5 border border-white/10 text-neutral-300 font-mono shrink-0">
+                {estimatedDuration >= 60 ? `${Math.floor(estimatedDuration / 60)}h${estimatedDuration % 60 > 0 ? ` ${estimatedDuration % 60}m` : ''}` : `${estimatedDuration}m`}
+              </span>
+            )}
+            {vehicleReceived === false && (
+              <span className="text-[7px] font-black px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 uppercase tracking-wider shrink-0 flex items-center gap-0.5">
+                <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                Sin recep.
+              </span>
+            )}
+            {vehicleReceived === true && (
+              <span className="text-[7px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-0.5">
+                <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>
+                En taller
+              </span>
+            )}
+            {description && (
+              <span className="text-[8px] text-neutral-500 italic truncate min-w-0">
+                {description}
+              </span>
+            )}
+          </div>
+        )}
 
         {!isCompact && (
            <div className="flex flex-col gap-1">

@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
-import InputGroup from '../components/common/Input/InputGroup';
+import InputGroup from '@/components/common/Input/InputGroup';
 import { useState } from 'react';
-import { useClientRegistration } from '../hooks/useClientRegistration';
-import { useWorkshopRegistration } from '../hooks/useWorkshopRegistration';
-import { RoleSelector } from '../components/features/registration/RoleSelector';
-import AddressAutocomplete from '../components/common/AddressAutocomplete';
+import { useClientRegistration } from '@/features/auth/hooks/useClientRegistration';
+import { useWorkshopRegistration } from '@/features/auth/hooks/useWorkshopRegistration';
+import { RoleSelector } from '@/features/auth/components/RoleSelector';
+import AddressAutocomplete from '@/components/common/AddressAutocomplete';
 
 export default function Registration() {
   const [role, setRole] = useState<'workshop' | 'client' | null>(null);

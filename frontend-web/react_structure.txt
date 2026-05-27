@@ -1,0 +1,241 @@
+================================================================================
+SECTION 1: ACTIVE FILES AND DIRECTORY TREE MAPPING
+================================================================================
+.
+./eslint.config.js
+./index.html
+./package.json
+./package-lock.json
+./public
+./public/vite.svg
+./react_structure.txt
+./README.md
+./src
+./src/App.tsx
+./src/assets
+./src/assets/cargaTrabajo.json
+./src/assets/json_data.json
+./src/assets/PitStopLogo.svg
+./src/components
+./src/components/common
+./src/components/common/AddressAutocomplete
+./src/components/common/AddressAutocomplete/FloorInputField.tsx
+./src/components/common/AddressAutocomplete/index.tsx
+./src/components/common/AddressAutocomplete/StreetInputField.tsx
+./src/components/common/AddressAutocomplete/SuggestionsDropdown.tsx
+./src/components/common/AddressAutocomplete/useAddressController.ts
+./src/components/common/AddressAutocomplete/useAddressSuggestions.ts
+./src/components/common/Badge
+./src/components/common/Badge/index.ts
+./src/components/common/Badge/Badge.tsx
+./src/components/common/BaseModal
+./src/components/common/BaseModal/index.tsx
+./src/components/common/Button
+./src/components/common/Button/index.ts
+./src/components/common/Button/Button.tsx
+./src/components/common/Button/BackButton.tsx
+./src/components/common/Card
+./src/components/common/Card/AppointmentCard.tsx
+./src/components/common/Card/Card.tsx
+./src/components/common/Card/index.ts
+./src/components/common/Card/VehicleCard.tsx
+./src/components/common/DateNavigator
+./src/components/common/DateNavigator/index.tsx
+./src/components/common/Icons
+./src/components/common/Icons/index.tsx
+./src/components/common/ImagePreviewModal
+./src/components/common/ImagePreviewModal/index.tsx
+./src/components/common/Input
+./src/components/common/Input/index.ts
+./src/components/common/Input/Input.tsx
+./src/components/common/Input/InputGroup.tsx
+./src/components/common/LoadingScreen
+./src/components/common/LoadingScreen/index.tsx
+./src/components/common/MetricCard.tsx
+./src/components/common/MonthSelector.tsx
+./src/components/common/PartsStatsWidget.tsx
+./src/components/common/ProgressBar.tsx
+./src/components/common/SearchableSelect
+./src/components/common/SearchableSelect/BrandLogos.tsx
+./src/components/common/SearchableSelect/index.tsx
+./src/components/layout
+./src/components/layout/BottomNav
+./src/components/layout/BottomNav/index.tsx
+./src/components/layout/DashboardHeader
+./src/components/layout/DashboardHeader/index.tsx
+./src/components/layout/HomeHeader
+./src/components/layout/HomeHeader/index.tsx
+./src/config
+./src/config/api.ts
+./src/features
+./src/features/appointments
+./src/features/appointments/components
+./src/features/appointments/components/AppointmentModal.tsx
+./src/features/appointments/components/AppointmentStackGroup.tsx
+./src/features/appointments/components/StaffAppointmentModal
+./src/features/appointments/components/StaffAppointmentModal/components
+./src/features/appointments/components/StaffAppointmentModal/components/AppointmentStep.tsx
+./src/features/appointments/components/StaffAppointmentModal/components/ClientStep.tsx
+./src/features/appointments/components/StaffAppointmentModal/components/VehicleStep.tsx
+./src/features/appointments/components/StaffAppointmentModal/hooks
+./src/features/appointments/components/StaffAppointmentModal/hooks/useStaffAppointment.ts
+./src/features/appointments/components/StaffAppointmentModal/index.tsx
+./src/features/appointments/components/StaffAppointmentModal/StaffAppointmentModal.styles.ts
+./src/features/auth
+./src/features/auth/components
+./src/features/auth/components/RoleSelector.tsx
+./src/features/auth/hooks
+./src/features/auth/hooks/useClientRegistration.ts
+./src/features/auth/hooks/useLogin.ts
+./src/features/auth/hooks/useWorkshopRegistration.ts
+./src/features/client
+./src/features/client/components
+./src/features/client/components/ClientAppointmentsTab.tsx
+./src/features/client/components/ClientHistoryTab.tsx
+./src/features/client/components/ClientOverviewTab.tsx
+./src/features/client/components/ClientReportsTab.tsx
+./src/features/client/components/ClientVehiclesTab.tsx
+./src/features/client/hooks
+./src/features/client/hooks/useClientDashboard.ts
+./src/features/home
+./src/features/home/components
+./src/features/home/components/FeaturesSection.tsx
+./src/features/home/components/FooterSection.tsx
+./src/features/home/components/HeroSection.tsx
+./src/features/vehicles
+./src/features/vehicles/components
+./src/features/vehicles/components/VehicleModal.tsx
+./src/features/vehicles/hooks
+./src/features/vehicles/hooks/useVehicleCatalog.ts
+./src/features/workshop
+./src/features/workshop/components
+./src/features/workshop/components/admin
+./src/features/workshop/components/admin/AppointmentSearch
+./src/features/workshop/components/admin/AppointmentSearch/index.tsx
+./src/features/workshop/components/admin/ConfirmedAppointmentsList.tsx
+./src/features/workshop/components/admin/MechanicSearch
+./src/features/workshop/components/admin/MechanicSearch/index.tsx
+./src/features/workshop/components/admin/MiPerfil
+./src/features/workshop/components/admin/MiPerfil/index.ts
+./src/features/workshop/components/admin/MiPerfil/MiPerfil.tsx
+./src/features/workshop/components/admin/PerfilTaller
+./src/features/workshop/components/admin/PerfilTaller/index.ts
+./src/features/workshop/components/admin/PerfilTaller/PerfilTaller.tsx
+./src/features/workshop/components/admin/tabs
+./src/features/workshop/components/admin/tabs/AppointmentBlock.tsx
+./src/features/workshop/components/admin/tabs/AppointmentsTab.tsx
+./src/features/workshop/components/admin/tabs/AvisosTab
+./src/features/workshop/components/admin/tabs/AvisosTab/index.ts
+./src/features/workshop/components/admin/tabs/AvisosTab/AvisosTab.tsx
+./src/features/workshop/components/admin/tabs/AvisosTab/AvisoMetricCard.tsx
+./src/features/workshop/components/admin/tabs/CompletedJobsTab.tsx
+./src/features/workshop/components/admin/tabs/OverviewTab
+./src/features/workshop/components/admin/tabs/OverviewTab/index.ts
+./src/features/workshop/components/admin/tabs/OverviewTab/OverviewTab.tsx
+./src/features/workshop/components/admin/tabs/OverviewTab/WelcomeHeader.tsx
+./src/features/workshop/components/admin/tabs/OverviewTab/WorkshopProfileCard.tsx
+./src/features/workshop/components/admin/tabs/OverviewTab/WorkingDaysSelector.tsx
+./src/features/workshop/components/admin/tabs/PartsTab.tsx
+./src/features/workshop/components/admin/tabs/PlanningTimeline.tsx
+./src/features/workshop/components/admin/tabs/ReportsTab.tsx
+./src/features/workshop/components/admin/tabs/TasksTab.tsx
+./src/features/workshop/components/admin/tabs/TeamTab
+./src/features/workshop/components/admin/tabs/TeamTab/index.ts
+./src/features/workshop/components/admin/tabs/TeamTab/TeamTab.tsx
+./src/features/workshop/components/admin/tabs/UnassignedColumn.tsx
+./src/features/workshop/components/GenerateInvoiceModal
+./src/features/workshop/components/GenerateInvoiceModal/index.tsx
+./src/features/workshop/components/MechanicLiveTask
+./src/features/workshop/components/MechanicLiveTask/index.ts
+./src/features/workshop/components/MechanicLiveTask/MechanicLiveTask.tsx
+./src/features/workshop/components/MechanicTaskModal
+./src/features/workshop/components/MechanicTaskModal/index.tsx
+./src/features/workshop/components/TaskChecklistModal
+./src/features/workshop/components/TaskChecklistModal/index.tsx
+./src/features/workshop/components/WorkshopCreationModal.tsx
+./src/features/workshop/components/WorkshopManagementTab.tsx
+./src/features/workshop/components/WorkshopReportsTab.tsx
+./src/features/workshop/hooks
+./src/features/workshop/hooks/useOwnerDashboard.ts
+./src/features/workshop/hooks/useWorkerDashboard.ts
+./src/features/workshop/hooks/useWorkshopAdmin.ts
+./src/index.css
+./src/main.tsx
+./src/pages
+./src/pages/ClientDashboard.tsx
+./src/pages/Home.tsx
+./src/pages/Login.tsx
+./src/pages/OwnerDashboard.tsx
+./src/pages/Registration.tsx
+./src/pages/WorkerDashboard.tsx
+./src/pages/WorkshopAdminDashboard.tsx
+./src/services
+./src/types
+./src/types/client.ts
+./src/utils
+./src/utils/InvoicePdfPrinter.ts
+./src/views
+./tsconfig.app.json
+./tsconfig.json
+./tsconfig.node.json
+./vite.config.ts
+
+
+================================================================================
+SECTION 2: MASTER REFACTORING & MODULARIZATION PLAN (THE "PITSTOP PLAN")
+================================================================================
+
+Este plan establece las directrices de arquitectura de software que gobernarán de forma estricta toda futura tarea de componetización, modularización y reusabilidad del código en PitStop. Siempre que el usuario solicite componetizar o estructurar un módulo, nos ceñiremos rigurosamente a este plan de diseño.
+
+--------------------------------------------------------------------------------
+1. DIRECTRICES DE CALIDAD DE CÓDIGO (CLEAN ARCHITECTURE & OWASP COHERENCE)
+--------------------------------------------------------------------------------
+- Modularización Extrema (SRP): Si una función tiene más de 20 líneas o realiza más de una operación lógica, debe fragmentarse. Si un componente React maneja múltiples estados ajenos, debe delegar a subcomponentes o hooks.
+- Desacoplamiento de Estado: Las vistas (`views/` y `pages/`) solo coordinan. La lógica compleja de peticiones API y validaciones debe residir exclusivamente en custom hooks (`src/features/[feature]/hooks/`) y servicios (`src/services/`).
+- Tipado Estricto (TypeScript-First): Prohibido usar `any` en nuevos componentes. Cada componente debe declarar sus `interface Props` específicas y tipar rigurosamente sus retornos.
+
+--------------------------------------------------------------------------------
+2. ESTRATEGIA DE REUTILIZACIÓN DE COMPONENTES DE UI (src/components/common/)
+--------------------------------------------------------------------------------
+Todo componente visual puramente estético y transversal debe centralizarse en `src/components/common/`. Se prohíbe crear copias locales de elementos visuales.
+
+- CREACIÓN PROACTIVA DE NUEVOS COMPONENTES COMUNES:
+  No nos limitamos a usar únicamente los componentes que ya existen. Cada vez que detectemos patrones de botones interactivos, tarjetas de visualización (tarjetas de operarios, tarjetas de checklists), selectores, chips de estado (Status Badges) u otros elementos de diseño que se utilicen en más de un lugar de la aplicación, es OBLIGATORIO componetizarlos activamente creando nuevos archivos reutilizables bajo `src/components/common/` (ej: `ActionButton.tsx`, `Badge.tsx`, `StatusChip.tsx`) para generalizar su reusabilidad global y unificar la estética de la app.
+
+
+A) Sistema de Botones y Botones de Retorno (Buttons):
+   - Reutilización de `BackButton`: En cualquier sección de auditorías, detalles del taller, fichas de vehículos o citas, se debe importar `@/components/common/Button/BackButton` en lugar de programar botones de retorno HTML inline.
+
+
+B) Tarjetas Métricas e Indicadores (Cards):
+   - Reutilización de `MetricCard`: Toda métrica numérica, importes económicos, contadores de citas o porcentajes mostrados en tableros analíticos del cliente, dueño o administrador debe renderizarse con `@/components/common/MetricCard` asegurando el borde de acento en rojo de taller y comportamiento hover.
+   - Reutilización del Sistema de Tarjetas Comunes (`src/components/common/Card/`):
+     - `AppointmentCard` y `VehicleCard` deben usarse de forma unificada tanto para mecánicos, administradores, gestores y vistas de clientes. Cualquier cambio visual se realiza en este único punto.
+
+C) Barras de Progreso e Histogramas (Progress Bars):
+   - Reutilización de `ProgressBar`: Cualquier barra de estado de reparación, porcentaje de ingresos de mano de obra vs. repuestos, o comparativa de rendimiento entre centros debe usar `@/components/common/ProgressBar` con el color corporativo `bg-red-600` inyectado por defecto.
+
+D) Modales y Ventanas Emergentes (Modals):
+   - Reutilización de `BaseModal`: En lugar de estructurar contenedores grises absolutos repetitivos, todos los diálogos interactivos (creación de taller, checklists, asignación de mecánicos, confirmación de tareas) deben envolverse con el componente genérico `@/components/common/BaseModal`.
+
+E) Componentes de Selección Interactiva:
+   - Reutilización de `MonthSelector`: El selector mensual reactivo debe centralizarse en todo tab de analíticas.
+   - Reutilización de `SearchableSelect`: Utilizar este buscador tipado y filtrado para cualquier selección dinámica de marca, cliente, operario o vehículo.
+
+--------------------------------------------------------------------------------
+3. ESTRATEGIA DE REUTILIZACIÓN DE FUNCIONES Y UTILIDADES (src/utils/)
+--------------------------------------------------------------------------------
+- Delegación de Procesamientos de Presentación Compleja:
+  - Cualquier procesamiento estático de PDF e impresiones del sistema debe delegarse a la utilidad unificada `@/utils/InvoicePdfPrinter` en lugar de inyectar maquetaciones HTML ocultas en los componentes.
+  - Las funciones puras como formateadores de moneda (`value.toFixed(2)}€`), parseadores de JSON (`partsJson`) y formateadores de fecha en formato militar (`dateTime`) deben migrarse a un archivo de utilidades transversales `src/utils/formatters.ts` para evitar la redundancia sintáctica en los renderizadores de React.
+
+--------------------------------------------------------------------------------
+4. SECUENCIA PASO A PASO PARA FUTURAS MODULARIZACIONES
+--------------------------------------------------------------------------------
+Cada vez que el usuario solicite estructurar o componetizar un componente monolítico (por ejemplo, `ReportsTab.tsx`, `TeamTab.tsx`, `PlanningTimeline.tsx`), se ejecutará la siguiente secuencia técnica:
+
+- PASO A: Análisis de Dependencias e Imports. Analizar los componentes importados localmente y contrastarlos con el mapa de alias `@/`.
+- PASO B: Identificación de Bloques Reutilizables. Extraer fragmentos repetidos de JSX (por ejemplo, filas de tablas, celdas interactivas, grids de KPIs) a subcomponentes internos de responsabilidad única.
+- PASO C: Extracción de Lógica a Custom Hooks. Mover llamadas `fetch`, `useMemo` analíticos complejos y manejadores de estado local (`useState`) a un hook correspondiente en `src/features/[feature]/hooks/`.
+- PASO D: Envoltura de Maquetación Común. Envolver las secciones reutilizando `BaseModal`, `MetricCard`, `ProgressBar`, `BackButton` e `InputGroup` de la carpeta `common/`.
+- PASO E: Validación de Compilación Rigurosa. Ejecutar compilación nativa asegurando 0 errores de tipado.

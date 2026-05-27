@@ -1,15 +1,15 @@
 import { Routes, Route } from 'react-router-dom';
-import './index.css';
+import '@/index.css';
 
 // Componentes
-import Home from './pages/Home';
-import Login from './pages/Login';
-import Registration from './pages/Registration';
+import Home from '@/pages/Home';
+import Login from '@/pages/Login';
+import Registration from '@/pages/Registration';
 
-import ClientDashboard from './pages/ClientDashboard'; 
-import OwnerDashboard from './pages/OwnerDashboard';
-import WorkshopAdminDashboard from './pages/WorkshopAdminDashboard';
-import WorkerDashboard from './pages/WorkerDashboard';
+import ClientDashboard from '@/pages/ClientDashboard'; 
+import OwnerDashboard from '@/pages/OwnerDashboard';
+import WorkshopAdminDashboard from '@/pages/WorkshopAdminDashboard';
+import WorkerDashboard from '@/pages/WorkerDashboard';
 
 function App() {
   return (

@@ -19,8 +19,8 @@ export const StreetInputField: React.FC<StreetInputFieldProps> = ({
       onChange={(e) => onChange(e.target.value)}
       onFocus={onFocus}
       placeholder={placeholder}
-      className={`w-full bg-neutral-900/50 backdrop-blur-sm rounded-xl p-4 text-white font-medium outline-none transition-all placeholder-neutral-600 border ${
-        error ? 'border-red-500 focus:border-red-500' : 'border-neutral-800 hover:border-neutral-700 focus:border-white focus:bg-black/80'
+      className={`w-full bg-neutral-950 rounded-xl px-4 py-3 text-white text-xs font-semibold outline-none transition-all placeholder-neutral-600 border ${
+        error ? 'border-red-500/50 focus:border-red-500/50' : 'border-neutral-800 focus:border-red-500/50 focus:bg-black/40'
       }`}
     />
     {isLoading && (

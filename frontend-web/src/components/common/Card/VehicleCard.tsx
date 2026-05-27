@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card } from './Card';
-import { BRAND_LOGOS, getBrandLogo } from '../SearchableSelect/BrandLogos';
+import { Card } from '@/components/common/Card/Card';
+import { BRAND_LOGOS, getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
 
 interface VehicleCardProps {
   brand: string;

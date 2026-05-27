@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useAddressSuggestions } from './useAddressSuggestions';
+import { useAddressSuggestions } from '@/components/common/AddressAutocomplete/useAddressSuggestions';
 
 export function useAddressController(initialValue: string, onParentChange: (val: string) => void) {
   const { suggestions, setSuggestions, isLoading, fetchSuggestions } = useAddressSuggestions();

@@ -1,28 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { GenerateInvoiceModal } from '../components/features/workshop/GenerateInvoiceModal/index';
-import { DashboardHeader } from '../components/layout/DashboardHeader/index';
-import { BottomNav } from '../components/layout/BottomNav/index';
-import { StaffAppointmentModal } from '../components/features/workshop/StaffAppointmentModal/index';
-import { useWorkshopAdmin } from '../hooks/useWorkshopAdmin';
-import { OverviewTab } from '../components/features/workshop/admin/tabs/OverviewTab';
-import { AppointmentsTab } from '../components/features/workshop/admin/tabs/AppointmentsTab';
-import { TeamTab } from '../components/features/workshop/admin/tabs/TeamTab';
-import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
-import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
-import { PartsTab } from '../components/features/workshop/admin/tabs/PartsTab';
-import { ReportsTab } from '../components/features/workshop/admin/tabs/ReportsTab';
-import { ImagePreviewModal } from '../components/common/ImagePreviewModal/index';
-import { AvisosTab } from '../components/features/workshop/admin/tabs/AvisosTab';
-import { DateNavigator } from '../components/common/DateNavigator/index';
-import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
-import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
-import { ConfirmedAppointmentsList } from '../components/features/workshop/admin/components/ConfirmedAppointmentsList';
-import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
-import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
-import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
-import { PerfilTaller } from '../components/features/workshop/admin/components/PerfilTaller';
-import { MiPerfil } from '../components/features/workshop/admin/components/MiPerfil';
+import { GenerateInvoiceModal } from '@/features/workshop/components/modals/GenerateInvoiceModal/index';
+import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
+import { BottomNav } from '@/components/layout/BottomNav/index';
+import { StaffAppointmentModal } from '@/features/appointments/components/StaffAppointmentModal/index';
+import { useWorkshopAdmin } from '@/features/workshop/hooks/useWorkshopAdmin';
+import { OverviewTab } from '@/features/workshop/components/admin/tabs/OverviewTab/OverviewTab';
+import { AppointmentsTab } from '@/features/workshop/components/admin/tabs/AppointmentsTab';
+import { TeamTab } from '@/features/workshop/components/admin/tabs/TeamTab/TeamTab';
+import { CompletedJobsTab } from '@/features/workshop/components/admin/tabs/CompletedJobsTab';
+import { TasksTab } from '@/features/workshop/components/admin/tabs/TasksTab';
+import { PartsTab } from '@/features/workshop/components/admin/tabs/PartsTab';
+import { ReportsTab } from '@/features/workshop/components/admin/tabs/ReportsTab';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { AvisosTab } from '@/features/workshop/components/admin/tabs/AvisosTab/AvisosTab';
+import { DateNavigator } from '@/components/common/DateNavigator/index';
+import { AppointmentSearch } from '@/features/workshop/components/admin/AppointmentSearch/index';
+import { MechanicSearch } from '@/features/workshop/components/admin/MechanicSearch/index';
+import { CitasTab } from '@/features/workshop/components/admin/tabs/CitasTab';
+import { PlanningTimeline } from '@/features/workshop/components/admin/tabs/AppointmentsTab/PlanningTimeline';
+import { Card } from '@/components/common/Card';
+import { Button } from '@/components/common/Button';
+import { TaskChecklistModal } from '@/features/workshop/components/modals/TaskChecklistModal/index';
+import { MechanicTaskModal } from '@/features/workshop/components/modals/MechanicTaskModal/index';
+import { PerfilTaller } from '@/features/workshop/components/admin/PerfilTaller/PerfilTaller';
+import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil';
 
 const diasSemana = [
   { value: 'LUNES', label: 'Lunes' },
@@ -110,7 +112,7 @@ export default function WorkshopAdminDashboard() {
   );
 
   const isOwner = userRole === 'WORKSHOP_OWNER';
-  const SECCIONES = ['RESUMEN', 'AVISOS', 'CITAS', 'PLANIFICACIÓN', 'FINALIZADOS', 'AGENDA', 'TAREAS', 'ALMACÉN', 'FACTURAS', 'EQUIPO'];
+  const SECCIONES = ['RESUMEN', 'AVISOS', 'CITAS', 'PLANIFICACIÓN', 'FINALIZADOS', 'AGENDA', 'TAREAS', 'ALMACÉN', 'INFORMES', 'EQUIPO'];
 
   const isSameDate = (isoString: string) => {
       const appDate = new Date(isoString);
@@ -184,26 +186,32 @@ export default function WorkshopAdminDashboard() {
                   </div>
 
                   <div className="flex items-center gap-4">
-                    <button 
+                    <Button 
+                      variant="secondary"
                       onClick={() => setIsAppModalOpen(true)}
-                      className="px-6 h-[54px] bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                      className="!px-6 !py-4"
                     >
                       <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/></svg>
                       Nueva Cita
-                    </button>
+                    </Button>
                   </div>
                </div>
 
             </header>
 
-            <div className="relative z-0">
+            {/* Panel Tabs Wrapper */}
+            <div className="max-w-[1400px] mx-auto pb-24 px-4 md:px-8 space-y-12">
+              
+              {/* TAB 1: RESUMEN */}
               {activeTab === 0 && (
-                <OverviewTab 
-                  workshopData={workshopData} 
-                  diasSemana={diasSemana} 
-                  employeeProfile={employeeProfile}
-                  userRole={userRole || undefined}
-                />
+                <div className="animate-fade-in-up">
+                  <OverviewTab 
+                    workshopData={workshopData} 
+                    diasSemana={diasSemana} 
+                    employeeProfile={employeeProfile}
+                    userRole={userRole || undefined}
+                  />
+                </div>
               )}
               
               {/* TAB 1: AVISOS */}
@@ -218,70 +226,26 @@ export default function WorkshopAdminDashboard() {
 
               {/* TAB 2: CITAS (Pendientes y Confirmadas) */}
               {activeTab === 2 && (
-                <div className="space-y-12 animate-fade-in-up">
-                  <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-[2rem] p-8">
-                    {/* Toolbar: Pendientes + Calendario */}
-                    <div className="flex flex-wrap items-center gap-4 mb-8">
-                      <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
-                      <button
-                        onClick={goToNextPendingDate}
-                        className="px-5 h-[46px] bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 border border-yellow-600/20 hover:border-yellow-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn"
-                      >
-                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
-                        Pendientes
-                      </button>
-                      <div className="ml-auto">
-                        <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="red" />
-                      </div>
-                    </div>
-
-                    <h3 className="text-white font-black uppercase tracking-widest text-sm mb-6 flex items-center gap-3">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                      Pendientes de Confirmar
-                      <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">{pendingAppointments.length}</span>
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {pendingAppointments.length > 0 ? pendingAppointments.map((app: any) => (
-                        <div key={app.id} className="bg-black/40 p-5 rounded-2xl border border-neutral-800 flex flex-col justify-between">
-                          <div>
-                            <div className="text-[10px] font-black uppercase text-yellow-500 tracking-widest mb-1">{app.serviceType}</div>
-                            <div className="text-lg font-black text-white">{app.vehicleDisplay}</div>
-                            <div className="text-neutral-400 text-xs font-mono mb-4">{new Date(app.dateTime).toLocaleDateString([], { day: '2-digit', month: '2-digit' })} {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h</div>
-                          </div>
-                          <button 
-                            onClick={() => updateAppointmentStatus(app.id, 'CONFIRMED')}
-                            className="w-full py-2.5 bg-white text-black hover:bg-neutral-200 rounded-xl font-black uppercase tracking-widest text-[10px] transition-colors"
-                          >
-                            Confirmar Cita
-                          </button>
-                        </div>
-                      )) : (
-                        <div className="col-span-full py-8 text-center text-neutral-500 text-xs uppercase tracking-widest font-bold">
-                          Todo al día. No hay citas por confirmar.
-                        </div>
-                      )}
-                    </div>
-                    
-                    {pendingAppointments.length > 0 && (
-                      <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-6 text-center">
-                        Las citas confirmadas se moverán a la pestaña "Planificación" para ser asignadas.
-                      </p>
-                    )}
-                    
-                    <ConfirmedAppointmentsList 
-                      appointments={appointments} 
-                      onDeleteAppointment={handleDeleteAppointment} 
-                      onCheckInAppointment={checkInVehicle}
-                    />
-
-                  </div>
-                </div>
+                <CitasTab
+                  appointments={appointments}
+                  pendingAppointments={pendingAppointments}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  goToNextPendingDate={goToNextPendingDate}
+                  updateAppointmentStatus={updateAppointmentStatus}
+                  handleDeleteAppointment={handleDeleteAppointment}
+                  checkInVehicle={checkInVehicle}
+                />
               )}
 
               {/* TAB 3: PLANIFICACIÓN */}
               {activeTab === 3 && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden">
+                <Card
+                  variant="neutral"
+                  rounded="2xl"
+                  padding="none"
+                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                >
                   {/* Toolbar dentro del contenedor */}
                   <div className="flex flex-wrap items-center gap-4 p-5 border-b border-neutral-800/60">
                     <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
@@ -294,13 +258,14 @@ export default function WorkshopAdminDashboard() {
                       })}
                       onSelectMechanic={() => {}}
                     />
-                    <button
+                    <Button
+                      variant="secondary"
                       onClick={goToNextUnassignedDate}
-                      className="px-5 h-[46px] bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 border border-blue-600/20 hover:border-blue-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn"
+                      className="!px-5 !py-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 border border-blue-600/20 hover:border-blue-500/40 group/btn"
                     >
                       <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                       Sin Asignar
-                    </button>
+                    </Button>
                     <div className="ml-auto">
                       <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="red" />
                     </div>
@@ -321,23 +286,33 @@ export default function WorkshopAdminDashboard() {
                       includeOwnerInPlanning={workshopData?.includeOwnerInPlanning}
                     />
                   </div>
-                </div>
+                </Card>
               )}
 
               {/* TAB 4: TRABAJOS */}
               {activeTab === 4 && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                <Card
+                  variant="neutral"
+                  rounded="2xl"
+                  padding="lg"
+                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                >
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
                     onCompleteJob={(job) => setInvoicingJob(job)}
                     onMarkPickedUp={markPickedUp}
                   />
-                </div>
+                </Card>
               )}
 
               {/* TAB 5: AGENDA (Timeline Individual de cualquier empleado) */}
               {activeTab === 5 && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
+                <Card
+                  variant="neutral"
+                  rounded="2xl"
+                  padding="none"
+                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden animate-fade-in-up"
+                >
                   <div className="flex flex-col md:flex-row md:items-center justify-between p-5 border-b border-neutral-800/60 gap-4">
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
@@ -395,28 +370,43 @@ export default function WorkshopAdminDashboard() {
                       readOnly
                     />
                   </div>
-                </div>
+                </Card>
               )}
 
               {/* TAB 6: TAREAS */}
               {activeTab === 6 && id && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                <Card
+                  variant="neutral"
+                  rounded="2xl"
+                  padding="lg"
+                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                >
                   <TasksTab workshopId={id} />
-                </div>
+                </Card>
               )}
 
               {/* TAB 7: ALMACÉN */}
               {activeTab === 7 && id && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                <Card
+                  variant="neutral"
+                  rounded="2xl"
+                  padding="lg"
+                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                >
                   <PartsTab workshopId={id} />
-                </div>
+                </Card>
               )}
 
               {/* TAB 8: INFORMES */}
               {activeTab === 8 && id && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6">
+                <Card
+                  variant="neutral"
+                  rounded="2xl"
+                  padding="lg"
+                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                >
                   <ReportsTab workshopId={id} />
-                </div>
+                </Card>
               )}
 
               {/* TAB 9: EQUIPO */}

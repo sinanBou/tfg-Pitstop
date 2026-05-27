@@ -73,4 +73,43 @@ En esta refactorización integral del sistema de repuestos y control de almacén
   - `MiPerfil` internaliza su propio estado local (`uploadingAvatar`, `profileSaved`, `fileInputRef`) reduciendo la complejidad del componente padre.
 - Propósito: Aplica el principio de responsabilidad única (SRP) extrayendo la lógica de UI modal a componentes reutilizables, y utiliza portales de React para evitar conflictos de stacking context en modales con scroll.
 
+11. COMPOSITE COMPONENT & CONSOLIDATED MONTHLY STATISTICS STRATEGY (Estructura & Comportamiento)
+-----------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se extrajo el diseño gráfico monolítico y recargado a componentes atómicos y reutilizables en `src/components/common/`:
+    - `MonthSelector`: Componente dropdown genérico para la filtración selectiva de meses (Enero a Diciembre o acumulado total).
+    - `SoberMetricCard`: Tarjeta KPI minimalista y de alto contraste libre de sombras de colores y glows sobrecargados.
+    - `SoberProgressBar`: Representador horizontal limpio de contribuciones relativas.
+    - `PartsStatsWidget`: Módulo unificado para auditar repuestos mostrando el coste real de adquisición y el precio de venta minorista (retail) obtenido.
+  - La lógica de cómputo reactivo de facturación y amortización se encapsuló en estrategias con `useMemo` en todos los dashboards (Cliente, Gerente y Propietario).
+- Propósito: Sigue el principio de modularización extrema exigido. Elimina la duplicación de código en la visualización de KPIs financieros, homogeneiza la estética seria/corporativa del ecosistema y permite que todos los componentes analíticos reaccionen al mes seleccionado de forma independiente y aislada.
+
+12. DELEGATION & UTILITY SEPARATION PATTERN - INVOICE PDF PRINTER (Estructura)
+-----------------------------------------------------------------------------
+- Cómo se creó:
+  - Se creó el módulo de utilidad centralizado `InvoicePdfPrinter.ts` en `src/utils/` encapsulando la lógica completa de generación HTML/CSS y flujo de impresión nativa.
+  - Se refactorizaron tanto `ClientReportsTab.tsx` como `ReportsTab.tsx` para delegar sus llamadas de impresión a esta utilidad común, eliminando más de 500 líneas redundantes de plantillas HTML estáticas de los archivos de vista de React.
+  - Se dividió `ClientReportsTab.tsx` en subcomponentes atómicos (`ClientKpisGrid`, `VehicleSpendAnalysis`, `RecentInvoicesList`) de responsabilidad única con menos de 30 líneas cada uno.
+- Propósito: Asegura la modularización extrema y la regla de mantener componentes por debajo del límite de líneas y con una única responsabilidad (Single Responsibility Principle), simplificando el mantenimiento de las plantillas y el código TypeScript.
+
+13. COMPONENTIZATION OF INTERACTIVE NAVIGATION ELEMENTS - SOBER BACK BUTTON (Estructura)
+----------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se extrajo el botón de retorno inline de la auditoría de taller a un componente autónomo y altamente reutilizable: `SoberBackButton.tsx` en `src/components/common/`.
+  - El botón recibe una prop `onClick` y de forma opcional un texto explicativo `title`.
+  - Estilísticamente, implementa un diseño industrial con grises neutros de alto contraste y un sutil punto rojo mecánico (`bg-red-600`) de enfoque deportivo en la esquina superior derecha que se activa suavemente al hacer hover, integrándose orgánicamente en el nuevo estilo Serious/Sober de la marca.
+- Propósito: Desacopla la lógica y el maquetado de los elementos de navegación secundaria de los componentes de página monolíticos, facilitando su reutilización en otros módulos analíticos y garantizando la coherencia estética del ecosistema de PitStop.
+
+14. GATEKEEPER PATTERN - VEHICLE RECEPTION GUARD (Comportamiento / Seguridad)
+------------------------------------------------------------------------------
+- Cómo se creó:
+  - Backend: Se añadió el campo `vehicleReceived` al DTO `WorkshopTaskDTO` y se mapeó en `WorkshopTaskService.convertToDTO()` leyendo el estado de la cita origen (`originAppointment.getVehicleReceived()`). Las citas (`AppointmentDTO`) ya exponían este campo.
+  - Frontend: Se implementó una cláusula guard `isVehicleReceived = appointment.vehicleReceived !== false` en los componentes `AppointmentBlock.tsx` y `MechanicLiveTask.tsx`.
+  - Cuando `vehicleReceived === false`:
+    - Los botones de "Gestionar" y "Checklist" se deshabilitan visualmente con estilo amber y muestran un icono de candado.
+    - Los botones de transición de estado (Confirmar, Iniciar Trabajo, Finalizar) se bloquean con texto "Recepción Pendiente".
+    - Se muestra un banner informativo "Pendiente de Recepción" en el componente `MechanicLiveTask`.
+- Propósito: Fuerza el cumplimiento del procedimiento operativo estándar del taller: ningún trabajo puede iniciarse ni gestionarse hasta que el vehículo haya sido físicamente recibido e inspeccionado. Protege contra errores humanos de planificación y garantiza la integridad del flujo administrativo.
+
+
 

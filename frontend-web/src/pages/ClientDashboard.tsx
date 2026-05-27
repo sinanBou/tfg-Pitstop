@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { useClientDashboard } from '../hooks/useClientDashboard';
-import { VehicleModal } from '../components/features/client/vehicle/VehicleModal';
-import { AppointmentModal } from '../components/features/client/appointments/AppointmentModal';
-import { DashboardHeader } from '../components/layout/DashboardHeader/index';
-import { BottomNav } from '../components/layout/BottomNav/index';
-import { LoadingScreen } from '../components/common/LoadingScreen/index';
-import { ClientOverviewTab } from '../components/features/client/ClientOverviewTab';
-import { ClientVehiclesTab } from '../components/features/client/ClientVehiclesTab';
-import { ClientAppointmentsTab } from '../components/features/client/ClientAppointmentsTab';
-import { ClientHistoryTab } from '../components/features/client/ClientHistoryTab';
+import { useClientDashboard } from '@/features/client/hooks/useClientDashboard';
+import { VehicleModal } from '@/features/vehicles/components/VehicleModal';
+import { AppointmentModal } from '@/features/appointments/components/AppointmentModal';
+import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
+import { BottomNav } from '@/components/layout/BottomNav/index';
+import { LoadingScreen } from '@/components/common/LoadingScreen/index';
+import { ClientOverviewTab } from '@/features/client/components/ClientOverviewTab';
+import { ClientVehiclesTab } from '@/features/client/components/ClientVehiclesTab';
+import { ClientAppointmentsTab } from '@/features/client/components/ClientAppointmentsTab';
+import { ClientHistoryTab } from '@/features/client/components/ClientHistoryTab';
+import { ClientReportsTab } from '@/features/client/components/ClientReportsTab';
 
-const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL'];
+const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL', 'INFORMES'];
 
 export default function ClientDashboard() {
   const { loading, userProfile, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots, getCatalogMakes, getCatalogModels, deleteAppointment, deleteVehicle, refresh } = useClientDashboard();
@@ -55,6 +56,7 @@ export default function ClientDashboard() {
             {activeTab === 1 && <ClientVehiclesTab vehicles={vehicles} onAddVehicle={() => setIsModalOpen(true)} onDeleteVehicle={deleteVehicle} />}
             {activeTab === 2 && <ClientAppointmentsTab appointments={appointments} onAddAppointment={() => setIsAppModalOpen(true)} deleteAppointment={deleteAppointment} />}
             {activeTab === 3 && <ClientHistoryTab history={history} appointments={appointments} />}
+            {activeTab === 4 && <ClientReportsTab history={history} vehicles={vehicles} appointments={appointments} />}
          </div>
       </main>
 

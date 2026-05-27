@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
-import { HeroSection } from "../components/features/home/HeroSection";
-import { FeaturesSection } from "../components/features/home/FeaturesSection";
-import { Footer } from "../components/features/home/FooterSection";
+import { HeroSection } from "@/features/home/components/HeroSection";
+import { FeaturesSection } from "@/features/home/components/FeaturesSection";
+import { Footer } from "@/features/home/components/FooterSection";
 
 export default function Home() {
   return (

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { getBrandLogo } from './BrandLogos';
+import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
 
 interface SearchableSelectProps {
   label: string;

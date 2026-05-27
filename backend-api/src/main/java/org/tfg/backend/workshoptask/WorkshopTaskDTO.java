@@ -33,6 +33,7 @@ public class WorkshopTaskDTO {
     private String clientFullName;
     
     private UUID originAppointmentId;
+    private Boolean vehicleReceived;
 
     private String completedTasks;
 

@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { useOwnerDashboard } from '../hooks/useOwnerDashboard';
-import { DashboardHeader } from '../components/layout/DashboardHeader/index';
-import { BottomNav } from '../components/layout/BottomNav/index';
-import { LoadingScreen } from '../components/common/LoadingScreen/index';
-import { WorkshopManagementTab } from '../components/features/workshop/WorkshopManagementTab';
-import { WorkshopReportsTab } from '../components/features/workshop/WorkshopReportsTab';
-import { WorkshopCreationModal } from '../components/features/workshop/WorkshopCreationModal';
+import { useOwnerDashboard } from '@/features/workshop/hooks/useOwnerDashboard';
+import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
+import { BottomNav } from '@/components/layout/BottomNav/index';
+import { LoadingScreen } from '@/components/common/LoadingScreen/index';
+import { WorkshopManagementTab } from '@/features/workshop/components/owner/WorkshopManagementTab';
+import { WorkshopReportsTab } from '@/features/workshop/components/owner/WorkshopReportsTab';
+import { WorkshopCreationModal } from '@/features/workshop/components/modals/WorkshopCreationModal';
 
 const SECCIONES = ['TALLERES', 'REPORTES'];
 
@@ -39,7 +39,7 @@ export default function OwnerDashboard() {
             </header>
 
             {activeTab === 0 && <WorkshopManagementTab workshops={workshops} onAddWorkshop={() => setIsModalOpen(true)} />}
-            {activeTab === 1 && <WorkshopReportsTab />}
+            {activeTab === 1 && <WorkshopReportsTab workshops={workshops} />}
          </div>
       </main>
 

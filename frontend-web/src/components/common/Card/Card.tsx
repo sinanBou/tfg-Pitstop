@@ -8,6 +8,7 @@ interface CardProps {
   border?: boolean;
   padding?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
   onClick?: () => void;
+  rounded?: '2xl' | '3xl' | 'default';
 }
 
 /**
@@ -20,7 +21,8 @@ export const Card: React.FC<CardProps> = ({
   glow = false,
   border = true,
   padding = 'md',
-  onClick
+  onClick,
+  rounded = 'default'
 }) => {
   const variantStyles = {
     red: 'border-red-900/30 group-hover:border-red-500/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]',
@@ -42,11 +44,18 @@ export const Card: React.FC<CardProps> = ({
     xl: 'p-10 md:p-14'
   };
 
+  const roundedStyles = {
+    '2xl': 'rounded-2xl',
+    '3xl': 'rounded-3xl',
+    'default': 'rounded-[2.5rem]'
+  };
+
   return (
     <div 
       onClick={onClick}
       className={`
-        relative group rounded-[2.5rem] bg-neutral-900/40 backdrop-blur-xl transition-all duration-500 overflow-hidden
+        relative group bg-neutral-900/80 backdrop-blur-2xl transition-all duration-500 overflow-hidden
+        ${roundedStyles[rounded]}
         ${border ? `border ${variantStyles[variant]}` : ''}
         ${paddingStyles[padding]}
         ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}

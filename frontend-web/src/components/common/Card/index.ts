@@ -1,3 +1,3 @@
-export * from './Card';
-export * from './AppointmentCard';
-export * from './VehicleCard';
+export * from '@/components/common/Card/Card';
+export * from '@/components/common/Card/AppointmentCard';
+export * from '@/components/common/Card/VehicleCard';

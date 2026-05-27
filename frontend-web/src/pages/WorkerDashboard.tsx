@@ -1,26 +1,26 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DashboardHeader } from '../components/layout/DashboardHeader/index';
-import { BottomNav } from '../components/layout/BottomNav/index';
-import { LoadingScreen } from '../components/common/LoadingScreen/index';
-import { StaffAppointmentModal } from '../components/features/workshop/StaffAppointmentModal/index';
-import { DateNavigator } from '../components/common/DateNavigator/index';
-import { useWorkerDashboard } from '../hooks/useWorkerDashboard';
-import { PlanningTimeline } from '../components/features/workshop/admin/tabs/PlanningTimeline';
-import { MechanicTaskModal } from '../components/features/workshop/MechanicTaskModal/index';
-import { TaskChecklistModal } from '../components/features/workshop/TaskChecklistModal/index';
-import { PartsTab } from '../components/features/workshop/admin/tabs/PartsTab';
-import { TasksTab } from '../components/features/workshop/admin/tabs/TasksTab';
-import { AvisosTab } from '../components/features/workshop/admin/tabs/AvisosTab';
-import { AppointmentsTab } from '../components/features/workshop/admin/tabs/AppointmentsTab';
-import { CompletedJobsTab } from '../components/features/workshop/admin/tabs/CompletedJobsTab';
-import { ConfirmedAppointmentsList } from '../components/features/workshop/admin/components/ConfirmedAppointmentsList';
-import { AppointmentSearch } from '../components/features/workshop/admin/components/AppointmentSearch/index';
-import { MechanicSearch } from '../components/features/workshop/admin/components/MechanicSearch/index';
-import { GenerateInvoiceModal } from '../components/features/workshop/GenerateInvoiceModal/index';
-import { OverviewTab } from '../components/features/workshop/admin/tabs/OverviewTab';
-import { ImagePreviewModal } from '../components/common/ImagePreviewModal/index';
-import { MiPerfil } from '../components/features/workshop/admin/components/MiPerfil';
+import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
+import { BottomNav } from '@/components/layout/BottomNav/index';
+import { LoadingScreen } from '@/components/common/LoadingScreen/index';
+import { StaffAppointmentModal } from '@/features/appointments/components/StaffAppointmentModal/index';
+import { DateNavigator } from '@/components/common/DateNavigator/index';
+import { useWorkerDashboard } from '@/features/workshop/hooks/useWorkerDashboard';
+import { PlanningTimeline } from '@/features/workshop/components/admin/tabs/AppointmentsTab/PlanningTimeline';
+import { MechanicTaskModal } from '@/features/workshop/components/modals/MechanicTaskModal/index';
+import { TaskChecklistModal } from '@/features/workshop/components/modals/TaskChecklistModal/index';
+import { PartsTab } from '@/features/workshop/components/admin/tabs/PartsTab';
+import { TasksTab } from '@/features/workshop/components/admin/tabs/TasksTab';
+import { AvisosTab } from '@/features/workshop/components/admin/tabs/AvisosTab/AvisosTab';
+import { AppointmentsTab } from '@/features/workshop/components/admin/tabs/AppointmentsTab';
+import { CompletedJobsTab } from '@/features/workshop/components/admin/tabs/CompletedJobsTab';
+import { CitasTab } from '@/features/workshop/components/admin/tabs/CitasTab';
+import { AppointmentSearch } from '@/features/workshop/components/admin/AppointmentSearch/index';
+import { MechanicSearch } from '@/features/workshop/components/admin/MechanicSearch/index';
+import { GenerateInvoiceModal } from '@/features/workshop/components/modals/GenerateInvoiceModal/index';
+import { OverviewTab } from '@/features/workshop/components/admin/tabs/OverviewTab/OverviewTab';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil';
 
 const diasSemana = [
   { value: 'LUNES', label: 'Lunes' },
@@ -281,65 +281,16 @@ export default function WorkerDashboard() {
 
               {/* TAB: CITAS (Habilitable opcionalmente - Como el Gerente) */}
               {SECCIONES[activeTab] === 'CITAS' && (
-                <div className="space-y-12 animate-fade-in-up">
-                  <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-[2rem] p-8">
-                    {/* Toolbar: Pendientes + Calendario */}
-                    <div className="flex flex-wrap items-center gap-4 mb-8">
-                      <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
-                      <button
-                        onClick={goToNextPendingDate}
-                        className="px-5 h-[46px] bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 border border-yellow-600/20 hover:border-yellow-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn"
-                      >
-                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" /></svg>
-                        Pendientes
-                      </button>
-                      <div className="ml-auto">
-                        <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
-                      </div>
-                    </div>
-
-                    <h3 className="text-white font-black uppercase tracking-widest text-sm mb-6 flex items-center gap-3">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-                      Pendientes de Confirmar
-                      <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">{appointments.filter(a => a.status === 'PENDING').length}</span>
-                    </h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {appointments.filter(a => a.status === 'PENDING').length > 0 ? appointments.filter(a => a.status === 'PENDING').map((app: any) => (
-                        <div key={app.id} className="bg-black/40 p-5 rounded-2xl border border-neutral-800 flex flex-col justify-between">
-                          <div>
-                            <div className="text-[10px] font-black uppercase text-yellow-500 tracking-widest mb-1">{app.serviceType}</div>
-                            <div className="text-lg font-black text-white">{app.vehicleDisplay}</div>
-                            <div className="text-neutral-400 text-xs font-mono mb-4">{new Date(app.dateTime).toLocaleDateString([], { day: '2-digit', month: '2-digit' })} {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h</div>
-                          </div>
-                          <button 
-                            onClick={() => updateAppointmentStatus(app.id, 'CONFIRMED')}
-                            className="w-full py-2.5 bg-white text-black hover:bg-neutral-200 rounded-xl font-black uppercase tracking-widest text-[10px] transition-colors"
-                          >
-                            Confirmar Cita
-                          </button>
-                        </div>
-                      )) : (
-                        <div className="col-span-full py-8 text-center text-neutral-500 text-xs uppercase tracking-widest font-bold">
-                          Todo al día. No hay citas por confirmar.
-                        </div>
-                      )}
-                    </div>
-                    
-                    {appointments.filter(a => a.status === 'PENDING').length > 0 && (
-                      <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-6 text-center">
-                        Las citas confirmadas se moverán a la pestaña "Planificación" para ser asignadas.
-                      </p>
-                    )}
-                    
-                    <ConfirmedAppointmentsList 
-                      appointments={appointments} 
-                      onDeleteAppointment={handleDeleteAppointment} 
-                      onCheckInAppointment={checkInVehicle}
-                    />
-
-                  </div>
-                </div>
+                <CitasTab
+                  appointments={appointments}
+                  pendingAppointments={appointments.filter(a => a.status === 'PENDING')}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
+                  goToNextPendingDate={goToNextPendingDate}
+                  updateAppointmentStatus={updateAppointmentStatus}
+                  handleDeleteAppointment={handleDeleteAppointment}
+                  checkInVehicle={checkInVehicle}
+                />
               )}
 
               {/* TAB: TAREAS (Habilitable opcionalmente - Como el Gerente) */}

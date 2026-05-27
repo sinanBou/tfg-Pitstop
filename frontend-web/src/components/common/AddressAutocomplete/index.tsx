@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { useAddressController } from './useAddressController';
-import { SuggestionsDropdown } from './SuggestionsDropdown';
-import { StreetInputField } from './StreetInputField';
-import { FloorInputField } from './FloorInputField';
+import { useAddressController } from '@/components/common/AddressAutocomplete/useAddressController';
+import { SuggestionsDropdown } from '@/components/common/AddressAutocomplete/SuggestionsDropdown';
+import { StreetInputField } from '@/components/common/AddressAutocomplete/StreetInputField';
+import { FloorInputField } from '@/components/common/AddressAutocomplete/FloorInputField';
 
 interface AddressAutocompleteProps {
   label: string;
@@ -35,7 +35,7 @@ export default function AddressAutocomplete({ label, value, onChange, error, pla
 
   return (
     <div className="w-full relative group z-50" ref={containerRef}>
-      <label className="block text-neutral-400 text-[10px] font-black uppercase tracking-widest mb-1.5 ml-1 group-hover:text-neutral-300">
+      <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 block mb-1.5">
         {label}
       </label>
       <div className="flex gap-3">
