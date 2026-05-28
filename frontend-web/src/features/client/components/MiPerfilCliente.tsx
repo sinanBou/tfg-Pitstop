@@ -38,6 +38,14 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
 }) => {
   const [profileSaved, setProfileSaved] = useState(false);
 
+  // Estados para cambio de contraseña
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
   if (!isOpen) return null;
 
   /** Envío del formulario de perfil */
@@ -48,9 +56,79 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
     setTimeout(() => setProfileSaved(false), 3000);
   };
 
+  /** Envío del formulario de contraseña */
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (newPassword.length < 6) {
+      setPasswordError('La nueva contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Las nuevas contraseñas no coinciden.');
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const response = await fetch('http://localhost:9091/api/users/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        })
+      });
+
+      if (response.ok) {
+        setPasswordSuccess('Contraseña cambiada correctamente.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        const text = await response.text();
+        try {
+          const json = JSON.parse(text);
+          setPasswordError(json.message || 'Error al cambiar la contraseña.');
+        } catch {
+          setPasswordError(text || 'La contraseña actual es incorrecta o no tiene permitido el cambio local.');
+        }
+      }
+    } catch {
+      setPasswordError('Error de conexión con el servidor.');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   return createPortal(
     <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-2xl relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+      <style>{`
+        /* Estilo personalizado de scrollbar premium negra */
+        .profile-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .profile-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .profile-scrollbar::-webkit-scrollbar-thumb {
+          background: #000000;
+          border-radius: 9999px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .profile-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #080808;
+        }
+      `}</style>
+      
+      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-2xl relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Glow premium azul para cliente */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
 
@@ -66,7 +144,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         </button>
 
         {/* Contenido scrolleable */}
-        <div className="p-10 overflow-y-auto flex-1">
+        <div className="p-10 overflow-y-auto flex-1 profile-scrollbar">
           <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
             <h3 className="text-3xl font-black uppercase tracking-widest text-white">
               Mi Perfil
@@ -88,7 +166,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             </div>
 
             {/* Datos Personales */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <InputField
                 label="Nombre"
                 required
@@ -106,7 +184,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             </div>
 
             {/* Datos Fijos de Sistema */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <InputField
                 label="Email (No modificable)"
                 disabled
@@ -124,7 +202,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             </div>
 
             {/* Datos Editables de Contacto */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <InputField
                 label="Teléfono de Contacto"
                 type="tel"
@@ -156,13 +234,78 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
               <Button
                 type="submit"
                 variant="primary"
-                glow={true}
-                className="bg-blue-600 hover:bg-blue-500 text-white shadow-[0_0_25px_rgba(37,99,235,0.3)]"
+                glow={false}
+                className="bg-blue-600 hover:bg-blue-500 text-white"
               >
                 Guardar Cambios
               </Button>
             </div>
           </form>
+
+          {/* Separador */}
+          <div className="my-10 border-b border-white/5"></div>
+
+          {/* Sección de Cambio de Contraseña */}
+          <section className="relative z-10 space-y-6">
+            <h4 className="text-lg font-black uppercase tracking-widest text-white mb-2">
+              Seguridad: Cambiar Contraseña
+            </h4>
+            
+            <form onSubmit={handlePasswordSubmit} className="space-y-6">
+              <div className="grid grid-cols-3 gap-6">
+                <InputField
+                  label="Clave Actual"
+                  type="password"
+                  required
+                  value={currentPassword}
+                  onChange={e => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                  focusVariant="blue"
+                />
+                <InputField
+                  label="Clave Nueva"
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                  placeholder="Mín. 6 caracteres"
+                  focusVariant="blue"
+                />
+                <InputField
+                  label="Repetir Clave"
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                  placeholder="Repite la contraseña"
+                  focusVariant="blue"
+                />
+              </div>
+
+              {passwordError && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center animate-fade-in-up">
+                  <p className="text-red-400 text-xs font-black uppercase tracking-widest">{passwordError}</p>
+                </div>
+              )}
+
+              {passwordSuccess && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-center animate-fade-in-up">
+                  <p className="text-emerald-400 text-xs font-black uppercase tracking-widest">{passwordSuccess}</p>
+                </div>
+              )}
+
+              <div className="pt-2 flex justify-end">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={passwordLoading}
+                  className="bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 hover:border-neutral-600 transition-all shadow-md active:scale-[0.98]"
+                >
+                  {passwordLoading ? 'Cambiando...' : 'Actualizar Contraseña'}
+                </Button>
+              </div>
+            </form>
+          </section>
         </div>
       </div>
     </div>,

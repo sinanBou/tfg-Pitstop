@@ -1,10 +1,10 @@
-
 import { Link } from 'react-router-dom';
 import { useLogin } from '@/features/auth/hooks/useLogin'; 
 import InputGroup from '@/components/common/Input/InputGroup'; 
+import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton';
 
 function Login() {
-  const { formData, errors, isLoading, handleChange, handleLogin } = useLogin();
+  const { formData, errors, isLoading, handleChange, handleLogin, handleGoogleLogin } = useLogin();
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 relative bg-zinc-950 font-sans selection:bg-blue-500/30 selection:text-white overflow-hidden">
@@ -63,7 +63,17 @@ function Login() {
             </button>
           </form>
 
-          <div className="mt-10 text-center">
+          {/* Separador Visual Premium */}
+          <div className="flex items-center my-6">
+            <div className="flex-1 h-[1px] bg-neutral-800/80"></div>
+            <span className="px-4 text-[10px] font-black uppercase tracking-widest text-neutral-600">o continuar con</span>
+            <div className="flex-1 h-[1px] bg-neutral-800/80"></div>
+          </div>
+
+          {/* Botón de Google */}
+          <GoogleSignInButton onSuccess={handleGoogleLogin} />
+
+          <div className="mt-8 text-center">
             <p className="text-neutral-500 text-sm">
               ¿No tienes cuenta?{' '}
               <Link to="/registration" className="text-blue-400 font-bold hover:text-blue-300 transition-colors">
@@ -93,4 +103,4 @@ function Login() {
   );
 }
 
-export default Login
+export default Login;

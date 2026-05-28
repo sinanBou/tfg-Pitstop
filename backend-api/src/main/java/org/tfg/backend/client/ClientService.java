@@ -31,7 +31,7 @@ public class ClientService {
      */
     @Transactional(readOnly = true)
     public ClientDTO getClientProfile(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Client client = user.getClient();
@@ -62,7 +62,7 @@ public class ClientService {
      */
     @Transactional
     public ClientDTO updateProfile(String email, ClientDTO request) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Client client = user.getClient();
@@ -82,8 +82,11 @@ public class ClientService {
             client.setPhoneNumber(request.getPhoneNumber().trim());
         }
         if (request.getAddress() != null) {
-            client.setAddress(request.getAddress().trim());
+            String cleanAddress = request.getAddress().trim();
+            client.setAddress(cleanAddress);
+            user.setAddress(cleanAddress);
         }
+        userRepository.save(user);
         clientRepository.save(client);
 
         return mapToDTO(client);
@@ -118,7 +121,7 @@ public class ClientService {
         }
 
         String email = (request.getEmail() != null && !request.getEmail().trim().isEmpty()) 
-                        ? request.getEmail() 
+                        ? request.getEmail().trim().toLowerCase() 
                         : request.getNif().toLowerCase() + "@talleres-pitstop.com";
 
         if (userRepository.existsByEmail(email)) {

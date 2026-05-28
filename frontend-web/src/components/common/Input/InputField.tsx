@@ -36,12 +36,12 @@ export const InputField: React.FC<InputFieldProps> = ({
     error ? 'border-red-500/50' : 'border-neutral-800'
   }`;
   
-  const labelStyles = `text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 block mb-1.5`;
+  const labelStyles = `text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 flex items-center mb-1.5 h-6`;
 
   return (
     <div className={`flex flex-col w-full ${className}`}>
       <label htmlFor={inputId} className={labelStyles}>
-        {label}
+        <span>{label}</span>
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </label>
       {multiline ? (

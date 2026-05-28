@@ -32,7 +32,7 @@ public class EmployeService {
      */
     @Transactional(readOnly = true)
     public EmployeeDTO getEmployeeProfile(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         Employee employee = user.getEmployee();
@@ -48,7 +48,7 @@ public class EmployeService {
      */
     @Transactional
     public EmployeeDTO updateProfile(String email, UpdateProfileRequest request) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (request.getFirstname() != null && !request.getFirstname().isBlank()) {
@@ -70,7 +70,7 @@ public class EmployeService {
      */
     @Transactional
     public EmployeeDTO uploadProfilePicture(String email, org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (user.getProfilePictureUrl() != null) {
@@ -89,7 +89,7 @@ public class EmployeService {
      */
     @Transactional
     public EmployeeDTO deleteProfilePicture(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(email.trim().toLowerCase())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
         if (user.getProfilePictureUrl() != null) {
