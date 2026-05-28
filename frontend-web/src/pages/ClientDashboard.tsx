@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useClientDashboard } from '@/features/client/hooks/useClientDashboard';
 import { VehicleModal } from '@/features/vehicles/components/VehicleModal';
 import { AppointmentModal } from '@/features/appointments/components/AppointmentModal';
@@ -10,19 +10,56 @@ import { ClientVehiclesTab } from '@/features/client/components/ClientVehiclesTa
 import { ClientAppointmentsTab } from '@/features/client/components/ClientAppointmentsTab';
 import { ClientHistoryTab } from '@/features/client/components/ClientHistoryTab';
 import { ClientReportsTab } from '@/features/client/components/ClientReportsTab';
+import { MiPerfilCliente } from '@/features/client/components/MiPerfilCliente';
 
-const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'HISTORIAL', 'INFORMES'];
+const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'NOTIFICACIONES', 'INFORMES'];
 
 export default function ClientDashboard() {
-  const { loading, userProfile, vehicles, workshops, appointments, history, registerVehicle, createAppointment, getAvailableSlots, getCatalogMakes, getCatalogModels, deleteAppointment, deleteVehicle, refresh } = useClientDashboard();
+  const { 
+    loading, 
+    userProfile, 
+    clientProfile,
+    vehicles, 
+    workshops, 
+    appointments, 
+    history, 
+    registerVehicle, 
+    createAppointment, 
+    getAvailableSlots, 
+    getCatalogMakes, 
+    getCatalogModels, 
+    deleteAppointment, 
+    deleteVehicle, 
+    refresh,
+    handleProfileUpdate
+  } = useClientDashboard();
 
   const [activeTab, setActiveTab] = useState(0);
-
   
   // 2. Nuevo estado para abrir/cerrar modal del registro de vehiculo
   const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
+
+  // Estados de perfil
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    firstname: '',
+    lastname: '',
+    address: '',
+    phoneNumber: ''
+  });
+
+  // Sincronizar formulario al cargar el perfil del cliente
+  useEffect(() => {
+    if (clientProfile) {
+      setProfileForm({
+        firstname: clientProfile.firstname || '',
+        lastname: clientProfile.lastname || '',
+        address: clientProfile.address || '',
+        phoneNumber: clientProfile.phoneNumber || ''
+      });
+    }
+  }, [clientProfile]);
 
 
   if (loading) {
@@ -31,11 +68,15 @@ export default function ClientDashboard() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-blue-500/30 selection:text-white pb-24">    
-      {/* Fondo Glow Animado Global */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen animate-pulse pointer-events-none"></div>
+      {/* Fondo Glow Estático Global */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
 
       {/* --- CONTENT AREA --- */}
-      <DashboardHeader type="client" />
+      <DashboardHeader 
+        type="client" 
+        profilePictureUrl={clientProfile?.profilePictureUrl}
+        onOpenProfile={() => setIsProfileOpen(true)}
+      />
 
       {/* --- CONTENT AREA --- */}
       <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
@@ -84,6 +125,19 @@ export default function ClientDashboard() {
         fetchSlots={getAvailableSlots}
         existingAppointments={appointments}
       />
+
+      {clientProfile && (
+        <MiPerfilCliente
+          isOpen={isProfileOpen}
+          onClose={() => setIsProfileOpen(false)}
+          clientProfile={clientProfile}
+          profileForm={profileForm}
+          setProfileForm={setProfileForm}
+          onSubmit={async (form) => {
+            await handleProfileUpdate(form);
+          }}
+        />
+      )}
 
     </div>
   );

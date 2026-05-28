@@ -22,6 +22,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
     <Card 
       variant={variant} 
       padding="none" 
+      rounded="2xl"
       onClick={onClick}
       className={`p-8 hover:border-blue-500/40 relative group overflow-hidden animate-in fade-in slide-in-from-bottom-${index % 5 + 1} duration-500 delay-${(index % 3) * 100}`}
     >

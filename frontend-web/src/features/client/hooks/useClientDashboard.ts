@@ -30,6 +30,7 @@ export const useClientDashboard = () => {
   // Estados centralizados
   const [loading, setLoading] = useState(true);
   const [userProfile, setUserProfile] = useState<UserDTO | null>(null);
+  const [clientProfile, setClientProfile] = useState<any | null>(null);
   const [vehicles, setVehicles] = useState<VehicleDTO[]>([]);
   const [workshops, setWorkshops] = useState<WorkshopMinDTO[]>([]);
   const [appointments, setAppointments] = useState<AppointmentDTO[]>([]);
@@ -48,14 +49,16 @@ export const useClientDashboard = () => {
     try {
       setLoading(true);
       
-      const [resUser, resVehicles, resWorkshops, resApps] = await Promise.all([
+      const [resUser, resClient, resVehicles, resWorkshops, resApps] = await Promise.all([
         fetchWithAuth('/users/me'),
+        fetchWithAuth('/clients/me'),
         fetchWithAuth('/vehicles/my-vehicles'),
         fetchWithAuth('/workshops'),
         fetchWithAuth('/appointments/my-appointments')
       ]);
 
       if (resUser.ok) setUserProfile(await resUser.json());
+      if (resClient.ok) setClientProfile(await resClient.json());
       if (resVehicles.ok) setVehicles(await resVehicles.json());
       if (resWorkshops.ok) setWorkshops(await resWorkshops.json());
       
@@ -96,7 +99,9 @@ export const useClientDashboard = () => {
             actualStartTime: app.actualStartTime,
             actualEndTime: app.actualEndTime,
             confirmedAt: app.confirmedAt,
-            parts: app.parts
+            parts: app.parts,
+            workshopId: app.workshopId,
+            serviceType: app.serviceType
           };
         }));
       }
@@ -233,9 +238,31 @@ export const useClientDashboard = () => {
     }
   }, []);
 
+  const handleProfileUpdate = useCallback(async (profileData: { firstname: string; lastname: string; address: string; phoneNumber?: string }) => {
+    try {
+      const response = await fetchWithAuth('/clients/me', {
+        method: 'PUT',
+        body: JSON.stringify(profileData)
+      });
+
+      if (response.ok) {
+        const updated = await response.json();
+        setClientProfile(updated);
+        const userRes = await fetchWithAuth('/users/me');
+        if (userRes.ok) setUserProfile(await userRes.json());
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error actualizando perfil del cliente:", error);
+      return false;
+    }
+  }, []);
+
   return {
     loading,
     userProfile,
+    clientProfile,
     vehicles,
     workshops,
     appointments,
@@ -248,6 +275,7 @@ export const useClientDashboard = () => {
     getCatalogModels,
     deleteAppointment,
     deleteVehicle,
-    logout
+    logout,
+    handleProfileUpdate
   };
 };

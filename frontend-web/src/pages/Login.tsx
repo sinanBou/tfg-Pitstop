@@ -9,20 +9,17 @@ function Login() {
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 relative bg-zinc-950 font-sans selection:bg-blue-500/30 selection:text-white overflow-hidden">
       
-      {/* Fondo Glow animado */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen animate-pulse"></div>
+      {/* Fondo Glow estático */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen"></div>
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none z-0"></div>
 
       <div className="w-full max-w-lg z-10 animate-fade-in-up">
         
         {/* Card Contenedor */}
         <div className="bg-neutral-950/60 backdrop-blur-xl p-10 sm:p-12 rounded-[2.5rem] border border-neutral-800/60 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group">
-          
-          {/* Luz en el borde superior */}
-          <div className="absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
 
           <div className="mb-10 text-center">
-            <h2 className="text-4xl font-black text-white italic uppercase tracking-tighter mb-2">Iniciar Sesión</h2>
+            <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">Iniciar Sesión</h2>
             <p className="text-neutral-500 text-sm font-medium tracking-wide">Bienvenido de nuevo a <span className="text-white font-bold">PitStop</span></p>
           </div>
 

@@ -1,4 +1,6 @@
 import React from 'react';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button';
 import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
 
 interface ClientAppointmentCardProps {
@@ -22,15 +24,20 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
   const isCancellable = !['IN_PROGRESS', 'DELAYED', 'COMPLETED', 'CANCELLED'].includes(appointment.status);
 
   return (
-    <div className="bg-neutral-900/40 border border-neutral-800 p-6 md:p-8 rounded-[2rem] relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 flex flex-col hover:shadow-2xl hover:-translate-y-1">
-      {/* Glow / Icono de Fondo */}
+    <Card 
+      variant="neutral" 
+      padding="md" 
+      rounded="2xl" 
+      className="hover:-translate-y-1 hover:border-blue-500/40"
+    >
+      {/* Icono de Fondo */}
       <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
         <svg className="w-32 h-32 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
       </div>
 
-      <div className="relative z-10 flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col">
         {/* Cabecera: Servicio, Fecha y Badge de Estado */}
         <div className="flex justify-between items-start mb-6">
           <div>
@@ -94,21 +101,21 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
 
         {/* Botón de Acción Principal (Cancelar o Estado Estático) */}
         {isCancellable ? (
-          <button
+          <Button
             onClick={() => {
               if (window.confirm("¿Deseas cancelar esta cita de forma permanente?")) {
                 deleteAppointment(appointment.id);
               }
             }}
-            className="w-full py-4 bg-neutral-800/50 border border-neutral-700/50 text-neutral-400 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm relative z-10 group/btn mt-auto overflow-hidden"
+            variant="danger"
+            glow={false}
+            className="w-full !py-4 shadow-sm mt-auto"
           >
-            <span className="flex items-center justify-center gap-2 relative z-10">
-              Cancelar Cita
-              <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </span>
-          </button>
+            Cancelar Cita
+            <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </Button>
         ) : (
           <div className={`w-full py-4 border rounded-xl text-[10px] font-black uppercase tracking-widest text-center mt-auto cursor-not-allowed ${
             appointment.status === 'COMPLETED'
@@ -119,6 +126,6 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 };

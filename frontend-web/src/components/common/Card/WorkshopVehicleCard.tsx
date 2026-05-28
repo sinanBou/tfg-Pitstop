@@ -34,32 +34,32 @@ export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicl
         return {
           badge: 'bg-green-500/10 border-green-500/20 text-green-400',
           ping: 'bg-green-500',
-          gradient: 'from-green-600/80 to-emerald-400',
-          border: 'border-green-900/50 hover:border-green-500/50',
+          gradient: 'from-blue-600 to-sky-400',
+          border: 'border-blue-500/50 hover:border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]',
           text: 'text-green-400',
         };
       case 'DELAYED':
         return {
           badge: 'bg-red-500/10 border-red-500/20 text-red-400',
           ping: 'bg-red-500',
-          gradient: 'from-red-600/80 to-rose-400',
-          border: 'border-red-900/50 hover:border-red-500/50',
+          gradient: 'from-blue-600 to-sky-400',
+          border: 'border-blue-500/50 hover:border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]',
           text: 'text-red-400',
         };
       case 'IN_PROGRESS':
         return {
           badge: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
           ping: 'bg-blue-500',
-          gradient: 'from-blue-600/80 to-sky-400',
-          border: 'border-blue-900/50 hover:border-blue-500/50',
+          gradient: 'from-blue-600 to-sky-400',
+          border: 'border-blue-500/50 hover:border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]',
           text: 'text-blue-400',
         };
       default:
         return {
           badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
           ping: 'bg-amber-500',
-          gradient: 'from-amber-600/80 to-yellow-400',
-          border: 'border-amber-900/50 hover:border-amber-500/50',
+          gradient: 'from-blue-600 to-sky-400',
+          border: 'border-blue-500/50 hover:border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)]',
           text: 'text-amber-400',
         };
     }
@@ -68,7 +68,7 @@ export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicl
   const colors = getThemeColors(vehicle.status);
 
   return (
-    <div className={`bg-gradient-to-br from-neutral-900/80 to-black border ${colors.border} p-5 rounded-[1.8rem] relative overflow-hidden group transition-all duration-300 flex flex-col justify-between hover:shadow-2xl hover:-translate-y-1 w-[280px] h-[200px] shrink-0`}>
+    <div className={`bg-gradient-to-br from-neutral-900/80 to-black border ${colors.border} p-5 rounded-2xl relative overflow-hidden group transition-all duration-300 flex flex-col justify-between hover:shadow-2xl hover:-translate-y-1 w-[280px] h-[200px] shrink-0`}>
       {/* Icono de Fondo */}
       <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
         <svg className="w-24 h-24 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +88,7 @@ export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicl
               </span>
               <p className="text-[8px] font-black uppercase tracking-[0.2em]">{getStatusLabel(vehicle.status)}</p>
             </div>
-            <span className="text-[9px] font-mono text-neutral-400 bg-black/40 px-2.5 py-1 rounded-lg border border-neutral-800 shadow-inner">
+            <span className="text-[11px] font-mono font-bold text-neutral-300 bg-neutral-950/80 px-3 py-1 rounded-lg border border-neutral-800 shadow-inner tracking-wider">
               {vehicle.licensePlate}
             </span>
           </div>

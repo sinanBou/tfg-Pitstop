@@ -1,30 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button';
+import { printInvoicePDF as importPrintInvoicePDF } from '@/utils/InvoicePdfPrinter';
 
-
-const HistoryIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>);
-
-interface PartItem {
-  name: string;
-  price: number;
-}
-
-interface Invoice {
-  id: string;
-  appointmentId: string;
-  workshopId: string;
-  laborRate: number;
-  totalLabor: number;
-  partsJson: string;
-  totalParts: number;
-  totalPrice: number;
-  createdAt: string;
-  clientFullName: string;
-  vehicleDisplay: string;
-  serviceType: string;
-  description: string;
-}
 
 interface NotificationItem {
   id: string;
@@ -42,6 +21,47 @@ interface ClientHistoryTabProps {
 
 export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    const workshopIds = new Set<string>();
+    (appointments || []).forEach(a => { if (a.workshopId) workshopIds.add(a.workshopId); });
+    (history || []).forEach(h => { if (h.workshopId) workshopIds.add(h.workshopId); });
+
+    if (workshopIds.size === 0) return;
+
+    const token = localStorage.getItem('jwt_token');
+    const promises = Array.from(workshopIds).map(workshopId => 
+      fetch(`${API_BASE_URL}/catalog/workshop/${workshopId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.ok ? res.json() : [])
+        .catch(() => [])
+    );
+
+    Promise.all(promises).then(results => {
+      const map = new Map<string, string>();
+      results.forEach(catalogList => {
+        if (Array.isArray(catalogList)) {
+          catalogList.forEach(cat => {
+            (cat.tasks || []).forEach((t: any) => {
+              map.set(t.code, t.name);
+            });
+          });
+        }
+      });
+      setCatalogMap(map);
+    });
+  }, [appointments, history]);
+
+  const translateServiceCodes = (serviceType: string | undefined, defaultDesc: string) => {
+    if (!serviceType) return defaultDesc || 'Mantenimiento General';
+    const codes = serviceType.split(',').map(c => c.trim()).filter(Boolean);
+    const translated = codes.map(code => catalogMap.get(code) || code);
+    if (translated.length === 0) return defaultDesc || 'Mantenimiento General';
+    return translated.join(', ');
+  };
+
 
   // Generar notificaciones dinámicas en base a citas y facturas
   const notifications = useMemo(() => {
@@ -121,7 +141,11 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
     });
   }, [appointments, history]);
 
-  const printInvoicePDF = (inv: Invoice) => {
+  const printInvoicePDF = (inv: any, translated?: string) => {
+    importPrintInvoicePDF(inv, translated);
+  };
+  /*
+  const old_printInvoicePDF = (inv: Invoice) => {
     const parsedParts: PartItem[] = JSON.parse(inv.partsJson || '[]');
     const dateObj = new Date(inv.createdAt);
     const formattedDate = dateObj.toLocaleDateString('es-ES', {
@@ -400,6 +424,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
 
     printWindow.document.close();
   };
+  */
 
   const handleDownloadInvoice = async (appointmentId: string) => {
     setDownloadingId(appointmentId);
@@ -410,7 +435,8 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
       });
       if (!res.ok) throw new Error('No se pudo encontrar la factura de este trabajo.');
       const inv = await res.json();
-      printInvoicePDF(inv);
+      const translated = translateServiceCodes(inv.serviceType || inv.description, inv.description);
+      printInvoicePDF(inv, translated);
     } catch (err: any) {
       alert(err.message || 'Error al descargar la factura.');
     } finally {
@@ -430,15 +456,16 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
         </div>
 
         {notifications.length === 0 ? (
-          <div className="p-6 bg-neutral-900/10 border border-neutral-900 rounded-[2rem] text-center text-neutral-600 text-xs py-10">
+          <Card variant="neutral" padding="none" rounded="2xl" className="p-6 bg-neutral-900/10 text-center text-neutral-600 text-xs py-10">
             No tienes notificaciones o actividad registrada en tus citas.
-          </div>
+          </Card>
         ) : (
           <div className="space-y-3">
             {notifications.map(notif => {
               const formattedTime = notif.dateTime.toLocaleDateString('es-ES', {
                 day: '2-digit',
-                month: 'short',
+                month: '2-digit',
+                year: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
                 hour12: false
@@ -499,10 +526,11 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
 
                   {/* Factura Download Button */}
                   {notif.type === 'invoice' && (
-                    <button
+                    <Button
                       onClick={() => handleDownloadInvoice(notif.appointmentId)}
                       disabled={downloadingId === notif.appointmentId}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black uppercase tracking-widest text-[9px] rounded-xl transition-all flex items-center gap-1.5 shrink-0 active:scale-95 disabled:opacity-50"
+                      glow={false}
+                      className="!px-4 !py-2 !text-[9px] !rounded-xl bg-emerald-600 hover:bg-emerald-500 hover:border-transparent text-white shrink-0"
                     >
                       {downloadingId === notif.appointmentId ? (
                         <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -514,106 +542,8 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
                           Descargar PDF
                         </>
                       )}
-                    </button>
+                    </Button>
                   )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── HISTORIAL DE TRABAJOS COMPLETADOS ── */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-neutral-500 animate-pulse" />
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
-            Historial de Trabajos Realizados (Vista Taller)
-          </h3>
-        </div>
-
-        {history.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 opacity-30">
-            <HistoryIcon />
-            <p className="text-xs font-black uppercase tracking-[0.4em] text-neutral-500 font-mono mt-4">Log Vacío</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {history.map(hist => {
-              const isFinished = hist.status === 'COMPLETED' || hist.status === 'PICKED_UP';
-              const isDownloading = downloadingId === hist.id;
-
-              return (
-                <div
-                  key={hist.id}
-                  className={`bg-neutral-900/40 border rounded-[2rem] p-6 relative overflow-hidden group transition-all duration-300 hover:shadow-[0_0_40px_rgba(59,130,246,0.05)] ${
-                    hist.status === 'CANCELLED'
-                      ? 'border-red-500/20 hover:border-red-500/40'
-                      : 'border-green-500/20 hover:border-green-500/40'
-                  }`}
-                >
-                  {/* Background glow */}
-                  <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none ${
-                    hist.status === 'CANCELLED' ? 'bg-red-500/5' : 'bg-green-500/5'
-                  }`} />
-
-                  <div className="relative z-10 space-y-4">
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className={`px-2.5 py-1 border rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                            hist.status === 'CANCELLED'
-                              ? 'bg-red-500/10 border-red-500/20 text-red-400'
-                              : 'bg-green-500/10 border-green-500/20 text-green-400'
-                          }`}>
-                            {hist.status === 'CANCELLED' ? '✕ Cancelado' : '✓ Finalizado'}
-                          </span>
-                        </div>
-                        <h4 className="text-lg font-black uppercase tracking-tight text-white truncate flex items-center gap-1.5">
-                          <span className="shrink-0 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]">
-                            {getBrandLogo((hist.vehicleName || '').split(' ')[0])}
-                          </span>
-                          <span>{hist.vehicleName}</span>
-                        </h4>
-                        <p className="text-neutral-500 text-xs font-bold mt-0.5">{hist.description}</p>
-                      </div>
-                    </div>
-
-                    {/* Details Box */}
-                    <div className="bg-black/30 rounded-xl p-4 border border-white/5 space-y-2">
-                      <div className="flex justify-between items-center text-sm">
-                        <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Fecha</span>
-                        <span className="text-white text-xs font-mono">{hist.finishDate}</span>
-                      </div>
-                      {hist.totalCost > 0 && (
-                        <div className="flex justify-between items-center text-sm">
-                          <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Costo total</span>
-                          <span className="text-blue-400 text-xs font-mono font-bold">{hist.totalCost.toFixed(2)}€</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Action button */}
-                    {isFinished && (
-                      <button
-                        onClick={() => handleDownloadInvoice(hist.id)}
-                        disabled={isDownloading}
-                        className="w-full py-3.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-widest text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.98] shadow-[0_0_20px_rgba(59,130,246,0.15)] disabled:opacity-50"
-                      >
-                        {isDownloading ? (
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        ) : (
-                          <>
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Descargar Factura PDF
-                          </>
-                        )}
-                      </button>
-                    )}
-                  </div>
                 </div>
               );
             })}

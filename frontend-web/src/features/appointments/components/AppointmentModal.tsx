@@ -3,6 +3,7 @@ import { type VehicleDTO, type AppointmentRequest, type WorkshopMinDTO } from '@
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/index';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { BackButton } from '@/components/common/Button/BackButton';
 
 interface AppointmentModalProps {
   isOpen: boolean;
@@ -169,7 +170,7 @@ export const AppointmentModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Nueva Cita"
-      subtitle="Sincronización en tiempo real"
+      showDot={false}
       theme="blue"
       progressBarWidth={`${(step / 4) * 100}%`}
     >
@@ -184,10 +185,13 @@ export const AppointmentModal = ({
       <div className="relative z-10 min-h-[300px] flex flex-col flex-1">
             
             {/* ENCABEZADOS DE PASOS COMUNES */}
-            <div className="mb-8 flex items-end justify-between">
+            <div className="mb-8 flex items-center gap-4">
+              {step > 1 && (
+                <BackButton onClick={prevStep} title="Paso anterior" />
+              )}
               <div>
-                <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{`Paso 0${step} / 04`}</p>
-                <h3 className="text-2xl font-black uppercase italic text-white leading-none">
+                <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1.5">{`Paso 0${step} / 04`}</p>
+                <h3 className="text-2xl font-black uppercase text-white leading-none">
                   {step === 1 && "Tu Vehículo"}
                   {step === 2 && "El Taller"}
                   {step === 3 && "Horario"}
@@ -211,7 +215,7 @@ export const AppointmentModal = ({
                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 10h14l1.5 4H3.5L5 10z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 14v4h2v-4m10 0v4h2v-4M8 10V8c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" /></svg>
                         </div>
                         <div>
-                          <p className="text-lg text-white font-black italic tracking-wide group-hover:text-blue-400 transition-colors uppercase">{v.brand} {v.model}</p>
+                          <p className="text-lg text-white font-black tracking-wide group-hover:text-blue-400 transition-colors uppercase">{v.brand} {v.model}</p>
                           <p className="text-xs text-neutral-500 font-mono mt-0.5 flex items-center gap-2">
                             Matrícula: <span className="text-neutral-300 bg-neutral-800/50 px-2 rounded-md py-0.5">{v.licensePlate}</span>
                           </p>
@@ -307,12 +311,7 @@ export const AppointmentModal = ({
                   )}
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-neutral-800 flex justify-start">
-                   <button onClick={prevStep} className="flex items-center gap-2 text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white transition-colors group">
-                      <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                      Atrás
-                   </button>
-                </div>
+                
               </div>
             )}
 
@@ -349,7 +348,7 @@ export const AppointmentModal = ({
                       {/* CALENDARIO PERSONALIZADO (Izquierda) */}
                       <div className="bg-neutral-900/50 border border-neutral-800 p-4 rounded-3xl w-full md:w-[450px] shrink-0">
                         <div className="flex items-center justify-between mb-4 px-2">
-                          <h3 className="text-sm font-black uppercase tracking-widest text-white italic">
+                          <h3 className="text-sm font-black uppercase tracking-widest text-white">
                             {monthNames[month]} <span className="text-blue-600">{year}</span>
                           </h3>
                           <div className="flex gap-1">
@@ -483,12 +482,7 @@ export const AppointmentModal = ({
                     </div>
                   </div>
                   
-                  <div className="mt-8 pt-4 border-t border-neutral-800 flex justify-start">
-                     <button onClick={prevStep} className="flex items-center gap-2 text-neutral-500 text-xs font-black uppercase tracking-widest hover:text-white transition-colors group">
-                        <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        Atrás
-                     </button>
-                  </div>
+                  
                 </div>
               )
             })()}
@@ -535,12 +529,7 @@ export const AppointmentModal = ({
                   </div>
                 </div>
 
-                <div className="mt-8 flex justify-between items-center bg-black/50 -mx-8 -mb-8 p-6 px-8 border-t border-neutral-800">
-                   <button onClick={prevStep} className="flex items-center gap-2 text-neutral-400 text-xs font-black uppercase tracking-widest hover:text-white transition-colors group">
-                      <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                      Atrás
-                   </button>
-                   
+                <div className="mt-8 flex justify-end items-center bg-black/50 -mx-8 -mb-8 p-6 px-8 border-t border-neutral-800">
                    <button 
                     onClick={handleFinish}
                     disabled={!formData.serviceType}

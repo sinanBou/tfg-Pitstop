@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
 import { MonthSelector } from '@/components/common/MonthSelector';
@@ -94,9 +94,11 @@ interface RecentInvoicesListProps {
   invoices: any[];
   downloadingId: string | null;
   onDownload: (id: string) => void;
+  translateServiceCodes: (serviceType: string | undefined, defaultDesc: string) => string;
+  formatToDDMMYYYY: (dateStr: string) => string;
 }
 
-function RecentInvoicesList({ invoices, downloadingId, onDownload }: RecentInvoicesListProps) {
+function RecentInvoicesList({ invoices, downloadingId, onDownload, translateServiceCodes, formatToDDMMYYYY }: RecentInvoicesListProps) {
   return (
     <div className="bg-neutral-950 border border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6">
       <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
@@ -124,8 +126,8 @@ function RecentInvoicesList({ invoices, downloadingId, onDownload }: RecentInvoi
                 </div>
                 <div>
                   <h4 className="text-xs font-black uppercase text-white">{inv.vehicleName}</h4>
-                  <p className="text-[10px] text-neutral-400 mt-0.5">{inv.description}</p>
-                  <span className="text-[9px] font-mono text-neutral-500">{inv.finishDate}</span>
+                  <p className="text-[10px] text-neutral-400 mt-0.5">{translateServiceCodes(inv.serviceType, inv.description)}</p>
+                  <span className="text-[9px] font-mono text-neutral-500">{formatToDDMMYYYY(inv.finishDate)}</span>
                 </div>
               </div>
 
@@ -162,6 +164,55 @@ function RecentInvoicesList({ invoices, downloadingId, onDownload }: RecentInvoi
 export function ClientReportsTab({ history = [], vehicles = [], appointments = [] }: ClientReportsTabProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState('all');
+  const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    const workshopIds = new Set<string>();
+    (appointments || []).forEach(a => { if (a.workshopId) workshopIds.add(a.workshopId); });
+    (history || []).forEach(h => { if (h.workshopId) workshopIds.add(h.workshopId); });
+
+    if (workshopIds.size === 0) return;
+
+    const token = localStorage.getItem('jwt_token');
+    const promises = Array.from(workshopIds).map(workshopId => 
+      fetch(`${API_BASE_URL}/catalog/workshop/${workshopId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.ok ? res.json() : [])
+        .catch(() => [])
+    );
+
+    Promise.all(promises).then(results => {
+      const map = new Map<string, string>();
+      results.forEach(catalogList => {
+        if (Array.isArray(catalogList)) {
+          catalogList.forEach(cat => {
+            (cat.tasks || []).forEach((t: any) => {
+              map.set(t.code, t.name);
+            });
+          });
+        }
+      });
+      setCatalogMap(map);
+    });
+  }, [appointments, history]);
+
+  const translateServiceCodes = (serviceType: string | undefined, defaultDesc: string) => {
+    if (!serviceType) return defaultDesc || 'Mantenimiento General';
+    const codes = serviceType.split(',').map(c => c.trim()).filter(Boolean);
+    const translated = codes.map(code => catalogMap.get(code) || code);
+    if (translated.length === 0) return defaultDesc || 'Mantenimiento General';
+    return translated.join(', ');
+  };
+
+  const formatToDDMMYYYY = (dateStr: string) => {
+    if (!dateStr) return '---';
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return dateStr;
+  };
 
   // 1. Filtrar los trabajos finalizados
   const completedWork = useMemo(() => {
@@ -236,7 +287,8 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
       });
       if (!res.ok) throw new Error('No se pudo encontrar la factura de este trabajo.');
       const inv = await res.json();
-      printInvoicePDF(inv);
+      const translated = translateServiceCodes(inv.serviceType || inv.description, inv.description);
+      printInvoicePDF(inv, translated);
     } catch (err: any) {
       alert(err.message || 'Error al descargar la factura.');
     } finally {
@@ -271,6 +323,8 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
         invoices={recentInvoices} 
         downloadingId={downloadingId} 
         onDownload={handleDownloadInvoice} 
+        translateServiceCodes={translateServiceCodes}
+        formatToDDMMYYYY={formatToDDMMYYYY}
       />
 
       <style>{`

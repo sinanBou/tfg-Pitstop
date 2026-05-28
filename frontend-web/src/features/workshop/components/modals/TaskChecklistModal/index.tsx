@@ -314,7 +314,6 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
           {/* TAREAS (Izquierda) */}
           <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
               Operaciones del Servicio
             </h4>
             
@@ -374,7 +373,6 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
           {/* PIEZAS Y REPUESTOS (Derecha) */}
           <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
               Materiales y Repuestos Requeridos
             </h4>
 

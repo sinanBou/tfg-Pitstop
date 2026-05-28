@@ -22,6 +22,7 @@ export interface AppointmentDTO {
   vehiclePlate?: string;  // Por compatibilidad
   vehicleDisplay?: string; // Ejemplo: "BMW Serie 3 (1234ABC)"
   workshopName?: string;
+  workshopId?: string;
   
   // Campos calculados para el Frontend
   date: string; 
@@ -48,6 +49,8 @@ export interface HistoryDTO {
   actualEndTime?: string;
   confirmedAt?: string;
   parts?: AppointmentPartDTO[];
+  workshopId?: string;
+  serviceType?: string;
 }
 export interface VehicleRequest {
   brand: string;

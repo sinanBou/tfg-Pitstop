@@ -111,5 +111,17 @@ En esta refactorización integral del sistema de repuestos y control de almacén
     - Se muestra un banner informativo "Pendiente de Recepción" en el componente `MechanicLiveTask`.
 - Propósito: Fuerza el cumplimiento del procedimiento operativo estándar del taller: ningún trabajo puede iniciarse ni gestionarse hasta que el vehículo haya sido físicamente recibido e inspeccionado. Protege contra errores humanos de planificación y garantiza la integridad del flujo administrativo.
 
+15. SHARED MODULAR UI PATTERN (Estructura) - Reutilización de Card y Button en Cliente
+----------------------------------------------------------------------------------------
+- Cómo se creó: Se refactorizó la interfaz del cliente (`ClientDashboard`, `ClientVehiclesTab`, `ClientAppointmentsTab` y `ClientHistoryTab`) para que dejen de usar contenedores y botones ad-hoc y en su lugar reutilicen e integren activamente los componentes unificados `Card` (con glassmorphism y variantes dinámicas 'red' | 'blue' | 'neutral') y `Button` (con variantes 'primary' | 'secondary' | 'danger' | 'ghost' y soporte para glow/pulsado).
+- Propósito: Sigue el estándar moderno de React y la directriz de modularización y reusabilidad extrema. Garantiza la consistencia visual total entre las áreas administrativas de taller y los paneles de cliente, reduce el acoplamiento y simplifica la incorporación de futuros cambios estilísticos y temas a toda la plataforma.
 
-
+16. CLIENT PROFILE & STORAGE ADAPTER INTEGRATION PATTERN (Estructura) - MiPerfilCliente & API /clients/me
+-------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Backend: Se integraron nuevos endpoints seguros en `ClientController` y `ClientService` (`GET /me`, `PUT /me`, `POST /me/avatar`, `DELETE /me/avatar`) inyectando el adaptador `StorageService` de AWS S3 de forma modular.
+  - Frontend:
+    - Se creó el componente Portal premium `MiPerfilCliente.tsx` estilizado en tonos azulados premium con campos de solo lectura (`email`, `nif`) y editables (`firstname`, `lastname`, `phoneNumber`, `address`), soporte para subida de avatar vía presigned S3 URLs, y visor a pantalla completa con `ImagePreviewModal`.
+    - Se refactorizó `useClientDashboard.ts` para orquestar la carga inicial de `/clients/me`, actualizar en caliente la información y re-sincronizar el perfil del usuario autenticado de forma reactiva.
+    - Se integró en `DashboardHeader` para permitir a los clientes acceder a la edición de sus datos desde el cabezal de navegación de forma unificada.
+- Propósito: Mantiene la modularización extrema y el principio de consistencia arquitectónica. Garantiza que la gestión de perfiles del cliente sea simétrica al perfil del personal del taller en el backend, desacoplando los archivos binarios pesados (imágenes de avatar) a un bucket de almacenamiento S3 de forma 100% segura.

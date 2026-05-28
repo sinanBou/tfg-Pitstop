@@ -57,6 +57,38 @@ public class ClientService {
                 .build();
     }
 
+    /**
+     * Actualiza el perfil del cliente autenticado.
+     */
+    @Transactional
+    public ClientDTO updateProfile(String email, ClientDTO request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        Client client = user.getClient();
+        if (client == null) {
+            throw new RuntimeException("El usuario no tiene un perfil de cliente asociado");
+        }
+
+        if (request.getFirstname() != null && !request.getFirstname().isBlank()) {
+            user.setFirstname(request.getFirstname().trim());
+        }
+        if (request.getLastname() != null && !request.getLastname().isBlank()) {
+            user.setLastname(request.getLastname().trim());
+        }
+        userRepository.save(user);
+
+        if (request.getPhoneNumber() != null) {
+            client.setPhoneNumber(request.getPhoneNumber().trim());
+        }
+        if (request.getAddress() != null) {
+            client.setAddress(request.getAddress().trim());
+        }
+        clientRepository.save(client);
+
+        return mapToDTO(client);
+    }
+
     @Transactional(readOnly = true)
     public Page<ClientSearchDTO> searchClientsPaginated(String query, int page, int size) {
         return clientRepository.searchClients(query, PageRequest.of(page, size))

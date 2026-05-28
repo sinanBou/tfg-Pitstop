@@ -29,7 +29,6 @@ Este documento detalla la responsabilidad de cada carpeta y archivo clave tras l
      - WorkshopCreationModal.tsx: Modal para que el Owner dé de alta nuevos talleres.
    - home/
      - HeroSection.tsx: Primer impacto visual con mockup animado.
-     - FeaturesSection.tsx: Cuadrícula Bento con las ventajas del sistema.
    - registration/
      - RoleSelector.tsx: Selección visual de perfil (Taller o Conductor).
 

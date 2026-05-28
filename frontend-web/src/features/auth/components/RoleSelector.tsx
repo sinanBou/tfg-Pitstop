@@ -11,7 +11,7 @@ export function RoleSelector({ onSelectRole }: RoleSelectorProps) {
          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-neutral-400">Paso 1 de 2: Perfil</span>
       </div>
 
-      <h2 className="text-4xl md:text-5xl font-black mb-4 text-white uppercase italic tracking-tighter">Únete a <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-400">PitStop</span></h2>
+      <h2 className="text-4xl md:text-5xl font-black mb-4 text-white uppercase tracking-tighter">Únete a <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-red-400">PitStop</span></h2>
       <p className="text-neutral-500 mb-12 text-sm font-medium tracking-wide">Selecciona tu perfil operativo para comenzar.</p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-3xl">

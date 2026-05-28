@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
 import { Card } from '@/components/common/Card';
 import { InputField } from '@/components/common/Input';
@@ -91,7 +92,6 @@ export const ConfirmedAppointmentsList = ({
     <div className="mt-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <h3 className="text-white font-black uppercase tracking-widest text-sm flex items-center gap-3">
-          <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
           Citas Confirmadas
           <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">{confirmedAppointments.length}</span>
         </h3>
@@ -220,7 +220,7 @@ export const ConfirmedAppointmentsList = ({
       </div>
 
       {/* Glassmorphism Reception Modal */}
-      {isModalOpen && (
+      {isModalOpen && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
           <Card 
             variant="neutral" 
@@ -229,7 +229,7 @@ export const ConfirmedAppointmentsList = ({
             className="max-w-md w-full shadow-2xl relative animate-scale-in border-neutral-800"
           >
             <h2 className="text-xl md:text-2xl font-black uppercase tracking-wider text-white mb-2 flex items-center gap-2">
-              <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+              <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 112-2h2a2 2 0 012 2" /></svg>
               Recepcionar Vehículo
             </h2>
             {selectedAppointmentDetails && (
@@ -288,7 +288,8 @@ export const ConfirmedAppointmentsList = ({
               </div>
             </form>
           </Card>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

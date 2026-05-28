@@ -18,7 +18,6 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
   return (
     <div className="space-y-6">
       <h3 className="text-white font-black uppercase tracking-widest text-sm mb-6 flex items-center gap-3">
-        <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
         Pendientes de Confirmar
         <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">
           {appointments.length}
@@ -34,15 +33,15 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
               border={false}
               padding="none"
               rounded="2xl"
-              className="bg-yellow-500/5 p-5 border border-yellow-500/20 flex flex-col justify-between group relative overflow-hidden transition-all duration-300 hover:border-yellow-500/40"
+              className="bg-neutral-900/40 p-5 border border-neutral-800/80 flex flex-col justify-between group relative overflow-hidden transition-all duration-300 hover:border-neutral-700 hover:shadow-2xl"
             >
               <div>
-                <div className="text-[10px] font-black uppercase text-yellow-500 tracking-widest mb-1.5">
+                <div className="text-[10px] font-black uppercase text-neutral-400 tracking-widest mb-1.5">
                   {app.serviceType}
                 </div>
                 
                 <div className="flex items-center gap-2 mt-1 mb-2">
-                  <div className="w-6 h-6 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-yellow-500 shadow-inner group-hover:bg-yellow-600 group-hover:text-black transition-all [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:text-[8px] flex-shrink-0">
+                  <div className="w-6 h-6 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center text-neutral-400 shadow-inner group-hover:bg-neutral-800 group-hover:text-white transition-all [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:text-[8px] flex-shrink-0">
                     {getBrandLogo(app.vehicleDisplay ? app.vehicleDisplay.split(' ')[0] : '')}
                   </div>
                   <div className="text-lg font-black text-white leading-none">
@@ -65,7 +64,7 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
 
               <Button
                 onClick={() => onConfirmAppointment(app.id)}
-                className="!px-5 !py-3 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 border border-yellow-600/20 hover:border-yellow-500/40 group/btn"
+                className="!px-5 !py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 group/btn"
               >
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />

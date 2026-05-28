@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -7,6 +8,7 @@ interface BaseModalProps {
   subtitle?: string;
   theme?: 'blue' | 'red' | 'neutral' | 'green';
   progressBarWidth?: string; // e.g., "50%" or "100%"
+  showDot?: boolean;
   children: React.ReactNode;
 }
 
@@ -17,6 +19,7 @@ export const BaseModal = ({
   subtitle,
   theme = 'blue',
   progressBarWidth,
+  showDot = true,
   children
 }: BaseModalProps) => {
   if (!isOpen) return null;
@@ -39,7 +42,7 @@ export const BaseModal = ({
     theme === 'green' ? 'bg-green-600' : 
     'bg-blue-600';
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay con desenfoque */}
       <div 
@@ -48,7 +51,10 @@ export const BaseModal = ({
       />
       
       {/* Landscape Modal Container: Wider than tall (max-w-5xl, h-[85vh] max-h-[650px]) */}
-      <div className="relative bg-gradient-to-br from-neutral-900 to-black border border-neutral-800 rounded-3xl w-full max-w-5xl h-[85vh] max-h-[650px] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative bg-neutral-900/95 backdrop-blur-2xl border border-neutral-800 rounded-2xl w-full max-w-5xl h-[85vh] max-h-[650px] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-300">
+        
+        {/* Glow decorativo */}
+        <div className={`absolute top-0 right-0 w-64 h-64 ${glowColor} rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none`}></div>
         
         {/* Barra de progreso visual con brillo (Opcional) */}
         {progressBarWidth && (
@@ -67,10 +73,12 @@ export const BaseModal = ({
           <div>
             <h2 className="text-white text-2xl font-black uppercase tracking-widest flex items-center gap-3">
               {title}
-              <span className="flex h-2 w-2 relative">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${pingColor} opacity-75`}></span>
-                <span className={`relative inline-flex rounded-full h-2 w-2 ${dotColor}`}></span>
-              </span>
+              {showDot && (
+                <span className="flex h-2 w-2 relative">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${pingColor} opacity-75`}></span>
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${dotColor}`}></span>
+                </span>
+              )}
             </h2>
             {subtitle && (
               <p className="text-[10px] text-neutral-500 font-mono mt-1 uppercase">{subtitle}</p>
@@ -83,18 +91,13 @@ export const BaseModal = ({
           </button>
         </div>
 
-        {/* Contenido principal con scroll auto */}
         <div className="p-8 pb-12 relative flex-1 overflow-y-auto custom-scrollbar">
-          {/* Fondo decorativo interno */}
-          <div className="absolute inset-0 pointer-events-none overflow-hidden">
-            <div className={`absolute -top-[40%] -left-[40%] w-full h-full ${glowColor} blur-[100px] rounded-full mix-blend-screen`}></div>
-          </div>
-          
           <div className="relative z-10 h-full flex flex-col">
             {children}
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

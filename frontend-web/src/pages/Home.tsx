@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { HeroSection } from "@/features/home/components/HeroSection";
-import { FeaturesSection } from "@/features/home/components/FeaturesSection";
 import { Footer } from "@/features/home/components/FooterSection";
 import { Button } from "@/components/common/Button";
 
@@ -39,7 +38,6 @@ export default function Home() {
       </nav>
 
       <HeroSection />
-      <FeaturesSection />
       <Footer />
 
       {/* Estilos globales compartidos para home */}

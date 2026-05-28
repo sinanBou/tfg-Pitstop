@@ -280,7 +280,6 @@ export const TeamTab: React.FC<TeamTabProps> = ({
       <div>
         <div className="flex items-center justify-between mb-6 px-2">
           <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
-            <span className="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
             Miembros de la Plantilla ({employees.length})
           </h3>
         </div>

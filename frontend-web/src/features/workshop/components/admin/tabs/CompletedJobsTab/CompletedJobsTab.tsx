@@ -127,10 +127,6 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
           : 'border border-green-500/20 hover:border-green-500/40'
       }`}
     >
-      {/* Background glow */}
-      <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl pointer-events-none ${
-        isApprove ? 'bg-amber-500/5' : 'bg-green-500/5'
-      }`} />
 
       <div className="relative z-10 space-y-4">
         {/* Header */}
@@ -142,7 +138,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
                   ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
                   : 'bg-green-500/10 border-green-500/20 text-green-400'
               }`}>
-                {isApprove ? '⏳ Pendiente de Aprobación' : '✓ Cliente Avisado'}
+                {isApprove ? 'Pendiente de Aprobación' : 'Cliente Avisado'}
               </span>
             </div>
             <h4 className="text-lg font-black uppercase tracking-tight text-white truncate">

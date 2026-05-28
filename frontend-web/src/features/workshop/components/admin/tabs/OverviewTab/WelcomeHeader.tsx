@@ -31,7 +31,6 @@ export const WelcomeHeader: React.FC<WelcomeHeaderProps> = ({
               )}
             </div>
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-red-500">Sesión Activa</p>
               <h3 className="text-lg font-black text-white">{userName}</h3>
             </div>
           </div>

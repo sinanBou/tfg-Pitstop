@@ -25,7 +25,7 @@ export const MonthSelector: React.FC<MonthSelectorProps> = ({ selectedMonth, onC
   return (
     <div className="flex items-center gap-2">
       <label htmlFor="month-select" className="text-[10px] font-black uppercase tracking-widest text-neutral-500 font-mono">
-        Filtrar Período:
+        Filtrar Periodo:
       </label>
       <select
         id="month-select"

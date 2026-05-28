@@ -4,10 +4,12 @@ import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
 
 interface WorkshopProfileCardProps {
   workshopData: any;
+  userRole?: string;
 }
 
-export const WorkshopProfileCard: React.FC<WorkshopProfileCardProps> = ({ workshopData }) => {
+export const WorkshopProfileCard: React.FC<WorkshopProfileCardProps> = ({ workshopData, userRole }) => {
   const [isLogoPreviewOpen, setIsLogoPreviewOpen] = useState(false);
+  const showCif = userRole === 'WORKSHOP_OWNER';
 
   return (
     <>
@@ -23,10 +25,6 @@ export const WorkshopProfileCard: React.FC<WorkshopProfileCardProps> = ({ worksh
               </div>
             )}
             <div>
-              <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2 font-black">
-                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-                Centro de Operaciones
-              </p>
               <h2 className="text-3xl md:text-5xl font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-neutral-500 mb-3 leading-none">
                 {workshopData?.companyName}
               </h2>
@@ -39,10 +37,12 @@ export const WorkshopProfileCard: React.FC<WorkshopProfileCardProps> = ({ worksh
               </p>
             </div>
           </div>
-          <div className="bg-neutral-900 border border-neutral-850 px-8 py-4 rounded-2xl flex flex-col items-center shadow-2xl shrink-0">
-            <span className="text-[9px] uppercase tracking-widest text-neutral-500 font-black mb-1">Identificador Fiscal</span>
-            <span className="text-white font-mono font-black tracking-[0.2em] text-lg">{workshopData?.cif}</span>
-          </div>
+          {showCif && workshopData?.cif && (
+            <div className="bg-neutral-900 border border-neutral-850 px-8 py-4 rounded-2xl flex flex-col items-center shadow-2xl shrink-0">
+              <span className="text-[9px] uppercase tracking-widest text-neutral-500 font-black mb-1">Identificador Fiscal</span>
+              <span className="text-white font-mono font-black tracking-[0.2em] text-lg">{workshopData?.cif}</span>
+            </div>
+          )}
         </div>
       </Card>
 

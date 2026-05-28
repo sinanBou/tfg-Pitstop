@@ -22,9 +22,7 @@ export const Button: React.FC<ButtonProps> = ({
     ghost: 'bg-transparent hover:bg-white/5 text-neutral-400 hover:text-white border border-neutral-800 hover:border-neutral-700',
   };
 
-  const glowStyles = glow && variant === 'primary' 
-    ? 'shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:shadow-[0_0_40px_rgba(239,68,68,0.4)]' 
-    : '';
+  const glowStyles = '';
 
   return (
     <button

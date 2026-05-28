@@ -44,7 +44,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </div>
 
       <div className="flex items-center gap-3">
-        {type === 'workshop' && onOpenProfile && (
+        {onOpenProfile && (
           <button 
              onClick={onOpenProfile}
              className="px-4 h-10 flex items-center gap-2 text-xs font-black uppercase tracking-widest text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-xl transition-all shadow-[0_0_10px_rgba(0,0,0,0.5)] bg-neutral-900/50 border border-neutral-800 active:scale-[0.98]"

@@ -36,4 +36,11 @@ public class ClientController {
     public ResponseEntity<ClientSearchDTO> manualRegister(@RequestBody ClientSearchDTO request) {
         return ResponseEntity.ok(clientService.registerManualClient(request));
     }
+
+    @PutMapping("/me")
+    public ResponseEntity<ClientDTO> updateMe(
+            @AuthenticationPrincipal User user,
+            @RequestBody ClientDTO request) {
+        return ResponseEntity.ok(clientService.updateProfile(user.getEmail(), request));
+    }
 }

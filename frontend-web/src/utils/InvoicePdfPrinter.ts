@@ -20,7 +20,7 @@ export interface InvoiceData {
 /**
  * Genera y descarga una factura PDF maquetada nativamente en alta fidelidad y estética seria.
  */
-export function printInvoicePDF(inv: InvoiceData) {
+export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string) {
   const parsedParts: PartItem[] = JSON.parse(inv.partsJson || '[]');
   const dateObj = new Date(inv.createdAt);
   const formattedDate = dateObj.toLocaleDateString('es-ES', {
@@ -222,6 +222,15 @@ export function printInvoicePDF(inv: InvoiceData) {
           <p>Servicio: ${inv.description || 'Mantenimiento General'}</p>
         </div>
       </div>
+
+      ${translatedTasks ? `
+      <div class="details-block" style="margin-bottom: 30px;">
+        <h3>Operaciones y Trabajos Realizados</h3>
+        <p style="font-size: 14px; color: #111827; font-weight: 600; margin: 6px 0 0 0; letter-spacing: -0.2px;">
+          ${translatedTasks}
+        </p>
+      </div>
+      ` : ''}
 
       <table>
         <thead>

@@ -78,8 +78,8 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
       isOpen={isOpen}
       onClose={onClose}
       title="Nuevo Vehículo"
-      subtitle="Añade a tu garaje"
       theme="blue"
+      showDot={false}
     >
       <form onSubmit={handleSubmit} className="space-y-5 flex-1 flex flex-col justify-between h-full">
           <div className="grid grid-cols-2 gap-4">

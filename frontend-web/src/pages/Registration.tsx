@@ -54,7 +54,7 @@ export default function Registration() {
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 relative bg-zinc-950 font-sans selection:bg-red-500/30 selection:text-white overflow-hidden">
       
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen animate-pulse z-0"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-0"></div>
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none z-0"></div>
 
       <div className="w-full max-w-4xl z-10">
@@ -72,11 +72,9 @@ export default function Registration() {
             </button>
 
             <div className={`bg-neutral-950/60 backdrop-blur-xl p-10 sm:p-12 rounded-[2.5rem] border shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group ${role === 'workshop' ? 'border-red-900/30' : 'border-blue-900/30'}`}>
-              
-              <div className={`absolute top-0 left-1/4 right-1/4 h-px bg-gradient-to-r from-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500 ${role === 'workshop' ? 'via-red-500/50' : 'via-blue-500/50'}`}></div>
 
               <div className="mb-10 text-center">
-                <h2 className="text-3xl font-black text-white italic uppercase tracking-tighter mb-2">Registro <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? 'Taller' : 'Cliente'}</span></h2>
+                <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Registro <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? 'Taller' : 'Cliente'}</span></h2>
                 <p className="text-neutral-500 text-sm font-medium tracking-wide">Configura tus credenciales de acceso</p>
               </div>
 

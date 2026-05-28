@@ -18,4 +18,5 @@ public class ClientDTO {
     private String nif;
     private String phoneNumber;
     private String address;
+    private String profilePictureUrl;
 }

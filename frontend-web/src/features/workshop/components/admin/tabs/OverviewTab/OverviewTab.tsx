@@ -37,24 +37,18 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
       />
 
       {/* Workshop Profile Card */}
-      <WorkshopProfileCard workshopData={workshopData} />
+      <WorkshopProfileCard workshopData={workshopData} userRole={userRole || employeeProfile?.role} />
          
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
          {/* Active Vehicles Card */}
          <Card variant="neutral" glow={false} border={false} padding="lg" className="lg:col-span-1 relative overflow-hidden group !rounded-2xl">
-            <div className="absolute -bottom-6 -right-6 text-neutral-850/10 group-hover:text-red-500/10 transition-colors duration-500">
-               <svg className="w-48 h-48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M13 10V3L4 14h7v7l9-11h-7z" />
-               </svg>
-            </div>
             <div className="relative z-10 flex flex-col h-full justify-between">
                <div>
                   <p className="text-[10px] uppercase font-black tracking-[0.2em] text-red-500 mb-2">Estado del Taller</p>
                   <p className="text-7xl font-black text-white tracking-tighter drop-shadow-xl">{workshopData?.vehiclesCurrentCount || 0}</p>
                </div>
                <div className="mt-8">
-                  <p className="text-sm font-black text-white tracking-widest uppercase">Vehículos Activos</p>
-                  <p className="text-[10px] text-red-400 font-mono mt-1 font-bold">OPERACIONES EN CURSO</p>
+                  <p className="text-sm font-black text-white tracking-widest uppercase">Vehículos en Taller</p>
                </div>
             </div>
          </Card>
