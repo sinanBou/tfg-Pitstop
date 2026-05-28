@@ -195,7 +195,6 @@ export default function WorkerDashboard() {
                   <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
                     <div className="flex items-center justify-between p-5 border-b border-neutral-800/60">
                       <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
                         <span className="text-blue-400 text-[10px] font-black uppercase tracking-widest">Mi Agenda</span>
                       </div>
                       <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />

@@ -168,10 +168,10 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
                     type="button" 
                     key={dia.value}
                     onClick={() => handleDiasCambio(dia.value)}
-                    className={`px-3 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border ${
+                    className={`px-3 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border cursor-pointer active:scale-95 ${
                       form.workingDays.includes(dia.value) 
-                        ? 'bg-red-600/20 border-red-500 text-red-500 shadow-[0_0_15px_rgba(220,38,38,0.2)]' 
-                        : 'bg-neutral-900 border-neutral-800 text-neutral-500 hover:border-neutral-700'
+                        ? 'bg-red-600 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.45)]' 
+                        : 'bg-neutral-950/60 border-neutral-800/80 text-neutral-400 hover:text-white hover:border-neutral-700'
                     }`}
                   >
                     {dia.label}

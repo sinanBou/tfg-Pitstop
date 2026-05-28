@@ -317,7 +317,6 @@ export default function WorkshopAdminDashboard() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between p-5 border-b border-neutral-800/60 gap-4">
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">Mi Agenda</span>
                       </div>
                       

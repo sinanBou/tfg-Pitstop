@@ -218,7 +218,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
               <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Días Laborables</label>
               <div className="flex flex-wrap gap-2">
                 {diasSemana.map(dia => (
-                  <Button
+                  <button
                     type="button"
                     key={dia.value}
                     onClick={() => {
@@ -227,15 +227,14 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                         : [...settingsForm.workingDays, dia.value];
                       setSettingsForm({ ...settingsForm, workingDays });
                     }}
-                    glow={false}
-                    className={`px-4 py-3 text-[10px] border shadow-none ${
+                    className={`px-4 py-3 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 active:scale-95 border cursor-pointer ${
                       settingsForm.workingDays.includes(dia.value)
-                        ? 'bg-red-600/20 border-red-500 text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.25)] border-red-500'
-                        : 'bg-black/40 border-white/5 hover:border-white/10 text-neutral-500 hover:text-white'
+                        ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(220,38,38,0.45)]'
+                        : 'bg-neutral-950/60 border-neutral-800/80 text-neutral-400 hover:text-white hover:border-neutral-700'
                     }`}
                   >
                     {dia.label}
-                  </Button>
+                  </button>
                 ))}
               </div>
             </div>
