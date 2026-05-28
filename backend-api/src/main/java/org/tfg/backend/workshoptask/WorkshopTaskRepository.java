@@ -10,4 +10,5 @@ public interface WorkshopTaskRepository extends JpaRepository<WorkshopTask, UUID
     List<WorkshopTask> findByWorkshopIdAndDateTimeBetween(UUID workshopId, LocalDateTime start, LocalDateTime end);
     List<WorkshopTask> findByAssignedEmployeeIdAndDateTimeBetween(UUID employeeId, LocalDateTime start, LocalDateTime end);
     List<WorkshopTask> findByOriginAppointmentId(UUID appointmentId);
+    void deleteByOriginAppointmentId(UUID appointmentId);
 }

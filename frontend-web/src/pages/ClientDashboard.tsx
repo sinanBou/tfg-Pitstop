@@ -22,8 +22,6 @@ export default function ClientDashboard() {
   // 2. Nuevo estado para abrir/cerrar modal del registro de vehiculo
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const cocheEnTaller = vehicles.find((v) => v.status !== 'EN_CASA');
-
   const [isAppModalOpen, setIsAppModalOpen] = useState(false);
 
 
@@ -52,7 +50,7 @@ export default function ClientDashboard() {
             </header>
 
             {/* TAB CONTENT: INICIO */}
-            {activeTab === 0 && <ClientOverviewTab vehicles={vehicles} appointments={appointments} cocheEnTaller={cocheEnTaller} userProfile={userProfile} />}
+            {activeTab === 0 && <ClientOverviewTab vehicles={vehicles} appointments={appointments} userProfile={userProfile} />}
             {activeTab === 1 && <ClientVehiclesTab vehicles={vehicles} onAddVehicle={() => setIsModalOpen(true)} onDeleteVehicle={deleteVehicle} />}
             {activeTab === 2 && <ClientAppointmentsTab appointments={appointments} onAddAppointment={() => setIsAppModalOpen(true)} deleteAppointment={deleteAppointment} />}
             {activeTab === 3 && <ClientHistoryTab history={history} appointments={appointments} />}

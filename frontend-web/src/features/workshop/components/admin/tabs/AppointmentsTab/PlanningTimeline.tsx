@@ -109,9 +109,25 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
     if (!app) return;
 
     const duration = app.estimatedDuration || 60;
-    // Si se suelta sobre un mecánico, calculamos el día y la hora exactos del drop (que está en selectedDate).
-    // Si se suelta de vuelta a "SIN ASIGNAR" (employeeId === null), mantenemos su hora original.
-    const targetDate = employeeId !== null ? computeDropTime(e) : new Date(app.dateTime);
+    const originalDate = new Date(app.dateTime);
+    let targetDate = employeeId !== null ? computeDropTime(e) : originalDate;
+
+    // Enforce business rules: Appointments (not Tasks) can only change their scheduled hour if they are DELAYED or explicitly unlocked
+    const unlockedApps = JSON.parse(localStorage.getItem('unlocked_appointments') || '[]');
+    const isUnlocked = app.status === 'DELAYED' || unlockedApps.includes(app.id);
+
+    if (employeeId !== null && !app.isTask && !isUnlocked) {
+      const originalHour = originalDate.getHours();
+      const originalMinute = originalDate.getMinutes();
+      const dropHour = targetDate.getHours();
+      const dropMinute = targetDate.getMinutes();
+
+      if (originalHour !== dropHour || originalMinute !== dropMinute) {
+        // Snap back to the original hour and minutes of the appointment
+        targetDate = new Date(selectedDate);
+        targetDate.setHours(originalHour, originalMinute, 0, 0);
+      }
+    }
 
     // ── Collision detection (only for assigned columns) ──
     if (employeeId !== null) {

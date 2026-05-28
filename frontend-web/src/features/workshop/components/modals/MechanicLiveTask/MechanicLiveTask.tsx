@@ -49,7 +49,8 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
     let nextStatus = '';
     if (appointment.status === 'PENDING') nextStatus = 'CONFIRMED';
     else if (appointment.status === 'CONFIRMED') nextStatus = 'IN_PROGRESS';
-    else if (appointment.status === 'IN_PROGRESS') nextStatus = 'COMPLETED';
+    else if (appointment.status === 'DELAYED') nextStatus = 'IN_PROGRESS';
+    else if (appointment.status === 'IN_PROGRESS' && !appointment.isTask) nextStatus = 'COMPLETED';
 
     if (nextStatus) {
       await onUpdateStatus(appointment.id, nextStatus);
@@ -121,7 +122,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
 
         {/* Botones de Acción */}
         <div className="flex gap-2">
-          {appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+          {((appointment.status !== 'IN_PROGRESS' || !appointment.isTask) && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED') && (
             <button
               onClick={handleAction}
               disabled={isUpdating || !isVehicleReceived}
@@ -136,13 +137,13 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
                isUpdating ? 'Procesando...' : 
                appointment.status === 'PENDING' ? 'Confirmar' :
                appointment.status === 'CONFIRMED' ? 'Iniciar Trabajo' :
-               appointment.status === 'DELAYED' ? 'Reanudar' :
-               'Finalizar'}
+               appointment.status === 'IN_PROGRESS' ? 'Finalizar' :
+               'Reanudar'}
             </button>
           )}
 
           {/* Botón Gestionar: abre el checklist de tareas y piezas (requiere recepción) */}
-          {onViewChecklist && (appointment.status === 'IN_PROGRESS' || appointment.status === 'CONFIRMED') && (
+          {onViewChecklist && appointment.isTask && (appointment.status === 'IN_PROGRESS' || appointment.status === 'CONFIRMED') && (
             <button
               onClick={() => isVehicleReceived && onViewChecklist(appointment)}
               disabled={!isVehicleReceived}
@@ -161,7 +162,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
             </button>
           )}
 
-          {appointment.status === 'IN_PROGRESS' && (
+          {(appointment.status === 'IN_PROGRESS' || appointment.status === 'CONFIRMED' || appointment.status === 'PENDING') && (
             <button
               onClick={markAsDelayed}
               disabled={isUpdating}

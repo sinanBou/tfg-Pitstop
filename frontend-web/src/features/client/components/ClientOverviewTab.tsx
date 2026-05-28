@@ -1,17 +1,34 @@
-
-
 import type { UserDTO } from '@/types/client';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
-
+import { WorkshopVehicleCard } from '@/components/common/Card/index';
 
 interface ClientOverviewTabProps {
   vehicles: any[];
   appointments: any[];
-  cocheEnTaller: any;
   userProfile?: UserDTO | null;
 }
 
-export function ClientOverviewTab({ vehicles, appointments, cocheEnTaller, userProfile }: ClientOverviewTabProps) {
+export function ClientOverviewTab({ vehicles, appointments, userProfile }: ClientOverviewTabProps) {
+  // Override status dynamically to follow strict business rules:
+  // - If a vehicle has an active appointment in status 'COMPLETED', it's 'COMPLETED' ("Listo para Recoger").
+  // - If it has an active appointment in status 'IN_PROGRESS', it's 'IN_PROGRESS' ("En Curso").
+  // - If 'DELAYED', it's 'DELAYED' ("Retrasado").
+  // - If 'CONFIRMED', it's 'CONFIRMED' ("Confirmado").
+  // - If 'PENDING', it's 'PENDING' ("Pendiente").
+  // - If no active appointment (meaning not in workshop, or already PICKED_UP / delivered), it remains 'EN_CASA'.
+  const cochesConEstadoModificado = vehicles.map((v) => {
+    const activeApp = appointments.find(
+      (app) => app.vehicleId === v.id && !['CANCELLED', 'PICKED_UP'].includes(app.status)
+    );
+    
+    if (!activeApp) {
+      return { ...v, status: 'EN_CASA' };
+    }
+    
+    return { ...v, status: activeApp.status };
+  });
+
+  const cochesEnTaller = cochesConEstadoModificado.filter((v) => v.status !== 'EN_CASA');
+
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* SECTION: GREETING & PERSONAL INFO */}
@@ -34,10 +51,10 @@ export function ClientOverviewTab({ vehicles, appointments, cocheEnTaller, userP
          </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="space-y-6">
-           <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest">Vista General</h3>
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* SECTION: VISTA GENERAL METRICAS (Colocado Arriba) */}
+      <div className="space-y-6">
+         <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest">Resumen de Cuenta</h3>
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {vehicles.length > 0 ? (
                <div className="bg-neutral-900/40 border border-neutral-800 p-6 rounded-[2rem] relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 hover:shadow-2xl">
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
@@ -57,6 +74,7 @@ export function ClientOverviewTab({ vehicles, appointments, cocheEnTaller, userP
                   </div>
                </div>
             )}
+            
             <div className="bg-neutral-900/40 border border-neutral-800 p-6 rounded-[2rem] relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 hover:shadow-2xl">
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
                   <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -69,52 +87,29 @@ export function ClientOverviewTab({ vehicles, appointments, cocheEnTaller, userP
          </div>
       </div>
 
-      {cocheEnTaller && (
-         <div className="space-y-6">
-            <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest">En reparación</h3>
-            <div className="bg-gradient-to-br from-neutral-900/80 to-black border border-blue-900/50 p-6 md:p-8 rounded-[2rem] relative overflow-hidden group hover:border-blue-500/50 transition-all duration-300 flex flex-col hover:shadow-2xl hover:-translate-y-1">
-               <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
-                  <svg className="w-32 h-32 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-               </div>
-               <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_0%,rgba(59,130,246,0.05)_50%,transparent_100%)] group-hover:animate-[shimmer_2s_infinite] -skew-x-12 pointer-events-none"></div>
-
-               <div className="relative z-10 flex flex-col h-full gap-6">
-                  <div className="flex justify-between items-start">
-                     <div>
-                        <div className="flex items-center gap-2 mb-3 bg-blue-500/10 border border-blue-500/20 px-3 py-1.5 rounded-full inline-flex">
-                           <span className="relative flex h-2 w-2">
-                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                              <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                            </span>
-                            <p className="text-blue-400 text-[10px] font-black uppercase tracking-[0.2em]">{cocheEnTaller.status.replace('_', ' ')}</p>
-                         </div>
-                         <h4 className="text-3xl lg:text-4xl text-white font-black uppercase leading-none mb-1 flex items-center gap-2">
-                         <span className="shrink-0 flex items-center justify-center [&_svg]:w-7 [&_svg]:h-7 [&_div]:w-7 [&_div]:h-7 [&_div]:text-sm">
-                            {getBrandLogo((cocheEnTaller.brand || '').split(' ')[0])}
-                         </span>
-                        <span>{cocheEnTaller.brand}</span>
-                      </h4>
-                         <h5 className="text-lg lg:text-xl text-neutral-400 font-bold uppercase">{cocheEnTaller.model}</h5>
-                        <p className="text-neutral-500 text-xs font-mono mt-3 bg-black/50 inline-block px-3 py-1.5 rounded-lg border border-neutral-800 shadow-inner">{cocheEnTaller.licensePlate}</p>
-                     </div>
+      {/* SECTION: EN REPARACIÓN (Deslizador Horizontal Premium - Colocado Abajo) */}
+      {cochesEnTaller.length > 0 && (
+         <div className="space-y-4 animate-fade-in">
+            <div className="flex justify-between items-center">
+               <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                  En reparación ({cochesEnTaller.length})
+               </h3>
+               {cochesEnTaller.length > 1 && (
+                  <p className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest animate-pulse">
+                     Desliza para ver más →
+                  </p>
+               )}
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x scroll-smooth">
+               {cochesEnTaller.map((vehicle) => (
+                  <div key={vehicle.id} className="snap-start shrink-0">
+                     <WorkshopVehicleCard vehicle={vehicle} />
                   </div>
-                  
-                  <div className="mt-auto pt-6 border-t border-neutral-800/50">
-                     <div className="flex justify-between items-center mb-2">
-                         <span className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Progreso</span>
-                         <span className="text-[10px] font-mono text-blue-400">En Curso</span>
-                     </div>
-                     <div className="h-2 w-full bg-neutral-900 rounded-full overflow-hidden shadow-inner border border-neutral-800/50">
-                        <div className="h-full bg-[linear-gradient(to_right,rgba(37,99,235,0.8),rgba(96,165,250,1))] w-2/3 rounded-full relative">
-                           <div className="absolute right-0 top-0 h-full w-full bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent)] animate-[shimmer_2s_infinite]"></div>
-                        </div>
-                     </div>
-                  </div>
-               </div>
+               ))}
             </div>
          </div>
       )}
-    </div>
     </div>
   );
 }

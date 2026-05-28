@@ -68,6 +68,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
           appointments={appointments} 
           onDeleteAppointment={handleDeleteAppointment} 
           onCheckInAppointment={checkInVehicle}
+          onUpdateStatus={updateAppointmentStatus}
         />
       </Card>
     </div>

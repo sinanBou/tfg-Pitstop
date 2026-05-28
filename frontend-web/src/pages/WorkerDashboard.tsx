@@ -276,6 +276,10 @@ export default function WorkerDashboard() {
                   appointments={appointments}
                   readyJobs={readyForCompletion}
                   fetchWorkshopData={fetchWorkerData}
+                  onGoToPlanning={() => {
+                    const idx = SECCIONES.indexOf('PLANIFICACIÓN');
+                    if (idx !== -1) setActiveTab(idx);
+                  }}
                 />
               )}
 

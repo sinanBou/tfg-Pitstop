@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { HeroSection } from "@/features/home/components/HeroSection";
 import { FeaturesSection } from "@/features/home/components/FeaturesSection";
 import { Footer } from "@/features/home/components/FooterSection";
+import { Button } from "@/components/common/Button";
 
 export default function Home() {
+  const navigate = useNavigate();
   return (
     <div className="w-full flex flex-col bg-zinc-950 font-sans selection:bg-red-600/30 selection:text-white relative overflow-hidden">
       
@@ -17,8 +19,21 @@ export default function Home() {
          <div className="w-full max-w-6xl bg-neutral-900/50 backdrop-blur-xl border border-neutral-800 rounded-2xl px-6 py-4 flex justify-between items-center shadow-lg">
             <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">PitStop <span className="text-red-600 text-[10px] tracking-[0.2em] ml-1">v2.0</span></h1>
             <div className="flex gap-4 items-center">
-               <Link to="/login" className="text-[10px] md:text-xs font-black uppercase tracking-widest text-neutral-400 hover:text-white transition-colors">Iniciar Sesión</Link>
-               <Link to="/registration" className="bg-white text-black text-[10px] md:text-xs font-black uppercase tracking-widest px-5 py-2.5 rounded-xl hover:bg-neutral-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]">Comenzar</Link>
+               <Button 
+                 onClick={() => navigate('/login')} 
+                 variant="ghost"
+                 className="!px-4 !py-2.5 !text-[10px] md:!text-xs border-transparent hover:border-neutral-800"
+               >
+                 Iniciar Sesión
+               </Button>
+               <Button 
+                 onClick={() => navigate('/registration')} 
+                 variant="primary"
+                 className="!px-5 !py-2.5 !text-[10px] md:!text-xs !bg-white !text-black hover:!bg-neutral-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] border-transparent"
+                 glow={false}
+               >
+                 Registrarse
+               </Button>
             </div>
          </div>
       </nav>

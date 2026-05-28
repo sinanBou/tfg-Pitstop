@@ -243,6 +243,24 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                 </button>
               )}
 
+              {/* Retrasar */}
+              {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    if (window.confirm("¿Seguro que deseas marcar esta cita/tarea como retrasada?")) {
+                      await onUpdateStatus(appointment.id, 'DELAYED', appointment.isTask);
+                    }
+                  }}
+                  className="w-7 h-7 bg-black/90 backdrop-blur-sm border border-amber-500/30 text-amber-500 rounded-full transition-all hover:bg-amber-500 hover:text-white shadow-xl flex items-center justify-center active:scale-95 cursor-pointer"
+                  title="Marcar como Retrasada"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+              )}
+
              {/* Eliminar */}
              {!readOnly && onUpdateStatus && (
                 <button

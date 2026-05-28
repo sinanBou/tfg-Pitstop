@@ -6,14 +6,16 @@ import { Button } from '@/components/common/Button';
 
 interface ConfirmedAppointmentsListProps {
   appointments: any[];
-  onDeleteAppointment: (id: string) => void;
+  onDeleteAppointment: (id: string) => Promise<boolean | void>;
   onCheckInAppointment?: (id: string, kilometers: number, notes: string) => Promise<boolean>;
+  onUpdateStatus?: (id: string, status: string) => Promise<boolean | void>;
 }
 
 export const ConfirmedAppointmentsList = ({ 
   appointments, 
   onDeleteAppointment,
-  onCheckInAppointment
+  onCheckInAppointment,
+  onUpdateStatus
 }: ConfirmedAppointmentsListProps) => {
   const [confirmedSearch, setConfirmedSearch] = useState('');
   
@@ -24,9 +26,9 @@ export const ConfirmedAppointmentsList = ({
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // All confirmed or in progress appointments with optional search
+  // All confirmed, in progress or delayed appointments with optional search
   const confirmedAppointments = useMemo(() => {
-    const confirmed = appointments.filter((a: any) => a.status === 'CONFIRMED' || a.status === 'IN_PROGRESS');
+    const confirmed = appointments.filter((a: any) => a.status === 'CONFIRMED' || a.status === 'IN_PROGRESS' || a.status === 'DELAYED');
     if (!confirmedSearch.trim()) return confirmed;
     
     const search = confirmedSearch.toLowerCase();
@@ -37,9 +39,14 @@ export const ConfirmedAppointmentsList = ({
     );
   }, [appointments, confirmedSearch]);
 
-  const handleDelete = (id: string) => {
-    if (window.confirm("¿Deseas eliminar esta cita y todas las tareas relacionadas de forma permanente?")) {
-      onDeleteAppointment(id);
+  const handleDelete = async (id: string) => {
+    if (window.confirm("¿Deseas cancelar esta cita y todas las tareas relacionadas de forma permanente?")) {
+      try {
+        await onDeleteAppointment(id);
+      } catch (err) {
+        console.error("Error al cancelar la cita:", err);
+        alert("No se pudo cancelar la cita. Puede que esté en un estado que no permite la cancelación.");
+      }
     }
   };
 
@@ -118,6 +125,9 @@ export const ConfirmedAppointmentsList = ({
                   {app.status === 'IN_PROGRESS' && (
                     <span className="bg-blue-500/10 text-blue-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-blue-500/20">En Curso</span>
                   )}
+                  {app.status === 'DELAYED' && (
+                    <span className="bg-amber-500/10 text-amber-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-amber-500/20 animate-pulse">Retrasada</span>
+                  )}
                   {app.vehicleReceived && (
                     <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-emerald-500/20">En Taller</span>
                   )}
@@ -175,13 +185,31 @@ export const ConfirmedAppointmentsList = ({
               )}
             </div>
             
-            <Button 
-              variant="danger"
-              onClick={() => handleDelete(app.id)}
-              className="w-full !px-4 !py-2.5 opacity-0 group-hover:opacity-100 mt-4"
-            >
-              Cancelar y Eliminar
-            </Button>
+            <div className="flex gap-2 mt-4 opacity-0 group-hover:opacity-100 transition-opacity w-full">
+              {onUpdateStatus && app.status !== 'DELAYED' && (
+                <Button
+                  variant="secondary"
+                  onClick={async () => {
+                    if (window.confirm("¿Seguro que deseas marcar esta cita como retrasada?")) {
+                      await onUpdateStatus(app.id, 'DELAYED');
+                    }
+                  }}
+                  className="flex-1 !px-3 !py-2 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 flex items-center justify-center gap-1 font-bold text-xs"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Retrasar
+                </Button>
+              )}
+              <Button 
+                variant="danger"
+                onClick={() => handleDelete(app.id)}
+                className="flex-1 !px-3 !py-2"
+              >
+                Cancelar
+              </Button>
+            </div>
           </Card>
         ))}
         {confirmedAppointments.length === 0 && confirmedSearch.trim() && (

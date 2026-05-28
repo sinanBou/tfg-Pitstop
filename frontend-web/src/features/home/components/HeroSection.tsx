@@ -1,7 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/common/Button';
 
 export const HeroSection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section className="relative z-10 w-full min-h-screen flex flex-col justify-center items-center text-center px-4 pt-32 pb-20">
       <div className="inline-flex items-center gap-2 px-4 py-2 mb-10 rounded-full border border-neutral-800 bg-neutral-900/50 backdrop-blur-md animate-fade-in-up">
@@ -22,15 +24,25 @@ export const HeroSection: React.FC = () => {
       </p>
 
       <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
-        <Link 
-          to="/registration" 
-          className="group relative inline-flex items-center justify-center bg-white text-black text-xs md:text-sm font-black uppercase tracking-widest py-4 px-10 rounded-2xl shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 transition-all duration-300 overflow-hidden"
+        <Button 
+          onClick={() => navigate('/registration')} 
+          variant="primary"
+          className="shadow-[0_0_40px_rgba(255,255,255,0.2)] !bg-white !text-black hover:!bg-neutral-200 border-transparent transition-all duration-300 scale-105 active:scale-95 px-10 py-4"
+          glow={false}
         >
           <span className="relative z-10 flex items-center gap-3">
-            Crear Cuenta Gratis
-            <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-          </span>
-        </Link>
+            Registrarse
+            </span>
+        </Button>
+        <Button 
+          onClick={() => navigate('/login')} 
+          variant="ghost"
+          className="border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white transition-all duration-300 scale-105 active:scale-95 px-10 py-4"
+        >
+          <span className="relative z-10 flex items-center gap-3">
+            Iniciar Sesión
+           </span>
+        </Button>
       </div>
 
       <div className="mt-20 w-full max-w-5xl relative animate-fade-in-up" style={{ animationDelay: '400ms' }}>

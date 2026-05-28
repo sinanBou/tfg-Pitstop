@@ -54,6 +54,9 @@ public class AppointmentService {
                      e.getUser().getRole() == org.tfg.backend.user.Role.WORKSHOP_MANAGER))
                 .count();
         long totalMechanics = staffCount == 0 ? 1 : staffCount;
+        if (workshop.getIncludeOwnerInPlanning() != null && workshop.getIncludeOwnerInPlanning()) {
+            totalMechanics += 1;
+        }
         System.out.println("[DEBUG-CAPACITY] getAvailableSlots: workshop=" + workshop.getCompanyName() + ", employees=" + workshop.getEmployees().size() + ", staffCount=" + staffCount + " -> totalMechanics=" + totalMechanics);
 
         LocalTime open = (workshop.getOpenTime() != null) ? workshop.getOpenTime() : LocalTime.of(9, 0);
@@ -167,6 +170,9 @@ public class AppointmentService {
                      e.getUser().getRole() == org.tfg.backend.user.Role.WORKSHOP_MANAGER))
                 .count();
         long totalMechanics = staffCount == 0 ? 1 : staffCount;
+        if (workshop.getIncludeOwnerInPlanning() != null && workshop.getIncludeOwnerInPlanning()) {
+            totalMechanics += 1;
+        }
 
         if ((busyMechanics + unassignedInSlot) >= totalMechanics) {
             throw new RuntimeException(
@@ -499,14 +505,30 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteAppointment(UUID id) {
-        // Verificamos si existe antes de borrar para evitar excepciones genéricas
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("La cita con ID " + id + " no existe"));
 
-        // Regla de Negocio: No se puede eliminar una cita que ya está retrasada o finalizada
-        if (appointment.getStatus() == AppointmentStatus.DELAYED || appointment.getStatus() == AppointmentStatus.COMPLETED) {
-            throw new RuntimeException("No se puede eliminar una cita en su estado actual.");
+        // Solo bloquear eliminación si ya fue completada o recogida
+        if (appointment.getStatus() == AppointmentStatus.COMPLETED || appointment.getStatus() == AppointmentStatus.PICKED_UP) {
+            throw new RuntimeException("No se puede eliminar una cita que ya ha sido completada o recogida.");
+        }
+
+        // Limpiar tareas asociadas
+        workshopTaskRepository.deleteByOriginAppointmentId(id);
+
+        // Limpiar factura asociada si existe
+        invoiceRepository.findByAppointmentId(id).ifPresent(invoiceRepository::delete);
+
+        // Liberar vehículo si estaba recibido en el taller
+        if (Boolean.TRUE.equals(appointment.getVehicleReceived())) {
+            var vehicle = appointment.getVehicle();
+            if (vehicle != null) {
+                vehicle.setCurrentWorkshop(null);
+                vehicle.setStatus("CANCELADO");
+                vehicleRepository.save(vehicle);
+            }
         }
 
         appointmentRepository.delete(appointment);

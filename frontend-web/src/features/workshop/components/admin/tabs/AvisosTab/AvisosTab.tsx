@@ -3,17 +3,18 @@ import { API_BASE_URL } from '@/config/api';
 import type { WorkshopInventory } from '@/types/client';
 import { BaseModal } from '@/components/common/BaseModal/index';
 import { SearchableSelect } from '@/components/common/SearchableSelect/index';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
 import { Badge } from '@/components/common/Badge';
+import { Button } from '@/components/common/Button';
 import { InputField } from '@/components/common/Input';
 import { AvisoMetricCard } from './AvisoMetricCard';
+import { AvisoPanel } from './AvisoPanel';
 
 interface AvisosTabProps {
   workshopId: string;
   appointments: any[];
   readyJobs: any[];
   fetchWorkshopData: () => Promise<void>;
+  onGoToPlanning?: () => void;
 }
 
 export const AvisosTab: React.FC<AvisosTabProps> = ({
@@ -21,6 +22,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
   appointments,
   readyJobs,
   fetchWorkshopData,
+  onGoToPlanning,
 }) => {
   const [inventory, setInventory] = useState<WorkshopInventory[]>([]);
   const [categories, setCategories] = useState<{ id: string; displayName: string }[]>([]);
@@ -138,6 +140,10 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
   const confirmedApps = appointments.filter((a) => a.status === 'CONFIRMED' || a.status === 'IN_PROGRESS');
 
+  // Delayed appointments list
+  const dismissedWarnings = JSON.parse(localStorage.getItem('dismissed_delay_warnings') || '[]');
+  const delayedApps = appointments.filter((a) => a.status === 'DELAYED' && !dismissedWarnings.includes(a.id));
+
   return (
     <div className="space-y-8 animate-fade-in-up relative">
       {/* Indicadores de cantidad arriba */}
@@ -159,94 +165,148 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
         />
       </div>
 
-      {/* Alertas de Almacén debajo */}
-      <Card variant="neutral" glow={false} padding="lg">
-        <div className="flex items-center justify-between border-b border-neutral-800/60 pb-6 mb-6">
-          <h3 className="text-white font-black uppercase tracking-wider text-xs flex items-center gap-2.5">
-            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            Alertas de Stock de Almacén
-            <Badge variant="danger">{lowStockItems.length}</Badge>
-          </h3>
-        </div>
+      {/* Paneles de Stock y Retrasos - Uno al lado del otro */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        
+        {/* PANEL IZQUIERDO: RETRASOS DE CITAS Y TAREAS */}
+        <AvisoPanel
+          title="Retrasos de Citas y Tareas"
+          badgeCount={delayedApps.length}
+          badgeVariant="warning"
+          indicatorColor="bg-amber-500"
+          borderColor="border-amber-500/10"
+          isEmpty={delayedApps.length === 0}
+          emptyStateMessage="Sin retrasos registrados"
+        >
+          {delayedApps.map((app) => (
+            <div
+              key={app.id}
+              className="bg-black/30 border border-neutral-800/80 p-5 rounded-2xl flex flex-col justify-between gap-4 group hover:border-amber-500/50 hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(245,158,11,0.06)] transition-all relative overflow-hidden"
+            >
+              <div className="space-y-2">
+                <div className="flex justify-between items-start">
+                  <Badge variant="warning">RETRASADO</Badge>
+                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-bold">
+                    {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h
+                  </span>
+                </div>
+                
+                <h4 className="text-sm font-extrabold text-white group-hover:text-amber-500 transition-colors flex items-center gap-1.5 mt-2 uppercase">
+                  {app.vehicleDisplay || 'Vehículo'}
+                </h4>
+                
+                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
+                  Cliente: {app.clientFullName || 'N/A'}
+                </p>
+                
+                <p className="text-xs text-neutral-500 font-medium leading-relaxed italic border-t border-neutral-800/60 pt-2">
+                  "{app.serviceType || 'Servicio'}: {app.description || 'Sin descripción'}"
+                </p>
+              </div>
 
-        {loadingInv ? (
-          <div className="py-16 text-center text-neutral-500 flex flex-col items-center justify-center gap-3">
-            <div className="w-6 h-6 border-2 border-neutral-800 border-t-red-500 rounded-full animate-spin" />
-            <span className="text-[10px] uppercase tracking-widest font-black">
-              Analizando existencias...
-            </span>
-          </div>
-        ) : lowStockItems.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {lowStockItems.map((item) => {
-              const stockVal = item.stockQuantity;
-              const threshVal = item.avisoThreshold || 1;
-              const percent = Math.min(100, Math.max(0, (stockVal / (threshVal || 1)) * 100));
-              const isCritical = stockVal === 0;
+              {onGoToPlanning && (
+                <button
+                  onClick={() => {
+                    // 1. Eliminar el aviso de retraso del listado local
+                    const currDismissed = JSON.parse(localStorage.getItem('dismissed_delay_warnings') || '[]');
+                    localStorage.setItem('dismissed_delay_warnings', JSON.stringify([...currDismissed, app.id]));
 
-              return (
-                <div
-                  key={item.id}
-                  onClick={() => handleStartEdit(item)}
-                  className="bg-black/30 border border-neutral-800/80 p-5 rounded-2xl flex flex-col gap-4 group hover:border-red-500/50 hover:bg-neutral-900/40 hover:scale-[1.02] shadow-sm hover:shadow-[0_0_20px_rgba(239,68,68,0.1)] transition-all cursor-pointer select-none"
-                  title="Haga clic para gestionar y editar este repuesto"
+                    // 2. Eliminar el bloqueo de hora fija para que pueda agendarse libremente
+                    const currUnlocked = JSON.parse(localStorage.getItem('unlocked_appointments') || '[]');
+                    localStorage.setItem('unlocked_appointments', JSON.stringify([...currUnlocked, app.id]));
+
+                    // 3. Redirigir a planificación
+                    onGoToPlanning();
+                  }}
+                  className="w-full py-2.5 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 mt-2"
                 >
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <Badge variant={isCritical ? 'danger' : 'neutral'}>
-                        {isCritical ? 'CRÍTICO: SIN STOCK' : 'STOCK BAJO'}
-                      </Badge>
-                      <h4 className="text-sm font-extrabold text-white group-hover:text-red-500 transition-colors flex items-center gap-1.5 mt-2">
-                        {item.part.name}
-                        <svg className="w-3.5 h-3.5 text-neutral-500 group-hover:text-red-500 opacity-40 group-hover:opacity-100 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                        </svg>
-                      </h4>
-                      <p className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider">
-                        OEM: {item.part.oemReference || 'N/A'} • Fab: {item.part.manufacturer || 'N/A'}
-                      </p>
-                    </div>
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Ir a Planificación
+                </button>
+              )}
+            </div>
+          ))}
+        </AvisoPanel>
 
-                    <div className="text-right">
-                      <span className="text-xs font-mono font-black text-white">
-                        {stockVal}{' '}
-                        <span className="text-neutral-500 text-[10px] font-normal">
-                          de {item.avisoThreshold} uds.
-                        </span>
-                      </span>
-                      <span className="text-[8px] font-black uppercase text-neutral-500 block tracking-widest mt-1">
-                        UMBRAL: {item.avisoThreshold}
-                      </span>
-                    </div>
-                  </div>
+        {/* PANEL DERECHO: ALERTAS DE STOCK DE ALMACÉN */}
+        <AvisoPanel
+          title="Alertas de Stock de Almacén"
+          badgeCount={lowStockItems.length}
+          badgeVariant="danger"
+          indicatorColor="bg-red-500"
+          borderColor="border-red-500/10"
+          isEmpty={lowStockItems.length === 0}
+          emptyStateMessage="Todo el stock está correcto"
+          isLoading={loadingInv}
+          loadingMessage="Analizando existencias..."
+        >
+          {lowStockItems.map((item) => {
+            const stockVal = item.stockQuantity;
+            const threshVal = item.avisoThreshold || 1;
+            const percent = Math.min(100, Math.max(0, (stockVal / (threshVal || 1)) * 100));
+            const isCritical = stockVal === 0;
 
-                  {/* Barra de progreso de alerta */}
-                  <div className="space-y-1.5">
-                    <div className="w-full h-2 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
-                      <div
-                        className={`h-full rounded-full transition-all duration-500 ${
-                          isCritical ? 'bg-red-600' : 'bg-white/80'
-                        }`}
-                        style={{ width: `${percent}%` }}
-                      />
-                    </div>
-                    <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider flex justify-between">
-                      <span>Nivel de Stock actual</span>
-                      <span className={isCritical ? 'text-red-500 font-black' : 'text-neutral-300 font-black'}>
-                        {isCritical ? 'Agotado' : 'Haga clic para editar'}
-                      </span>
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleStartEdit(item)}
+                className="bg-black/30 border border-neutral-800/80 p-5 rounded-2xl flex flex-col gap-4 group hover:border-red-500/50 hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(239,68,68,0.06)] transition-all cursor-pointer select-none"
+                title="Haga clic para gestionar y editar este repuesto"
+              >
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <Badge variant={isCritical ? 'danger' : 'neutral'}>
+                      {isCritical ? 'CRÍTICO: SIN STOCK' : 'STOCK BAJO'}
+                    </Badge>
+                    <h4 className="text-sm font-extrabold text-white group-hover:text-red-500 transition-colors flex items-center gap-1.5 mt-2 truncate">
+                      {item.part.name}
+                      <svg className="w-3.5 h-3.5 text-neutral-500 group-hover:text-red-500 opacity-40 group-hover:opacity-100 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                      </svg>
+                    </h4>
+                    <p className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider truncate">
+                      OEM: {item.part.oemReference || 'N/A'} • Fab: {item.part.manufacturer || 'N/A'}
                     </p>
                   </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-xs font-mono font-black text-white block">
+                      {stockVal}{' '}
+                      <span className="text-neutral-500 text-[10px] font-normal">
+                        de {item.avisoThreshold} uds.
+                      </span>
+                    </span>
+                    <span className="text-[8px] font-black uppercase text-neutral-500 block tracking-widest mt-1">
+                      UMBRAL: {item.avisoThreshold}
+                    </span>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="py-16 text-center text-neutral-500 text-[10px] uppercase tracking-widest font-black border border-dashed border-neutral-800 rounded-2xl">
-            Todo el stock está correcto
-          </div>
-        )}
-      </Card>
+
+                {/* Barra de progreso de alerta */}
+                <div className="space-y-1.5">
+                  <div className="w-full h-2 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        isCritical ? 'bg-red-600' : 'bg-white/80'
+                      }`}
+                      style={{ width: `${percent}%` }}
+                    />
+                  </div>
+                  <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider flex justify-between">
+                    <span>Nivel de Stock actual</span>
+                    <span className={isCritical ? 'text-red-500 font-black' : 'text-neutral-300 font-black'}>
+                      {isCritical ? 'Agotado' : 'Haga clic para editar'}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </AvisoPanel>
+
+      </div>
 
       {/* MODAL DE EDICIÓN DE STOCK DE ALMACÉN */}
       <BaseModal
@@ -301,91 +361,68 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                 onChange={(e) => setEditManufacturer(e.target.value)}
               />
 
-              {/* Stock Cantidad */}
+              {/* Ficha técnica */}
               <InputField
-                label="Cantidad en almacén"
+                label="Ficha Técnica / Especificaciones"
+                multiline
+                rows={3}
+                value={editSpecs}
+                onChange={(e) => setEditSpecs(e.target.value)}
+                className="md:col-span-2"
+              />
+
+              {/* Cantidad Actual */}
+              <InputField
+                label="Stock actual"
                 type="number"
-                min="0"
                 required
                 value={editStockQty}
                 onChange={(e) => setEditStockQty(e.target.value)}
-                mono={true}
               />
 
-              {/* Umbral Aviso */}
+              {/* Umbral Mínimo */}
               <InputField
-                label="Umbral de Aviso Mínimo"
+                label="Umbral de aviso"
                 type="number"
-                min="0"
                 required
                 value={editAvisoThreshold}
                 onChange={(e) => setEditAvisoThreshold(e.target.value)}
-                mono={true}
               />
 
               {/* Precio Coste */}
               <InputField
                 label="Precio de Coste (€)"
                 type="number"
-                step="0.01"
-                min="0"
                 required
                 value={editCostPrice}
                 onChange={(e) => setEditCostPrice(e.target.value)}
-                mono={true}
               />
 
               {/* Precio Venta */}
               <InputField
                 label="Precio de Venta (€)"
                 type="number"
-                step="0.01"
-                min="0"
                 required
                 value={editRetailPrice}
                 onChange={(e) => setEditRetailPrice(e.target.value)}
-                mono={true}
-              />
-
-              {/* Especificaciones */}
-              <InputField
-                label="Especificaciones Técnicas"
-                multiline={true}
-                rows={2}
-                value={editSpecs}
-                onChange={(e) => setEditSpecs(e.target.value)}
-                className="md:col-span-2"
               />
             </div>
 
-            <div className="flex gap-4 justify-end pt-5 border-t border-neutral-800/60 mt-auto shrink-0">
+            <div className="flex gap-4 pt-4 border-t border-neutral-800/60 mt-4">
               <Button
+                type="button"
                 variant="secondary"
                 onClick={() => setEditingItem(null)}
-                className="px-6 h-12"
+                className="w-1/2 !py-3"
               >
                 Cancelar
               </Button>
               <Button
                 type="submit"
                 disabled={savingEdit}
-                variant="primary"
-                glow={true}
-                className="px-8 h-12"
+                className="w-1/2 !py-3 bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]"
               >
-                {savingEdit ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-neutral-500 border-t-white rounded-full animate-spin" />
-                    Guardando...
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Guardar Cambios
-                  </>
-                )}
+                {savingEdit ? 'Guardando...' : 'Guardar Cambios'}
               </Button>
             </div>
           </form>

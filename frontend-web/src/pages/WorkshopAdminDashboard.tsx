@@ -221,6 +221,7 @@ export default function WorkshopAdminDashboard() {
                   appointments={appointments}
                   readyJobs={readyForCompletion}
                   fetchWorkshopData={fetchWorkshopData}
+                  onGoToPlanning={() => setActiveTab(3)}
                 />
               )}
 
