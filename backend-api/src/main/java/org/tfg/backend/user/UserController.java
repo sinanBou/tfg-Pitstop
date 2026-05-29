@@ -7,30 +7,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.tfg.backend.user.service.UserLookupService;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserLookupService userLookupService;
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMe(@AuthenticationPrincipal UserDetails userDetails) {
-
-        UserDTO userDto = userService.getUserDetails(userDetails.getUsername());
-
-        UserDTO finalDto = UserDTO.builder()
-                .id(userDto.getId())
-                .firstname(userDto.getFirstname())
-                .lastname(userDto.getLastname())
-                .email(userDto.getEmail())
-                .role(userDto.getRole())
-                .clientId(userDto.getClientId())
-                .employeeId(userDto.getEmployeeId())
-                .workshopId(userDto.getWorkshopId())
-                .build();
-
-        return ResponseEntity.ok(finalDto);
+        UserDTO userDto = userLookupService.getUserDetails(userDetails.getUsername());
+        return ResponseEntity.ok(userDto);
     }
 }

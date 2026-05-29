@@ -1,0 +1,15 @@
+# Ignorar archivos locales y confidenciales de configuración de IA
+.env
+
+# Ignorar entorno virtual de Python
+venv/
+
+# Ignorar almacenamiento local persistente de ChromaDB
+chroma_db/
+
+# Ignorar archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/

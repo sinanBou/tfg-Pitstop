@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +14,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WorkshopController {
 
-    private final WorkshopService workshopService;
+    private final WorkshopAdminService workshopAdminService;
+    private final WorkshopLookupService workshopLookupService;
 
     /**
      * Crea un nuevo taller.
@@ -22,7 +24,7 @@ public class WorkshopController {
      */
     @PostMapping
     public ResponseEntity<WorkshopDTO> createWorkshop(@RequestBody WorkshopRequest request) {
-        return ResponseEntity.ok(workshopService.saveWorkshop(request));
+        return ResponseEntity.ok(workshopAdminService.saveWorkshop(request));
     }
 
     /**
@@ -31,7 +33,7 @@ public class WorkshopController {
      */
     @GetMapping
     public ResponseEntity<List<WorkshopDTO>> getAllWorkshops() {
-        return ResponseEntity.ok(workshopService.getAllWorkshops());
+        return ResponseEntity.ok(workshopLookupService.getAllWorkshops());
     }
 
     /**
@@ -40,15 +42,13 @@ public class WorkshopController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<WorkshopDTO> getWorkshopById(@PathVariable UUID id) {
-        return ResponseEntity.ok(workshopService.getWorkshopById(id));
+        return ResponseEntity.ok(workshopLookupService.getWorkshopById(id));
     }
 
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<WorkshopDTO>> getWorkshopsByOwner(@PathVariable UUID ownerId) {
-        return ResponseEntity.ok(workshopService.getWorkshopsByOwnerId(ownerId));
+        return ResponseEntity.ok(workshopLookupService.getWorkshopsByOwnerId(ownerId));
     }
-
-    // En backend/workshop/WorkshopController.java
 
     /**
      * Actualiza la configuración de horario y duración de citas de un taller.
@@ -59,7 +59,7 @@ public class WorkshopController {
     public ResponseEntity<WorkshopDTO> updateSettings(
             @PathVariable UUID id,
             @RequestBody WorkshopRequest request) {
-        return ResponseEntity.ok(workshopService.updateWorkshopSettings(id, request));
+        return ResponseEntity.ok(workshopAdminService.updateWorkshopSettings(id, request));
     }
 
     @GetMapping("/search")
@@ -67,7 +67,7 @@ public class WorkshopController {
             @RequestParam(defaultValue = "") String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(workshopService.searchWorkshops(query, page, size));
+        return ResponseEntity.ok(workshopLookupService.searchWorkshops(query, page, size));
     }
 
     /**
@@ -76,9 +76,9 @@ public class WorkshopController {
     @PostMapping("/{id}/logo")
     public ResponseEntity<WorkshopDTO> uploadLogo(
             @PathVariable UUID id,
-            @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+            @RequestParam("file") MultipartFile file) {
         try {
-            return ResponseEntity.ok(workshopService.uploadLogo(id, file));
+            return ResponseEntity.ok(workshopAdminService.uploadLogo(id, file));
         } catch (Exception e) {
             throw new RuntimeException("Error al subir el logo del taller: " + e.getMessage(), e);
         }
@@ -89,6 +89,6 @@ public class WorkshopController {
      */
     @DeleteMapping("/{id}/logo")
     public ResponseEntity<WorkshopDTO> deleteLogo(@PathVariable UUID id) {
-        return ResponseEntity.ok(workshopService.deleteLogo(id));
+        return ResponseEntity.ok(workshopAdminService.deleteLogo(id));
     }
 }

@@ -6,22 +6,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.tfg.backend.user.User;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/clients")
 @RequiredArgsConstructor
 public class ClientController {
 
-    private final ClientService clientService;
+    private final ClientProfileService clientProfileService;
+    private final ClientAdminService clientAdminService;
 
     /**
      * Devuelve el perfil del cliente que ha iniciado sesión.
      */
     @GetMapping("/me")
     public ResponseEntity<ClientDTO> getMe(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(clientService.getClientProfile(user.getEmail()));
+        return ResponseEntity.ok(clientProfileService.getClientProfile(user.getEmail()));
     }
 
     @GetMapping("/search")
@@ -29,18 +28,18 @@ public class ClientController {
             @RequestParam(defaultValue = "") String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(clientService.searchClientsPaginated(query, page, size));
+        return ResponseEntity.ok(clientAdminService.searchClientsPaginated(query, page, size));
     }
 
     @PostMapping("/manual-register")
     public ResponseEntity<ClientSearchDTO> manualRegister(@RequestBody ClientSearchDTO request) {
-        return ResponseEntity.ok(clientService.registerManualClient(request));
+        return ResponseEntity.ok(clientAdminService.registerManualClient(request));
     }
 
     @PutMapping("/me")
     public ResponseEntity<ClientDTO> updateMe(
             @AuthenticationPrincipal User user,
             @RequestBody ClientDTO request) {
-        return ResponseEntity.ok(clientService.updateProfile(user.getEmail(), request));
+        return ResponseEntity.ok(clientProfileService.updateProfile(user.getEmail(), request));
     }
 }

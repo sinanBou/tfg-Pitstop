@@ -1,6 +1,7 @@
 package org.tfg.backend.appointment;
 
 import lombok.RequiredArgsConstructor;
+import org.tfg.backend.appointment.state.AppointmentStateFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -274,39 +275,10 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        // Regla de Negocio: No se puede cancelar una cita que ya está en curso, retrasada o finalizada
-        if (newStatus == AppointmentStatus.CANCELLED && (appointment.getStatus() == AppointmentStatus.IN_PROGRESS || appointment.getStatus() == AppointmentStatus.DELAYED || appointment.getStatus() == AppointmentStatus.COMPLETED)) {
-            throw new RuntimeException("No se puede cancelar una cita en este estado.");
-        }
+        // Delegamos la transición de estado al patrón State
+        org.tfg.backend.appointment.state.AppointmentState currentState = AppointmentStateFactory.getState(appointment.getStatus());
+        currentState.transitionTo(appointment, newStatus, vehicleRepository);
 
-        // Lógica de "fichado" automático
-        if ((newStatus == AppointmentStatus.CONFIRMED || newStatus == AppointmentStatus.IN_PROGRESS || newStatus == AppointmentStatus.COMPLETED) && appointment.getConfirmedAt() == null) {
-            appointment.setConfirmedAt(LocalDateTime.now());
-        }
-
-        if (newStatus == AppointmentStatus.IN_PROGRESS && appointment.getActualStartTime() == null) {
-            appointment.setActualStartTime(LocalDateTime.now());
-        } else if (newStatus == AppointmentStatus.COMPLETED) {
-            appointment.setActualEndTime(LocalDateTime.now());
-        }
-
-        if (newStatus == AppointmentStatus.PICKED_UP) {
-            org.tfg.backend.vehicle.Vehicle vehicle = appointment.getVehicle();
-            if (vehicle != null) {
-                vehicle.setCurrentWorkshop(null);
-                vehicle.setStatus("ENTREGADO");
-                vehicleRepository.save(vehicle);
-            }
-        } else if (newStatus == AppointmentStatus.CANCELLED) {
-            org.tfg.backend.vehicle.Vehicle vehicle = appointment.getVehicle();
-            if (vehicle != null) {
-                vehicle.setCurrentWorkshop(null);
-                vehicle.setStatus("CANCELADO");
-                vehicleRepository.save(vehicle);
-            }
-        }
-
-        appointment.setStatus(newStatus);
         appointmentRepository.save(appointment);
         // Aquí se podría disparar la lógica de notificación al cliente si el estado es DELAYED
     }

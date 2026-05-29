@@ -32,4 +32,14 @@ public class Employee {
 
     @Column(name = "allowed_sections")
     private String allowedSections;
+
+    // Datos personales del empleado/dueño (mismos campos que Client)
+    @Column(name = "nif")
+    private String nif;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "address")
+    private String address;
 }

@@ -125,3 +125,128 @@ En esta refactorización integral del sistema de repuestos y control de almacén
     - Se refactorizó `useClientDashboard.ts` para orquestar la carga inicial de `/clients/me`, actualizar en caliente la información y re-sincronizar el perfil del usuario autenticado de forma reactiva.
     - Se integró en `DashboardHeader` para permitir a los clientes acceder a la edición de sus datos desde el cabezal de navegación de forma unificada.
 - Propósito: Mantiene la modularización extrema y el principio de consistencia arquitectónica. Garantiza que la gestión de perfiles del cliente sea simétrica al perfil del personal del taller en el backend, desacoplando los archivos binarios pesados (imágenes de avatar) a un bucket de almacenamiento S3 de forma 100% segura.
+
+17. APPOINTMENT LIFECYCLE STATE PATTERN (Comportamiento) - Gestión de Estados de Citas
+--------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se implementó la interfaz `AppointmentState` y sus respectivas clases de estado concretas (`PendingState`, `ConfirmedState`, `InProgressState`, `DelayedState`, `CompletedState`, `PickedUpState`, `CancelledState`) bajo el paquete `org.tfg.backend.appointment.state`.
+  - Se diseñó un registro estático Flyweight `AppointmentStateFactory` para resolver las instancias concretas en tiempo de ejecución de manera altamente eficiente (Singleton/Flyweight).
+  - Se refactorizó la lógica en `AppointmentService.updateAppointmentStatus` delegando de forma polimórfica la transición de estados y la actualización de entidades asociadas (como vehículos y marcas de tiempo automáticas) a los manejadores de estado.
+- Propósito: Sigue a rajatabla los principios SOLID de Single Responsibility (SRP) y Open/Closed (OCP). Desacopla las transiciones de estado complejas y validaciones del core del servicio, facilitando la adición de nuevos comportamientos de estado futuros sin necesidad de modificar el flujo central de negocio.
+
+
+18. USER REGISTRATION STRATEGY & FACTORY PATTERN (Comportamiento & Creación) - Gestión de Registro
+-------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se definió la interfaz `RegistrationStrategy` con los métodos `register(RegisterRequest request, User user)` y `supports(Role role)`.
+  - Se crearon las estrategias concretas `ClientRegistrationStrategy` (valida y crea clientes) y `WorkshopRegistrationStrategy` (crea mecánicos/propietarios).
+  - Se implementó la factoría `RegistrationStrategyFactory` que actúa como registro en tiempo de ejecución para resolver las estrategias dinámicamente según el rol.
+  - Se desacopló `AuthService` para delegar la creación específica de perfiles, eliminando dependencias redundantes.
+- Propósito: Cumple rigurosamente con Single Responsibility (SRP) y Open/Closed (OCP). El flujo central de autenticación y creación del usuario base queda aislado de las reglas específicas de los perfiles comerciales, facilitando futuras ampliaciones de roles de usuario.
+
+
+19. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Empleados
+---------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `EmployeService` contenía dos dominios de negocio diferenciados: el control de los datos del perfil propio de un empleado (Self Profile CRUD) y la administración de los empleados del taller por parte de un administrador (Team Administration).
+  - Se dividió este servicio en dos clases de alta cohesión: `EmployeeProfileService` (encargada estricta de `/me`, `/me/avatar`) y `EmployeeAdminService` (encargada de listados de equipo, registros, despidos, ascensos/descensos de gerencia y permisos).
+  - Se introdujo `EmployeeMapper` como un Bean especializado para centralizar las transformaciones a `EmployeeDTO`.
+  - Se adaptó `EmployeeController` para inyectar ambos servicios especializados de forma limpia, y se eliminó por completo el archivo legado duplicado.
+- Propósito: Sigue rigurosamente el principio de responsabilidad única (SRP). Evita que los cambios operativos sobre la gestión de personal (Team Administration) afecten al flujo de modificación de datos personales (Profile CRUD) o viceversa. Aumenta la mantenibilidad y facilita la creación de pruebas unitarias específicas de alta granularidad.
+
+
+20. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Clientes
+-------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `ClientService` contenía dos dominios de negocio diferenciados: la gestión del perfil propio de un cliente (Self Profile CRUD) y la administración e inscripción en persona de clientes por parte del personal del taller (Client Administration).
+  - Se dividió este servicio en dos clases independientes y cohesivas: `ClientProfileService` (encargada de `/me` GET y PUT) y `ClientAdminService` (encargada de búsquedas paginadas y registros manuales rápidos).
+  - Se introdujo `ClientMapper` como un componente de mapeo especializado para aislar la conversión de DTOs.
+  - Se refactorizó `ClientController` para inyectar ambos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP), garantizando que las modificaciones sobre los procesos de registro físico o consultas administrativas del taller no afecten al flujo de modificación de datos de clientes logueados, aislando fallos y aumentando notablemente la calidad y la cobertura de pruebas.
+
+
+21. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Vehículos
+-------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `VehicleService` contenía dos dominios de negocio diferenciados: el registro y consulta de vehículos del cliente logueado (Self Vehicle CRUD) y la administración y búsqueda de vehículos en general por parte del personal del taller (Vehicle Administration).
+  - Se dividió este servicio en dos clases independientes y cohesivas: `VehicleProfileService` (encargada de `/my-vehicles`, altas seguras del cliente logueado y bajas con borrado en cascada de citas) y `VehicleAdminService` (encargada de búsquedas de matrículas y registros manuales rápidos).
+  - Se introdujo `VehicleMapper` como un componente de mapeo especializado para aislar la conversión de DTOs.
+  - Se refactorizó `VehicleController` para inyectar ambos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP), garantizando que las modificaciones sobre las búsquedas globales o registros del taller no interfieran con la lógica de auto-servicio del cliente o el borrado seguro en cascada de sus citas asociadas.
+
+
+22. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Facturación (Invoices)
+-------------------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `InvoiceService` contenía dos dominios de negocio diferenciados: la administración y generación de facturas (Invoice Generation / State Transitioning to COMPLETED) y la consulta/búsqueda de facturas asociadas a citas (Invoice Lookup / Graceful Querying).
+  - Se dividió este servicio en dos clases independientes y cohesivas: `InvoiceAdminService` (encargada de `/invoices` POST para transicionar citas y guardar facturas, y de obtener facturas del taller) y `InvoiceLookupService` (encargada de obtener facturas por ID de cita con tolerancia a fallos).
+  - Se introdujo `InvoiceMapper` como un componente de mapeo especializado, resolviendo un problema de rendimiento N+1 de base de datos al permitir el mapeo DTO con cita pre-resuelta en lugar de realizar consultas adicionales repetidas en bucle.
+  - Se refactorizó `InvoiceController` para inyectar ambos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP) y Open/Closed (OCP), aislando la lógica de negocio y transición de citas de la lógica de consulta y visualización de facturas, eliminando la duplicación y cuellos de botella de rendimiento de consultas recurrentes (N+1 database query issues).
+
+
+23. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Talleres (Workshops)
+-------------------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `WorkshopService` contenía dos dominios de negocio diferenciados: la administración y mutación de talleres (Workshop Creation, Settings Modification, Logo Upload/Delete) y las consultas de búsqueda y lectura (Workshop Lookup, Owner Queries, Paged Search).
+  - Se dividió este servicio en dos clases independientes y cohesivas: `WorkshopAdminService` (encargada de `/workshops` POST y `/settings` PUT y de la carga/eliminación de logos a S3) y `WorkshopLookupService` (encargada de obtener talleres de forma individual, listados de taller, consultas de dueño, y búsquedas paginadas).
+  - Se introdujo `WorkshopMapper` como un componente de mapeo especializado, aislando la resolución de URLs pre-firmadas a través de `StorageService` y el cálculo de estadísticas (total de empleados, cantidad de vehículos activos en taller).
+  - Se refactorizó `WorkshopController` para inyectar ambos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP), garantizando que las modificaciones sobre las operaciones de subida de ficheros, almacenamiento o creación física de talleres no afecten a los rápidos flujos de consulta de dueños y clientes, mejorando la legibilidad, escalabilidad y testabilidad del sistema.
+
+
+24. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Repuestos (Parts)
+-------------------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `PartService` contenía múltiples dominios de negocio diferenciados: la administración de categorías y de piezas en el inventario (Part Category Creation/Deletion, Inventory stock addition/updates/deletions), las consultas de búsqueda y lectura (Part Catalog Lists, Inventory Stock lists, Appointment parts lookup, Category Lists), y la lógica compleja de asignación/desasignación de piezas (applying dynamic Pricing Strategies, triggering low stock Observer events, decrementing/restoring stocks, recalculating labor and parts cost totals).
+  - Se dividió este servicio en tres clases independientes y altamente cohesivas dentro del subpaquete `org.tfg.backend.part.service`:
+    * `PartAdminService`: Encargada de altas/modificaciones/bajas de almacén e inventario, inicializaciones de catálogos y gestión de categorías.
+    * `PartLookupService`: Encargada únicamente de consultas de lectura optimizadas para catálogos, inventarios, repuestos de cita y categorías.
+    * `PartAssignmentService`: Encargada de las lógicas transaccionales complejas de asignación de piezas estándar (con patrones Observer/Strategy), asignación de piezas personalizadas con precio pendiente, desasignación de repuestos y recalculo de totales de cita.
+  - Se refactorizó `PartController` y `PartInventoryFacade` para inyectar estos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP) y Open/Closed (OCP), aislando la lógica operacional de mutación de stocks del taller del comportamiento y lógica transaccional de asignación a citas por parte del mecánico y de las consultas rápidas de lectura, aumentando notablemente la granularidad de los tests y la robustez global ante picos de demanda.
+
+
+25. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Usuarios (Users)
+-------------------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `UserService` combinaba la lógica de negocio pura de consultar detalles de usuario por email (`getUserDetails`) con la lógica física y estructural de mapeo y transformación a DTO (`mapToDTO`).
+  - Se dividió esta clase en subpaquetes y componentes especializados:
+    * `UserMapper`: En la carpeta `org.tfg.backend.user.mapper`, se encarga de convertir de manera segura entidades `User` a `UserDTO`, incluyendo la resolución de relaciones inversas complejas (`clientId`, `employeeId`, `workshopId`).
+    * `UserLookupService`: En la carpeta `org.tfg.backend.user.service`, se encarga únicamente de consultas transaccionales de solo lectura de usuarios por email, inyectando `UserMapper`.
+  - Se actualizó `UserController` para inyectar `UserLookupService` directamente y devolver el DTO limpio sin duplicación de construcción en el controlador, y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Aísla la lógica de negocio y consulta de datos del comportamiento de representación y transformación de datos, permitiendo una suite de tests unitarios aislada con un 100% de éxito, y reduce la duplicación de código en la capa de controladores y servicios de autenticación.
+
+
+26. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Catálogo de Tareas (Task Catalog)
+-------------------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `CatalogService` combinaba las operaciones de mutación y administración (crear categorías, autogenerar códigos secuenciales a través de prefijos numéricos o hashes ligeros de nombres, crear tareas, actualizar especificaciones y horas, y eliminación de tareas) con la consulta de solo lectura de categorías asociadas a talleres.
+  - Se dividió esta clase en subpaquetes y componentes altamente cohesivos:
+    * `CatalogAdminService`: En la carpeta `org.tfg.backend.taskcatalog.service`, gestiona de manera aislada la lógica de mutación de catálogo, inicialización y autogeneración de códigos secuenciales para tareas.
+    * `CatalogLookupService`: En la carpeta `org.tfg.backend.taskcatalog.service`, gestiona exclusivamente las consultas de lectura ordenadas de categorías y tareas para talleres.
+  - Se actualizó `CatalogController` para inyectar y delegar llamadas a estos dos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP), previniendo que los rápidos flujos de consulta de catálogos y tareas de la app web por mecánicos y clientes sufran degradaciones por bloqueos de transacciones de mutación o reajuste de tareas complejas, mejorando drásticamente el aislamiento y la modularidad en los tests del backend.
+
+
+27. SINGLE RESPONSIBILITY SERVICE SEPARATION PATTERN (Estructura / Clean Architecture) - Módulo de Tareas del Taller (Workshop Tasks)
+-------------------------------------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se identificó que la clase monolítica original `WorkshopTaskService` combinaba las operaciones de mutación y asignación del personal (actualizaciones de tareas, reasignaciones de empleados, lógicas transaccionales y condicionales complejas de borrado de tareas contra citas asociadas reduciendo el estado a `CANCELLED` si la cita tiene múltiples tareas o desvinculando la cita para dejarla sin asignar si era la única) con consultas rápidas de lectura (búsqueda de tareas por rango de fechas por taller y por empleado).
+  - Se dividió esta clase en subpaquetes y componentes altamente cohesivos:
+    * `WorkshopTaskMapper`: En la carpeta `org.tfg.backend.workshoptask.mapper`, se encarga de manera aislada de la transformación de entidades `WorkshopTask` a `WorkshopTaskDTO` formateando campos descriptivos de vehículo, taller, empleado y cliente.
+    * `WorkshopTaskAdminService`: En la carpeta `org.tfg.backend.workshoptask.service`, gestiona de manera aislada las operaciones de modificación de estado, reasignaciones condicionales de mecánicos, cancelaciones y eliminaciones lógicas de tareas.
+    * `WorkshopTaskLookupService`: En la carpeta `org.tfg.backend.workshoptask.service`, gestiona de manera aislada la recuperación de tareas por fechas agrupadas por taller y mecánicos.
+  - Se actualizó `WorkshopTaskController` para inyectar y delegar llamadas a estos servicios independientes y se eliminó por completo el archivo monolítico legado redundante.
+- Propósito: Sigue estrictamente el principio de responsabilidad única (SRP), previniendo que la lógica de reasignación y el guardado de perfiles de la cita impacten en la velocidad y el rendimiento del listado y renderizado del calendario de tareas en la aplicación web, facilitando un mantenimiento totalmente desacoplado.
+
+
+
+
+
+
+
+
+
+
+

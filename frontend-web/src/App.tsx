@@ -1,5 +1,7 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import '@/index.css';
+import AiAssistantChat from '@/features/ai-assistant/components/AiAssistantChat/index';
 
 // Componentes
 import Home from '@/pages/Home';
@@ -12,8 +14,20 @@ import WorkshopAdminDashboard from '@/pages/WorkshopAdminDashboard';
 import WorkerDashboard from '@/pages/WorkerDashboard';
 
 function App() {
+  const location = useLocation();
+  const [userRole, setUserRole] = useState<'CLIENT' | 'WORKSHOP_STAFF' | 'WORKSHOP_MANAGER' | 'WORKSHOP_OWNER' | null>(null);
+
+  useEffect(() => {
+    const role = localStorage.getItem('role');
+    if (role && ['CLIENT', 'WORKSHOP_STAFF', 'WORKSHOP_MANAGER', 'WORKSHOP_OWNER'].includes(role)) {
+      setUserRole(role as any);
+    } else {
+      setUserRole(null);
+    }
+  }, [location]);
+
   return (
-    <div className="h-full bg-black text-white flex flex-col">
+    <div className="h-full bg-black text-white flex flex-col relative">
       {/* CONTENIDO CAMBIANTE */}
       <main className="bg-black h-screen w-full">
         <Routes>
@@ -27,6 +41,9 @@ function App() {
           <Route path="/worker-dashboard" element={<WorkerDashboard />} />
         </Routes>
       </main>
+
+      {/* ASISTENTE DE IA FLOTANTE (Solo si está logueado) */}
+      {userRole && <AiAssistantChat userRole={userRole} />}
     </div>
   );
 }

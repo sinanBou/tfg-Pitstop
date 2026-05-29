@@ -6,35 +6,23 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.tfg.backend.client.Client;
-import org.tfg.backend.client.ClientRepository;
+import org.tfg.backend.auth.strategy.RegistrationStrategyFactory;
 import org.tfg.backend.config.JwtService;
-import org.tfg.backend.employee.Employee;
-import org.tfg.backend.employee.EmployeeRepository;
 import org.tfg.backend.user.Role;
 import org.tfg.backend.user.User;
 import org.tfg.backend.user.UserRepository;
-import org.tfg.backend.workshop.Workshop;
-import org.tfg.backend.workshop.WorkshopRepository;
-
-import java.time.LocalTime;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final ClientRepository clientRepository;
-    private final WorkshopRepository workshopRepository;
-    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-
+    private final RegistrationStrategyFactory strategyFactory;
 
     public AuthResponse login(LoginRequest request) {
-        // 1. Autenticar (si falla, Spring lanza una excepción 403 automáticamente)
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -42,66 +30,34 @@ public class AuthService {
                 )
         );
 
-        // 2. Buscar al usuario
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        // 3. Generar Token
         var jwtToken = jwtService.generarToken(user.getUsername());
 
-        // 4. Devolver Token y Rol
         return AuthResponse.builder()
                 .token(jwtToken)
                 .role(user.getRole().name())
                 .build();
     }
+
     // --- REGISTRO DE CLIENTE ---
     @Transactional
     public String registerClient(RegisterRequest request) {
-        validateCommonData(request);
-        if (clientRepository.existsByNif(request.getNif())) {
-            throw new RuntimeException("El NIF ya está registrado.");
-        }
-
-        User user = createBaseUser(request, Role.CLIENT);
-
-        Client client = Client.builder()
-                .user(user)
-                .nif(request.getNif())
-                .phoneNumber(request.getPhoneNumber())
-                .address(request.getAddress())
-                .build();
-        clientRepository.save(client);
-
-        return "Cliente registrado correctamente";
+        return registerUser(request, Role.CLIENT);
     }
 
-    // --- REGISTRO DE DUEÑO + TALLER ---
-    // En backend/auth/AuthService.java
-
+    // --- REGISTRO DE DUEÑO ---
     @Transactional
     public String registerWorkshop(RegisterRequest request) {
-        validateCommonData(request);
-
-        User user = createBaseUser(request, Role.WORKSHOP_OWNER);
-
-        Employee ownerEmployee = Employee.builder()
-                .user(user)
-                .build();
-        employeeRepository.save(ownerEmployee);
-
-        return "Dueño registrado correctamente";
+        return registerUser(request, Role.WORKSHOP_OWNER);
     }
 
     // --- MÉTODOS PRIVADOS DE APOYO ---
 
-    private void validateCommonData(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("El email ya está en uso.");
-        }
-    }
+    private String registerUser(RegisterRequest request, Role role) {
+        validateCommonData(request);
 
-    private User createBaseUser(RegisterRequest request, Role role) {
         User user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -109,6 +65,17 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
                 .build();
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        // Delegar la creación del perfil específico a la estrategia correspondiente
+        strategyFactory.getStrategy(role).register(request, user);
+
+        return role == Role.CLIENT ? "Cliente registrado correctamente" : "Dueño registrado correctamente";
+    }
+
+    private void validateCommonData(RegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("El email ya está en uso.");
+        }
     }
 }
