@@ -43,11 +43,7 @@ function Login() {
               placeholder="••••••••" 
             />
 
-            {errors.general && (
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
-                 <p className="text-red-400 text-xs font-black uppercase tracking-widest">{errors.general}</p>
-              </div>
-            )}
+
 
             <button 
               type="submit"

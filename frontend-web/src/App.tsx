@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import '@/index.css';
+import { ToastProvider } from '@/context/ToastContext';
 
 // Componentes
 import Home from '@/pages/Home';
@@ -13,21 +14,23 @@ import WorkerDashboard from '@/pages/WorkerDashboard';
 
 function App() {
   return (
-    <div className="h-full bg-black text-white flex flex-col">
-      {/* CONTENIDO CAMBIANTE */}
-      <main className="bg-black h-screen w-full">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registration" element={<Registration />} />
+    <ToastProvider>
+      <div className="h-full bg-black text-white flex flex-col">
+        {/* CONTENIDO CAMBIANTE */}
+        <main className="bg-black h-screen w-full">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registration" element={<Registration />} />
 
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
-          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-          <Route path="/workshop/:id" element={<WorkshopAdminDashboard />} />
-          <Route path="/worker-dashboard" element={<WorkerDashboard />} />
-        </Routes>
-      </main>
-    </div>
+            <Route path="/client-dashboard" element={<ClientDashboard />} />
+            <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+            <Route path="/workshop/:id" element={<WorkshopAdminDashboard />} />
+            <Route path="/worker-dashboard" element={<WorkerDashboard />} />
+          </Routes>
+        </main>
+      </div>
+    </ToastProvider>
   );
 }
 

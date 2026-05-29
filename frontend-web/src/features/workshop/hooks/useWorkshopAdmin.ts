@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '@/config/api';
+import { useToast } from '@/context/ToastContext';
 
 export function useWorkshopAdmin() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -51,7 +53,7 @@ export function useWorkshopAdmin() {
     if (!token) return navigate('/login');
     
     if (role !== 'WORKSHOP_OWNER' && role !== 'WORKSHOP_MANAGER') {
-      alert("Acceso denegado");
+      showToast("Acceso denegado", "error");
       return navigate(role === 'CLIENT' ? '/client-dashboard' : '/worker-dashboard');
     }
 
@@ -141,13 +143,13 @@ export function useWorkshopAdmin() {
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        alert("Ajustes actualizados correctamente");
+        showToast("Ajustes actualizados correctamente", "success");
         fetchWorkshopData();
       } else {
         const errorText = await res.text();
-        alert("Error al guardar ajustes: " + errorText);
+        showToast("Error al guardar ajustes: " + errorText, "error");
       }
-    } catch (err) { alert("Error al guardar ajustes"); }
+    } catch (err) { showToast("Error al guardar ajustes", "error"); }
   };
 
   const handleEmployeeSubmit = async (e: React.FormEvent) => {
@@ -163,14 +165,14 @@ export function useWorkshopAdmin() {
         body: JSON.stringify(employeeForm)
       });
       if (res.ok) {
-        alert("Empleado registrado con éxito");
+        showToast("Empleado registrado con éxito", "success");
         setEmployeeForm({ firstname: '', lastname: '', email: '', password: '', role: 'WORKSHOP_STAFF', address: '' });
         fetchWorkshopData();
       } else {
         const error = await res.text();
-        alert("Error: " + error);
+        showToast("Error: " + error, "error");
       }
-    } catch (err) { alert("Error de conexión"); }
+    } catch (err) { showToast("Error de conexión", "error"); }
   };
 
   const handleDeleteEmployee = async (employeeId: string) => {
@@ -183,12 +185,12 @@ export function useWorkshopAdmin() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
-        alert("Empleado eliminado");
+        showToast("Empleado eliminado", "success");
         fetchWorkshopData();
       } else {
-        alert("Error al eliminar");
+        showToast("Error al eliminar", "error");
       }
-    } catch (err) { alert("Error de conexión"); }
+    } catch (err) { showToast("Error de conexión", "error"); }
   };
 
   const handlePromoteEmployee = async (employeeId: string) => {
@@ -201,13 +203,13 @@ export function useWorkshopAdmin() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
-        alert("Empleado ascendido correctamente");
+        showToast("Empleado ascendido correctamente", "success");
         fetchWorkshopData();
       } else {
         const error = await res.text();
-        alert("Error: " + error);
+        showToast("Error: " + error, "error");
       }
-    } catch (err) { alert("Error de conexión"); }
+    } catch (err) { showToast("Error de conexión", "error"); }
   };
 
   const handleDemoteEmployee = async (employeeId: string) => {
@@ -219,13 +221,13 @@ export function useWorkshopAdmin() {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
-        alert("Operación completada");
+        showToast("Operación completada", "success");
         fetchWorkshopData();
       } else {
         const error = await res.text();
-        alert("Error: " + error);
+        showToast("Error: " + error, "error");
       }
-    } catch (err) { alert("Error de conexión"); }
+    } catch (err) { showToast("Error de conexión", "error"); }
   };
 
   const handleAssignAppointment = async (appointmentId: string, employeeId: string | null) => {
@@ -240,10 +242,10 @@ export function useWorkshopAdmin() {
         fetchWorkshopData();
       } else {
          const errorText = await res.text();
-         alert(`Error al asignar la cita: ${res.status} - ${errorText}`);
+         showToast(`Error al asignar la cita: ${res.status} - ${errorText}`, "error");
       }
     } catch (err) {
-      alert(`Error de conexión: ${err}`);
+      showToast(`Error de conexión: ${err}`, "error");
     }
   };
 
@@ -265,10 +267,10 @@ export function useWorkshopAdmin() {
         fetchWorkshopData();
       } else {
         const errorText = await res.text();
-        alert(`Error al reubicar: ${res.status} - ${errorText}`);
+        showToast(`Error al reubicar: ${res.status} - ${errorText}`, "error");
       }
     } catch (err) {
-      alert(`Error de conexión: ${err}`);
+      showToast(`Error de conexión: ${err}`, "error");
     }
   };
 
@@ -341,10 +343,10 @@ export function useWorkshopAdmin() {
         fetchWorkshopData();
       } else {
         const errorText = await res.text();
-        alert(`Error al reubicar tarea: ${res.status} - ${errorText}`);
+        showToast(`Error al reubicar tarea: ${res.status} - ${errorText}`, "error");
       }
     } catch (err) {
-      alert(`Error de conexión: ${err}`);
+      showToast(`Error de conexión: ${err}`, "error");
     }
   };
 
@@ -456,7 +458,7 @@ export function useWorkshopAdmin() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas sin asignar en los próximos días.");
+      showToast("No hay más citas sin asignar en los próximos días.", "info");
     }
   }, [appointments, selectedDate]);
 
@@ -479,7 +481,7 @@ export function useWorkshopAdmin() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas pendientes en los próximos días.");
+      showToast("No hay más citas pendientes en los próximos días.", "info");
     }
   }, [appointments, selectedDate, setSelectedDate]);
 
@@ -499,11 +501,11 @@ export function useWorkshopAdmin() {
         setEmployeeProfile(updated);
         await fetchWorkshopData();
       } else {
-        alert('Error al actualizar el perfil');
+        showToast('Error al actualizar el perfil', "error");
       }
     } catch (err) {
       console.error('Error actualizando perfil:', err);
-      alert('Error de conexión al actualizar el perfil');
+      showToast('Error de conexión al actualizar el perfil', "error");
     }
   };
 

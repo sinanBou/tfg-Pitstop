@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '@/config/api';
+import { useToast } from '@/context/ToastContext';
 
 export function useWorkerDashboard() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [employeeProfile, setEmployeeProfile] = useState<any>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -78,11 +80,11 @@ export function useWorkerDashboard() {
         fetchWorkerData();
       } else {
         const errorText = await res.text();
-        alert(`Error al asignar la cita: ${res.status} - ${errorText}`);
+        showToast(`Error al asignar la cita: ${res.status} - ${errorText}`, "error");
       }
     } catch (err) {
       console.error(err);
-      alert(`Error de conexión: ${err}`);
+      showToast(`Error de conexión: ${err}`, "error");
     }
   };
 
@@ -104,10 +106,10 @@ export function useWorkerDashboard() {
         fetchWorkerData();
       } else {
         const errorText = await res.text();
-        alert(`Error al reubicar: ${res.status} - ${errorText}`);
+        showToast(`Error al reubicar: ${res.status} - ${errorText}`, "error");
       }
     } catch (err) {
-      alert(`Error de conexión: ${err}`);
+      showToast(`Error de conexión: ${err}`, "error");
     }
   };
 
@@ -171,10 +173,10 @@ export function useWorkerDashboard() {
         fetchWorkerData();
       } else {
         const errorText = await res.text();
-        alert(`Error al reubicar tarea: ${res.status} - ${errorText}`);
+        showToast(`Error al reubicar tarea: ${res.status} - ${errorText}`, "error");
       }
     } catch (err) {
-      alert(`Error de conexión: ${err}`);
+      showToast(`Error de conexión: ${err}`, "error");
     }
   };
 
@@ -295,7 +297,7 @@ export function useWorkerDashboard() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas sin asignar en los próximos días.");
+      showToast("No hay más citas sin asignar en los próximos días.", "info");
     }
   }, [appointments, selectedDate]);
 
@@ -318,7 +320,7 @@ export function useWorkerDashboard() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas pendientes en los próximos días.");
+      showToast("No hay más citas pendientes en los próximos días.", "info");
     }
   }, [appointments, selectedDate]);
 
@@ -341,11 +343,11 @@ export function useWorkerDashboard() {
         const updated = await res.json();
         setEmployeeProfile(updated);
       } else {
-        alert('Error al actualizar el perfil');
+        showToast('Error al actualizar el perfil', "error");
       }
     } catch (err) {
       console.error('Error actualizando perfil:', err);
-      alert('Error de conexión al actualizar el perfil');
+      showToast('Error de conexión al actualizar el perfil', "error");
     }
   };
 

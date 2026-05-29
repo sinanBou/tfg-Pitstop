@@ -1,55 +1,57 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/context/ToastContext';
+import { getErrorMessage } from '@/utils/errorUtils';
 
 export function useWorkshopRegistration() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  // El estado inicial usa los nombres exactos de tu WorkshopRequest en Java
+  // Estado inicial completo para el Dueño del Taller y su negocio
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
+    phoneNumber: '', // Teléfono del dueño
+    companyName: '',  // Nombre del taller
+    cif: '',          // CIF del taller
+    address: '',      // Dirección del taller
     email: '',
     password: '',
-    address: '',
+    confirmPassword: '', // Doble verificación de contraseña
   });
 
-  /**
-   * Manejador de cambios modular que soporta tanto inputs de texto
-   * como la lógica de máscara para los campos de hora.
-   */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  /**
-   * Función para realizar el envío de datos al backend.
-   */
   const registerWorkshop = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Se envía el objeto formData directamente ya que los nombres coinciden con el DTO de Java
+      // Excluir confirmPassword antes de enviar al backend
+      const { confirmPassword, ...payload } = formData;
+
       const response = await fetch('http://localhost:9091/api/auth/register/workshop', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json' 
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
-        alert('Taller registrado con éxito');
+        showToast('¡Taller registrado con éxito! Por favor, verifica tu correo electrónico antes de iniciar sesión.', 'success');
         navigate('/login');
       } else {
-        const error = await response.text();
-        alert(`Error: ${error}`);
+        const errorMsg = await getErrorMessage(response);
+        showToast(errorMsg, 'error');
       }
     } catch (error) {
       console.error("Error de conexión:", error);
-      alert('Error de conexión con el servidor');
+      showToast('Error de conexión con el servidor.', 'error');
     } finally {
       setIsLoading(false);
     }
@@ -57,6 +59,7 @@ export function useWorkshopRegistration() {
 
   return { 
     formData, 
+    setFormData,
     handleChange, 
     registerWorkshop, 
     isLoading 

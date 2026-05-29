@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/context/ToastContext';
+import { getErrorMessage } from '@/utils/errorUtils';
 
 interface LoginFormData {
   email: string;
@@ -9,6 +11,7 @@ interface LoginFormData {
 
 export function useLogin() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -36,7 +39,10 @@ export function useLogin() {
         const response = await fetch('http://localhost:9091/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            email: formData.email.trim().toLowerCase(), // Normalizar email en frontend también
+            password: formData.password
+          }),
         });
 
         if (response.ok) {
@@ -47,7 +53,7 @@ export function useLogin() {
             localStorage.setItem('role', data.role);
           }
 
-          alert('¡Inicio de sesión exitoso!');
+          showToast('¡Inicio de sesión exitoso!', 'success');
 
           // Redirección inteligente
           switch (data.role) {
@@ -71,13 +77,13 @@ export function useLogin() {
           }
 
         } else {
-          const text = await response.text();
-          setErrors({ general: text || 'Credenciales inválidas o error en el servidor.' });
-          alert(text || 'Credenciales inválidas o error en el servidor.');
+          const errorMsg = await getErrorMessage(response);
+          setErrors({ general: errorMsg });
+          showToast(errorMsg, 'error');
         }
       } catch {
         setErrors({ general: 'Error de conexión con el servidor.' });
-        alert('Error de conexión con el servidor.');
+        showToast('Error de conexión con el servidor.', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -102,7 +108,7 @@ export function useLogin() {
           localStorage.setItem('role', data.role);
         }
 
-        alert('¡Inicio de sesión con Google exitoso!');
+        showToast('¡Inicio de sesión con Google exitoso!', 'success');
 
         // Redirección inteligente
         switch (data.role) {
@@ -126,15 +132,13 @@ export function useLogin() {
         }
 
       } else {
-        const errorMsg = response.status === 401 
-          ? 'Acceso denegado. Tu cuenta debe ser registrada previamente por un administrador.'
-          : 'Error en la autenticación con Google.';
+        const errorMsg = await getErrorMessage(response);
         setErrors({ general: errorMsg });
-        alert(errorMsg);
+        showToast(errorMsg, 'error');
       }
     } catch {
       setErrors({ general: 'Error de conexión con el servidor.' });
-      alert('Error de conexión con el servidor.');
+      showToast('Error de conexión con el servidor.', 'error');
     } finally {
       setIsLoading(false);
     }
