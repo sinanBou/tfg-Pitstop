@@ -6,7 +6,7 @@ import { AddCategoryForm } from '../shared/AddCategoryForm';
 import { TabHeader } from '../shared/TabHeader';
 import { PartFormInline } from './components/PartFormInline';
 import { PartItemRow } from './components/PartItemRow';
-import { Card } from '@/components/common/Card';
+import { Card } from '@/components/common/Card/Card';
 
 interface PartsTabProps {
   workshopId: string;

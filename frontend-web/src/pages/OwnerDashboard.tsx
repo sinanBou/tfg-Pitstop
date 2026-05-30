@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import { useOwnerDashboard } from '@/features/workshop/hooks/useOwnerDashboard';
 import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
 import { BottomNav } from '@/components/layout/BottomNav/index';
-import { LoadingScreen } from '@/components/common/LoadingScreen/index';
+import { LoadingScreen } from '@/components/common/LoadingScreen/LoadingScreen';
 import { WorkshopManagementTab } from '@/features/workshop/components/owner/WorkshopManagementTab';
 import { WorkshopReportsTab } from '@/features/workshop/components/owner/WorkshopReportsTab';
 import { WorkshopCreationModal } from '@/features/workshop/components/modals/WorkshopCreationModal';
 import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 
 const SECCIONES = ['TALLERES', 'REPORTES'];
 

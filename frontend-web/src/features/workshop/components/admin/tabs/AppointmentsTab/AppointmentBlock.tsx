@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { AppointmentCard } from '@/components/common/Card/index';
+import { AppointmentCard } from '@/components/common/Card/AppointmentCard';
 
 interface AppointmentBlockProps {
   appointment: any;

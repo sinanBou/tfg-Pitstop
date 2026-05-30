@@ -1,17 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
-
-interface SearchableSelectProps {
-  label: string;
-  placeholder: string;
-  options: string[];
-  value: string;
-  onChange: (value: string) => void;
-  disabled?: boolean;
-  popularOptions?: string[];
-  popularLabel?: string;
-  restLabel?: string;
-}
+import { getBrandLogo } from '@/assets/BrandLogos';
+import type { SearchableSelectProps } from './SearchableSelect.types';
+import { useSearchableSelect } from './useSearchableSelect';
 
 export const SearchableSelect = ({ 
   label, 
@@ -24,30 +13,17 @@ export const SearchableSelect = ({
   popularLabel = "Marcas más populares",
   restLabel = "Resto de marcas"
 }: SearchableSelectProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const filteredOptions = options.filter(opt => 
-    opt.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const populars = popularOptions
-    ? filteredOptions.filter(opt => popularOptions.some(p => p.toUpperCase() === opt.toUpperCase()))
-    : [];
-  const rest = popularOptions
-    ? filteredOptions.filter(opt => !popularOptions.some(p => p.toUpperCase() === opt.toUpperCase()))
-    : filteredOptions;
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const {
+    isOpen,
+    setIsOpen,
+    search,
+    setSearch,
+    containerRef,
+    filteredOptions,
+    populars,
+    rest,
+    handleSelect
+  } = useSearchableSelect({ options, popularOptions, onChange });
 
   return (
     <div className="space-y-1 relative" ref={containerRef}>
@@ -55,6 +31,7 @@ export const SearchableSelect = ({
       <div 
         className={`w-full bg-black/50 border ${isOpen ? 'border-blue-500' : 'border-neutral-800'} rounded-xl p-3 text-sm flex justify-between items-center cursor-pointer transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
+        data-testid="select-trigger"
       >
         <span className="flex items-center gap-2">
           {value && label.toUpperCase() === 'MARCA' && getBrandLogo(value)}
@@ -78,6 +55,7 @@ export const SearchableSelect = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               onClick={(e) => e.stopPropagation()}
+              data-testid="search-input"
             />
           </div>
           <div className="max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-700">
@@ -93,11 +71,7 @@ export const SearchableSelect = ({
                         key={`pop-${i}`}
                         type="button"
                         className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors hover:bg-blue-600/20 hover:text-blue-400 ${value === opt ? 'bg-blue-600/10 text-blue-500 font-bold' : 'text-neutral-400'}`}
-                        onClick={() => {
-                          onChange(opt);
-                          setIsOpen(false);
-                          setSearch('');
-                        }}
+                        onClick={() => handleSelect(opt)}
                       >
                         {label.toUpperCase() === 'MARCA' && getBrandLogo(opt)}
                         <span>{opt}</span>
@@ -118,11 +92,7 @@ export const SearchableSelect = ({
                         key={`rest-${i}`}
                         type="button"
                         className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors hover:bg-blue-600/20 hover:text-blue-400 ${value === opt ? 'bg-blue-600/10 text-blue-500 font-bold' : 'text-neutral-400'}`}
-                        onClick={() => {
-                          onChange(opt);
-                          setIsOpen(false);
-                          setSearch('');
-                        }}
+                        onClick={() => handleSelect(opt)}
                       >
                         {label.toUpperCase() === 'MARCA' && getBrandLogo(opt)}
                         <span>{opt}</span>

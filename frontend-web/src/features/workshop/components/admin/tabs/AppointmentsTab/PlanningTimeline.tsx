@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { AppointmentBlock } from './AppointmentBlock';
 import { UnassignedColumn } from './UnassignedColumn';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 
 interface Column {
   id: string;

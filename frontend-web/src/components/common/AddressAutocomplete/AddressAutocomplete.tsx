@@ -1,17 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
-import { useAddressController } from '@/components/common/AddressAutocomplete/useAddressController';
-import { SuggestionsDropdown } from '@/components/common/AddressAutocomplete/SuggestionsDropdown';
-import { StreetInputField } from '@/components/common/AddressAutocomplete/StreetInputField';
-import { FloorInputField } from '@/components/common/AddressAutocomplete/FloorInputField';
-
-interface AddressAutocompleteProps {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-  placeholder?: string;
-}
+import { useAddressController } from './useAddressController';
+import { SuggestionsDropdown } from './SuggestionsDropdown';
+import { StreetInputField } from './StreetInputField';
+import { FloorInputField } from './FloorInputField';
+import type { AddressAutocompleteProps } from './AddressAutocomplete.types';
 
 export default function AddressAutocomplete({ label, value, onChange, error, placeholder }: AddressAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false);

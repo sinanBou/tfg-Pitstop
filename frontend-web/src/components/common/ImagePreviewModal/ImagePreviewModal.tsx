@@ -1,12 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-
-interface ImagePreviewModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  imageUrl: string;
-  title?: string;
-}
+import type { ImagePreviewModalProps } from './ImagePreviewModal.types';
 
 export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
   isOpen,
@@ -22,6 +16,7 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
       <div 
         className="absolute inset-0 bg-black/95 backdrop-blur-md transition-opacity duration-300 cursor-zoom-out animate-fade-in" 
         onClick={onClose} 
+        data-testid="image-modal-overlay"
       />
       
       {/* Close button at the top-right corner of the viewport */}
@@ -29,6 +24,7 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
         onClick={onClose} 
         className="absolute top-6 right-6 p-3 text-neutral-400 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-2xl transition-all duration-300 z-50 shadow-2xl active:scale-95"
         title="Cerrar vista previa"
+        data-testid="image-modal-close-btn"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { HeroSection } from "@/features/home/components/HeroSection";
 import { Footer } from "@/features/home/components/FooterSection";
-import { Button } from "@/components/common/Button";
+import { Button } from "@/components/common/Button/Button";
 
 export default function Home() {
   const navigate = useNavigate();

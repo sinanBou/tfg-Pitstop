@@ -1,11 +1,5 @@
 import React from 'react';
-
-interface ProgressBarProps {
-  label: string;
-  sublabel?: string;
-  valueText: string;
-  percentage: number;
-}
+import type { ProgressBarProps } from './ProgressBar.types';
 
 export const ProgressBar: React.FC<ProgressBarProps> = ({ label, sublabel, valueText, percentage }) => {
   return (

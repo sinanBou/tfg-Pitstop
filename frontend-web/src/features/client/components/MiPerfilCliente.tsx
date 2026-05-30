@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@/components/common/Button';
-import { InputField } from '@/components/common/Input';
+import { Button } from '@/components/common/Button/Button';
+import { InputField } from '@/components/common/InputField/InputField';
 
 interface MiPerfilClienteProps {
   isOpen: boolean;

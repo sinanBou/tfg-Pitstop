@@ -1,6 +1,7 @@
 
-import { VehicleCard, Card } from '@/components/common/Card/index';
-import { Button } from '@/components/common/Button';
+import { VehicleCard } from '@/components/common/Card/VehicleCard';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button/Button';
 
 interface ClientVehiclesTabProps {
   vehicles: any[];

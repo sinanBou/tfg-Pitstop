@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import { MonthSelector } from '@/components/common/MonthSelector';
-import { MetricCard } from '@/components/common/MetricCard';
-import { ProgressBar } from '@/components/common/ProgressBar';
-import { PartsStatsWidget } from '@/components/common/PartsStatsWidget';
+import { MonthSelector } from '@/components/common/MonthSelector/MonthSelector';
+import { MetricCard } from '@/components/common/MetricCard/MetricCard';
+import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
+import { PartsStatsWidget } from '@/components/common/PartsStatsWidget/PartsStatsWidget';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
 
 interface PartItem {

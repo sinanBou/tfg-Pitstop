@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
-import { Card } from '@/components/common/Card';
-import { InputField } from '@/components/common/Input';
-import { Button } from '@/components/common/Button';
+import { getBrandLogo } from '@/assets/BrandLogos';
+import { Card } from '@/components/common/Card/Card';
+import { InputField } from '@/components/common/InputField/InputField';
+import { Button } from '@/components/common/Button/Button';
 
 interface ConfirmedAppointmentsListProps {
   appointments: any[];

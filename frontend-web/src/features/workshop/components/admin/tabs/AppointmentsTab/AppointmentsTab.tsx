@@ -1,6 +1,6 @@
 import React from 'react';
 import { PlanningTimeline } from './PlanningTimeline';
-import { Card } from '@/components/common/Card';
+import { Card } from '@/components/common/Card/Card';
 
 interface AppointmentsTabProps {
   appointments: any[];

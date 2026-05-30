@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/common/Button';
+import { Button } from '@/components/common/Button/Button';
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();

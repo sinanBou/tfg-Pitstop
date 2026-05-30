@@ -1,16 +1,5 @@
-import React from 'react';
 import { createPortal } from 'react-dom';
-
-interface BaseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  subtitle?: string;
-  theme?: 'blue' | 'red' | 'neutral' | 'green';
-  progressBarWidth?: string; // e.g., "50%" or "100%"
-  showDot?: boolean;
-  children: React.ReactNode;
-}
+import type { BaseModalProps } from './BaseModal.types';
 
 export const BaseModal = ({
   isOpen,
@@ -48,6 +37,7 @@ export const BaseModal = ({
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300" 
         onClick={onClose} 
+        data-testid="modal-overlay"
       />
       
       {/* Landscape Modal Container: Wider than tall (max-w-5xl, h-[85vh] max-h-[650px]) */}
@@ -84,7 +74,7 @@ export const BaseModal = ({
               <p className="text-[10px] text-neutral-500 font-mono mt-1 uppercase">{subtitle}</p>
             )}
           </div>
-          <button onClick={onClose} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors">
+          <button onClick={onClose} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors" data-testid="modal-close-btn">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>

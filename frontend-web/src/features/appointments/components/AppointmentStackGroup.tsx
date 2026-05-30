@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { AppointmentCard } from '@/components/common/Card/index';
+import { AppointmentCard } from '@/components/common/Card/AppointmentCard';
 
 /* ─────────────────────────────────────────────
  *  STACK & POPOVER PATTERN

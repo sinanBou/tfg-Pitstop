@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { type VehicleDTO, type AppointmentRequest, type WorkshopMinDTO } from '@/types/client';
 import { API_BASE_URL } from '@/config/api';
-import { BaseModal } from '@/components/common/BaseModal/index';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
-import { BackButton } from '@/components/common/Button/BackButton';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
+import { BackButton } from '@/components/common/BackButton/BackButton';
 
 interface AppointmentModalProps {
   isOpen: boolean;

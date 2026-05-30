@@ -1,11 +1,5 @@
 import React from 'react';
-
-interface BackButtonProps {
-  onClick: () => void;
-  title?: string;
-  theme?: 'blue' | 'red';
-  showDot?: boolean;
-}
+import type { BackButtonProps } from './BackButton.types';
 
 export const BackButton: React.FC<BackButtonProps> = ({ 
   onClick, 

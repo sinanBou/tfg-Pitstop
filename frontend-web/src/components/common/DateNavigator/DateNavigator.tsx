@@ -1,10 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-
-interface DateNavigatorProps {
-  selectedDate: Date;
-  onChange: (d: Date) => void;
-  variant?: 'red' | 'blue';
-}
+import type { DateNavigatorProps } from './DateNavigator.types';
 
 export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onChange, variant = 'red' }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -69,6 +64,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
           <button 
              onClick={prevDay} 
              className={`p-3 bg-black/40 text-neutral-400 hover:text-white rounded-xl transition-all border border-transparent ${hoverBorderColor} ${hoverBgColor}`}
+             data-testid="prev-day-btn"
           >
              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
           </button>
@@ -76,6 +72,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
           <button 
              onClick={() => setShowCalendar(!showCalendar)} 
              className="flex flex-col items-center px-2 min-w-[100px] hover:bg-white/5 py-2 rounded-xl transition-colors"
+             data-testid="calendar-toggle-btn"
           >
              <span className={`${primaryColor} font-black text-[10px] uppercase tracking-widest leading-none mb-1`}>
                 {selectedDate.toLocaleDateString('es-ES', { weekday: 'short' })}
@@ -88,6 +85,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
           <button 
              onClick={nextDay} 
              className={`p-3 bg-black/40 text-neutral-400 hover:text-white rounded-xl transition-all border border-transparent ${hoverBorderColor} ${hoverBgColor}`}
+             data-testid="next-day-btn"
           >
              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
           </button>
@@ -96,13 +94,13 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
        {showCalendar && (
           <div className="absolute top-[110%] left-1/2 -translate-x-1/2 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl z-50 p-4">
              <div className="flex items-center justify-between mb-4">
-                <button onClick={prevMonth} className="p-1 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors">
+                <button onClick={prevMonth} className="p-1 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors" data-testid="prev-month-btn">
                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
                 </button>
                 <span className="text-white font-bold text-xs uppercase tracking-widest">
                    {viewMonth.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                 </span>
-                <button onClick={nextMonth} className="p-1 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors">
+                <button onClick={nextMonth} className="p-1 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors" data-testid="next-month-btn">
                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </button>
              </div>
@@ -141,6 +139,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
                    setShowCalendar(false);
                 }} 
                 className={`w-full mt-4 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors border border-white/5 hover:border-white/20`}
+                data-testid="go-to-today-btn"
              >
                 Ir a hoy
              </button>

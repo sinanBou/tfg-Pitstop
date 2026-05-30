@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button/Button';
 import { AppointmentSearch } from '@/features/workshop/components/admin/AppointmentSearch/index';
-import { DateNavigator } from '@/components/common/DateNavigator/index';
+import { DateNavigator } from '@/components/common/DateNavigator/DateNavigator';
 import { PendingAppointmentsList } from './PendingAppointmentsList';
 import { ConfirmedAppointmentsList } from './ConfirmedAppointmentsList';
 

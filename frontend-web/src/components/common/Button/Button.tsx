@@ -1,9 +1,5 @@
 import React from 'react';
-
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  glow?: boolean;
-}
+import type { ButtonProps } from './Button.types';
 
 export const Button: React.FC<ButtonProps> = ({
   children,

@@ -1,9 +1,5 @@
 import React from 'react';
-
-interface MonthSelectorProps {
-  selectedMonth: string; // 'all' | '01' | '02' | ... | '12'
-  onChange: (month: string) => void;
-}
+import type { MonthSelectorProps } from './MonthSelector.types';
 
 export const MonthSelector: React.FC<MonthSelectorProps> = ({ selectedMonth, onChange }) => {
   const months = [

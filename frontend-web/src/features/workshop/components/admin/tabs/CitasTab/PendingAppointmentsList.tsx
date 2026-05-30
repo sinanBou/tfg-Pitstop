@@ -1,7 +1,7 @@
 import React from 'react';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button/Button';
+import { getBrandLogo } from '@/assets/BrandLogos';
 
 interface PendingAppointmentsListProps {
   appointments: any[];

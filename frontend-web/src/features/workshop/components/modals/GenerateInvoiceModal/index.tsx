@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import { BaseModal } from '@/components/common/BaseModal/index';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 
 interface PartItem {
   name: string;

@@ -1,11 +1,11 @@
 import React from 'react';
-import AddressAutocomplete from '@/components/common/AddressAutocomplete';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
-import { BaseModal } from '@/components/common/BaseModal/index';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
-import { Badge } from '@/components/common/Badge';
-import { InputField } from '@/components/common/Input';
+import AddressAutocomplete from '@/components/common/AddressAutocomplete/AddressAutocomplete';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button/Button';
+import { Badge } from '@/components/common/Badge/Badge';
+import { InputField } from '@/components/common/InputField/InputField';
 import { API_BASE_URL } from '@/config/api';
 
 interface TeamTabProps {

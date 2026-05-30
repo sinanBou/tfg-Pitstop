@@ -5,7 +5,7 @@ import { AddCategoryForm } from '../shared/AddCategoryForm';
 import { CategoryHeader } from '../PartsTab/components/CategoryHeader';
 import { TaskFormInline } from './components/TaskFormInline';
 import { TaskItemRow } from './components/TaskItemRow';
-import { Card } from '@/components/common/Card';
+import { Card } from '@/components/common/Card/Card';
 
 export interface CatalogTask {
   id: string;

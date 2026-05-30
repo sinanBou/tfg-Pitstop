@@ -3,7 +3,7 @@ import { useStaffAppointment } from '@/features/appointments/components/StaffApp
 import { ClientStep } from '@/features/appointments/components/StaffAppointmentModal/components/ClientStep';
 import { VehicleStep } from '@/features/appointments/components/StaffAppointmentModal/components/VehicleStep';
 import { AppointmentStep } from '@/features/appointments/components/StaffAppointmentModal/components/AppointmentStep';
-import { BaseModal } from '@/components/common/BaseModal/index';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 
 interface StaffAppointmentModalProps {
   isOpen: boolean;

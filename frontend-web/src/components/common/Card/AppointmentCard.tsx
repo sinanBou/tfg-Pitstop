@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
+import { getBrandLogo } from '@/assets/BrandLogos';
 
 interface AppointmentCardProps {
   type: string;

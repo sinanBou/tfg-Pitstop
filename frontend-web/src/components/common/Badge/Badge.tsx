@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface BadgeProps {
-  children: React.ReactNode;
-  variant?: 'primary' | 'secondary' | 'danger' | 'neutral' | 'warning';
-  className?: string;
-}
+import type { BadgeProps } from './Badge.types';
 
 export const Badge: React.FC<BadgeProps> = ({
   children,

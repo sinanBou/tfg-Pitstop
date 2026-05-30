@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AddressAutocomplete from '@/components/common/AddressAutocomplete';
-import { BaseModal } from '@/components/common/BaseModal';
+import AddressAutocomplete from '@/components/common/AddressAutocomplete/AddressAutocomplete';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 
 const API_URL = 'http://localhost:9091/api';
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
+import { getBrandLogo } from '@/assets/BrandLogos';
 
 interface UnassignedAppointment {
   id: string;

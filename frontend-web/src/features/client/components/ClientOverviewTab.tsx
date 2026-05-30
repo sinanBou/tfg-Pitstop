@@ -1,5 +1,6 @@
 import type { UserDTO } from '@/types/client';
-import { WorkshopVehicleCard, Card } from '@/components/common/Card/index';
+import { WorkshopVehicleCard } from '@/components/common/Card/WorkshopVehicleCard';
+import { Card } from '@/components/common/Card/Card';
 
 interface ClientOverviewTabProps {
   vehicles: any[];

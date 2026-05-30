@@ -1,13 +1,5 @@
 import React from 'react';
-
-interface InputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-  multiline?: boolean;
-  rows?: number;
-  error?: string;
-  mono?: boolean;
-  focusVariant?: 'red' | 'blue' | 'emerald' | 'neutral';
-}
+import type { InputFieldProps } from './InputField.types';
 
 export const InputField: React.FC<InputFieldProps> = ({
   label,

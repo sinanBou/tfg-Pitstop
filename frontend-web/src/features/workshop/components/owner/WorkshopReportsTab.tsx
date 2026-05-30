@@ -1,12 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { ReportsTab } from '@/features/workshop/components/admin/tabs/ReportsTab';
-import { MonthSelector } from '@/components/common/MonthSelector';
-import { MetricCard } from '@/components/common/MetricCard';
-import { ProgressBar } from '@/components/common/ProgressBar';
-import { PartsStatsWidget } from '@/components/common/PartsStatsWidget';
-import { BackButton } from '@/components/common/Button/BackButton';
-import { Card } from '@/components/common/Card';
+import { MonthSelector } from '@/components/common/MonthSelector/MonthSelector';
+import { MetricCard } from '@/components/common/MetricCard/MetricCard';
+import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
+import { PartsStatsWidget } from '@/components/common/PartsStatsWidget/PartsStatsWidget';
+import { BackButton } from '@/components/common/BackButton/BackButton';
+import { Card } from '@/components/common/Card/Card';
 
 interface Invoice {
   id: string;

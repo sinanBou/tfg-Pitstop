@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
-import { MonthSelector } from '@/components/common/MonthSelector';
-import { MetricCard } from '@/components/common/MetricCard';
-import { ProgressBar } from '@/components/common/ProgressBar';
+import { getBrandLogo } from '@/assets/BrandLogos';
+import { MonthSelector } from '@/components/common/MonthSelector/MonthSelector';
+import { MetricCard } from '@/components/common/MetricCard/MetricCard';
+import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
 
 

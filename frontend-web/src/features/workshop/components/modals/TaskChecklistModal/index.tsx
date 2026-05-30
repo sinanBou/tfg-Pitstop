@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import { BaseModal } from '@/components/common/BaseModal/index';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import type { WorkshopInventory } from '@/types/client';
 
 /* ─────────────────────────────────────────────

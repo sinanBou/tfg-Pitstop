@@ -1,10 +1,5 @@
 import React from 'react';
-
-interface MetricCardProps {
-  label: string;
-  value: string | number;
-  subtext?: string;
-}
+import type { MetricCardProps } from './MetricCard.types';
 
 export const MetricCard: React.FC<MetricCardProps> = ({ label, value, subtext }) => {
   return (

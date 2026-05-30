@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button/Button';
 
 interface CompletedJobsTabProps {
   readyJobs: any[];

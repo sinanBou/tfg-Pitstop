@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card } from '@/components/common/Card';
-import { Badge } from '@/components/common/Badge';
+import { Card } from '@/components/common/Card/Card';
+import { Badge } from '@/components/common/Badge/Badge';
 
 interface AvisoPanelProps {
   title: string;

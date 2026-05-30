@@ -1,5 +1,5 @@
 import React from 'react';
-import { getBrandLogo } from '@/components/common/SearchableSelect/BrandLogos';
+import { getBrandLogo } from '@/assets/BrandLogos';
 
 interface WorkshopVehicleCardProps {
   vehicle: any;

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import type { WorkshopInventory } from '@/types/client';
-import { BaseModal } from '@/components/common/BaseModal/index';
-import { SearchableSelect } from '@/components/common/SearchableSelect/index';
-import { Badge } from '@/components/common/Badge';
-import { Button } from '@/components/common/Button';
-import { InputField } from '@/components/common/Input';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
+import { Badge } from '@/components/common/Badge/Badge';
+import { Button } from '@/components/common/Button/Button';
+import { InputField } from '@/components/common/InputField/InputField';
 import { AvisoMetricCard } from './AvisoMetricCard';
 import { AvisoPanel } from './AvisoPanel';
 

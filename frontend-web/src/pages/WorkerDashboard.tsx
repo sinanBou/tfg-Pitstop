@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
 import { BottomNav } from '@/components/layout/BottomNav/index';
-import { LoadingScreen } from '@/components/common/LoadingScreen/index';
+import { LoadingScreen } from '@/components/common/LoadingScreen/LoadingScreen';
 import { StaffAppointmentModal } from '@/features/appointments/components/StaffAppointmentModal/index';
-import { DateNavigator } from '@/components/common/DateNavigator/index';
+import { DateNavigator } from '@/components/common/DateNavigator/DateNavigator';
 import { useWorkerDashboard } from '@/features/workshop/hooks/useWorkerDashboard';
 import { PlanningTimeline } from '@/features/workshop/components/admin/tabs/AppointmentsTab/PlanningTimeline';
 import { MechanicTaskModal } from '@/features/workshop/components/modals/MechanicTaskModal/index';
@@ -19,7 +19,7 @@ import { AppointmentSearch } from '@/features/workshop/components/admin/Appointm
 import { MechanicSearch } from '@/features/workshop/components/admin/MechanicSearch/index';
 import { GenerateInvoiceModal } from '@/features/workshop/components/modals/GenerateInvoiceModal/index';
 import { OverviewTab } from '@/features/workshop/components/admin/tabs/OverviewTab/OverviewTab';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil';
 
 const diasSemana = [

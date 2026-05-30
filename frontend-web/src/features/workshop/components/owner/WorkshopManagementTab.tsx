@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
-import { Card } from '@/components/common/Card';
-import { Button } from '@/components/common/Button';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
+import { Card } from '@/components/common/Card/Card';
+import { Button } from '@/components/common/Button/Button';
 
 interface WorkshopManagementTabProps {
   workshops: any[];

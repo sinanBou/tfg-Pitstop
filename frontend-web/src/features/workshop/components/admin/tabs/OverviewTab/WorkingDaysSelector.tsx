@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card } from '@/components/common/Card/index';
+import { Card } from '@/components/common/Card/Card';
 
 interface WorkingDaysSelectorProps {
   workshopData: any;

@@ -1,9 +1,5 @@
 import React from 'react';
-
-interface PartsStatsWidgetProps {
-  partsCost: number; // Cost of spare parts (acquisition price)
-  partsSold: number; // Value they were sold for
-}
+import type { PartsStatsWidgetProps } from './PartsStatsWidget.types';
 
 export const PartsStatsWidget: React.FC<PartsStatsWidgetProps> = ({ partsCost, partsSold }) => {
   const margin = partsSold > 0 ? ((partsSold - partsCost) / partsSold) * 100 : 0;

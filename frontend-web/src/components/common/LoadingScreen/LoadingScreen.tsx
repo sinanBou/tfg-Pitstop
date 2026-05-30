@@ -1,7 +1,4 @@
-interface LoadingScreenProps {
-  message: string;
-  theme: 'client' | 'workshop';
-}
+import type { LoadingScreenProps } from './LoadingScreen.types';
 
 export function LoadingScreen({ message, theme }: LoadingScreenProps) {
   const isClient = theme === 'client';

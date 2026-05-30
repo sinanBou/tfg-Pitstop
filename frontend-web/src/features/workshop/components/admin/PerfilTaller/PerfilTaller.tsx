@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@/components/common/Button';
+import { Button } from '@/components/common/Button/Button';
 
 interface PerfilTallerProps {
   isOpen: boolean;

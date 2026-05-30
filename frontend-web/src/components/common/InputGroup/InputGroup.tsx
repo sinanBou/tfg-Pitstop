@@ -1,16 +1,4 @@
-// src/components/ui/InputGroup.tsx
-
-interface InputGroupProps {
-  label: string;
-  name: string;
-  type?: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  error?: string;
-  placeholder?: string;
-  // Añadimos maxLength opcional
-  maxLength?: number; 
-}
+import type { InputGroupProps } from './InputGroup.types';
 
 export default function InputGroup({ 
   label, name, type = "text", value, onChange, error, placeholder, maxLength 

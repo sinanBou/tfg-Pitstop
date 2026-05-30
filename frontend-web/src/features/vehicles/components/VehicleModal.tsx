@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { type VehicleRequest } from '@/types/client.ts';
-import { SearchableSelect } from '@/components/common/SearchableSelect/index';
-import { BaseModal } from '@/components/common/BaseModal/index';
+import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
+import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 
 // 1. Definimos una interfaz clara para las props del Modal
 interface VehicleModalProps {

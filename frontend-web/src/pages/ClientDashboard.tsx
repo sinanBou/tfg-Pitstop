@@ -4,7 +4,7 @@ import { VehicleModal } from '@/features/vehicles/components/VehicleModal';
 import { AppointmentModal } from '@/features/appointments/components/AppointmentModal';
 import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
 import { BottomNav } from '@/components/layout/BottomNav/index';
-import { LoadingScreen } from '@/components/common/LoadingScreen/index';
+import { LoadingScreen } from '@/components/common/LoadingScreen/LoadingScreen';
 import { ClientOverviewTab } from '@/features/client/components/ClientOverviewTab';
 import { ClientVehiclesTab } from '@/features/client/components/ClientVehiclesTab';
 import { ClientAppointmentsTab } from '@/features/client/components/ClientAppointmentsTab';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Card } from '@/components/common/Card/index';
-import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/index';
+import { Card } from '@/components/common/Card/Card';
+import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 
 interface WelcomeHeaderProps {
   employeeProfile: any;

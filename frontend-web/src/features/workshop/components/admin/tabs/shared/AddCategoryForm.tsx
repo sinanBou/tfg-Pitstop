@@ -1,5 +1,5 @@
 import React from 'react';
-import { InputField } from '@/components/common/Input';
+import { InputField } from '@/components/common/InputField/InputField';
 
 interface AddCategoryFormProps {
   title: string;
