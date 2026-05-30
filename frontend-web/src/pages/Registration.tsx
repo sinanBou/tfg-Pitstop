@@ -34,11 +34,9 @@ export default function Registration() {
       newErrors.password = 'Mín 8 car, 1 Mayús, 1 Núm.'; isValid = false;
     }
 
-    if (role === 'client') {
-      const clientData = clientReg.formData;
-      if (!clientData.nif) { newErrors.nif = 'El DNI/NIF es obligatorio.'; isValid = false; }
-      if (!clientData.phoneNumber) { newErrors.phoneNumber = 'El teléfono es obligatorio.'; isValid = false; }
-    }
+    // Tanto el cliente como el dueño deben ingresar NIF y teléfono obligatorios
+    if (!currentFormData.nif) { newErrors.nif = 'El DNI/NIF es obligatorio.'; isValid = false; }
+    if (!currentFormData.phoneNumber) { newErrors.phoneNumber = 'El teléfono es obligatorio.'; isValid = false; }
 
     setErrors(newErrors);
 
@@ -74,7 +72,7 @@ export default function Registration() {
             <div className={`bg-neutral-950/60 backdrop-blur-xl p-10 sm:p-12 rounded-[2.5rem] border shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group ${role === 'workshop' ? 'border-red-900/30' : 'border-blue-900/30'}`}>
 
               <div className="mb-10 text-center">
-                <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Registro <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? 'Taller' : 'Cliente'}</span></h2>
+                <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Registro <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? 'Dueño' : 'Cliente'}</span></h2>
                 <p className="text-neutral-500 text-sm font-medium tracking-wide">Configura tus credenciales de acceso</p>
               </div>
 
@@ -86,6 +84,12 @@ export default function Registration() {
                       <InputGroup label="Nombre" name="firstname" value={workshopReg.formData.firstname} onChange={workshopReg.handleChange} error={errors.firstname} placeholder="Juan" />
                       <InputGroup label="Apellidos" name="lastname" value={workshopReg.formData.lastname} onChange={workshopReg.handleChange} error={errors.lastname} placeholder="Pérez" />
                     </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                      <InputGroup label="DNI / NIF" name="nif" value={workshopReg.formData.nif} onChange={workshopReg.handleChange} error={errors.nif} placeholder="12345678Z" />
+                      <InputGroup label="Teléfono" name="phoneNumber" value={workshopReg.formData.phoneNumber} onChange={workshopReg.handleChange} error={errors.phoneNumber} placeholder="600123456" />
+                    </div>
+
                     <AddressAutocomplete 
                         label="Dirección del Dueño" 
                         name="address" 

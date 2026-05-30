@@ -21,4 +21,6 @@ public class EmployeeDTO {
     private String address;
     private String allowedSections;
     private String profilePictureUrl;
+    private String nif;
+    private String phoneNumber;
 }

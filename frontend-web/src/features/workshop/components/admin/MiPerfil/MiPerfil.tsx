@@ -9,14 +9,18 @@ interface MiPerfilProps {
     profilePictureUrl?: string;
     firstname: string;
     lastname: string;
+    nif?: string;
+    phoneNumber?: string;
   };
   profileForm: {
     firstname: string;
     lastname: string;
     address: string;
+    nif: string;
+    phoneNumber: string;
   };
-  setProfileForm: (form: { firstname: string; lastname: string; address: string }) => void;
-  onSubmit: (form: { firstname: string; lastname: string; address: string }) => Promise<void>;
+  setProfileForm: (form: { firstname: string; lastname: string; address: string; nif: string; phoneNumber: string }) => void;
+  onSubmit: (form: { firstname: string; lastname: string; address: string; nif: string; phoneNumber: string }) => Promise<void>;
   onUploadAvatar: (file: File) => Promise<boolean | void>;
   onDeleteAvatar: () => Promise<boolean | void>;
   onPreviewImage: () => void;
@@ -191,6 +195,31 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                   value={profileForm.lastname}
                   onChange={e => setProfileForm({ ...profileForm, lastname: e.target.value })}
                   className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">DNI / NIF</label>
+                <input
+                  type="text"
+                  required
+                  value={profileForm.nif}
+                  onChange={e => setProfileForm({ ...profileForm, nif: e.target.value })}
+                  className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
+                  placeholder="Introduce tu NIF..."
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Teléfono</label>
+                <input
+                  type="text"
+                  required
+                  value={profileForm.phoneNumber}
+                  onChange={e => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
+                  className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
+                  placeholder="Introduce tu teléfono..."
                 />
               </div>
             </div>

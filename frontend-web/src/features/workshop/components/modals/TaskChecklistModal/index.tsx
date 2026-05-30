@@ -164,6 +164,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   const [partQuery, setPartQuery] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const [quantityToUse, setQuantityToUse] = useState(1);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [addingPart, setAddingPart] = useState(false);
 
   const jobId = item?.originAppointmentId || item?.id;
@@ -224,6 +225,9 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     if (quantityToUse <= 0) return;
 
     let payload: any = { quantity: quantityToUse };
+    if (discountPercent > 0) {
+      payload.discount = discountPercent / 100;
+    }
     if (matchedInv) {
       if (matchedInv.stockQuantity < quantityToUse) {
         alert(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
@@ -256,6 +260,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
       setSelectedInvId('');
       setPartQuery('');
       setQuantityToUse(1);
+      setDiscountPercent(0);
       setShowDropdown(false);
       onSuccess?.();
     } catch (err: any) {
@@ -452,6 +457,18 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                 placeholder="Cant."
                 className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
               />
+              
+              <input 
+                type="number"
+                min="0"
+                max="100"
+                value={discountPercent || ''}
+                onChange={e => setDiscountPercent(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
+                placeholder="Desc. %"
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-white"
+                title="Descuento opcional en porcentaje (0-100)"
+              />
+
               <button
                 type="submit"
                 disabled={addingPart || !partQuery.trim()}

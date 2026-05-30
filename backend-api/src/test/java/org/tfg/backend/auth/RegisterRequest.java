@@ -7,23 +7,16 @@ import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class RegisterRequest {
-    // Comunes
-    private String firstname;
-    private String lastname;
     private String email;
     private String password;
-    private String role; // "CLIENT" o "WORKSHOP"
-
-    // Específicos Cliente
+    private String firstname;
+    private String lastname;
     private String nif;
     private String phoneNumber;
     private String address;
-
-    // Específicos Taller
     private String cif;
     private String companyName;
-    // Usaremos 'firstname' como nombre del taller si es rol WORKSHOP
 }

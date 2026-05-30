@@ -5,13 +5,15 @@ export function useWorkshopRegistration() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  // El estado inicial usa los nombres exactos de tu WorkshopRequest en Java
+  // El estado inicial para el dueño (propietario) pide los mismos datos personales que el cliente
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
     email: '',
     password: '',
     address: '',
+    nif: '',
+    phoneNumber: '',
   });
 
   /**
@@ -31,8 +33,7 @@ export function useWorkshopRegistration() {
     setIsLoading(true);
 
     try {
-      // Se envía el objeto formData directamente ya que los nombres coinciden con el DTO de Java
-      const response = await fetch('http://localhost:9091/api/auth/register/workshop', {
+      const response = await fetch('http://localhost:9091/api/auth/register/owner', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json' 
@@ -41,7 +42,7 @@ export function useWorkshopRegistration() {
       });
 
       if (response.ok) {
-        alert('Taller registrado con éxito');
+        alert('Propietario registrado con éxito');
         navigate('/login');
       } else {
         const error = await response.text();

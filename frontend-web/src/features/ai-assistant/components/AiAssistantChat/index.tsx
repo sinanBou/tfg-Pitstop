@@ -193,7 +193,7 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
                   !isServerUp 
-                    ? "Inicie el servidor de IA..." 
+                    ? "El asistente IA no está disponible" 
                     : mode === 'manual' 
                       ? "Preguntar sobre el uso de la app..." 
                       : "Describir consulta o fallo mecánico..."

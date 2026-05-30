@@ -44,7 +44,7 @@ export default function WorkshopAdminDashboard() {
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isWorkshopSettingsOpen, setIsWorkshopSettingsOpen] = useState(false);
-  const [profileForm, setProfileForm] = useState({ firstname: '', lastname: '', address: '' });
+  const [profileForm, setProfileForm] = useState({ firstname: '', lastname: '', address: '', nif: '', phoneNumber: '' });
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isLogoPreviewOpen, setIsLogoPreviewOpen] = useState(false);
 
@@ -100,7 +100,9 @@ export default function WorkshopAdminDashboard() {
       setProfileForm({
         firstname: employeeProfile.firstname || '',
         lastname: employeeProfile.lastname || '',
-        address: employeeProfile.address || ''
+        address: employeeProfile.address || '',
+        nif: employeeProfile.nif || '',
+        phoneNumber: employeeProfile.phoneNumber || ''
       });
     }
   }, [employeeProfile]);

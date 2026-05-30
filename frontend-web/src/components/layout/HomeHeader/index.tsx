@@ -13,6 +13,7 @@ export default function Navbar() {
     localStorage.removeItem('role');
     
     localStorage.clear(); 
+    sessionStorage.clear();
 
     navigate('/');
   };

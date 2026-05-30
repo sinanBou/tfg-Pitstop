@@ -17,12 +17,12 @@ public class AuthController {
     }
 
     @PostMapping("/register/client")
-    public ResponseEntity<String> registerClient(@RequestBody RegisterRequest request) {
+    public ResponseEntity<String> registerClient(@RequestBody ClientRegisterRequest request) {
         return ResponseEntity.ok(authService.registerClient(request));
     }
 
-    @PostMapping("/register/workshop")
-    public ResponseEntity<String> registerWorkshop(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.registerWorkshop(request));
+    @PostMapping({"/register/workshop", "/register/owner"})
+    public ResponseEntity<String> registerOwner(@RequestBody OwnerRegisterRequest request) {
+        return ResponseEntity.ok(authService.registerOwner(request));
     }
 }

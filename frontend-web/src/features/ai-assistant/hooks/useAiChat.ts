@@ -2,12 +2,35 @@ import { useState, useEffect, useRef } from 'react';
 import { askMechanic, askManual, checkAiHealth } from '../services/aiApi';
 import type { ChatMessage } from '@/types/ai';
 
-
+// Función helper pura para decodificar de forma segura el JWT token desde el cliente
+const decodeToken = (token: string | null) => {
+  if (!token) return null;
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+};
 
 export function useAiChat(userRole: string) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Obtener el identificador único del usuario para aislar completamente su historial
+  const token = localStorage.getItem('jwt_token');
+  const decoded = decodeToken(token);
+  const userEmail = decoded?.sub || 'default';
+  const chatKey = `pitstop_ai_chat_messages_${userEmail}`;
+
   const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    const saved = sessionStorage.getItem('pitstop_ai_chat_messages');
+    const saved = sessionStorage.getItem(chatKey);
     if (saved) {
       try {
         return JSON.parse(saved);
@@ -31,13 +54,32 @@ export function useAiChat(userRole: string) {
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Recargar los mensajes cuando el chatKey cambia (ej. cambio de usuario)
+  useEffect(() => {
+    const saved = sessionStorage.getItem(chatKey);
+    if (saved) {
+      try {
+        setMessages(JSON.parse(saved));
+      } catch {
+        // Fallback en caso de error de parseo
+      }
+    } else {
+      setMessages([
+        {
+          role: 'assistant',
+          content: `¡Hola! Soy tu asistente inteligente de **Pitstop**. 🤖\n\n¿En qué te puedo ayudar hoy? Escribe tu consulta abajo.`
+        }
+      ]);
+    }
+  }, [chatKey]);
+
   // Guardar mensajes en la caché de sesión para mantener el chat fluido al cambiar de página
   useEffect(() => {
-    sessionStorage.setItem('pitstop_ai_chat_messages', JSON.stringify(messages));
+    sessionStorage.setItem(chatKey, JSON.stringify(messages));
     scrollToBottom();
-  }, [messages]);
+  }, [messages, chatKey]);
 
-  // Verificar la conexión y salud del microservicio al abrir el chat
+  // 1. Verificar la conexión y salud del microservicio una sola vez al montar (para pintar el led rojo/verde)
   useEffect(() => {
     const verifyHealth = async () => {
       const health = await checkAiHealth();
@@ -49,11 +91,27 @@ export function useAiChat(userRole: string) {
         setIsGroqConfigured(false);
       }
     };
-    
     verifyHealth();
-    const interval = setInterval(verifyHealth, 15000); // Re-verificar cada 15 segundos
-    return () => clearInterval(interval);
   }, []);
+
+  // 2. Intervalo activo de re-verificación SOLO mientras la ventana de chat está abierta (Optimización de recursos)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const verifyHealth = async () => {
+      const health = await checkAiHealth();
+      if (health.status === 'healthy') {
+        setIsServerUp(true);
+        setIsGroqConfigured(health.groq_configured);
+      } else {
+        setIsServerUp(false);
+        setIsGroqConfigured(false);
+      }
+    };
+    
+    const interval = setInterval(verifyHealth, 15000); // Re-verificar cada 15 segundos mientras está abierto
+    return () => clearInterval(interval);
+  }, [isOpen]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -74,7 +132,7 @@ export function useAiChat(userRole: string) {
     try {
       let reply = '';
       if (!isServerUp) {
-        reply = 'Lo sentimos, el microservicio de Inteligencia Artificial independiente de Pitstop no se encuentra activo o cargando. Por favor, asegúrate de iniciar el microservicio en local (puerto 8000).';
+        reply = 'El asistente IA no está disponible en estos momentos';
       } else if (mode === 'mechanics') {
         // Enviar consulta de mecánica directa con historial
         reply = await askMechanic(userText, messages.slice(-6)); // Enviamos las últimas 3 parejas de mensajes como contexto
@@ -104,7 +162,7 @@ export function useAiChat(userRole: string) {
       content: `¡Hola! Soy tu asistente inteligente de **Pitstop**. 🤖\n\n¿En qué te puedo ayudar hoy? Escribe tu consulta abajo.`
     } as ChatMessage;
     setMessages([defaultWelcome]);
-    sessionStorage.removeItem('pitstop_ai_chat_messages');
+    sessionStorage.removeItem(chatKey);
   };
 
   return {

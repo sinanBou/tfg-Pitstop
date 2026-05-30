@@ -17,8 +17,6 @@ import org.tfg.backend.config.JwtService;
 import org.tfg.backend.user.Role;
 import org.tfg.backend.user.User;
 import org.tfg.backend.user.UserRepository;
-import org.tfg.backend.auth.strategy.RegistrationStrategy;
-import org.tfg.backend.auth.strategy.RegistrationStrategyFactory;
 
 import java.util.Optional;
 
@@ -47,16 +45,13 @@ class AuthServiceTest {
     @Mock
     private JwtService jwtService;
 
-    @Mock
-    private RegistrationStrategyFactory strategyFactory;
-
     @InjectMocks
     private AuthService authService;
 
     private User testUser;
     private LoginRequest loginRequest;
-    private RegisterRequest clientRegisterRequest;
-    private RegisterRequest workshopRegisterRequest;
+    private ClientRegisterRequest clientRegisterRequest;
+    private OwnerRegisterRequest ownerRegisterRequest;
 
     @BeforeEach
     void setUp() {
@@ -68,43 +63,39 @@ class AuthServiceTest {
                 .role(Role.CLIENT)
                 .build();
 
-        loginRequest = new LoginRequest();
-        loginRequest.setEmail("sinan@pitstop.com");
-        loginRequest.setPassword("rawPassword");
+        loginRequest = new LoginRequest("sinan@pitstop.com", "rawPassword");
 
-        clientRegisterRequest = RegisterRequest.builder()
+        clientRegisterRequest = ClientRegisterRequest.builder()
                 .firstname("Sinan")
                 .lastname("Bou")
                 .email("sinan@pitstop.com")
                 .password("rawPassword")
                 .nif("12345678A")
-                .phoneNumber("666777888")
-                .address("Calle Pitstop 123")
+                .phoneNumber("600123456")
+                .address("Calle Principal 123")
                 .build();
 
-        workshopRegisterRequest = RegisterRequest.builder()
+        ownerRegisterRequest = OwnerRegisterRequest.builder()
                 .firstname("Sinan")
                 .lastname("Bou")
                 .email("sinan@pitstop.com")
                 .password("rawPassword")
                 .nif("12345678A")
-                .phoneNumber("666777888")
-                .address("Calle Pitstop 123")
-                .cif("B12345678")
-                .companyName("Taller Sinan")
+                .phoneNumber("600123456")
+                .address("Calle Principal 123")
                 .build();
     }
 
     @Test
-    void login_ShouldReturnAuthResponseOnSuccess() {
+    void login_ShouldAuthenticateAndReturnAuthResponse() {
         when(userRepository.findByEmail("sinan@pitstop.com")).thenReturn(Optional.of(testUser));
         when(jwtService.generarToken("sinan@pitstop.com")).thenReturn("mockedJwtToken");
 
-        AuthResponse response = authService.login(loginRequest);
+        AuthResponse result = authService.login(loginRequest);
 
-        assertNotNull(response);
-        assertEquals("mockedJwtToken", response.getToken());
-        assertEquals("CLIENT", response.getRole());
+        assertNotNull(result);
+        assertEquals("mockedJwtToken", result.getToken());
+        assertEquals("CLIENT", result.getRole());
 
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(userRepository, times(1)).findByEmail("sinan@pitstop.com");
@@ -119,26 +110,26 @@ class AuthServiceTest {
         assertEquals("Usuario no encontrado", exception.getMessage());
 
         verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
+        verify(userRepository, times(1)).findByEmail("sinan@pitstop.com");
         verify(jwtService, never()).generarToken(anyString());
     }
 
     @Test
     void registerClient_ShouldCreateUserAndSaveClient() {
         when(userRepository.existsByEmail("sinan@pitstop.com")).thenReturn(false);
+        when(clientRepository.existsByNif("12345678A")).thenReturn(false);
         when(passwordEncoder.encode("rawPassword")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-
-        RegistrationStrategy clientStrategy = mock(RegistrationStrategy.class);
-        when(strategyFactory.getStrategy(Role.CLIENT)).thenReturn(clientStrategy);
 
         String result = authService.registerClient(clientRegisterRequest);
 
         assertEquals("Cliente registrado correctamente", result);
 
         verify(userRepository, times(1)).existsByEmail("sinan@pitstop.com");
+        verify(clientRepository, times(1)).existsByNif("12345678A");
         verify(passwordEncoder, times(1)).encode("rawPassword");
         verify(userRepository, times(1)).save(any(User.class));
-        verify(clientStrategy, times(1)).register(eq(clientRegisterRequest), any(User.class));
+        verify(clientRepository, times(1)).save(any(Client.class));
     }
 
     @Test
@@ -150,26 +141,23 @@ class AuthServiceTest {
 
         verify(userRepository, times(1)).existsByEmail("sinan@pitstop.com");
         verify(userRepository, never()).save(any(User.class));
-        verify(strategyFactory, never()).getStrategy(any(Role.class));
+        verify(clientRepository, never()).save(any(Client.class));
     }
 
     @Test
-    void registerWorkshop_ShouldCreateUserAndSaveEmployee() {
+    void registerOwner_ShouldCreateUserAndSaveEmployee() {
         testUser.setRole(Role.WORKSHOP_OWNER);
         when(userRepository.existsByEmail("sinan@pitstop.com")).thenReturn(false);
         when(passwordEncoder.encode("rawPassword")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
-        RegistrationStrategy workshopStrategy = mock(RegistrationStrategy.class);
-        when(strategyFactory.getStrategy(Role.WORKSHOP_OWNER)).thenReturn(workshopStrategy);
-
-        String result = authService.registerWorkshop(workshopRegisterRequest);
+        String result = authService.registerOwner(ownerRegisterRequest);
 
         assertEquals("Dueño registrado correctamente", result);
 
         verify(userRepository, times(1)).existsByEmail("sinan@pitstop.com");
         verify(passwordEncoder, times(1)).encode("rawPassword");
         verify(userRepository, times(1)).save(any(User.class));
-        verify(workshopStrategy, times(1)).register(eq(workshopRegisterRequest), any(User.class));
+        verify(employeeRepository, times(1)).save(any(Employee.class));
     }
 }

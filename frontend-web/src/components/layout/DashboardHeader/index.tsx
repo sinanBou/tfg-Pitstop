@@ -18,6 +18,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   const handleLogout = () => {
     localStorage.clear();
+    sessionStorage.clear();
     navigate('/login');
   };
 

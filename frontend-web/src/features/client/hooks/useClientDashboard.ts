@@ -121,6 +121,7 @@ export const useClientDashboard = () => {
   const logout = useCallback(() => {
     localStorage.removeItem('jwt_token');
     localStorage.removeItem('role');
+    sessionStorage.clear();
     navigate('/login');
   }, [navigate]);
 

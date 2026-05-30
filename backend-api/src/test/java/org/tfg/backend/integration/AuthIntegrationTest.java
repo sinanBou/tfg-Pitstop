@@ -12,7 +12,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import org.tfg.backend.auth.AuthResponse;
-import org.tfg.backend.auth.RegisterRequest;
+import org.tfg.backend.auth.ClientRegisterRequest;
 import org.tfg.backend.auth.LoginRequest;
 
 import java.util.UUID;
@@ -47,7 +47,7 @@ class AuthIntegrationTest {
         String randomSuffix = UUID.randomUUID().toString().substring(0, 8);
         String uniqueEmail = "integration.user." + randomSuffix + "@pitstop.com";
 
-        RegisterRequest registerRequest = RegisterRequest.builder()
+        ClientRegisterRequest registerRequest = ClientRegisterRequest.builder()
                 .firstname("Integration")
                 .lastname("Tester")
                 .email(uniqueEmail)

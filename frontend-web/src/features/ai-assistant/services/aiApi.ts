@@ -18,7 +18,7 @@ export async function askMechanic(query: string, history: ChatMessage[] = []): P
     return data.response;
   } catch (error) {
     console.error('Error in askMechanic:', error);
-    return 'Lo sentimos, hubo un problema al conectar con el asistente de mecánica. Asegúrate de que el microservicio de IA esté ejecutándose localmente.';
+    return 'El asistente IA no está disponible en estos momentos';
   }
 }
 
@@ -36,7 +36,7 @@ export async function askManual(query: string, role: string): Promise<string> {
     return data.response;
   } catch (error) {
     console.error('Error in askManual:', error);
-    return 'Lo sentimos, hubo un problema al consultar el manual de la aplicación. Asegúrate de que el microservicio de IA esté ejecutándose localmente.';
+    return 'El asistente IA no está disponible en estos momentos';
   }
 }
 

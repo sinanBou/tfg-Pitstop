@@ -6,7 +6,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.tfg.backend.auth.strategy.RegistrationStrategyFactory;
+import org.tfg.backend.client.Client;
+import org.tfg.backend.client.ClientRepository;
+import org.tfg.backend.employee.Employee;
+import org.tfg.backend.employee.EmployeeRepository;
 import org.tfg.backend.config.JwtService;
 import org.tfg.backend.user.Role;
 import org.tfg.backend.user.User;
@@ -17,10 +20,11 @@ import org.tfg.backend.user.UserRepository;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final ClientRepository clientRepository;
+    private final EmployeeRepository employeeRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
-    private final RegistrationStrategyFactory strategyFactory;
 
     public AuthResponse login(LoginRequest request) {
         authenticationManager.authenticate(
@@ -43,39 +47,58 @@ public class AuthService {
 
     // --- REGISTRO DE CLIENTE ---
     @Transactional
-    public String registerClient(RegisterRequest request) {
-        return registerUser(request, Role.CLIENT);
-    }
-
-    // --- REGISTRO DE DUEÑO ---
-    @Transactional
-    public String registerWorkshop(RegisterRequest request) {
-        return registerUser(request, Role.WORKSHOP_OWNER);
-    }
-
-    // --- MÉTODOS PRIVADOS DE APOYO ---
-
-    private String registerUser(RegisterRequest request, Role role) {
-        validateCommonData(request);
+    public String registerClient(ClientRegisterRequest request) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("El email ya está en uso.");
+        }
+        if (clientRepository.existsByNif(request.getNif())) {
+            throw new RuntimeException("El NIF ya está registrado.");
+        }
 
         User user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(role)
+                .role(Role.CLIENT)
                 .build();
         userRepository.save(user);
 
-        // Delegar la creación del perfil específico a la estrategia correspondiente
-        strategyFactory.getStrategy(role).register(request, user);
+        Client client = Client.builder()
+                .user(user)
+                .nif(request.getNif())
+                .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
+                .build();
+        clientRepository.save(client);
 
-        return role == Role.CLIENT ? "Cliente registrado correctamente" : "Dueño registrado correctamente";
+        return "Cliente registrado correctamente";
     }
 
-    private void validateCommonData(RegisterRequest request) {
+    // --- REGISTRO DE DUEÑO ---
+    @Transactional
+    public String registerOwner(OwnerRegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("El email ya está en uso.");
         }
+
+        User user = User.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(Role.WORKSHOP_OWNER)
+                .build();
+        userRepository.save(user);
+
+        Employee ownerEmployee = Employee.builder()
+                .user(user)
+                .nif(request.getNif())
+                .phoneNumber(request.getPhoneNumber())
+                .address(request.getAddress())
+                .build();
+        employeeRepository.save(ownerEmployee);
+
+        return "Dueño registrado correctamente";
     }
 }

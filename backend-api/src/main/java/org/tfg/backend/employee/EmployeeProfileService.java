@@ -47,7 +47,21 @@ public class EmployeeProfileService {
         }
 
         userRepository.save(user);
-        return employeeMapper.mapToDTO(user.getEmployee());
+
+        Employee employee = user.getEmployee();
+        if (employee != null) {
+            if (request.getNif() != null) {
+                employee.setNif(request.getNif().trim());
+            }
+            if (request.getPhoneNumber() != null) {
+                employee.setPhoneNumber(request.getPhoneNumber().trim());
+            }
+            if (request.getAddress() != null) {
+                employee.setAddress(request.getAddress().trim());
+            }
+        }
+
+        return employeeMapper.mapToDTO(employee);
     }
 
     @Transactional

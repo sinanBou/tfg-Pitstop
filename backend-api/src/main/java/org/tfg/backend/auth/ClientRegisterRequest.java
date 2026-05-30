@@ -1,22 +1,20 @@
-package org.tfg.backend.employee;
+package org.tfg.backend.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * DTO para actualizar el perfil del empleado autenticado.
- * Solo permite campos seguros (sin cambio de rol ni contraseña).
- */
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class UpdateProfileRequest {
+@AllArgsConstructor
+public class ClientRegisterRequest {
+    private String email;
+    private String password;
     private String firstname;
     private String lastname;
-    private String address;
     private String nif;
     private String phoneNumber;
+    private String address;
 }

@@ -20,9 +20,11 @@ public class EmployeeMapper {
                 .role(employee.getUser().getRole().name())
                 .workshopId(employee.getWorkshop() != null ? employee.getWorkshop().getId() : null)
                 .workshopName(employee.getWorkshop() != null ? employee.getWorkshop().getCompanyName() : "Sin taller")
-                .address(employee.getUser().getAddress())
+                .address(employee.getAddress() != null ? employee.getAddress() : employee.getUser().getAddress())
                 .allowedSections(employee.getAllowedSections())
                 .profilePictureUrl(storageService.generatePresignedUrl(employee.getUser().getProfilePictureUrl()))
+                .nif(employee.getNif())
+                .phoneNumber(employee.getPhoneNumber())
                 .build();
     }
 }

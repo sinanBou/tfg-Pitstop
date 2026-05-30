@@ -12,15 +12,11 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.tfg.backend.auth.AuthResponse;
-import org.tfg.backend.auth.RegisterRequest;
+import org.tfg.backend.auth.OwnerRegisterRequest;
 import org.tfg.backend.auth.LoginRequest;
 import org.tfg.backend.employee.EmployeeDTO;
-import org.tfg.backend.user.UserDTO;
-import org.tfg.backend.workshop.WorkshopDTO;
-import org.tfg.backend.workshop.WorkshopRequest;
 import org.tfg.backend.taskcatalog.CatalogCategory;
 
-import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +54,7 @@ class WorkshopIntegrationTest {
         String ownerEmail = "owner." + randomSuffix + "@pitstop.com";
 
         // 1. Registrar dueño del taller
-        RegisterRequest registerOwner = RegisterRequest.builder()
+        OwnerRegisterRequest registerOwner = OwnerRegisterRequest.builder()
                 .firstname("OwnerName")
                 .lastname("OwnerLastname")
                 .email(ownerEmail)
@@ -66,11 +62,9 @@ class WorkshopIntegrationTest {
                 .nif("NIF-" + randomSuffix.toUpperCase())
                 .phoneNumber("655666777")
                 .address("Calle Taller 123")
-                .cif("CIF-" + randomSuffix.toUpperCase())
-                .companyName("Taller Integration " + randomSuffix)
                 .build();
 
-        mockMvc.perform(post("/api/auth/register/workshop")
+        mockMvc.perform(post("/api/auth/register/owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerOwner)))
                 .andExpect(status().isOk());

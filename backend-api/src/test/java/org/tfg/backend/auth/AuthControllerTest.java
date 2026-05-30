@@ -55,7 +55,7 @@ class AuthControllerTest {
 
     @Test
     void registerClient_ShouldReturnSuccessMessage() throws Exception {
-        when(authService.registerClient(any(RegisterRequest.class))).thenReturn("Cliente registrado correctamente");
+        when(authService.registerClient(any(ClientRegisterRequest.class))).thenReturn("Cliente registrado correctamente");
 
         String registerPayload = "{\"firstname\":\"Sinan\",\"lastname\":\"Bou\",\"email\":\"sinan@pitstop.com\",\"password\":\"rawPassword\",\"nif\":\"12345678A\"}";
 
@@ -65,21 +65,21 @@ class AuthControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Cliente registrado correctamente"));
 
-        verify(authService, times(1)).registerClient(any(RegisterRequest.class));
+        verify(authService, times(1)).registerClient(any(ClientRegisterRequest.class));
     }
 
     @Test
-    void registerWorkshop_ShouldReturnSuccessMessage() throws Exception {
-        when(authService.registerWorkshop(any(RegisterRequest.class))).thenReturn("Dueño registrado correctamente");
+    void registerOwner_ShouldReturnSuccessMessage() throws Exception {
+        when(authService.registerOwner(any(OwnerRegisterRequest.class))).thenReturn("Dueño registrado correctamente");
 
-        String registerPayload = "{\"firstname\":\"Sinan\",\"lastname\":\"Bou\",\"email\":\"sinan@pitstop.com\",\"password\":\"rawPassword\",\"nif\":\"12345678A\",\"cif\":\"B12345678\",\"companyName\":\"Taller Sinan\"}";
+        String registerPayload = "{\"firstname\":\"Sinan\",\"lastname\":\"Bou\",\"email\":\"sinan@pitstop.com\",\"password\":\"rawPassword\",\"nif\":\"12345678A\"}";
 
-        mockMvc.perform(post("/api/auth/register/workshop")
+        mockMvc.perform(post("/api/auth/register/owner")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(registerPayload))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Dueño registrado correctamente"));
 
-        verify(authService, times(1)).registerWorkshop(any(RegisterRequest.class));
+        verify(authService, times(1)).registerOwner(any(OwnerRegisterRequest.class));
     }
 }
