@@ -1,28 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '@/config/api';
+import * as clientService from '../services/clientService';
 import type { 
   UserDTO, 
   VehicleDTO, 
   AppointmentDTO, 
   HistoryDTO, 
   AppointmentRequest, 
-  WorkshopMinDTO, 
-  AvailableSlotDTO 
-} from '@/types/client.ts';
-
-// Helper local para evitar repetición en las cabeceras de autenticación
-const fetchWithAuth = async (endpoint: string, options: RequestInit = {}) => {
-  const token = localStorage.getItem('jwt_token');
-  return fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-      'Authorization': `Bearer ${token}`
-    }
-  });
-};
+  WorkshopMinDTO 
+} from '../types/client.types';
 
 export const useClientDashboard = () => {
   const navigate = useNavigate();
@@ -49,27 +35,25 @@ export const useClientDashboard = () => {
     try {
       setLoading(true);
       
-      const [resUser, resClient, resVehicles, resWorkshops, resApps] = await Promise.all([
-        fetchWithAuth('/users/me'),
-        fetchWithAuth('/clients/me'),
-        fetchWithAuth('/vehicles/my-vehicles'),
-        fetchWithAuth('/workshops'),
-        fetchWithAuth('/appointments/my-appointments')
+      const [dataUser, dataClient, dataVehicles, dataWorkshops, dataApps] = await Promise.all([
+        clientService.getUserProfile(),
+        clientService.getClientProfile(),
+        clientService.getMyVehicles(),
+        clientService.getWorkshops(),
+        clientService.getMyAppointments()
       ]);
 
-      if (resUser.ok) setUserProfile(await resUser.json());
-      if (resClient.ok) setClientProfile(await resClient.json());
-      if (resVehicles.ok) setVehicles(await resVehicles.json());
-      if (resWorkshops.ok) setWorkshops(await resWorkshops.json());
+      setUserProfile(dataUser);
+      setClientProfile(dataClient);
+      setVehicles(dataVehicles);
+      setWorkshops(dataWorkshops);
       
-      if (resApps.ok) {
-        const data: AppointmentDTO[] = await resApps.json();
-        
+      if (dataApps) {
         // 1. Citas Activas: PENDING, CONFIRMED, IN_PROGRESS, DELAYED + COMPLETED (para mostrar "Listo para recoger")
-        const active = data.filter(app => !['CANCELLED', 'PICKED_UP'].includes(app.status || 'PENDING'));
+        const active = dataApps.filter(app => !['CANCELLED', 'PICKED_UP'].includes(app.status || 'PENDING'));
         
         // 2. Historial: CANCELLED, COMPLETED, PICKED_UP
-        const historical = data.filter(app => ['CANCELLED', 'COMPLETED', 'PICKED_UP'].includes(app.status || 'PENDING'));
+        const historical = dataApps.filter(app => ['CANCELLED', 'COMPLETED', 'PICKED_UP'].includes(app.status || 'PENDING'));
 
         const sortedHistorical = [...historical].sort((a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime());
 
@@ -129,34 +113,21 @@ export const useClientDashboard = () => {
     brand: string; model: string; licensePlate: string; vin: string; year: number; color: string;
   }) => {
     try {
-      const response = await fetchWithAuth('/vehicles/register', {
-        method: 'POST',
-        body: JSON.stringify(vehicleData)
-      });
-
-      if (response.ok) {
+      const success = await clientService.registerVehicle(vehicleData);
+      if (success) {
         await loadDashboardData();
         return true;
       }
       return false;
     } catch (error) {
-      console.error("Error de red registrando vehículo:", error);
+      console.error("Error registrando vehículo:", error);
       return false;
     }
   }, [loadDashboardData]);
 
   const createAppointment = useCallback(async (appointmentData: AppointmentRequest) => {
-    const payload = {
-      ...appointmentData,
-      dateTime: `${appointmentData.date}T${appointmentData.time}:00` 
-    };
-
     try {
-      const response = await fetchWithAuth('/appointments', {
-        method: 'POST',
-        body: JSON.stringify(payload)
-      });
-      return response.ok;
+      return await clientService.createAppointment(appointmentData);
     } catch (error) {
       console.error("Error creando cita:", error);
       return false;
@@ -164,18 +135,8 @@ export const useClientDashboard = () => {
   }, []);
 
   const getAvailableSlots = useCallback(async (workshopId: string, date: string): Promise<string[]> => {
-    if (!workshopId || !date) return [];
-
     try {
-      const response = await fetchWithAuth(`/appointments/availability/${workshopId}?date=${date}`);
-      
-      if (response.ok) {
-        const data: AvailableSlotDTO[] = await response.json();
-        return data
-          .filter(slot => slot.available)
-          .map(slot => slot.time.substring(0, 5)); 
-      }
-      return [];
+      return await clientService.getAvailableSlots(workshopId, date);
     } catch (error) {
       console.error("Error al obtener disponibilidad:", error);
       return [];
@@ -184,11 +145,8 @@ export const useClientDashboard = () => {
 
   const deleteAppointment = useCallback(async (appointmentId: string) => {
     try {
-      const response = await fetchWithAuth(`/appointments/${appointmentId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
+      const success = await clientService.deleteAppointment(appointmentId);
+      if (success) {
         await loadDashboardData();
         return true;
       }
@@ -201,11 +159,8 @@ export const useClientDashboard = () => {
 
   const deleteVehicle = useCallback(async (vehicleId: string) => {
     try {
-      const response = await fetchWithAuth(`/vehicles/${vehicleId}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
+      const success = await clientService.deleteVehicle(vehicleId);
+      if (success) {
         await loadDashboardData();
         return true;
       }
@@ -218,9 +173,7 @@ export const useClientDashboard = () => {
 
   const getCatalogMakes = useCallback(async (): Promise<string[]> => {
     try {
-      const response = await fetchWithAuth('/vehicles/catalog/makes');
-      if (response.ok) return await response.json();
-      return [];
+      return await clientService.getCatalogMakes();
     } catch (error) {
       console.error("Error al obtener marcas:", error);
       return [];
@@ -228,11 +181,8 @@ export const useClientDashboard = () => {
   }, []);
 
   const getCatalogModels = useCallback(async (make: string): Promise<string[]> => {
-    if (!make) return [];
     try {
-      const response = await fetchWithAuth(`/vehicles/catalog/models/${make}`);
-      if (response.ok) return await response.json();
-      return [];
+      return await clientService.getCatalogModels(make);
     } catch (error) {
       console.error("Error al obtener modelos:", error);
       return [];
@@ -241,19 +191,11 @@ export const useClientDashboard = () => {
 
   const handleProfileUpdate = useCallback(async (profileData: { firstname: string; lastname: string; address: string; phoneNumber?: string }) => {
     try {
-      const response = await fetchWithAuth('/clients/me', {
-        method: 'PUT',
-        body: JSON.stringify(profileData)
-      });
-
-      if (response.ok) {
-        const updated = await response.json();
-        setClientProfile(updated);
-        const userRes = await fetchWithAuth('/users/me');
-        if (userRes.ok) setUserProfile(await userRes.json());
-        return true;
-      }
-      return false;
+      const updated = await clientService.updateProfile(profileData);
+      setClientProfile(updated);
+      const dataUser = await clientService.getUserProfile();
+      setUserProfile(dataUser);
+      return true;
     } catch (error) {
       console.error("Error actualizando perfil del cliente:", error);
       return false;

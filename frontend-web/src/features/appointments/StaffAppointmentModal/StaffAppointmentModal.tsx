@@ -1,16 +1,10 @@
 import React from 'react';
-import { useStaffAppointment } from '@/features/appointments/components/StaffAppointmentModal/hooks/useStaffAppointment';
-import { ClientStep } from '@/features/appointments/components/StaffAppointmentModal/components/ClientStep';
-import { VehicleStep } from '@/features/appointments/components/StaffAppointmentModal/components/VehicleStep';
-import { AppointmentStep } from '@/features/appointments/components/StaffAppointmentModal/components/AppointmentStep';
+import { useStaffAppointment } from './hooks/useStaffAppointment';
+import { ClientStep } from './components/ClientStep';
+import { VehicleStep } from './components/VehicleStep';
+import { AppointmentStep } from './components/AppointmentStep';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
-
-interface StaffAppointmentModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  workshopId: string;
-  onSuccess: () => void;
-}
+import type { StaffAppointmentModalProps } from './types/StaffAppointmentModal.types';
 
 export const StaffAppointmentModal: React.FC<StaffAppointmentModalProps> = ({
   isOpen, onClose, workshopId, onSuccess

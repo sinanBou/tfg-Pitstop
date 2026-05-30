@@ -1,7 +1,7 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import '@/index.css';
-import AiAssistantChat from '@/features/ai-assistant/components/AiAssistantChat/index';
+import AiAssistantChat from '@/features/ai-assistant/components/AiAssistantChat';
 
 // Componentes
 import Home from '@/pages/Home';

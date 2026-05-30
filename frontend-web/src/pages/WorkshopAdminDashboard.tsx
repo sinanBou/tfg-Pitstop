@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { GenerateInvoiceModal } from '@/features/workshop/components/modals/GenerateInvoiceModal/index';
 import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
 import { BottomNav } from '@/components/layout/BottomNav/index';
-import { StaffAppointmentModal } from '@/features/appointments/components/StaffAppointmentModal/index';
+import { StaffAppointmentModal } from '@/features/appointments/StaffAppointmentModal/index';
 import { useWorkshopAdmin } from '@/features/workshop/hooks/useWorkshopAdmin';
 import { OverviewTab } from '@/features/workshop/components/admin/tabs/OverviewTab/OverviewTab';
 import { AppointmentsTab } from '@/features/workshop/components/admin/tabs/AppointmentsTab';
@@ -258,7 +258,7 @@ export default function WorkshopAdminDashboard() {
                         if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
                         if (e.role === 'WORKSHOP_OWNER' && workshopData?.includeOwnerInPlanning) return true;
                         return false;
-                      })}
+                      }) as any}
                       onSelectMechanic={() => {}}
                     />
                     <Button

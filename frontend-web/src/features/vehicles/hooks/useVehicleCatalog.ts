@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { API_BASE_URL } from '@/config/api';
+import * as vehicleService from '../services/vehicleService';
 
 export function useVehicleCatalog() {
   const [makes, setMakes] = useState<string[]>([]);
@@ -8,12 +8,8 @@ export function useVehicleCatalog() {
 
   const fetchMakes = useCallback(async () => {
     setLoading(true);
-    const token = localStorage.getItem('jwt_token');
     try {
-      const res = await fetch(`${API_BASE_URL}/vehicles/catalog/makes`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
+      const data = await vehicleService.getCatalogMakes();
       setMakes(data);
       return data;
     } catch (err) {
@@ -27,12 +23,8 @@ export function useVehicleCatalog() {
   const fetchModels = useCallback(async (make: string) => {
     if (!make) return [];
     setLoading(true);
-    const token = localStorage.getItem('jwt_token');
     try {
-      const res = await fetch(`${API_BASE_URL}/vehicles/catalog/models/${make}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
+      const data = await vehicleService.getCatalogModels(make);
       setModels(data);
       return data;
     } catch (err) {

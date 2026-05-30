@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
-import { API_BASE_URL } from '@/config/api';
-import { 
-  type ClientSearchDTO, 
-  type VehicleSearchDTO, 
-  type VehicleRequest
-} from '@/types/client';
+import type { ClientSearchDTO, VehicleSearchDTO, VehicleRequest } from '@/types/client';
+import * as service from '../services/staffAppointmentService';
 
 export function useStaffAppointment(workshopId: string, onSuccess: () => void, isOpen: boolean) {
   const [step, setStep] = useState(1);
@@ -76,80 +72,50 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
 
   useEffect(() => {
     if (isOpen && workshopId) {
-      const token = localStorage.getItem('jwt_token');
-      
       // Fetch workshop settings
-      fetch(`${API_BASE_URL}/workshops/${workshopId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      .then(res => res.json())
-      .then(data => setWorkshopSettings(data))
-      .catch(err => console.error("Error fetching workshop settings:", err));
+      service.fetchWorkshopSettings(workshopId)
+        .then(data => setWorkshopSettings(data))
+        .catch(err => console.error("Error fetching workshop settings:", err));
 
       // Fetch employees for assignment
-      fetch(`${API_BASE_URL}/employees/workshop/${workshopId}`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      .then(res => res.json())
-      .then(data => setEmployees(data))
-      .catch(err => console.error("Error fetching employees:", err));
+      service.fetchEmployees(workshopId)
+        .then(data => setEmployees(data))
+        .catch(err => console.error("Error fetching employees:", err));
     }
   }, [isOpen, workshopId]);
 
   useEffect(() => {
     if (isNewVehicle && makes.length === 0) {
-      fetchMakes().then(setMakes);
+      service.fetchCatalogMakes()
+        .then(setMakes)
+        .catch(err => console.error("Error fetching makes:", err));
     }
-  }, [isNewVehicle]);
+  }, [isNewVehicle, makes.length]);
 
   useEffect(() => {
     if (vehicleForm.brand) {
-      fetchModels(vehicleForm.brand).then(setModels);
+      service.fetchCatalogModels(vehicleForm.brand)
+        .then(setModels)
+        .catch(err => console.error("Error fetching models:", err));
     } else {
       setModels([]);
     }
   }, [vehicleForm.brand]);
 
-  // API Methods
-  const fetchMakes = async () => {
-    const token = localStorage.getItem('jwt_token');
-    const res = await fetch(`${API_BASE_URL}/vehicles/catalog/makes`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    return await res.json();
-  };
-
-  const fetchModels = async (make: string) => {
-    const token = localStorage.getItem('jwt_token');
-    const res = await fetch(`${API_BASE_URL}/vehicles/catalog/models/${make}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    return await res.json();
-  };
-
   const handleSearch = async (pageIdx = 0, isNewSearch = true) => {
     if (!searchQuery.trim()) return;
     setLoading(true);
-    const token = localStorage.getItem('jwt_token');
     try {
-      const [cRes, vRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/clients/search?query=${encodeURIComponent(searchQuery)}&page=${pageIdx}&size=5`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        isNewSearch ? fetch(`${API_BASE_URL}/vehicles/search?licensePlate=${searchQuery}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }) : Promise.resolve(null)
+      const [cData, vData] = await Promise.all([
+        service.searchClients(searchQuery, pageIdx),
+        isNewSearch ? service.searchVehiclesByPlate(searchQuery).catch(() => []) : Promise.resolve(null)
       ]);
 
-      let newClients: ClientSearchDTO[] = [];
-      if (cRes.ok) {
-        const data = await cRes.json();
-        newClients = data.content;
-        setHasMore(!data.last);
-        setCurrentPage(pageIdx);
-      }
+      let newClients: ClientSearchDTO[] = cData.content || [];
+      setHasMore(!cData.last);
+      setCurrentPage(pageIdx);
 
-      const vehicles = (vRes && vRes.ok) ? await vRes.json() : (isNewSearch ? [] : searchResults.vehicles);
+      const vehicles = vData !== null ? vData : (isNewSearch ? [] : searchResults.vehicles);
 
       setSearchResults(prev => ({
         clients: isNewSearch ? newClients : [...prev.clients, ...newClients],
@@ -173,13 +139,11 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     setCurrentPage(0);
     setHasMore(false);
     
-    const token = localStorage.getItem('jwt_token');
-    const res = await fetch(`${API_BASE_URL}/vehicles/client/${client.id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const vehicles = await res.json();
+    try {
+      const vehicles = await service.fetchClientVehicles(client.id);
       setSearchResults(prev => ({ ...prev, vehicles }));
+    } catch (err) {
+      console.error("Error fetching client vehicles:", err);
     }
     setStep(2);
   };
@@ -191,26 +155,13 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
 
   const handleCreateClient = async () => {
     setLoading(true);
-    const token = localStorage.getItem('jwt_token');
     try {
-      const res = await fetch(`${API_BASE_URL}/clients/manual-register`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(clientForm)
-      });
-      if (res.ok) {
-        const client = await res.json();
-        setSelectedClient(client);
-        setStep(2);
-      } else {
-        const errorText = await res.text();
-        alert("Error al crear cliente: " + errorText);
-      }
-    } catch (err) {
+      const client = await service.manualRegisterClient(clientForm);
+      setSelectedClient(client);
+      setStep(2);
+    } catch (err: any) {
       console.error(err);
+      alert("Error al crear cliente: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -219,75 +170,52 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
   const handleCreateVehicle = async () => {
     if (!selectedClient) return;
     setLoading(true);
-    const token = localStorage.getItem('jwt_token');
     try {
-      const res = await fetch(`${API_BASE_URL}/vehicles/register-for-client/${selectedClient.id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(vehicleForm)
-      });
-      if (res.ok) {
-        const vehicle = await res.json();
-        setSelectedVehicle(vehicle);
-        setStep(3);
-      } else {
-        alert("Error al crear vehículo");
-      }
+      const vehicle = await service.registerVehicleForClient(selectedClient.id, vehicleForm);
+      setSelectedVehicle(vehicle);
+      setStep(3);
     } catch (err) {
       console.error(err);
+      alert("Error al crear vehículo");
     } finally {
       setLoading(false);
     }
   };
 
   const fetchSlots = async (date: string) => {
-    const token = localStorage.getItem('jwt_token');
-    const res = await fetch(`${API_BASE_URL}/appointments/availability/${workshopId}?date=${date}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setAvailableSlots(data.filter((s:any) => s.available).map((s:any) => s.time.slice(0,5)));
+    try {
+      const data = await service.fetchAvailabilitySlots(workshopId, date);
+      setAvailableSlots(data.filter((s: any) => s.available).map((s: any) => s.time.slice(0, 5)));
+    } catch (err) {
+      console.error("Error fetching availability slots:", err);
     }
   };
 
   const handleFinish = async () => {
-    if (!selectedVehicle || !appointmentForm.date || !appointmentForm.time) return;
+    if (!selectedVehicle || !appointmentForm.date || !appointmentForm.time) return false;
     setLoading(true);
-    const token = localStorage.getItem('jwt_token');
     try {
       const [year, month, day] = appointmentForm.date.split('-');
       const dateTime = `${year}-${month}-${day}T${appointmentForm.time}:00`;
 
-      const res = await fetch(`${API_BASE_URL}/appointments/staff`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          workshopId,
-          vehicleId: selectedVehicle.id,
-          dateTime,
-          serviceType: appointmentForm.serviceType,
-          description: appointmentForm.description,
-          estimatedDuration: appointmentForm.estimatedDuration,
-          assignedEmployeeId: appointmentForm.assignedEmployeeId || null
-        })
+      const success = await service.createStaffAppointment({
+        workshopId,
+        vehicleId: selectedVehicle.id,
+        dateTime,
+        serviceType: appointmentForm.serviceType,
+        description: appointmentForm.description,
+        estimatedDuration: appointmentForm.estimatedDuration,
+        assignedEmployeeId: appointmentForm.assignedEmployeeId || null
       });
 
-      if (res.ok) {
+      if (success) {
         onSuccess();
         return true;
-      } else {
-        alert("Error al registrar la cita");
-        return false;
       }
+      return false;
     } catch (err) {
       console.error(err);
+      alert("Error al registrar la cita");
       return false;
     } finally {
       setLoading(false);

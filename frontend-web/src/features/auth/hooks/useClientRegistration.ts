@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import * as authService from '../services/authService';
+import type { ClientRegistrationFormData } from '../types/auth.types';
 
 export function useClientRegistration() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ClientRegistrationFormData>({
     firstname: '', lastname: '', email: '', password: '',
     nif: '', phoneNumber: '', address: ''
   });
@@ -17,21 +19,11 @@ export function useClientRegistration() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:9091/api/auth/register/client', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        alert('Cliente registrado con éxito');
-        navigate('/login');
-      } else {
-        const error = await response.text();
-        alert(error);
-      }
-    } catch {
-      alert('Error de conexión');
+      await authService.registerClient(formData);
+      alert('Cliente registrado con éxito');
+      navigate('/login');
+    } catch (err: any) {
+      alert(err.message || 'Error de conexión');
     } finally {
       setIsLoading(false);
     }

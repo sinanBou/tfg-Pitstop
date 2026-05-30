@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
 import { BottomNav } from '@/components/layout/BottomNav/index';
 import { LoadingScreen } from '@/components/common/LoadingScreen/LoadingScreen';
-import { StaffAppointmentModal } from '@/features/appointments/components/StaffAppointmentModal/index';
+import { StaffAppointmentModal } from '@/features/appointments/StaffAppointmentModal/index';
 import { DateNavigator } from '@/components/common/DateNavigator/DateNavigator';
 import { useWorkerDashboard } from '@/features/workshop/hooks/useWorkerDashboard';
 import { PlanningTimeline } from '@/features/workshop/components/admin/tabs/AppointmentsTab/PlanningTimeline';
@@ -237,7 +237,7 @@ export default function WorkerDashboard() {
                         if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
                         if (e.role === 'WORKSHOP_OWNER' && workshopData?.includeOwnerInPlanning) return true;
                         return false;
-                      })}
+                      }) as any}
                       onSelectMechanic={() => {}}
                     />
                     <button

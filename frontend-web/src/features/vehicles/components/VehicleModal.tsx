@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
 import { type VehicleRequest } from '@/types/client.ts';
 import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { useVehicleForm } from '../hooks/useVehicleForm';
 
 // 1. Definimos una interfaz clara para las props del Modal
 interface VehicleModalProps {
@@ -19,59 +19,17 @@ const POPULAR_BRANDS = [
 ];
 
 export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModels }: VehicleModalProps) => {
-  const [loading, setLoading] = useState(false);
-  const [makes, setMakes] = useState<string[]>([]);
-  const [models, setModels] = useState<string[]>([]);
-
-  // 2. Inicializamos el estado asegurando que cumpla con el tipo VehicleRequest
-  const [formData, setFormData] = useState<VehicleRequest>({
-    brand: '',
-    model: '',
-    licensePlate: '',
-    vin: '',
-    year: new Date().getFullYear(),
-    color: ''
-  });
-
-  // Cargar marcas iniciales
-  useEffect(() => {
-    if (isOpen) {
-      fetchMakes().then(setMakes);
-    }
-  }, [isOpen, fetchMakes]);
-
-  // Cargar modelos cuando cambie la marca
-  useEffect(() => {
-    if (formData.brand) {
-      fetchModels(formData.brand).then(setModels);
-    } else {
-      setModels([]);
-    }
-  }, [formData.brand, fetchModels]);
-
+  const {
+    loading,
+    makes,
+    models,
+    formData,
+    setFormData,
+    handleSubmit
+  } = useVehicleForm({ isOpen, onClose, onSubmit, fetchMakes, fetchModels });
 
   // Si no está abierto, no renderizamos nada
   if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const success = await onSubmit(formData);
-      if (success) {
-        // Opcional: Limpiar el formulario al tener éxito
-        setFormData({
-          brand: '', model: '', licensePlate: '', 
-          vin: '', year: new Date().getFullYear(), color: ''
-        });
-        onClose();
-      }
-    } catch (error) {
-      console.error("Error al registrar vehículo:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <BaseModal

@@ -1,9 +1,6 @@
 import React from 'react';
-import { useAiChat } from '../../hooks/useAiChat';
-
-interface AiAssistantChatProps {
-  userRole: 'CLIENT' | 'WORKSHOP_STAFF' | 'WORKSHOP_MANAGER' | 'WORKSHOP_OWNER';
-}
+import { useAiChat } from '../hooks/useAiChat';
+import type { AiAssistantChatProps } from '../types/aiAssistant';
 
 export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) => {
   const {
@@ -153,7 +150,7 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
 
           {/* Listado de Mensajes */}
           <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4 scroll-smooth scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-zinc-900/40">
-            {messages.map((msg, index) => (
+            {messages.map((msg: any, index: number) => (
               <div 
                 key={index} 
                 className={`flex w-full ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}

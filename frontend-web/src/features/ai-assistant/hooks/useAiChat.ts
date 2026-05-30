@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { askMechanic, askManual, checkAiHealth } from '../services/aiApi';
-import type { ChatMessage } from '@/types/ai';
+import type { ChatMessage } from '../types/aiAssistant';
 
 // Función helper pura para decodificar de forma segura el JWT token desde el cliente
 const decodeToken = (token: string | null) => {

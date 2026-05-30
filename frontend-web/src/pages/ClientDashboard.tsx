@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useClientDashboard } from '@/features/client/hooks/useClientDashboard';
 import { VehicleModal } from '@/features/vehicles/components/VehicleModal';
-import { AppointmentModal } from '@/features/appointments/components/AppointmentModal';
+import { ClientAppointmentModal } from '@/features/appointments/ClientAppointmentModal';
 import { DashboardHeader } from '@/components/layout/DashboardHeader/index';
 import { BottomNav } from '@/components/layout/BottomNav/index';
 import { LoadingScreen } from '@/components/common/LoadingScreen/LoadingScreen';
@@ -110,7 +110,7 @@ export default function ClientDashboard() {
         fetchModels={getCatalogModels}
       />
 
-      <AppointmentModal 
+      <ClientAppointmentModal 
         isOpen={isAppModalOpen}
         onClose={() => setIsAppModalOpen(false)}
         vehicles={vehicles}

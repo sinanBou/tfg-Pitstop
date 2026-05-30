@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import AddressAutocomplete from '@/components/common/AddressAutocomplete/AddressAutocomplete';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
-
-const API_URL = 'http://localhost:9091/api';
+import * as workshopService from '../../services/workshopService';
 
 interface WorkshopCreationModalProps {
   isOpen: boolean;
@@ -74,7 +73,6 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
     }
 
     try {
-      const token = localStorage.getItem('jwt_token');
       const payload = {
         ...form,
         slotDurationMinutes: 60,
@@ -82,16 +80,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
         ownerId: ownerId,
       };
 
-      const res = await fetch(`${API_URL}/workshops`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` 
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error(await res.text());
+      await workshopService.createWorkshop(payload);
 
       alert("Taller creado con éxito.");
       onClose();
