@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # 1. BASE DE DATOS DOCKERIZADA
+  # 1. BASE DE DATOS
   db:
     image: mysql:8.0
     environment:
@@ -9,14 +9,10 @@ services:
       MYSQL_DATABASE: mecanicalApp
     volumes:
       - mysql_data:/var/lib/mysql
-    ports:
-      - "3306:3306"
 
   # 2. MICROSERVICIO IA
   ai-service:
     build: ./ai-service
-    ports:
-      - "8000:8000"
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
     volumes:
@@ -28,7 +24,6 @@ services:
     ports:
       - "9091:9091"
     environment:
-      # ¡Aquí ocurre la magia! Docker inyecta 'db' en lugar de 'localhost'
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mecanicalApp?createDatabaseIfNotExist=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: admin123
@@ -44,9 +39,9 @@ services:
     build:
       context: ./frontend-web
       args:
-        - VITE_API_BASE_URL=http://localhost:9091/api
+        - VITE_API_BASE_URL=/api
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - backend
 

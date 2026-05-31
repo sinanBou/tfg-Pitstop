@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://localhost:8000/api/ai"
+BASE_URL = "https://pitstop.solutions/api/ai"
 
 def test_download_invoice():
     query = "¿Cómo puedo descargar mi última factura?"
