@@ -1,7 +1,7 @@
 import type { ChatMessage } from '../types/aiAssistant';
 
 
-const AI_API_BASE_URL = 'http://localhost:8000/api/ai';
+const AI_API_BASE_URL = '/api/ai';
 
 
 export async function askMechanic(query: string, history: ChatMessage[] = []): Promise<string> {

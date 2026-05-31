@@ -21,7 +21,5 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # Iniciar servidor Uvicorn en el puerto 8000
-echo "===================================================================="
-echo " ARRANCANDO SERVIDOR FASTAPI EN http://localhost:8000 "
-echo "===================================================================="
+
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
