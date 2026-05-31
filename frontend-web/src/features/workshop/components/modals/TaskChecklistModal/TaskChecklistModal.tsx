@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { useToast } from '@/hooks/useToast';
 import type { WorkshopInventory } from '@/types/client';
 
 /* ─────────────────────────────────────────────
@@ -59,6 +60,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   onUpdateStatus,
   onSuccess,
 }) => {
+  const toast = useToast();
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
   const [loadingCatalog, setLoadingCatalog] = useState(true);
 
@@ -230,7 +232,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     }
     if (matchedInv) {
       if (matchedInv.stockQuantity < quantityToUse) {
-        alert(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
+      toast.warning(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
         return;
       }
       payload.partId = matchedInv.part.id;
@@ -264,7 +266,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
       setShowDropdown(false);
       onSuccess?.();
     } catch (err: any) {
-      alert(err.message || 'Error al guardar repuesto.');
+      toast.error(err.message || 'Error al guardar repuesto.');
     } finally {
       setAddingPart(false);
     }

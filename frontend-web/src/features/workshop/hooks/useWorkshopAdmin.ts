@@ -1,11 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../services/workshopService';
 import type { EmployeeProfile, Workshop } from '../types/workshop.types';
 
 export function useWorkshopAdmin() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState(0);
 
   const [selectedDate, setSelectedDate] = useState(() => {
@@ -50,7 +52,7 @@ export function useWorkshopAdmin() {
     const role = localStorage.getItem('role');
 
     if (role !== 'WORKSHOP_OWNER' && role !== 'WORKSHOP_MANAGER') {
-      alert("Acceso denegado");
+      toast.error("Acceso denegado");
       return navigate(role === 'CLIENT' ? '/client-dashboard' : '/worker-dashboard');
     }
 
@@ -100,7 +102,7 @@ export function useWorkshopAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [id, navigate, selectedDate]);
+  }, [id, navigate, selectedDate, toast]);
 
   useEffect(() => {
     fetchWorkshopData();
@@ -119,11 +121,11 @@ export function useWorkshopAdmin() {
         includeOwnerInPlanning: settingsForm.includeOwnerInPlanning
       };
       await workshopService.updateWorkshopSettings(id, payload);
-      alert("Ajustes actualizados correctamente");
+      toast.success("Ajustes actualizados correctamente");
       await fetchWorkshopData();
     } catch (err) { 
       console.error(err);
-      alert("Error al guardar ajustes"); 
+      toast.error("Error al guardar ajustes"); 
     }
   };
 
@@ -132,12 +134,12 @@ export function useWorkshopAdmin() {
     if (!id) return;
     try {
       await workshopService.registerEmployee(id, employeeForm);
-      alert("Empleado registrado con éxito");
+      toast.success("Empleado registrado con éxito");
       setEmployeeForm({ firstname: '', lastname: '', email: '', password: '', role: 'WORKSHOP_STAFF', address: '' });
       await fetchWorkshopData();
     } catch (err) { 
       console.error(err);
-      alert("Error al registrar empleado"); 
+      toast.error("Error al registrar empleado"); 
     }
   };
 
@@ -145,11 +147,11 @@ export function useWorkshopAdmin() {
     if (!window.confirm("¿Estás seguro de eliminar este empleado? Se borrará toda su información permanentemente.")) return;
     try {
       await workshopService.deleteEmployee(employeeId);
-      alert("Empleado eliminado");
+      toast.success("Empleado eliminado");
       await fetchWorkshopData();
     } catch (err) { 
       console.error(err);
-      alert("Error al eliminar"); 
+      toast.error("Error al eliminar"); 
     }
   };
 
@@ -157,11 +159,11 @@ export function useWorkshopAdmin() {
     if (!window.confirm("¿Estás seguro de ascender a este empleado a Gerente? Obtendrá permisos de administración.")) return;
     try {
       await workshopService.promoteEmployee(employeeId);
-      alert("Empleado ascendido correctamente");
+      toast.success("Empleado ascendido correctamente");
       await fetchWorkshopData();
     } catch (err) { 
       console.error(err);
-      alert("Error al ascender"); 
+      toast.error("Error al ascender"); 
     }
   };
 
@@ -169,11 +171,11 @@ export function useWorkshopAdmin() {
     if (!window.confirm("¿Seguro que quieres pasar a este Gerente a Mecánico de plantilla? Perderá privilegios de administración.")) return;
     try {
       await workshopService.demoteEmployee(employeeId);
-      alert("Operación completada");
+      toast.success("Operación completada");
       await fetchWorkshopData();
     } catch (err) { 
       console.error(err);
-      alert("Error al demoler cargo"); 
+      toast.error("Error al demoler cargo"); 
     }
   };
 
@@ -183,7 +185,7 @@ export function useWorkshopAdmin() {
       await fetchWorkshopData();
     } catch (err) {
       console.error(err);
-      alert(`Error al asignar la cita: ${err}`);
+      toast.error(`Error al asignar la cita: ${err}`);
     }
   };
 
@@ -194,7 +196,7 @@ export function useWorkshopAdmin() {
       await fetchWorkshopData();
     } catch (err) {
       console.error(err);
-      alert(`Error al reubicar: ${err}`);
+      toast.error(`Error al reubicar: ${err}`);
     }
   };
 
@@ -235,7 +237,7 @@ export function useWorkshopAdmin() {
       await fetchWorkshopData();
     } catch (err) {
       console.error(err);
-      alert(`Error al reubicar tarea: ${err}`);
+      toast.error(`Error al reubicar tarea: ${err}`);
     }
   };
 
@@ -313,9 +315,9 @@ export function useWorkshopAdmin() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas sin asignar en los próximos días.");
+      toast.info("No hay más citas sin asignar en los próximos días.");
     }
-  }, [appointments, selectedDate]);
+  }, [appointments, selectedDate, toast]);
 
   const goToNextPendingDate = useCallback(() => {
     if (!appointments.length) return;
@@ -336,9 +338,9 @@ export function useWorkshopAdmin() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas pendientes en los próximos días.");
+      toast.info("No hay más citas pendientes en los próximos días.");
     }
-  }, [appointments, selectedDate]);
+  }, [appointments, selectedDate, toast]);
 
   const handleProfileUpdate = async (profileData: { firstname: string; lastname: string; address: string }) => {
     try {
@@ -347,7 +349,7 @@ export function useWorkshopAdmin() {
       await fetchWorkshopData();
     } catch (err) {
       console.error('Error actualizando perfil:', err);
-      alert('Error al actualizar el perfil');
+      toast.error('Error al actualizar el perfil');
     }
   };
 

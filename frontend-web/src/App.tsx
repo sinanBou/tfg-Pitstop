@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import '@/index.css';
 import AiAssistantChat from '@/features/ai-assistant/components/AiAssistantChat';
+import { ToastProvider } from '@/hooks/useToast';
 
 // Componentes
 import Home from '@/pages/Home';
@@ -27,24 +28,26 @@ function App() {
   }, [location]);
 
   return (
-    <div className="h-full bg-black text-white flex flex-col relative">
-      {/* CONTENIDO CAMBIANTE */}
-      <main className="bg-black h-screen w-full">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/registration" element={<Registration />} />
+    <ToastProvider>
+      <div className="h-full bg-black text-white flex flex-col relative">
+        {/* CONTENIDO CAMBIANTE */}
+        <main className="bg-black h-screen w-full">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/registration" element={<Registration />} />
 
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
-          <Route path="/owner-dashboard" element={<OwnerDashboard />} />
-          <Route path="/workshop/:id" element={<WorkshopAdminDashboard />} />
-          <Route path="/worker-dashboard" element={<WorkerDashboard />} />
-        </Routes>
-      </main>
+            <Route path="/client-dashboard" element={<ClientDashboard />} />
+            <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+            <Route path="/workshop/:id" element={<WorkshopAdminDashboard />} />
+            <Route path="/worker-dashboard" element={<WorkerDashboard />} />
+          </Routes>
+        </main>
 
-      {/* ASISTENTE DE IA FLOTANTE (Solo si está logueado) */}
-      {userRole && <AiAssistantChat userRole={userRole} />}
-    </div>
+        {/* ASISTENTE DE IA FLOTANTE (Solo si está logueado) */}
+        {userRole && <AiAssistantChat userRole={userRole} />}
+      </div>
+    </ToastProvider>
   );
 }
 

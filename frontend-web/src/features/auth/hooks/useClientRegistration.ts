@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/authService';
 import type { ClientRegistrationFormData } from '../types/auth.types';
+import { useToast } from '@/hooks/useToast';
 
 export function useClientRegistration() {
+  const toast = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<ClientRegistrationFormData>({
@@ -20,10 +22,10 @@ export function useClientRegistration() {
     setIsLoading(true);
     try {
       await authService.registerClient(formData);
-      alert('Cliente registrado con éxito');
+      toast.success('Cliente registrado con éxito');
       navigate('/login');
     } catch (err: any) {
-      alert(err.message || 'Error de conexión');
+      toast.error(err.message || 'Error al registrar el cliente');
     } finally {
       setIsLoading(false);
     }

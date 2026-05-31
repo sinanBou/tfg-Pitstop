@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/useToast';
 import type { ClientSearchDTO, VehicleSearchDTO, VehicleRequest } from '@/types/client';
 import * as service from '../services/staffAppointmentService';
 
 export function useStaffAppointment(workshopId: string, onSuccess: () => void, isOpen: boolean) {
+  const toast = useToast();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   
@@ -161,7 +163,7 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
       setStep(2);
     } catch (err: any) {
       console.error(err);
-      alert("Error al crear cliente: " + err.message);
+      toast.error("Error al crear cliente: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -176,7 +178,7 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
       setStep(3);
     } catch (err) {
       console.error(err);
-      alert("Error al crear vehículo");
+      toast.error("Error al crear vehículo");
     } finally {
       setLoading(false);
     }
@@ -215,7 +217,7 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
       return false;
     } catch (err) {
       console.error(err);
-      alert("Error al registrar la cita");
+      toast.error("Error al registrar la cita");
       return false;
     } finally {
       setLoading(false);

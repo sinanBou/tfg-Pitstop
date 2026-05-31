@@ -7,12 +7,14 @@ import { TabHeader } from '../shared/TabHeader';
 import { PartFormInline } from './components/PartFormInline';
 import { PartItemRow } from './components/PartItemRow';
 import { Card } from '@/components/common/Card/Card';
+import { useToast } from '@/hooks/useToast';
 
 interface PartsTabProps {
   workshopId: string;
 }
 
 export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
+  const toast = useToast();
   const [categories, setCategories] = useState<PartCategory[]>([]);
   const [inventory, setInventory] = useState<WorkshopInventory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -156,7 +158,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       setShowAddCategory(false);
       await fetchData();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setAddingCategory(false);
     }
@@ -209,7 +211,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       
       await fetchData();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setAddingPart(false);
     }
@@ -265,7 +267,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       setEditingItem(null);
       await fetchData();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setSavingEdit(false);
     }
@@ -284,7 +286,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       if (!res.ok) throw new Error('No se pudo eliminar el repuesto');
       await fetchData();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -302,7 +304,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       if (!res.ok) throw new Error('No se pudo eliminar la categoría (comprueba que no contenga repuestos)');
       await fetchData();
     } catch (err: any) {
-      alert(err.message);
+        toast.error(err.message);
     }
   };
 

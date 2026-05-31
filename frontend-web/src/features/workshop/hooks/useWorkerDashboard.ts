@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../services/workshopService';
 import type { EmployeeProfile, Workshop } from '../types/workshop.types';
 
 export function useWorkerDashboard() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [employeeProfile, setEmployeeProfile] = useState<EmployeeProfile | null>(null);
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -56,7 +58,7 @@ export function useWorkerDashboard() {
       await fetchWorkerData();
     } catch (err) {
       console.error(err);
-      alert(`Error al asignar la cita: ${err}`);
+      toast.error(`Error al asignar la cita: ${err}`);
     }
   };
 
@@ -68,7 +70,7 @@ export function useWorkerDashboard() {
       await fetchWorkerData();
     } catch (err) {
       console.error(err);
-      alert(`Error al reubicar: ${err}`);
+      toast.error(`Error al reubicar: ${err}`);
     }
   };
 
@@ -106,7 +108,7 @@ export function useWorkerDashboard() {
       await fetchWorkerData();
     } catch (err) {
       console.error(err);
-      alert(`Error al reubicar tarea: ${err}`);
+      toast.error(`Error al reubicar tarea: ${err}`);
     }
   };
 
@@ -191,9 +193,9 @@ export function useWorkerDashboard() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas sin asignar en los próximos días.");
+      toast.info("No hay más citas sin asignar en los próximos días.");
     }
-  }, [appointments, selectedDate]);
+  }, [appointments, selectedDate, toast]);
 
   const goToNextPendingDate = useCallback(() => {
     if (!appointments.length) return;
@@ -214,9 +216,9 @@ export function useWorkerDashboard() {
       nextDate.setHours(0,0,0,0);
       setSelectedDate(nextDate);
     } else {
-      alert("No hay más citas pendientes en los próximos días.");
+      toast.info("No hay más citas pendientes en los próximos días.");
     }
-  }, [appointments, selectedDate]);
+  }, [appointments, selectedDate, toast]);
 
   useEffect(() => {
     fetchWorkerData();
@@ -228,7 +230,7 @@ export function useWorkerDashboard() {
       setEmployeeProfile(updated);
     } catch (err) {
       console.error('Error actualizando perfil:', err);
-      alert('Error al actualizar el perfil');
+      toast.error('Error al actualizar el perfil');
     }
   };
 

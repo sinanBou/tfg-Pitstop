@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { AppointmentCard } from '@/components/common/Card/AppointmentCard';
+import { useToast } from '@/hooks/useToast';
 
 interface AppointmentBlockProps {
   appointment: any;
@@ -33,6 +34,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
   totalLanes = 1,
   readOnly = false
 }) => {
+  const toast = useToast();
   const isVehicleReceived = appointment.vehicleReceived === true;
   const [isResizing, setIsResizing] = useState(false);
   
@@ -200,7 +202,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                 onClick={(e) => { 
                   e.stopPropagation();
                   if (!isVehicleReceived) return;
-                  onManage ? onManage(appointment) : alert(`Gestionar: ${appointment.vehicleDisplay}`);
+                  onManage ? onManage(appointment) : toast.info(`Gestionar: ${appointment.vehicleDisplay}`);
                 }}
                 disabled={!isVehicleReceived}
                 className={`w-7 h-7 backdrop-blur-sm border rounded-full transition-all shadow-xl flex items-center justify-center active:scale-95 ${

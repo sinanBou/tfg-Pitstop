@@ -8,6 +8,7 @@ import { Button } from '@/components/common/Button/Button';
 import { InputField } from '@/components/common/InputField/InputField';
 import { AvisoMetricCard } from './AvisoMetricCard';
 import { AvisoPanel } from './AvisoPanel';
+import { useToast } from '@/hooks/useToast';
 
 interface AvisosTabProps {
   workshopId: string;
@@ -27,6 +28,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
   const [inventory, setInventory] = useState<WorkshopInventory[]>([]);
   const [categories, setCategories] = useState<{ id: string; displayName: string }[]>([]);
   const [loadingInv, setLoadingInv] = useState(true);
+  const toast = useToast();
 
   // Edit stock item state
   const [editingItem, setEditingItem] = useState<WorkshopInventory | null>(null);
@@ -122,11 +124,11 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
         await fetchWorkshopData();
       } else {
         const text = await res.text();
-        alert(text || 'Error al guardar los cambios en el repuesto');
+        toast.error(text || 'Error al guardar los cambios en el repuesto');
       }
     } catch (err) {
       console.error('Error saving edited item from warning:', err);
-      alert('Ocurrió un error al intentar actualizar el stock');
+      toast.error('Ocurrió un error al intentar actualizar el stock');
     } finally {
       setSavingEdit(false);
     }

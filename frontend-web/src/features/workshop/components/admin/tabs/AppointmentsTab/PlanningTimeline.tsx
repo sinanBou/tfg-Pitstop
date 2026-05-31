@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AppointmentBlock } from './AppointmentBlock';
 import { UnassignedColumn } from './UnassignedColumn';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
+import { useToast } from '@/hooks/useToast';
 
 interface Column {
   id: string;
@@ -48,6 +49,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   onManage,
   onViewChecklist,
 }) => {
+  const toast = useToast();
   const [activePreview, setActivePreview] = useState<{ url: string; title: string } | null>(null);
 
   const filteredAppointments = appointments.filter(app => {
@@ -146,7 +148,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
 
       if (collision) {
         const colTime = new Date(collision.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-        alert(`No se puede colocar aquí: ya existe "${collision.vehicleDisplay || 'una cita'}" a las ${colTime} en esta columna.`);
+        toast.warning(`No se puede colocar aquí: ya existe "${collision.vehicleDisplay || 'una cita'}" a las ${colTime} en esta columna.`);
         return;
       }
     }

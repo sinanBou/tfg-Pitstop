@@ -4,6 +4,7 @@ import { getBrandLogo } from '@/assets/BrandLogos';
 import { Card } from '@/components/common/Card/Card';
 import { InputField } from '@/components/common/InputField/InputField';
 import { Button } from '@/components/common/Button/Button';
+import { useToast } from '@/hooks/useToast';
 
 interface ConfirmedAppointmentsListProps {
   appointments: any[];
@@ -19,6 +20,7 @@ export const ConfirmedAppointmentsList = ({
   onUpdateStatus
 }: ConfirmedAppointmentsListProps) => {
   const [confirmedSearch, setConfirmedSearch] = useState('');
+  const toast = useToast();
   
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,7 +48,7 @@ export const ConfirmedAppointmentsList = ({
         await onDeleteAppointment(id);
       } catch (err) {
         console.error("Error al cancelar la cita:", err);
-        alert("No se pudo cancelar la cita. Puede que esté en un estado que no permite la cancelación.");
+        toast.error("No se pudo cancelar la cita. Puede que esté en un estado que no permite la cancelación.");
       }
     }
   };
@@ -57,7 +59,7 @@ export const ConfirmedAppointmentsList = ({
 
     const kmNum = parseInt(kilometers, 10);
     if (isNaN(kmNum) || kmNum < 0) {
-      alert("Por favor, introduce un número de kilómetros válido.");
+      toast.warning("Por favor, introduce un número de kilómetros válido.");
       return;
     }
 
@@ -70,11 +72,11 @@ export const ConfirmedAppointmentsList = ({
         setKilometers('');
         setNotes('');
       } else {
-        alert("Ocurrió un error al procesar la recepción.");
+        toast.error("Ocurrió un error al procesar la recepción.");
       }
     } catch (err) {
       console.error(err);
-      alert("Error de conexión.");
+      toast.error("Error de conexión.");
     } finally {
       setIsSubmitting(false);
     }

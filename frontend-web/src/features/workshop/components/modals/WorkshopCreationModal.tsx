@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AddressAutocomplete from '@/components/common/AddressAutocomplete/AddressAutocomplete';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../../services/workshopService';
 
 interface WorkshopCreationModalProps {
@@ -21,6 +22,7 @@ const diasSemana = [
 ];
 
 export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: WorkshopCreationModalProps) {
+  const toast = useToast();
   const [form, setForm] = useState({
     cif: '',
     companyName: '',
@@ -68,7 +70,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (form.workingDays.length === 0) {
-      alert("Debes seleccionar al menos un día de trabajo");
+      toast.warning("Debes seleccionar al menos un día de trabajo");
       return;
     }
 
@@ -82,7 +84,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
 
       await workshopService.createWorkshop(payload);
 
-      alert("Taller creado con éxito.");
+      toast.success("Taller creado con éxito.");
       onClose();
       setForm({
         cif: '',
@@ -94,7 +96,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
       });
       onSuccess();
     } catch (err: any) {
-      alert("Error: " + err.message);
+      toast.error("Error: " + err.message);
     }
   };
 

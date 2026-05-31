@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
+import { useToast } from '@/hooks/useToast';
 
 interface PartItem {
   name: string;
@@ -28,6 +29,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   onSuccess,
 }) => {
   const [catalogMap, setCatalogMap] = useState<Map<string, { name: string; hours: number }>>(new Map());
+  const toast = useToast();
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [parts, setParts] = useState<PartItem[]>([]);
   const [newPartName, setNewPartName] = useState('');
@@ -164,7 +166,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   const handleConfirmInvoice = async () => {
     // Validación: todos los repuestos deben tener precio
     if (hasMissingPrices) {
-      alert('Hay repuestos sin precio asignado. Por favor, completa todos los precios antes de confirmar.');
+      toast.warning('Hay repuestos sin precio asignado. Por favor, completa todos los precios antes de confirmar.');
       return;
     }
 
@@ -193,7 +195,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      alert(err.message || 'Error al completar el trabajo');
+      toast.error(err.message || 'Error al completar el trabajo');
     } finally {
       setSubmitting(false);
     }

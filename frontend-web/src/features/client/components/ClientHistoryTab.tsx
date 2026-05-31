@@ -3,6 +3,7 @@ import { API_BASE_URL } from '@/config/api';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { printInvoicePDF as importPrintInvoicePDF } from '@/utils/InvoicePdfPrinter';
+import { useToast } from '@/hooks/useToast';
 
 
 interface NotificationItem {
@@ -22,6 +23,7 @@ interface ClientHistoryTabProps {
 export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProps) {
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+  const toast = useToast();
 
   useEffect(() => {
     const workshopIds = new Set<string>();
@@ -438,7 +440,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
       const translated = translateServiceCodes(inv.serviceType || inv.description, inv.description);
       printInvoicePDF(inv, translated);
     } catch (err: any) {
-      alert(err.message || 'Error al descargar la factura.');
+      toast.error(err.message || 'Error al descargar la factura.');
     } finally {
       setDownloadingId(null);
     }

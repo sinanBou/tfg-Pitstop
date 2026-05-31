@@ -6,6 +6,7 @@ import { CategoryHeader } from '../PartsTab/components/CategoryHeader';
 import { TaskFormInline } from './components/TaskFormInline';
 import { TaskItemRow } from './components/TaskItemRow';
 import { Card } from '@/components/common/Card/Card';
+import { useToast } from '@/hooks/useToast';
 
 export interface CatalogTask {
   id: string;
@@ -29,6 +30,7 @@ interface TasksTabProps {
 }
 
 export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
+  const toast = useToast();
   const [categories, setCategories] = useState<CatalogCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -113,7 +115,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       setShowAddCat(false);
       await fetchCatalog();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setAddingCat(false);
     }
@@ -155,7 +157,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       setAddingTaskCatId(null);
       await fetchCatalog();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setAddingTask(false);
     }
@@ -217,7 +219,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       setEditingTask(null);
       await fetchCatalog();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     } finally {
       setSavingEdit(false);
     }
@@ -236,7 +238,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       if (!res.ok) throw new Error('No se pudo eliminar la tarea');
       await fetchCatalog();
     } catch (err: any) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 

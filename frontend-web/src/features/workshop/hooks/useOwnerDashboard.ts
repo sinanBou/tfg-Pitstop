@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../services/workshopService';
 import type { EmployeeProfile, Workshop } from '../types/workshop.types';
 
 export function useOwnerDashboard() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [loading, setLoading] = useState(true);
   const [workshops, setWorkshops] = useState<Workshop[]>([]);
   const [ownerId, setOwnerId] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export function useOwnerDashboard() {
       await fetchData();
     } catch (err) {
       console.error('Error updating profile:', err);
-      alert('Error al actualizar el perfil');
+      toast.error('Error al actualizar el perfil');
     }
   };
 

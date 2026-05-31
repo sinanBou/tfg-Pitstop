@@ -7,6 +7,7 @@ import { Button } from '@/components/common/Button/Button';
 import { Badge } from '@/components/common/Badge/Badge';
 import { InputField } from '@/components/common/InputField/InputField';
 import { API_BASE_URL } from '@/config/api';
+import { useToast } from '@/hooks/useToast';
 
 interface TeamTabProps {
   employeeForm: any;
@@ -33,6 +34,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = React.useState<string>('');
   const userRole = localStorage.getItem('role');
+  const toast = useToast();
 
   const handleTogglePermission = async (empId: string, currentAllowed: string[], tabValue: string) => {
     let newAllowed: string[];
@@ -55,7 +57,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
         const updatedEmp = { ...selectedEmp, allowedSections: newAllowed.join(',') };
         setSelectedEmp(updatedEmp);
       } else {
-        alert("Error al actualizar permisos");
+        toast.error("Error al actualizar permisos");
       }
     } catch (err) {
       console.error("Error updating permissions:", err);

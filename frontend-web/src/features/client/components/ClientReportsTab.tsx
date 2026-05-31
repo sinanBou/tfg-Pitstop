@@ -5,6 +5,7 @@ import { MonthSelector } from '@/components/common/MonthSelector/MonthSelector';
 import { MetricCard } from '@/components/common/MetricCard/MetricCard';
 import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
+import { useToast } from '@/hooks/useToast';
 
 
 interface ClientReportsTabProps {
@@ -165,6 +166,7 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+  const toast = useToast();
 
   useEffect(() => {
     const workshopIds = new Set<string>();
@@ -290,7 +292,7 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
       const translated = translateServiceCodes(inv.serviceType || inv.description, inv.description);
       printInvoicePDF(inv, translated);
     } catch (err: any) {
-      alert(err.message || 'Error al descargar la factura.');
+      toast.error(err.message || 'Error al descargar la factura.');
     } finally {
       setDownloadingId(null);
     }

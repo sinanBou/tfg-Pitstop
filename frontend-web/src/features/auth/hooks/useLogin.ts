@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/authService';
 import type { LoginFormData } from '../types/auth.types';
-
+import { useToast } from '@/hooks/useToast';
 export function useLogin() {
+  const toast = useToast();
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({ email: '', password: '' });
   const [errors, setErrors] = useState<{[key: string]: string}>({});
@@ -37,9 +38,8 @@ export function useLogin() {
           localStorage.setItem('role', data.role); // Guardamos el rol (CLIENT, WORKSHOP_OWNER, etc)
         }
 
-        alert('¡Inicio de sesión exitoso!');
+        toast.success('¡Inicio de sesión exitoso!');
 
-        // --- REDIRECCIÓN INTELIGENTE MEJORADA ---
         switch (data.role) {
           case 'CLIENT':
             navigate('/client-dashboard');
@@ -60,7 +60,7 @@ export function useLogin() {
             break;
         }
       } catch (err: any) {
-        alert(err.message || 'Credenciales inválidas o error en el servidor.');
+        toast.error(err.message || 'Credenciales inválidas o error en el servidor.');
       } finally {
         setIsLoading(false);
       }

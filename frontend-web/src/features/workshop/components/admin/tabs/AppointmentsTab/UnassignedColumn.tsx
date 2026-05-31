@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getBrandLogo } from '@/assets/BrandLogos';
+import { useToast } from '@/hooks/useToast';
 
 interface UnassignedAppointment {
   id: string;
@@ -45,6 +46,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
   readOnly = false,
   columnWidth,
 }) => {
+  const toast = useToast();
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const dragGhostRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -210,7 +212,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               if (!isReceived) return;
-                              onManage ? onManage(app) : alert(`Gestionar: ${app.vehicleDisplay}`);
+                              onManage ? onManage(app) : toast.info(`Gestionar: ${app.vehicleDisplay}`);
                             }}
                             disabled={!isReceived}
                             className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${

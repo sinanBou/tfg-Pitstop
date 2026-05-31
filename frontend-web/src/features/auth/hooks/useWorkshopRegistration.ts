@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/authService';
 import type { WorkshopRegistrationFormData } from '../types/auth.types';
+import { useToast } from '@/hooks/useToast';
 
 export function useWorkshopRegistration() {
+  const toast = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,10 +30,10 @@ export function useWorkshopRegistration() {
 
     try {
       await authService.registerWorkshop(formData);
-      alert('Propietario registrado con éxito');
+      toast.success('Propietario registrado con éxito');
       navigate('/login');
     } catch (err: any) {
-      alert(err.message || 'Error de conexión con el servidor');
+      toast.error(err.message || 'Error de conexión con el servidor');
     } finally {
       setIsLoading(false);
     }
