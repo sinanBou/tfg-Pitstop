@@ -6,6 +6,7 @@ venv/
 
 # Ignorar almacenamiento local persistente de ChromaDB
 chroma_db/
+chroma_test_db/
 
 # Ignorar archivos compilados de Python
 __pycache__/
