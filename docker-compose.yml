@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # 1. BASE DE DATOS DOCKERIZADA
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: mecanicalApp
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  # 2. MICROSERVICIO IA
+  ai-service:
+    build: ./ai-service
+    ports:
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      - ./ai-service/chroma_test_db:/app/chroma_test_db
+
+  # 3. BACKEND (Spring Boot)
+  backend:
+    build: ./backend-api
+    ports:
+      - "9091:9091"
+    environment:
+      # ¡Aquí ocurre la magia! Docker inyecta 'db' en lugar de 'localhost'
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mecanicalApp?createDatabaseIfNotExist=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: admin123
+      AI_SERVICE_URL: http://ai-service:8000
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+    depends_on:
+      - db
+      - ai-service
+
+  # 4. FRONTEND
+  frontend:
+    build:
+      context: ./frontend-web
+      args:
+        - VITE_API_BASE_URL=http://localhost:9091/api
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:

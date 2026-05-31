@@ -1,2 +1,7 @@
-# Pitstop Project Git Ignore
-principios_solid.txt
+
+# Seguridad
+.env
+
+# Carpetas de datos locales
+mysql_data/
+ai-service/chroma_test_db/
