@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.tfg.backend.workshoptask.service.WorkshopTaskAdminService;
-import org.tfg.backend.workshoptask.service.WorkshopTaskLookupService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,9 +14,7 @@ import java.util.UUID;
 @RequestMapping("/api/workshop-tasks")
 @RequiredArgsConstructor
 public class WorkshopTaskController {
-
-    private final WorkshopTaskAdminService taskAdminService;
-    private final WorkshopTaskLookupService taskLookupService;
+    private final WorkshopTaskService taskService;
 
     @GetMapping("/workshop/{workshopId}")
     public List<WorkshopTaskDTO> getWorkshopTasks(
@@ -26,17 +22,17 @@ public class WorkshopTaskController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(23, 59, 59);
-        return taskLookupService.getTasksByWorkshopAndDate(workshopId, start, end);
+        return taskService.getTasksByWorkshopAndDate(workshopId, start, end);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<WorkshopTaskDTO> updateTask(@PathVariable UUID id, @RequestBody WorkshopTaskDTO dto) {
-        return ResponseEntity.ok(taskAdminService.updateTask(id, dto));
+        return ResponseEntity.ok(taskService.updateTask(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
-        taskAdminService.deleteTask(id);
+        taskService.deleteTask(id);
         return ResponseEntity.ok().build();
     }
 }

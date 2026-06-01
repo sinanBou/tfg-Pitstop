@@ -12,12 +12,20 @@ vi.mock('../services/authService', () => ({
   registerClient: vi.fn().mockResolvedValue(undefined)
 }));
 
+vi.mock('@/hooks/useToast', () => ({
+  useToast: () => ({
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn()
+  })
+}));
+
 import * as authService from '../services/authService';
 
 describe('useClientRegistration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal('alert', vi.fn());
   });
 
   it('debe inicializar con campos vacíos y sin errores', () => {
@@ -25,6 +33,7 @@ describe('useClientRegistration', () => {
 
     expect(result.current.formData).toEqual({
       firstname: '', lastname: '', email: '', password: '',
+      confirmPassword: '',
       nif: '', phoneNumber: '', address: ''
     });
     expect(result.current.isLoading).toBe(false);

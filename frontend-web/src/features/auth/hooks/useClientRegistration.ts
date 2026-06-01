@@ -9,8 +9,14 @@ export function useClientRegistration() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<ClientRegistrationFormData>({
-    firstname: '', lastname: '', email: '', password: '',
-    nif: '', phoneNumber: '', address: ''
+    firstname: '', 
+    lastname: '', 
+    email: '', 
+    password: '',
+    confirmPassword: '',
+    nif: '', 
+    phoneNumber: '', 
+    address: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,7 +28,7 @@ export function useClientRegistration() {
     setIsLoading(true);
     try {
       await authService.registerClient(formData);
-      toast.success('Cliente registrado con éxito');
+      toast.success('¡Registro exitoso! Por favor, verifica tu correo electrónico antes de iniciar sesión.');
       navigate('/login');
     } catch (err: any) {
       toast.error(err.message || 'Error al registrar el cliente');

@@ -14,9 +14,10 @@ export function useOwnerRegistration() {
     lastname: '',
     email: '',
     password: '',
-    address: '',
+    confirmPassword: '',
     nif: '',
     phoneNumber: '',
+    address: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,7 +31,7 @@ export function useOwnerRegistration() {
 
     try {
       await authService.registerOwner(formData);
-      toast.success('Propietario registrado con éxito');
+      toast.success('¡Dueño registrado con éxito! Por favor, verifica tu correo electrónico antes de iniciar sesión.');
       navigate('/login');
     } catch (err: any) {
       toast.error(err.message || 'Error de conexión con el servidor');

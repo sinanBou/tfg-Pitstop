@@ -41,6 +41,9 @@ class WorkshopEmployeeIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private org.tfg.backend.user.UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -71,6 +74,11 @@ class WorkshopEmployeeIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerOwner)))
                 .andExpect(status().isOk());
+
+        // 1.5. Autoverificar el propietario para poder iniciar sesión
+        org.tfg.backend.user.User registeredUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        registeredUser.setVerified(true);
+        userRepository.save(registeredUser);
 
         LoginRequest loginOwner = new LoginRequest(ownerEmail, "ownerPassword123");
         MvcResult loginOwnerResult = mockMvc.perform(post("/api/auth/login")

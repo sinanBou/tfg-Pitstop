@@ -4,8 +4,10 @@ import { useClientRegistration } from '@/features/auth/hooks/useClientRegistrati
 import { useOwnerRegistration } from '@/features/auth/hooks/useOwnerRegistration';
 import { RoleSelector } from '@/features/auth/components/RoleSelector';
 import { AuthFormFields } from '@/features/auth/components/AuthFormFields';
+import { useToast } from '@/hooks/useToast';
 
 export default function Registration() {
+  const toast = useToast();
   const [role, setRole] = useState<'workshop' | 'client' | null>(null);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
@@ -23,29 +25,42 @@ export default function Registration() {
 
     const currentFormData = currentReg.formData;
 
-    if (!currentFormData.firstname) { newErrors.firstname = 'El nombre es obligatorio.'; isValid = false; }
-    if (!currentFormData.lastname) { newErrors.lastname = 'Los apellidos son obligatorios.'; isValid = false; }
-    if (!currentFormData.email) { newErrors.email = 'El correo electrónico es obligatorio.'; isValid = false; }
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentFormData.email)) {
+    // Validaciones comunes de nombres y contacto
+    if (!currentFormData.firstname.trim()) { newErrors.firstname = 'El nombre es obligatorio.'; isValid = false; }
+    if (!currentFormData.lastname.trim()) { newErrors.lastname = 'Los apellidos son obligatorios.'; isValid = false; }
+    if (!currentFormData.nif.trim()) { newErrors.nif = 'El DNI/NIF es obligatorio.'; isValid = false; }
+    if (!currentFormData.phoneNumber.trim()) { newErrors.phoneNumber = 'El teléfono es obligatorio.'; isValid = false; }
+
+
+    // Validación común de email
+    if (!currentFormData.email.trim()) { newErrors.email = 'El correo electrónico es obligatorio.'; isValid = false; }
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentFormData.email.trim())) {
       newErrors.email = 'Formato de email inválido.'; isValid = false;
     }
+
+    // Validación común de contraseña
     if (!currentFormData.password) { newErrors.password = 'La contraseña es obligatoria.'; isValid = false; }
     else if (currentFormData.password.length < 8 || !/[A-Z]/.test(currentFormData.password) || !/[0-9]/.test(currentFormData.password)) {
       newErrors.password = 'Mín 8 car, 1 Mayús, 1 Núm.'; isValid = false;
     }
 
-    // Tanto el cliente como el dueño deben ingresar NIF y teléfono obligatorios
-    if (!currentFormData.nif) { newErrors.nif = 'El DNI/NIF es obligatorio.'; isValid = false; }
-    if (!currentFormData.phoneNumber) { newErrors.phoneNumber = 'El teléfono es obligatorio.'; isValid = false; }
+    // Doble verificación de contraseña
+    if (currentFormData.password !== currentFormData.confirmPassword) {
+      newErrors.confirmPassword = 'Las contraseñas no coinciden.';
+      isValid = false;
+    }
 
     setErrors(newErrors);
 
-    if (isValid) {
-      if (role === 'client') {
-        await clientReg.registerClient(e);
-      } else if (role === 'workshop') {
-        await ownerReg.registerOwner(e);
-      }
+    if (!isValid) {
+      toast.warning('Por favor, corrige los errores del formulario.');
+      return;
+    }
+
+    if (role === 'client') {
+      await clientReg.registerClient(e);
+    } else if (role === 'workshop') {
+      await ownerReg.registerOwner(e);
     }
   };
 
@@ -55,16 +70,16 @@ export default function Registration() {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-0"></div>
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none z-0"></div>
 
-      <div className="w-full max-w-4xl z-10">
+      <div className="w-full max-w-4xl z-10 py-8">
         
         {role === null && (
           <RoleSelector onSelectRole={setRole} />
         )}
 
         {role !== null && (
-          <div className="max-w-xl mx-auto animate-fade-in-up">
+          <div className="max-w-2xl mx-auto animate-fade-in-up">
 
-            <button onClick={() => setRole(null)} className="flex items-center gap-2 text-neutral-500 hover:text-white mb-8 text-[10px] font-black uppercase tracking-widest transition-colors">
+            <button onClick={() => setRole(null)} className="flex items-center gap-2 text-neutral-500 hover:text-white mb-8 text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
               Cambiar Perfil
             </button>
@@ -73,7 +88,7 @@ export default function Registration() {
 
               <div className="mb-10 text-center">
                 <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Registro <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? 'Dueño' : 'Cliente'}</span></h2>
-                <p className="text-neutral-500 text-sm font-medium tracking-wide">Configura tus credenciales de acceso</p>
+                <p className="text-neutral-500 text-sm font-medium tracking-wide">Configura tus credenciales y datos de acceso</p>
               </div>
 
               <form onSubmit={handleRegistrationSubmit} className="flex flex-col gap-6">
@@ -89,7 +104,7 @@ export default function Registration() {
                 <button 
                   type="submit"
                   disabled={isLoading}
-                  className={`mt-6 w-full text-white font-black uppercase tracking-widest text-sm py-4 rounded-2xl transition-all duration-300 relative overflow-hidden ${
+                  className={`mt-6 w-full text-white font-black uppercase tracking-widest text-sm py-4 rounded-2xl transition-all duration-300 relative overflow-hidden cursor-pointer ${
                     isLoading 
                       ? 'bg-neutral-800 cursor-wait text-neutral-400' 
                       : role === 'workshop' 
@@ -108,7 +123,7 @@ export default function Registration() {
                <Link to="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
                   Volver al Inicio
                </Link>
-            </div>
+             </div>
           </div>
         )}
       </div>

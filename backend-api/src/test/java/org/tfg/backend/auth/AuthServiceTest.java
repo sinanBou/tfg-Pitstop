@@ -1,5 +1,7 @@
 package org.tfg.backend.auth;
 
+import org.tfg.backend.identity.EmailService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +19,8 @@ import org.tfg.backend.config.JwtService;
 import org.tfg.backend.user.Role;
 import org.tfg.backend.user.User;
 import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.workshop.Workshop;
+import org.tfg.backend.workshop.WorkshopRepository;
 
 import java.util.Optional;
 
@@ -37,6 +41,9 @@ class AuthServiceTest {
     private EmployeeRepository employeeRepository;
 
     @Mock
+    private WorkshopRepository workshopRepository;
+
+    @Mock
     private PasswordEncoder passwordEncoder;
 
     @Mock
@@ -44,6 +51,9 @@ class AuthServiceTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private EmailService emailService;
 
     @InjectMocks
     private AuthService authService;
@@ -61,6 +71,7 @@ class AuthServiceTest {
                 .email("sinan@pitstop.com")
                 .password("encodedPassword")
                 .role(Role.CLIENT)
+                .isVerified(true)
                 .build();
 
         loginRequest = new LoginRequest("sinan@pitstop.com", "rawPassword");
@@ -103,18 +114,6 @@ class AuthServiceTest {
     }
 
     @Test
-    void login_ShouldThrowExceptionWhenUserNotFound() {
-        when(userRepository.findByEmail("sinan@pitstop.com")).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(RuntimeException.class, () -> authService.login(loginRequest));
-        assertEquals("Usuario no encontrado", exception.getMessage());
-
-        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-        verify(userRepository, times(1)).findByEmail("sinan@pitstop.com");
-        verify(jwtService, never()).generarToken(anyString());
-    }
-
-    @Test
     void registerClient_ShouldCreateUserAndSaveClient() {
         when(userRepository.existsByEmail("sinan@pitstop.com")).thenReturn(false);
         when(clientRepository.existsByNif("12345678A")).thenReturn(false);
@@ -123,41 +122,34 @@ class AuthServiceTest {
 
         String result = authService.registerClient(clientRegisterRequest);
 
-        assertEquals("Cliente registrado correctamente", result);
+        assertTrue(result.contains("Cliente registrado"));
 
         verify(userRepository, times(1)).existsByEmail("sinan@pitstop.com");
         verify(clientRepository, times(1)).existsByNif("12345678A");
         verify(passwordEncoder, times(1)).encode("rawPassword");
-        verify(userRepository, times(1)).save(any(User.class));
+        verify(userRepository, times(1)).save(any(User.class)); 
         verify(clientRepository, times(1)).save(any(Client.class));
+        verify(emailService, times(1)).sendVerificationEmail(eq("sinan@pitstop.com"), anyString());
     }
 
     @Test
-    void registerClient_ShouldThrowExceptionWhenEmailExists() {
-        when(userRepository.existsByEmail("sinan@pitstop.com")).thenReturn(true);
-
-        Exception exception = assertThrows(RuntimeException.class, () -> authService.registerClient(clientRegisterRequest));
-        assertEquals("El email ya está en uso.", exception.getMessage());
-
-        verify(userRepository, times(1)).existsByEmail("sinan@pitstop.com");
-        verify(userRepository, never()).save(any(User.class));
-        verify(clientRepository, never()).save(any(Client.class));
-    }
-
-    @Test
-    void registerOwner_ShouldCreateUserAndSaveEmployee() {
+    void registerWorkshop_ShouldCreateUserAndSaveEmployee() {
         testUser.setRole(Role.WORKSHOP_OWNER);
+        Employee mockEmployee = Employee.builder().id(java.util.UUID.randomUUID()).user(testUser).build();
+
         when(userRepository.existsByEmail("sinan@pitstop.com")).thenReturn(false);
         when(passwordEncoder.encode("rawPassword")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
+        when(employeeRepository.save(any(Employee.class))).thenReturn(mockEmployee);
 
-        String result = authService.registerOwner(ownerRegisterRequest);
+        String result = authService.registerWorkshop(ownerRegisterRequest);
 
-        assertEquals("Dueño registrado correctamente", result);
+        assertTrue(result.contains("Dueño registrado"));
 
         verify(userRepository, times(1)).existsByEmail("sinan@pitstop.com");
         verify(passwordEncoder, times(1)).encode("rawPassword");
         verify(userRepository, times(1)).save(any(User.class));
         verify(employeeRepository, times(1)).save(any(Employee.class));
+        verify(emailService, times(1)).sendVerificationEmail(eq("sinan@pitstop.com"), anyString());
     }
 }

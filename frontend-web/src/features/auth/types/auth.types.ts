@@ -14,6 +14,7 @@ export interface ClientRegistrationFormData {
   lastname: string;
   email: string;
   password: string;
+  confirmPassword: string;
   nif: string;
   phoneNumber: string;
   address: string;
@@ -24,8 +25,10 @@ export interface OwnerRegistrationFormData {
   lastname: string;
   email: string;
   password: string;
-  address: string;
+  confirmPassword: string;
   nif: string;
   phoneNumber: string;
+  address: string;
 }
+
 

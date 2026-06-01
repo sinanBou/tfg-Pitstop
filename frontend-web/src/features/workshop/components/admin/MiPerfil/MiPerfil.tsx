@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@/components/common/Button/Button';
+import { Button } from '@/components/common/Button';
 
 interface MiPerfilProps {
   isOpen: boolean;
@@ -9,8 +9,6 @@ interface MiPerfilProps {
     profilePictureUrl?: string;
     firstname: string;
     lastname: string;
-    nif?: string;
-    phoneNumber?: string;
   };
   profileForm: {
     firstname: string;
@@ -45,6 +43,14 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
 
+  // Estados para cambio de contraseña
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+
   if (!isOpen) return null;
 
   /** Wrapper seguro para la subida de avatar */
@@ -73,9 +79,79 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
     setTimeout(() => setProfileSaved(false), 3000);
   };
 
+  /** Submit del formulario de cambio de contraseña */
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (newPassword.length < 6) {
+      setPasswordError('La nueva contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordError('Las nuevas contraseñas no coinciden.');
+      return;
+    }
+
+    setPasswordLoading(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const response = await fetch('http://localhost:9091/api/users/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          currentPassword,
+          newPassword
+        })
+      });
+
+      if (response.ok) {
+        setPasswordSuccess('Contraseña cambiada correctamente.');
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        const text = await response.text();
+        try {
+          const json = JSON.parse(text);
+          setPasswordError(json.message || 'Error al cambiar la contraseña.');
+        } catch {
+          setPasswordError(text || 'La contraseña actual es incorrecta o no tiene permitido el cambio local.');
+        }
+      }
+    } catch {
+      setPasswordError('Error de conexión con el servidor.');
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   return createPortal(
     <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+      <style>{`
+        /* Estilo personalizado de scrollbar premium negra */
+        .profile-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .profile-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .profile-scrollbar::-webkit-scrollbar-thumb {
+          background: #000000;
+          border-radius: 9999px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .profile-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #080808;
+        }
+      `}</style>
+      
+      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Glow decorativo */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
 
@@ -91,7 +167,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         </button>
 
         {/* Contenido con scroll */}
-        <div className="p-10 overflow-y-auto flex-1">
+        <div className="p-10 overflow-y-auto flex-1 profile-scrollbar">
           <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
             <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
@@ -176,60 +252,35 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
             </div>
 
             {/* Form Fields */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Nombre</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Nombre</label>
                 <input
                   type="text"
                   required
                   value={profileForm.firstname}
-                  onChange={e => setProfileForm({ ...profileForm, firstname: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, firstname: e.target.value })}
                   className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Apellido</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Apellido</label>
                 <input
                   type="text"
                   required
                   value={profileForm.lastname}
-                  onChange={e => setProfileForm({ ...profileForm, lastname: e.target.value })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, lastname: e.target.value })}
                   className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">DNI / NIF</label>
-                <input
-                  type="text"
-                  required
-                  value={profileForm.nif}
-                  onChange={e => setProfileForm({ ...profileForm, nif: e.target.value })}
-                  className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
-                  placeholder="Introduce tu NIF..."
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Teléfono</label>
-                <input
-                  type="text"
-                  required
-                  value={profileForm.phoneNumber}
-                  onChange={e => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
-                  className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
-                  placeholder="Introduce tu teléfono..."
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Dirección de Residencia</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Dirección de Residencia</label>
               <input
                 type="text"
                 value={profileForm.address}
-                onChange={e => setProfileForm({ ...profileForm, address: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, address: e.target.value })}
                 className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
                 placeholder="Introduce tu dirección de residencia..."
               />
@@ -253,6 +304,78 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
               </Button>
             </div>
           </form>
+
+          {/* Separador */}
+          <div className="my-10 border-b border-white/5"></div>
+
+          {/* Sección de Cambio de Contraseña */}
+          <section className="relative z-10 space-y-6">
+            <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              Seguridad: Cambiar Contraseña
+            </p>
+            
+            <form onSubmit={handlePasswordSubmit} className="space-y-6">
+              <div className="grid grid-cols-3 gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Clave Actual</label>
+                  <input
+                    type="password"
+                    required
+                    value={currentPassword}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Clave Nueva</label>
+                  <input
+                    type="password"
+                    required
+                    value={newPassword}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
+                    placeholder="Mín. 6 caracteres"
+                    className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Repetir Clave</label>
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                    placeholder="Repite la contraseña"
+                    className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                  />
+                </div>
+              </div>
+
+              {passwordError && (
+                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center animate-fade-in-up">
+                  <p className="text-red-400 text-xs font-black uppercase tracking-widest">{passwordError}</p>
+                </div>
+              )}
+
+              {passwordSuccess && (
+                <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center animate-fade-in-up">
+                  <p className="text-green-400 text-xs font-black uppercase tracking-widest">{passwordSuccess}</p>
+                </div>
+              )}
+
+              <div className="pt-2 flex justify-end">
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={passwordLoading}
+                  className="bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 hover:border-neutral-600 transition-all shadow-md active:scale-[0.98]"
+                >
+                  {passwordLoading ? 'Cambiando...' : 'Actualizar Contraseña'}
+                </Button>
+              </div>
+            </form>
+          </section>
         </div>
       </div>
     </div>,
