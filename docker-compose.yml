@@ -42,6 +42,8 @@ services:
       - SPRING_MAIL_FROM=${SPRING_MAIL_FROM}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - APP_FRONTEND_URL=${APP_FRONTEND_URL}
+      - APP_BACKEND_URL=${APP_BACKEND_URL}
     depends_on:
       - db
       - ai-service

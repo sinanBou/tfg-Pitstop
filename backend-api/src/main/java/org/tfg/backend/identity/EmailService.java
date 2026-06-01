@@ -17,8 +17,14 @@ public class EmailService {
     @Value("${spring.mail.from}")
     private String fromEmail;
 
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
+
+    @Value("${app.backend.url:http://localhost:9091}")
+    private String backendUrl;
+
     public void sendVerificationEmail(String toEmail, String token) {
-        String verificationUrl = "http://localhost:9091/api/auth/verify?token=" + token;
+        String verificationUrl = backendUrl + "/api/auth/verify?token=" + token;
         String subject = "Verifica tu cuenta - PitStop";
         String messageBody = "Hola,\n\n" +
                 "Gracias por registrarte en PitStop. Por favor, haz clic en el siguiente enlace para verificar tu cuenta:\n" +
@@ -45,7 +51,7 @@ public class EmailService {
     }
 
     public void sendPasswordResetEmail(String toEmail, String token) {
-        String resetUrl = "http://localhost:5173/reset-password?token=" + token; // Puerto frontend por defecto
+        String resetUrl = frontendUrl + "/reset-password?token=" + token;
         String subject = "Recuperación de contraseña - PitStop";
         String messageBody = "Hola,\n\n" +
                 "Has solicitado restablecer tu contraseña. Por favor, utiliza el siguiente enlace para crear una nueva contraseña:\n" +
