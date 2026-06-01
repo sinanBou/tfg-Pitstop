@@ -8,9 +8,10 @@ export interface AuthFormFieldsProps {
     lastname: string;
     email: string;
     password: string;
+    confirmPassword: string;
     address: string;
-    nif: string;
     phoneNumber: string;
+    nif: string;
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAddressChange: (val: string) => void;
@@ -29,7 +30,7 @@ export default function AuthFormFields({
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <InputGroup 
-          label="Nombre" 
+          label={isWorkshop ? "Nombre del Dueño" : "Nombre"} 
           name="firstname" 
           value={formData.firstname} 
           onChange={onChange} 
@@ -37,7 +38,7 @@ export default function AuthFormFields({
           placeholder={isWorkshop ? "Juan" : "Carlos"} 
         />
         <InputGroup 
-          label="Apellidos" 
+          label={isWorkshop ? "Apellidos del Dueño" : "Apellidos"} 
           name="lastname" 
           value={formData.lastname} 
           onChange={onChange} 
@@ -48,7 +49,7 @@ export default function AuthFormFields({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <InputGroup 
-          label="DNI / NIF" 
+          label={isWorkshop ? "DNI / NIF del Dueño" : "DNI / NIF"} 
           name="nif" 
           value={formData.nif} 
           onChange={onChange} 
@@ -56,7 +57,7 @@ export default function AuthFormFields({
           placeholder="12345678Z" 
         />
         <InputGroup 
-          label="Teléfono" 
+          label={isWorkshop ? "Teléfono del Dueño" : "Teléfono"} 
           name="phoneNumber" 
           value={formData.phoneNumber} 
           onChange={onChange} 
@@ -66,12 +67,12 @@ export default function AuthFormFields({
       </div>
 
       <AddressAutocomplete 
-        label={isWorkshop ? "Dirección del Dueño" : "Dirección (Opcional)"} 
+        label={isWorkshop ? "Dirección del Dueño (Opcional)" : "Dirección (Opcional)"} 
         name="address" 
         value={formData.address || ''} 
         onChange={onAddressChange} 
         error={errors.address} 
-        placeholder={isWorkshop ? "Tu dirección personal..." : "Madrid, Calle..."} 
+        placeholder="Calle, Número, Ciudad..." 
       />
 
       <div className="border-t border-neutral-800/50 my-2 pt-6 flex flex-col gap-5 relative">
@@ -84,15 +85,26 @@ export default function AuthFormFields({
           error={errors.email} 
           placeholder="tu@email.com" 
         />
-        <InputGroup 
-          label="Contraseña" 
-          name="password" 
-          type="password" 
-          value={formData.password} 
-          onChange={onChange} 
-          error={errors.password} 
-          placeholder="Mín 8 car, 1 Mayús, 1 Núm" 
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <InputGroup 
+            label="Contraseña" 
+            name="password" 
+            type="password" 
+            value={formData.password} 
+            onChange={onChange} 
+            error={errors.password} 
+            placeholder="Mín 8 car, 1 Mayús, 1 Núm" 
+          />
+          <InputGroup 
+            label="Confirmar Contraseña" 
+            name="confirmPassword" 
+            type="password" 
+            value={formData.confirmPassword} 
+            onChange={onChange} 
+            error={errors.confirmPassword} 
+            placeholder="Repite la contraseña" 
+          />
+        </div>
       </div>
     </>
   );

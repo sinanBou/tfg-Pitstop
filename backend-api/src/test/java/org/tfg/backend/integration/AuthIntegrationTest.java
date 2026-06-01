@@ -14,6 +14,8 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import org.tfg.backend.auth.AuthResponse;
 import org.tfg.backend.auth.ClientRegisterRequest;
 import org.tfg.backend.auth.LoginRequest;
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
 
 import java.util.UUID;
 
@@ -34,6 +36,9 @@ class AuthIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -62,6 +67,11 @@ class AuthIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isOk());
+
+        // 1.5. Verificar el usuario para poder iniciar sesión
+        User registeredUser = userRepository.findByEmail(uniqueEmail).orElseThrow();
+        registeredUser.setVerified(true);
+        userRepository.save(registeredUser);
 
         // 2. Login para obtener el Token
         LoginRequest loginRequest = new LoginRequest(uniqueEmail, "securePassword123");

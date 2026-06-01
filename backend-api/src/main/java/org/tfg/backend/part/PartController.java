@@ -1,12 +1,8 @@
 package org.tfg.backend.part;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.tfg.backend.part.service.PartAdminService;
-import org.tfg.backend.part.service.PartAssignmentService;
-import org.tfg.backend.part.service.PartLookupService;
 
 import java.util.List;
 import java.util.Map;
@@ -14,27 +10,29 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/parts")
-@RequiredArgsConstructor
 public class PartController {
 
-    private final PartAdminService partAdminService;
-    private final PartLookupService partLookupService;
-    private final PartAssignmentService partAssignmentService;
+    private final PartService partService;
     private final PartInventoryFacade partInventoryFacade;
+
+    public PartController(PartService partService, PartInventoryFacade partInventoryFacade) {
+        this.partService = partService;
+        this.partInventoryFacade = partInventoryFacade;
+    }
 
     @GetMapping("/catalog")
     public ResponseEntity<List<PartCatalog>> getCatalog() {
-        return ResponseEntity.ok(partLookupService.getAllCatalog());
+        return ResponseEntity.ok(partService.getAllCatalog());
     }
 
     @GetMapping("/inventory")
     public ResponseEntity<List<WorkshopInventory>> getInventory() {
-        return ResponseEntity.ok(partLookupService.getAllInventory());
+        return ResponseEntity.ok(partService.getAllInventory());
     }
 
     @GetMapping("/appointments/{appointmentId}")
     public ResponseEntity<List<AppointmentPart>> getAppointmentParts(@PathVariable UUID appointmentId) {
-        return ResponseEntity.ok(partLookupService.getPartsByAppointment(appointmentId));
+        return ResponseEntity.ok(partService.getPartsByAppointment(appointmentId));
     }
 
     @PostMapping("/appointments/{appointmentId}")
@@ -48,7 +46,7 @@ public class PartController {
             AppointmentPart ap;
             if (payload.containsKey("customName") && payload.get("customName") != null && !((String) payload.get("customName")).trim().isEmpty()) {
                 String customName = (String) payload.get("customName");
-                ap = partAssignmentService.assignCustomPartToAppointment(appointmentId, customName, quantity);
+                ap = partService.assignCustomPartToAppointment(appointmentId, customName, quantity);
             } else {
                 UUID partId = UUID.fromString((String) payload.get("partId"));
                 if (discount > 0.0) {
@@ -94,7 +92,7 @@ public class PartController {
             int stockQuantity = ((Number) payload.get("stockQuantity")).intValue();
             int avisoThreshold = ((Number) payload.getOrDefault("avisoThreshold", 5)).intValue();
 
-            WorkshopInventory inventory = partAdminService.addPartToInventory(
+            WorkshopInventory inventory = partService.addPartToInventory(
                     oemReference, name, manufacturer, technicalSpecs, categoryId,
                     costPrice, retailPrice, stockQuantity, avisoThreshold
             );
@@ -120,10 +118,10 @@ public class PartController {
             int stockQuantity = ((Number) payload.get("stockQuantity")).intValue();
             int avisoThreshold = ((Number) payload.getOrDefault("avisoThreshold", 5)).intValue();
 
-            WorkshopInventory inventory = partAdminService.updateInventoryItem(
+            WorkshopInventory inventory = partService.updateInventoryItem(
                     id, oemReference, name, manufacturer, technicalSpecs, categoryId,
                     costPrice, retailPrice, stockQuantity, avisoThreshold
-            );
+                );
             return ResponseEntity.ok(inventory);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -133,7 +131,7 @@ public class PartController {
     @DeleteMapping("/inventory/{id}")
     public ResponseEntity<?> deleteInventoryItem(@PathVariable UUID id) {
         try {
-            partAdminService.deleteInventoryItem(id);
+            partService.deleteInventoryItem(id);
             return ResponseEntity.ok("Pieza de inventario eliminada correctamente");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -142,14 +140,14 @@ public class PartController {
 
     @GetMapping("/categories")
     public ResponseEntity<List<PartCategory>> getCategories() {
-        return ResponseEntity.ok(partLookupService.getAllCategories());
+        return ResponseEntity.ok(partService.getAllCategories());
     }
 
     @PostMapping("/categories")
     public ResponseEntity<?> createCategory(@RequestBody Map<String, Object> payload) {
         try {
             String displayName = (String) payload.get("displayName");
-            PartCategory category = partAdminService.createCategory(displayName);
+            PartCategory category = partService.createCategory(displayName);
             return ResponseEntity.status(HttpStatus.CREATED).body(category);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -159,7 +157,7 @@ public class PartController {
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable UUID id) {
         try {
-            partAdminService.deleteCategory(id);
+            partService.deleteCategory(id);
             return ResponseEntity.ok("Categoría eliminada correctamente");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

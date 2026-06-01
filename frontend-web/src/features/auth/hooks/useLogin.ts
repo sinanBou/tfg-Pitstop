@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/authService';
 import type { LoginFormData } from '../types/auth.types';
 import { useToast } from '@/hooks/useToast';
+
 export function useLogin() {
   const toast = useToast();
   const navigate = useNavigate();
@@ -67,5 +68,44 @@ export function useLogin() {
     }
   };
 
-  return { formData, errors, isLoading, handleChange, handleLogin };
+  const handleGoogleLogin = async (idToken: string) => {
+    setIsLoading(true);
+    setErrors({});
+    try {
+      const data = await authService.loginWithGoogle(idToken);
+
+      if (data.token) {
+        localStorage.setItem('jwt_token', data.token);
+        localStorage.setItem('role', data.role);
+      }
+
+      toast.success('¡Inicio de sesión con Google exitoso!');
+
+      switch (data.role) {
+        case 'CLIENT':
+          navigate('/client-dashboard');
+          break;
+
+        case 'WORKSHOP_OWNER':
+          navigate('/owner-dashboard');
+          break;
+
+        case 'WORKSHOP_MANAGER':
+        case 'WORKSHOP_STAFF':
+          navigate('/worker-dashboard');
+          break;
+
+        default:
+          console.error("Rol no reconocido:", data.role);
+          navigate('/login');
+          break;
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error al iniciar sesión con Google.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { formData, errors, isLoading, handleChange, handleLogin, handleGoogleLogin };
 }

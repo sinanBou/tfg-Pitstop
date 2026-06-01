@@ -8,6 +8,8 @@ import { ToastProvider } from '@/hooks/useToast';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import Registration from '@/pages/Registration';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
 
 import ClientDashboard from '@/pages/ClientDashboard'; 
 import OwnerDashboard from '@/pages/OwnerDashboard';
@@ -36,6 +38,9 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/registration" element={<Registration />} />
+
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route path="/client-dashboard" element={<ClientDashboard />} />
             <Route path="/owner-dashboard" element={<OwnerDashboard />} />

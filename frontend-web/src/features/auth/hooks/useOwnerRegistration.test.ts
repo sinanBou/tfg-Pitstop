@@ -12,20 +12,34 @@ vi.mock('../services/authService', () => ({
   registerOwner: vi.fn().mockResolvedValue(undefined)
 }));
 
+vi.mock('@/hooks/useToast', () => ({
+  useToast: () => ({
+    success: vi.fn(),
+    error: vi.fn(),
+    info: vi.fn(),
+    warning: vi.fn()
+  })
+}));
+
 import * as authService from '../services/authService';
 
 describe('useOwnerRegistration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.stubGlobal('alert', vi.fn());
   });
 
   it('debe inicializar con campos vacíos y sin errores', () => {
     const { result } = renderHook(() => useOwnerRegistration());
 
     expect(result.current.formData).toEqual({
-      firstname: '', lastname: '', email: '', password: '',
-      nif: '', phoneNumber: '', address: ''
+      firstname: '',
+      lastname: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      nif: '',
+      phoneNumber: '',
+      address: '',
     });
     expect(result.current.isLoading).toBe(false);
   });

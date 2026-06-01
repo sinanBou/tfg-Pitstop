@@ -241,6 +241,16 @@ En esta refactorización integral del sistema de repuestos y control de almacén
 - Propósito: Sigue estrictamente el principio de responsabilidad única (SRP), previniendo que la lógica de reasignación y el guardado de perfiles de la cita impacten en la velocidad y el rendimiento del listado y renderizado del calendario de tareas en la aplicación web, facilitando un mantenimiento totalmente desacoplado.
 
 
+28. SPECIALIZED DATA TRANSFER OBJECT PATTERN (DTO Specialization) - Módulo de Registro
+-------------------------------------------------------------------------------------
+- Cómo se creó:
+  - Se eliminó el DTO monolítico genérico `RegisterRequest` que acumulaba campos opcionales para roles dispares (como `nif`, `cif`, `companyName`, `address`, `phoneNumber`).
+  - Se crearon DTOs específicos y fuertemente tipados: `ClientRegisterRequest` (para clientes independientes) y `OwnerRegisterRequest` (para gerentes/propietarios de talleres).
+  - Se adaptaron los endpoints del controlador `/api/auth/register/client` y `/api/auth/register/workshop` para recibir sus DTOs correspondientes con validaciones `@Valid` estrictas e independientes.
+- Propósito: Sigue los principios de robustez y Security-First del Clean Code. Evita el uso de campos nulos ambiguos, mejora la claridad y auto-documentación de la API de registro, e impide que un cliente registre de forma fraudulenta campos exclusivos de administradores de taller o viceversa.
+
+
+
 
 
 

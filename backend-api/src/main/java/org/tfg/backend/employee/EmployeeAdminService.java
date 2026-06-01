@@ -68,6 +68,7 @@ public class EmployeeAdminService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole())
                 .address(request.getAddress())
+                .isVerified(true)
                 .build();
         userRepository.save(user);
 

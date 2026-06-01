@@ -34,7 +34,11 @@ export const SearchableSelect = ({
         data-testid="select-trigger"
       >
         <span className="flex items-center gap-2">
-          {value && label.toUpperCase() === 'MARCA' && getBrandLogo(value)}
+          {value && label.toUpperCase() === 'MARCA' && (
+            <span className="text-white flex items-center shrink-0">
+              {getBrandLogo(value)}
+            </span>
+          )}
           <span className={value ? 'text-white' : 'text-neutral-700'}>
             {value || placeholder}
           </span>

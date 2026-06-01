@@ -8,6 +8,7 @@ describe('AuthFormFields', () => {
     lastname: '',
     email: '',
     password: '',
+    confirmPassword: '',
     address: '',
     nif: '',
     phoneNumber: '',
@@ -28,17 +29,17 @@ describe('AuthFormFields', () => {
     expect(screen.getByPlaceholderText('Carlos')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Sainz')).toBeInTheDocument();
     expect(screen.getByText(/Dirección \(Opcional\)/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Madrid, Calle...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Calle, Número, Ciudad...')).toBeInTheDocument();
   });
 
   it('renders standard fields with owner specific placeholders when isWorkshop is true', () => {
     render(<AuthFormFields {...defaultProps} isWorkshop={true} />);
 
-    expect(screen.getByText(/Nombre/i)).toBeInTheDocument();
+    expect(screen.getByText(/Nombre del Dueño/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Juan')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Pérez')).toBeInTheDocument();
-    expect(screen.getByText(/Dirección del Dueño/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Tu dirección personal...')).toBeInTheDocument();
+    expect(screen.getByText(/Dirección del Dueño \(Opcional\)/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Calle, Número, Ciudad...')).toBeInTheDocument();
   });
 
   it('displays validation error messages when errors are passed', () => {
