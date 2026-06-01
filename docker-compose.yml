@@ -1,11 +1,12 @@
-version: '3.8'
+ersion: '3.8'
 
 services:
   # 1. BASE DE DATOS
   db:
     image: mysql:8.0
+    restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       MYSQL_DATABASE: mecanicalApp
     volumes:
       - mysql_data:/var/lib/mysql
@@ -13,23 +14,30 @@ services:
   # 2. MICROSERVICIO IA
   ai-service:
     build: ./ai-service
+    ports:
+      - "127.0.0.1:8000:8000"
+    restart: always
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
     volumes:
-      - ./ai-service/chroma_test_db:/app/chroma_test_db
+      - ./ai-service/chroma_db:/app/chroma_db
 
   # 3. BACKEND (Spring Boot)
   backend:
     build: ./backend-api
     ports:
-      - "9091:9091"
+      - "127.0.0.1:9091:9091"
+    restart: always
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/mecanicalApp?createDatabaseIfNotExist=true&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: admin123
-      AI_SERVICE_URL: http://ai-service:8000
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/mecanicalApp?createDatabaseIfNotExist=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - AI_SERVICE_URL=http://ai-service:8000
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - JWT_SECRET_ENV=${JWT_SECRET_ENV}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     depends_on:
       - db
       - ai-service
@@ -40,8 +48,9 @@ services:
       context: ./frontend-web
       args:
         - VITE_API_BASE_URL=/api
+    restart: always
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     depends_on:
       - backend
 
