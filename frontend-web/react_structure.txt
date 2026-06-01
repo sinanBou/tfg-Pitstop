@@ -84,10 +84,14 @@ SECTION 1: ACTIVE FILES AND DIRECTORY TREE MAPPING
 ./src/features/auth
 ./src/features/auth/components
 ./src/features/auth/components/RoleSelector.tsx
+./src/features/auth/components/AuthFormFields
+./src/features/auth/components/AuthFormFields/AuthFormFields.tsx
+./src/features/auth/components/AuthFormFields/index.ts
+./src/features/auth/components/AuthFormFields/AuthFormFields.test.tsx
 ./src/features/auth/hooks
 ./src/features/auth/hooks/useClientRegistration.ts
 ./src/features/auth/hooks/useLogin.ts
-./src/features/auth/hooks/useWorkshopRegistration.ts
+./src/features/auth/hooks/useOwnerRegistration.ts
 ./src/features/client
 ./src/features/client/components
 ./src/features/client/components/ClientAppointmentsTab.tsx

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useWorkshopRegistration } from './useWorkshopRegistration';
+import { useOwnerRegistration } from './useOwnerRegistration';
 
 // Mocks
 const mockNavigate = vi.fn();
@@ -9,19 +9,19 @@ vi.mock('react-router-dom', () => ({
 }));
 
 vi.mock('../services/authService', () => ({
-  registerWorkshop: vi.fn().mockResolvedValue(undefined)
+  registerOwner: vi.fn().mockResolvedValue(undefined)
 }));
 
 import * as authService from '../services/authService';
 
-describe('useWorkshopRegistration', () => {
+describe('useOwnerRegistration', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.stubGlobal('alert', vi.fn());
   });
 
   it('debe inicializar con campos vacíos y sin errores', () => {
-    const { result } = renderHook(() => useWorkshopRegistration());
+    const { result } = renderHook(() => useOwnerRegistration());
 
     expect(result.current.formData).toEqual({
       firstname: '', lastname: '', email: '', password: '',
@@ -30,8 +30,8 @@ describe('useWorkshopRegistration', () => {
     expect(result.current.isLoading).toBe(false);
   });
 
-  it('debe registrar un taller/propietario correctamente', async () => {
-    const { result } = renderHook(() => useWorkshopRegistration());
+  it('debe registrar un propietario correctamente', async () => {
+    const { result } = renderHook(() => useOwnerRegistration());
 
     act(() => {
       result.current.handleChange({
@@ -40,10 +40,10 @@ describe('useWorkshopRegistration', () => {
     });
 
     await act(async () => {
-      await result.current.registerWorkshop({ preventDefault: vi.fn() } as any);
+      await result.current.registerOwner({ preventDefault: vi.fn() } as any);
     });
 
-    expect(authService.registerWorkshop).toHaveBeenCalled();
+    expect(authService.registerOwner).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 });

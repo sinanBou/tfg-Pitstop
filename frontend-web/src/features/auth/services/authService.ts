@@ -3,7 +3,7 @@ import type {
   LoginFormData, 
   LoginResponse, 
   ClientRegistrationFormData, 
-  WorkshopRegistrationFormData 
+  OwnerRegistrationFormData 
 } from '../types/auth.types';
 
 export const login = async (formData: LoginFormData): Promise<LoginResponse> => {
@@ -32,7 +32,7 @@ export const registerClient = async (formData: ClientRegistrationFormData): Prom
   }
 };
 
-export const registerWorkshop = async (formData: WorkshopRegistrationFormData): Promise<void> => {
+export const registerOwner = async (formData: OwnerRegistrationFormData): Promise<void> => {
   const res = await fetch(`${API_BASE_URL}/auth/register/owner`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

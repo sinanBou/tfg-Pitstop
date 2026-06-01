@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
-import InputGroup from '@/components/common/InputGroup/InputGroup';
 import { useState } from 'react';
 import { useClientRegistration } from '@/features/auth/hooks/useClientRegistration';
-import { useWorkshopRegistration } from '@/features/auth/hooks/useWorkshopRegistration';
+import { useOwnerRegistration } from '@/features/auth/hooks/useOwnerRegistration';
 import { RoleSelector } from '@/features/auth/components/RoleSelector';
-import AddressAutocomplete from '@/components/common/AddressAutocomplete/AddressAutocomplete';
+import { AuthFormFields } from '@/features/auth/components/AuthFormFields';
 
 export default function Registration() {
   const [role, setRole] = useState<'workshop' | 'client' | null>(null);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const clientReg = useClientRegistration();
-  const workshopReg = useWorkshopRegistration();
+  const ownerReg = useOwnerRegistration();
 
-  const isLoading = role === 'client' ? clientReg.isLoading : workshopReg.isLoading;
+  const currentReg = role === 'client' ? clientReg : ownerReg;
+  const isLoading = currentReg.isLoading;
 
   const handleRegistrationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +21,7 @@ export default function Registration() {
     const newErrors: {[key: string]: string} = {};
     let isValid = true;
 
-    const currentFormData = role === 'client' ? clientReg.formData : workshopReg.formData;
+    const currentFormData = currentReg.formData;
 
     if (!currentFormData.firstname) { newErrors.firstname = 'El nombre es obligatorio.'; isValid = false; }
     if (!currentFormData.lastname) { newErrors.lastname = 'Los apellidos son obligatorios.'; isValid = false; }
@@ -44,7 +44,7 @@ export default function Registration() {
       if (role === 'client') {
         await clientReg.registerClient(e);
       } else if (role === 'workshop') {
-        await workshopReg.registerWorkshop(e);
+        await ownerReg.registerOwner(e);
       }
     }
   };
@@ -78,56 +78,13 @@ export default function Registration() {
 
               <form onSubmit={handleRegistrationSubmit} className="flex flex-col gap-6">
 
-                {role === 'workshop' && (
-                  <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <InputGroup label="Nombre" name="firstname" value={workshopReg.formData.firstname} onChange={workshopReg.handleChange} error={errors.firstname} placeholder="Juan" />
-                      <InputGroup label="Apellidos" name="lastname" value={workshopReg.formData.lastname} onChange={workshopReg.handleChange} error={errors.lastname} placeholder="Pérez" />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <InputGroup label="DNI / NIF" name="nif" value={workshopReg.formData.nif} onChange={workshopReg.handleChange} error={errors.nif} placeholder="12345678Z" />
-                      <InputGroup label="Teléfono" name="phoneNumber" value={workshopReg.formData.phoneNumber} onChange={workshopReg.handleChange} error={errors.phoneNumber} placeholder="600123456" />
-                    </div>
-
-                    <AddressAutocomplete 
-                        label="Dirección del Dueño" 
-                        name="address" 
-                        value={workshopReg.formData.address || ''} 
-                        onChange={(val: string) => workshopReg.handleChange({ target: { name: 'address', value: val } } as any)} 
-                        error={errors.address} 
-                        placeholder="Tu dirección personal..." 
-                    />
-                  </>
-                )}
-
-                {role === 'client' && (
-                  <>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <InputGroup label="Nombre" name="firstname" value={clientReg.formData.firstname} onChange={clientReg.handleChange} error={errors.firstname} placeholder="Carlos" />
-                      <InputGroup label="Apellidos" name="lastname" value={clientReg.formData.lastname} onChange={clientReg.handleChange} error={errors.lastname} placeholder="Sainz" />
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                      <InputGroup label="DNI / NIF" name="nif" value={clientReg.formData.nif} onChange={clientReg.handleChange} error={errors.nif} placeholder="12345678Z" />
-                      <InputGroup label="Teléfono" name="phoneNumber" value={clientReg.formData.phoneNumber} onChange={clientReg.handleChange} error={errors.phoneNumber} placeholder="600123456" />
-                    </div>
-
-                    <AddressAutocomplete 
-                      label="Dirección (Opcional)" 
-                      name="address" 
-                      value={clientReg.formData.address || ''} 
-                      onChange={(val: string) => clientReg.handleChange({ target: { name: 'address', value: val } } as any)} 
-                      error={errors.address} 
-                      placeholder="Madrid, Calle..." 
-                    />
-                  </>
-                )}
-
-                <div className="border-t border-neutral-800/50 my-2 pt-6 flex flex-col gap-5 relative">
-                  <InputGroup label="Correo Electrónico" name="email" type="email" value={role === 'client' ? clientReg.formData.email : workshopReg.formData.email} onChange={role === 'client' ? clientReg.handleChange : workshopReg.handleChange} error={errors.email} placeholder="tu@email.com" />
-                  <InputGroup label="Contraseña" name="password" type="password" value={role === 'client' ? clientReg.formData.password : workshopReg.formData.password} onChange={role === 'client' ? clientReg.handleChange : workshopReg.handleChange} error={errors.password} placeholder="Mín 8 car, 1 Mayús, 1 Núm" />
-                </div>
+                <AuthFormFields
+                  formData={currentReg.formData}
+                  onChange={currentReg.handleChange}
+                  onAddressChange={(val: string) => currentReg.handleChange({ target: { name: 'address', value: val } } as any)}
+                  errors={errors}
+                  isWorkshop={role === 'workshop'}
+                />
 
                 <button 
                   type="submit"

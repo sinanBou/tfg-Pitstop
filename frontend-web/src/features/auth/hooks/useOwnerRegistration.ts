@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as authService from '../services/authService';
-import type { WorkshopRegistrationFormData } from '../types/auth.types';
+import type { OwnerRegistrationFormData } from '../types/auth.types';
 import { useToast } from '@/hooks/useToast';
 
-export function useWorkshopRegistration() {
+export function useOwnerRegistration() {
   const toast = useToast();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [formData, setFormData] = useState<WorkshopRegistrationFormData>({
+  const [formData, setFormData] = useState<OwnerRegistrationFormData>({
     firstname: '',
     lastname: '',
     email: '',
@@ -24,12 +24,12 @@ export function useWorkshopRegistration() {
     setFormData({ ...formData, [name]: value });
   };
 
-  const registerWorkshop = async (e: React.FormEvent) => {
+  const registerOwner = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await authService.registerWorkshop(formData);
+      await authService.registerOwner(formData);
       toast.success('Propietario registrado con éxito');
       navigate('/login');
     } catch (err: any) {
@@ -42,7 +42,7 @@ export function useWorkshopRegistration() {
   return { 
     formData, 
     handleChange, 
-    registerWorkshop, 
+    registerOwner, 
     isLoading 
   };
 }

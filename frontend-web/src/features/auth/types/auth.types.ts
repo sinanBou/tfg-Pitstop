@@ -19,7 +19,7 @@ export interface ClientRegistrationFormData {
   address: string;
 }
 
-export interface WorkshopRegistrationFormData {
+export interface OwnerRegistrationFormData {
   firstname: string;
   lastname: string;
   email: string;
@@ -28,3 +28,4 @@ export interface WorkshopRegistrationFormData {
   nif: string;
   phoneNumber: string;
 }
+
