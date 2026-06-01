@@ -1,24 +1,17 @@
-# Etapa 1: Construcción (Node.js)
-FROM node:20 AS build
+# ETAPA 1: Construcción
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
+COPY pom.xml .
+RUN mvn dependency:go-offline
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-
-ARG VITE_API_BASE_URL
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
-
-
-# Copiamos solo los archivos de dependencias primero 
-COPY package*.json ./
-RUN npm install
-# Copiamos el resto del código y construimos la app
-COPY . .
-RUN npm run build
-
-
-
-# Etapa 2: Servidor Web (Nginx)
-FROM nginx:alpine
-# Copiamos el resultado de Vite (la carpeta /dist) al servidor Nginx
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+# ETAPA 2: Ejecución
+FROM eclipse-temurin:25-jdk
+WORKDIR /app
+RUN useradd -m usuario
+COPY --from=build /app/target/*.jar app.jar
+RUN chown usuario:usuario app.jar
+USER usuario
+EXPOSE 9091
+ENTRYPOINT ["java", "-jar", "app.jar"]
