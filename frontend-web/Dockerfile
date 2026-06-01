@@ -1,17 +1,31 @@
 # ETAPA 1: Construcción
-FROM maven:3.9-eclipse-temurin-25 AS build
+FROM node:20-alpine AS build
 WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
-COPY src ./src
-RUN mvn clean package -DskipTests
+
+# Copiar archivos de dependencias
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Variables de entorno en tiempo de compilación (Vite las incrusta)
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+# Copiar código fuente
+COPY . .
+
+# Compilar la SPA para producción
+RUN npm run build
 
 # ETAPA 2: Ejecución
-FROM eclipse-temurin:25-jdk
-WORKDIR /app
-RUN useradd -m usuario
-COPY --from=build /app/target/*.jar app.jar
-RUN chown usuario:usuario app.jar
-USER usuario
-EXPOSE 9091
-ENTRYPOINT ["java", "-jar", "app.jar"]
+FROM nginx:alpine
+
+# Copiar los recursos compilados de la SPA
+COPY --from=build /app/dist /usr/share/nginx/html
+
+# Copiar la configuración de Nginx para soportar React Router (SPA) en puerto 80
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
