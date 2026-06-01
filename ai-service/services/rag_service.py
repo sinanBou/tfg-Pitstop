@@ -90,7 +90,7 @@ class RAGService:
             documents=chunks,
             metadatas=metadatas
         )
-        print(f"✅ Ingesta finalizada: {len(chunks)} fragmentos vectorizados en '{collection_type}_manual'.")
+        print(f" Ingesta finalizada: {len(chunks)} fragmentos vectorizados en '{collection_type}_manual'.")
 
     def query_manual(self, query: str, user_role: str, k: int = 3) -> str:
         """
