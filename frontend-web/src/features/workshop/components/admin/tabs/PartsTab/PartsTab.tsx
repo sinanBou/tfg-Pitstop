@@ -8,6 +8,7 @@ import { PartFormInline } from './components/PartFormInline';
 import { PartItemRow } from './components/PartItemRow';
 import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface PartsTabProps {
   workshopId: string;
@@ -51,6 +52,50 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
   const [editStockQty, setEditStockQty] = useState('');
   const [editAvisoThreshold, setEditAvisoThreshold] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    type: 'part' | 'category' | null;
+    id: string | null;
+    title: string;
+    description: string;
+    confirmText?: string;
+    theme?: 'red' | 'blue' | 'green' | 'amber';
+  } | null>(null);
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal || !confirmModal.id) return;
+    const { type, id } = confirmModal;
+    setConfirmModal(null);
+
+    if (type === 'part') {
+      try {
+        const token = localStorage.getItem('jwt_token');
+        const res = await fetch(`${API_BASE_URL}/parts/inventory/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('No se pudo eliminar el repuesto');
+        toast.success('Repuesto eliminado con éxito del almacén.');
+        await fetchData();
+      } catch (err: any) {
+        toast.error(err.message);
+      }
+    } else if (type === 'category') {
+      try {
+        const token = localStorage.getItem('jwt_token');
+        const res = await fetch(`${API_BASE_URL}/parts/categories/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('No se pudo eliminar la categoría (comprueba que no contenga repuestos)');
+        toast.success('Categoría eliminada con éxito.');
+        await fetchData();
+      } catch (err: any) {
+        toast.error(err.message);
+      }
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -274,38 +319,30 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
   };
 
   // Delete inventory handler
-  const handleDeletePart = async (id: string) => {
-    if (!window.confirm('¿Seguro que deseas eliminar este repuesto del almacén? Se desvinculará de cualquier orden histórica.')) return;
-
-    try {
-      const token = localStorage.getItem('jwt_token');
-      const res = await fetch(`${API_BASE_URL}/parts/inventory/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('No se pudo eliminar el repuesto');
-      await fetchData();
-    } catch (err: any) {
-      toast.error(err.message);
-    }
+  const handleDeletePart = (id: string) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'part',
+      id,
+      title: 'Eliminar Repuesto',
+      description: '¿Seguro que deseas eliminar este repuesto del almacén? Se desvinculará de cualquier orden histórica.',
+      confirmText: 'Sí, Eliminar',
+      theme: 'red'
+    });
   };
 
   // Delete Category Handler
-  const handleDeleteCategory = async (e: React.MouseEvent, categoryId: string) => {
+  const handleDeleteCategory = (e: React.MouseEvent, categoryId: string) => {
     e.stopPropagation();
-    if (!window.confirm('¿Seguro que deseas eliminar esta categoría? Debe estar vacía.')) return;
-
-    try {
-      const token = localStorage.getItem('jwt_token');
-      const res = await fetch(`${API_BASE_URL}/parts/categories/${categoryId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('No se pudo eliminar la categoría (comprueba que no contenga repuestos)');
-      await fetchData();
-    } catch (err: any) {
-        toast.error(err.message);
-    }
+    setConfirmModal({
+      isOpen: true,
+      type: 'category',
+      id: categoryId,
+      title: 'Eliminar Categoría',
+      description: '¿Seguro que deseas eliminar esta categoría? Debe estar vacía.',
+      confirmText: 'Sí, Eliminar',
+      theme: 'red'
+    });
   };
 
   if (loading) {
@@ -490,6 +527,17 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
           })
         )}
       </div>
+      {confirmModal && (
+        <ConfirmCardModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal(null)}
+          onConfirm={handleConfirmAction}
+          title={confirmModal.title}
+          description={confirmModal.description}
+          confirmText={confirmModal.confirmText}
+          theme={confirmModal.theme}
+        />
+      )}
     </div>
   );
 };

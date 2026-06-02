@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface WorkshopManagementTabProps {
   workshops: any[];
   onAddWorkshop: () => void;
+  onDeleteWorkshop: (id: string) => Promise<void>;
 }
 
 const WorkshopIcon = () => (
@@ -15,11 +17,30 @@ const WorkshopIcon = () => (
   </svg>
 );
 
-export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopManagementTabProps) {
+export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorkshop }: WorkshopManagementTabProps) {
   const navigate = useNavigate();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
   const [previewTitle, setPreviewTitle] = useState('');
+
+  // Estados para el flujo de eliminación segura
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState<string>('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmDeleteId) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteWorkshop(confirmDeleteId);
+      setConfirmDeleteId(null);
+      setConfirmDeleteName('');
+    } catch (err) {
+      console.error('Error deleting workshop:', err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div>
@@ -96,17 +117,33 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
                   </div>
                </div>
                
-               <Button 
-                  onClick={() => navigate(`/workshop/${workshop.id}`)} 
-                  className="w-full !py-4 bg-neutral-800/50 border border-neutral-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:border-red-500 transition-all shadow-sm relative z-10 group/btn mt-auto overflow-hidden"
-               >
-                  <span className="flex items-center justify-center gap-2 relative z-10">
-                     Gestionar Taller
-                     <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+               <div className="flex gap-3 mt-auto relative z-10 w-full">
+                  <Button 
+                     onClick={() => navigate(`/workshop/${workshop.id}`)} 
+                     className="flex-1 !py-4 bg-neutral-800/50 border border-neutral-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:border-red-500 transition-all shadow-sm group/btn overflow-hidden"
+                  >
+                     <span className="flex items-center justify-center gap-2 relative z-10">
+                        Gestionar
+                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                     </span>
+                  </Button>
+                  
+                  <button 
+                     onClick={(e) => {
+                        e.stopPropagation();
+                        setConfirmDeleteId(workshop.id);
+                        setConfirmDeleteName(workshop.companyName);
+                     }}
+                     className="p-4 bg-red-950/20 hover:bg-red-600 border border-red-900/40 hover:border-red-500 text-red-500 hover:text-white rounded-xl transition-all cursor-pointer flex items-center justify-center group/trash"
+                     title="Eliminar Taller"
+                  >
+                     <svg className="w-4 h-4 group-hover/trash:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                      </svg>
-                  </span>
-               </Button>
+                  </button>
+               </div>
             </Card>
          ))}
       </div>
@@ -119,6 +156,22 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop }: WorkshopMana
             title={previewTitle}
          />
       )}
+
+      {/* MODAL DE CONFIRMACIÓN REUTILIZABLE */}
+      <ConfirmCardModal
+         isOpen={!!confirmDeleteId}
+         onClose={() => {
+            setConfirmDeleteId(null);
+            setConfirmDeleteName('');
+         }}
+         onConfirm={handleDeleteConfirm}
+         title="¿Eliminar Taller?"
+         description={`¿Estás seguro de que deseas eliminar permanentemente el taller "${confirmDeleteName}"? Esta acción es irreversible, desasociará a todos los empleados e historiales y no se puede deshacer.`}
+         confirmText="Sí, Confirmar"
+         cancelText="Cancelar"
+         theme="red"
+         isLoading={isDeleting}
+      />
     </div>
   );
 }

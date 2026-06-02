@@ -8,6 +8,7 @@ import { Badge } from '@/components/common/Badge/Badge';
 import { InputField } from '@/components/common/InputField/InputField';
 import { API_BASE_URL } from '@/config/api';
 import { useToast } from '@/hooks/useToast';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface TeamTabProps {
   employeeForm: any;
@@ -33,6 +34,31 @@ export const TeamTab: React.FC<TeamTabProps> = ({
   const [selectedEmp, setSelectedEmp] = React.useState<any>(null);
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [previewTitle, setPreviewTitle] = React.useState<string>('');
+  const [confirmModal, setConfirmModal] = React.useState<{
+    isOpen: boolean;
+    type: 'delete' | 'promote' | 'demote' | null;
+    employeeId: string;
+    title: string;
+    description: string;
+    confirmText?: string;
+    theme?: 'red' | 'blue' | 'green';
+  } | null>(null);
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal) return;
+    const { type, employeeId } = confirmModal;
+    setConfirmModal(null);
+    setSelectedEmp(null);
+
+    if (type === 'delete') {
+      await onDelete(employeeId);
+    } else if (type === 'promote') {
+      await onPromote(employeeId);
+    } else if (type === 'demote') {
+      await onDemote(employeeId);
+    }
+  };
+
   const userRole = localStorage.getItem('role');
   const toast = useToast();
 
@@ -156,7 +182,17 @@ export const TeamTab: React.FC<TeamTabProps> = ({
               {/* Botón de Ascenso (Solo Dueño y si el empleado es mecánico) */}
               {userRole === 'WORKSHOP_OWNER' && selectedEmp.role === 'WORKSHOP_STAFF' && (
                 <Button 
-                  onClick={() => { onPromote(selectedEmp.id); setSelectedEmp(null); }}
+                  onClick={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      type: 'promote',
+                      employeeId: selectedEmp.id,
+                      title: 'Ascender a Gerente',
+                      description: `¿Estás seguro de ascender a ${selectedEmp.firstname} a Gerente? Obtendrá permisos de administración.`,
+                      confirmText: 'Sí, Ascender',
+                      theme: 'blue'
+                    });
+                  }}
                   variant="primary"
                   className="w-full h-12 uppercase tracking-widest text-[9px] font-black"
                 >
@@ -168,7 +204,17 @@ export const TeamTab: React.FC<TeamTabProps> = ({
               {/* Botón de Degradación (Solo Dueño y si el empleado es Gerente) */}
               {userRole === 'WORKSHOP_OWNER' && selectedEmp.role === 'WORKSHOP_MANAGER' && (
                 <Button 
-                  onClick={() => { onDemote(selectedEmp.id); setSelectedEmp(null); }}
+                  onClick={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      type: 'demote',
+                      employeeId: selectedEmp.id,
+                      title: 'Degradar a Mecánico',
+                      description: `¿Seguro que quieres pasar a este Gerente a Mecánico de plantilla? Perderá privilegios de administración.`,
+                      confirmText: 'Sí, Degradar',
+                      theme: 'red'
+                    });
+                  }}
                   variant="secondary"
                   className="w-full h-12 uppercase tracking-widest text-[9px] font-black"
                 >
@@ -179,7 +225,17 @@ export const TeamTab: React.FC<TeamTabProps> = ({
 
               {selectedEmp.role !== 'WORKSHOP_OWNER' && (
                 <Button 
-                  onClick={() => { onDelete(selectedEmp.id); setSelectedEmp(null); }}
+                  onClick={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      type: 'delete',
+                      employeeId: selectedEmp.id,
+                      title: 'Eliminar Empleado',
+                      description: `¿Estás seguro de eliminar a ${selectedEmp.firstname}? Se borrará toda su información permanentemente.`,
+                      confirmText: 'Sí, Eliminar',
+                      theme: 'red'
+                    });
+                  }}
                   variant="danger"
                   className="w-full h-12 uppercase tracking-widest text-[9px] font-black"
                 >
@@ -343,6 +399,17 @@ export const TeamTab: React.FC<TeamTabProps> = ({
         imageUrl={previewUrl || ''}
         title={previewTitle}
       />
+      {confirmModal && (
+        <ConfirmCardModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal(null)}
+          onConfirm={handleConfirmAction}
+          title={confirmModal.title}
+          description={confirmModal.description}
+          confirmText={confirmModal.confirmText}
+          theme={confirmModal.theme}
+        />
+      )}
     </div>
   );
 };

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { getBrandLogo } from '@/assets/BrandLogos';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface ClientAppointmentCardProps {
   appointment: any;
@@ -22,6 +23,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
   deleteAppointment,
 }) => {
   const isCancellable = !['IN_PROGRESS', 'DELAYED', 'COMPLETED', 'CANCELLED'].includes(appointment.status);
+  const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
   return (
     <Card 
@@ -102,11 +104,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
         {/* Botón de Acción Principal (Cancelar o Estado Estático) */}
         {isCancellable ? (
           <Button
-            onClick={() => {
-              if (window.confirm("¿Deseas cancelar esta cita de forma permanente?")) {
-                deleteAppointment(appointment.id);
-              }
-            }}
+            onClick={() => setConfirmCancelOpen(true)}
             variant="danger"
             glow={false}
             className="w-full !py-4 shadow-sm mt-auto"
@@ -126,6 +124,21 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
           </div>
         )}
       </div>
+
+      {confirmCancelOpen && (
+        <ConfirmCardModal
+          isOpen={confirmCancelOpen}
+          onClose={() => setConfirmCancelOpen(false)}
+          onConfirm={() => {
+            setConfirmCancelOpen(false);
+            deleteAppointment(appointment.id);
+          }}
+          title="Cancelar Cita"
+          description="¿Deseas cancelar esta cita de forma permanente?"
+          confirmText="Sí, Cancelar"
+          theme="red"
+        />
+      )}
     </Card>
   );
 };

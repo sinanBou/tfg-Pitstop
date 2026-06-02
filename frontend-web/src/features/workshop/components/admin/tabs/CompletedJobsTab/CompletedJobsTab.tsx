@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface CompletedJobsTabProps {
   readyJobs: any[];
@@ -16,17 +17,24 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
   const [processingId, setProcessingId] = useState<string | null>(null);
   // Optimistic removal — hide cards instantly while API runs
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
+  const [confirmPickupId, setConfirmPickupId] = useState<string | null>(null);
 
   const handleComplete = (job: any) => {
     onCompleteJob(job);
   };
 
-  const handlePickedUp = async (id: string) => {
-    if (!window.confirm('¿Confirmar que el cliente ha recogido su vehículo?')) return;
+  const handleConfirmPickedUp = async () => {
+    if (!confirmPickupId) return;
+    const id = confirmPickupId;
+    setConfirmPickupId(null);
     setProcessingId(id);
     setDismissedIds(prev => new Set(prev).add(id));
     await onMarkPickedUp(id);
     setProcessingId(null);
+  };
+
+  const handlePickedUp = (id: string) => {
+    setConfirmPickupId(id);
   };
 
   // Filter out optimistically dismissed items
@@ -98,6 +106,17 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
             ))}
           </div>
         </div>
+      )}
+      {confirmPickupId !== null && (
+        <ConfirmCardModal
+          isOpen={confirmPickupId !== null}
+          onClose={() => setConfirmPickupId(null)}
+          onConfirm={handleConfirmPickedUp}
+          title="Confirmar Recogida"
+          description="¿Confirmar que el cliente ha recogido su vehículo?"
+          confirmText="Sí, Confirmar"
+          theme="green"
+        />
       )}
     </div>
   );

@@ -20,7 +20,7 @@ export interface InvoiceData {
 /**
  * Genera y descarga una factura PDF maquetada nativamente en alta fidelidad y estética seria.
  */
-export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string) {
+export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string, onError?: (message: string) => void) {
   const parsedParts: PartItem[] = JSON.parse(inv.partsJson || '[]');
   const dateObj = new Date(inv.createdAt);
   const formattedDate = dateObj.toLocaleDateString('es-ES', {
@@ -33,7 +33,11 @@ export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string) {
 
   const printWindow = window.open('', '_blank');
   if (!printWindow) {
-    alert('Por favor, permite las ventanas emergentes para descargar la factura.');
+    if (onError) {
+      onError('Por favor, permite las ventanas emergentes para descargar la factura.');
+    } else {
+      console.warn('Por favor, permite las ventanas emergentes para descargar la factura.');
+    }
     return;
   }
 

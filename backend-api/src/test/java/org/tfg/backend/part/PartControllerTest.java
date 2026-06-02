@@ -7,12 +7,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.tfg.backend.part.service.PartAdminService;
-import org.tfg.backend.part.service.PartAssignmentService;
-import org.tfg.backend.part.service.PartLookupService;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,13 +27,7 @@ class PartControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private PartAdminService partAdminService;
-
-    @Mock
-    private PartLookupService partLookupService;
-
-    @Mock
-    private PartAssignmentService partAssignmentService;
+    private PartService partService;
 
     @Mock
     private PartInventoryFacade partInventoryFacade;
@@ -85,39 +75,39 @@ class PartControllerTest {
 
     @Test
     void getCatalog_ShouldReturnList() throws Exception {
-        when(partLookupService.getAllCatalog()).thenReturn(List.of(mockPart));
+        when(partService.getAllCatalog()).thenReturn(List.of(mockPart));
 
         mockMvc.perform(get("/api/parts/catalog"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].name", is("Pastillas Brembo")));
 
-        verify(partLookupService, times(1)).getAllCatalog();
+        verify(partService, times(1)).getAllCatalog();
     }
 
     @Test
     void getInventory_ShouldReturnList() throws Exception {
-        when(partLookupService.getAllInventory()).thenReturn(List.of(mockInventory));
+        when(partService.getAllInventory()).thenReturn(List.of(mockInventory));
 
         mockMvc.perform(get("/api/parts/inventory"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].stockQuantity", is(10)));
 
-        verify(partLookupService, times(1)).getAllInventory();
+        verify(partService, times(1)).getAllInventory();
     }
 
     @Test
     void getAppointmentParts_ShouldReturnList() throws Exception {
         UUID appId = UUID.randomUUID();
-        when(partLookupService.getPartsByAppointment(appId)).thenReturn(List.of(mockAppointmentPart));
+        when(partService.getPartsByAppointment(appId)).thenReturn(List.of(mockAppointmentPart));
 
         mockMvc.perform(get("/api/parts/appointments/{appointmentId}", appId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].quantityUsed", is(2)));
 
-        verify(partLookupService, times(1)).getPartsByAppointment(appId);
+        verify(partService, times(1)).getPartsByAppointment(appId);
     }
 
     @Test
@@ -157,7 +147,7 @@ class PartControllerTest {
     @Test
     void addPartToAppointment_Custom_ShouldReturnDTO() throws Exception {
         UUID appId = UUID.randomUUID();
-        when(partAssignmentService.assignCustomPartToAppointment(appId, "Pastillas Custom", 2)).thenReturn(mockAppointmentPart);
+        when(partService.assignCustomPartToAppointment(appId, "Pastillas Custom", 2)).thenReturn(mockAppointmentPart);
 
         String payload = "{\"customName\":\"Pastillas Custom\",\"quantity\":2}";
 
@@ -167,7 +157,7 @@ class PartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.quantityUsed", is(2)));
 
-        verify(partAssignmentService, times(1)).assignCustomPartToAppointment(appId, "Pastillas Custom", 2);
+        verify(partService, times(1)).assignCustomPartToAppointment(appId, "Pastillas Custom", 2);
     }
 
     @Test
@@ -185,7 +175,7 @@ class PartControllerTest {
     @Test
     void addInventoryItem_ShouldReturnCreated() throws Exception {
         UUID categoryId = UUID.randomUUID();
-        when(partAdminService.addPartToInventory(
+        when(partService.addPartToInventory(
                 eq("REF-123"), eq("Pastillas Brembo"), eq("Brembo"), eq("Specs"), eq(categoryId),
                 eq(20.0), eq(35.0), eq(10), eq(5)
         )).thenReturn(mockInventory);
@@ -200,7 +190,7 @@ class PartControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.stockQuantity", is(10)));
 
-        verify(partAdminService, times(1)).addPartToInventory(
+        verify(partService, times(1)).addPartToInventory(
                 eq("REF-123"), eq("Pastillas Brembo"), eq("Brembo"), eq("Specs"), eq(categoryId),
                 eq(20.0), eq(35.0), eq(10), eq(5)
         );
@@ -210,7 +200,7 @@ class PartControllerTest {
     void updateInventoryItem_ShouldReturnOk() throws Exception {
         UUID inventoryId = mockInventory.getId();
         UUID categoryId = UUID.randomUUID();
-        when(partAdminService.updateInventoryItem(
+        when(partService.updateInventoryItem(
                 eq(inventoryId), eq("REF-123"), eq("Pastillas Brembo"), eq("Brembo"), eq("Specs"), eq(categoryId),
                 eq(20.0), eq(35.0), eq(10), eq(5)
         )).thenReturn(mockInventory);
@@ -225,7 +215,7 @@ class PartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.stockQuantity", is(10)));
 
-        verify(partAdminService, times(1)).updateInventoryItem(
+        verify(partService, times(1)).updateInventoryItem(
                 eq(inventoryId), eq("REF-123"), eq("Pastillas Brembo"), eq("Brembo"), eq("Specs"), eq(categoryId),
                 eq(20.0), eq(35.0), eq(10), eq(5)
         );
@@ -239,24 +229,24 @@ class PartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Pieza de inventario eliminada correctamente"));
 
-        verify(partAdminService, times(1)).deleteInventoryItem(inventoryId);
+        verify(partService, times(1)).deleteInventoryItem(inventoryId);
     }
 
     @Test
     void getCategories_ShouldReturnList() throws Exception {
-        when(partLookupService.getAllCategories()).thenReturn(List.of(mockCategory));
+        when(partService.getAllCategories()).thenReturn(List.of(mockCategory));
 
         mockMvc.perform(get("/api/parts/categories"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].displayName", is("Frenos")));
 
-        verify(partLookupService, times(1)).getAllCategories();
+        verify(partService, times(1)).getAllCategories();
     }
 
     @Test
     void createCategory_ShouldReturnCreated() throws Exception {
-        when(partAdminService.createCategory("Filtros")).thenReturn(mockCategory);
+        when(partService.createCategory("Filtros")).thenReturn(mockCategory);
 
         String payload = "{\"displayName\":\"Filtros\"}";
 
@@ -266,7 +256,7 @@ class PartControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.displayName", is("Frenos")));
 
-        verify(partAdminService, times(1)).createCategory("Filtros");
+        verify(partService, times(1)).createCategory("Filtros");
     }
 
     @Test
@@ -277,6 +267,6 @@ class PartControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Categoría eliminada correctamente"));
 
-        verify(partAdminService, times(1)).deleteCategory(categoryId);
+        verify(partService, times(1)).deleteCategory(categoryId);
     }
 }

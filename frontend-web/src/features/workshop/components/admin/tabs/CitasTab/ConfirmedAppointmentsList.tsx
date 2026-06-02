@@ -5,6 +5,7 @@ import { Card } from '@/components/common/Card/Card';
 import { InputField } from '@/components/common/InputField/InputField';
 import { Button } from '@/components/common/Button/Button';
 import { useToast } from '@/hooks/useToast';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface ConfirmedAppointmentsListProps {
   appointments: any[];
@@ -29,6 +30,33 @@ export const ConfirmedAppointmentsList = ({
   const [notes, setNotes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    type: 'cancel' | 'delay' | null;
+    appId: string | null;
+    title: string;
+    description: string;
+    confirmText?: string;
+    theme?: 'red' | 'blue' | 'green' | 'amber';
+  } | null>(null);
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal || !confirmModal.appId) return;
+    const { type, appId } = confirmModal;
+    setConfirmModal(null);
+
+    if (type === 'cancel') {
+      try {
+        await onDeleteAppointment(appId);
+      } catch (err) {
+        console.error("Error al cancelar la cita:", err);
+        toast.error("No se pudo cancelar la cita. Puede que esté en un estado que no permite la cancelación.");
+      }
+    } else if (type === 'delay' && onUpdateStatus) {
+      await onUpdateStatus(appId, 'DELAYED');
+    }
+  };
+
   // All confirmed, in progress or delayed appointments with optional search
   const confirmedAppointments = useMemo(() => {
     const confirmed = appointments.filter((a: any) => a.status === 'CONFIRMED' || a.status === 'IN_PROGRESS' || a.status === 'DELAYED');
@@ -42,15 +70,16 @@ export const ConfirmedAppointmentsList = ({
     );
   }, [appointments, confirmedSearch]);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("¿Deseas cancelar esta cita y todas las tareas relacionadas de forma permanente?")) {
-      try {
-        await onDeleteAppointment(id);
-      } catch (err) {
-        console.error("Error al cancelar la cita:", err);
-        toast.error("No se pudo cancelar la cita. Puede que esté en un estado que no permite la cancelación.");
-      }
-    }
+  const handleDelete = (id: string) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'cancel',
+      appId: id,
+      title: 'Cancelar Cita',
+      description: '¿Deseas cancelar esta cita y todas las tareas relacionadas de forma permanente?',
+      confirmText: 'Sí, Cancelar',
+      theme: 'red'
+    });
   };
 
   const handleCheckInSubmit = async (e: React.FormEvent) => {
@@ -191,10 +220,16 @@ export const ConfirmedAppointmentsList = ({
               {onUpdateStatus && app.status !== 'DELAYED' && (
                 <Button
                   variant="secondary"
-                  onClick={async () => {
-                    if (window.confirm("¿Seguro que deseas marcar esta cita como retrasada?")) {
-                      await onUpdateStatus(app.id, 'DELAYED');
-                    }
+                  onClick={() => {
+                    setConfirmModal({
+                      isOpen: true,
+                      type: 'delay',
+                      appId: app.id,
+                      title: 'Retrasar Cita',
+                      description: '¿Seguro que deseas marcar esta cita como retrasada?',
+                      confirmText: 'Sí, Marcar',
+                      theme: 'amber'
+                    });
                   }}
                   className="flex-1 !px-3 !py-2 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 flex items-center justify-center gap-1 font-bold text-xs"
                 >
@@ -292,6 +327,17 @@ export const ConfirmedAppointmentsList = ({
           </Card>
         </div>,
         document.body
+      )}
+      {confirmModal && (
+        <ConfirmCardModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal(null)}
+          onConfirm={handleConfirmAction}
+          title={confirmModal.title}
+          description={confirmModal.description}
+          confirmText={confirmModal.confirmText}
+          theme={confirmModal.theme}
+        />
       )}
     </div>
   );

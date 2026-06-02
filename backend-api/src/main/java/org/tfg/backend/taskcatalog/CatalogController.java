@@ -51,4 +51,10 @@ public class CatalogController {
         catalogService.deleteTask(taskId);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/categories/{categoryId}")
+    public ResponseEntity<Void> deleteCategory(@PathVariable UUID categoryId) {
+        catalogService.deleteCategory(categoryId);
+        return ResponseEntity.ok().build();
+    }
 }

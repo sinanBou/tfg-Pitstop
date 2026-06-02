@@ -9,8 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.tfg.backend.taskcatalog.service.CatalogAdminService;
-import org.tfg.backend.taskcatalog.service.CatalogLookupService;
 
 import java.util.List;
 import java.util.UUID;
@@ -29,10 +27,7 @@ class CatalogControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private CatalogAdminService catalogAdminService;
-
-    @Mock
-    private CatalogLookupService catalogLookupService;
+    private CatalogService catalogService;
 
     @InjectMocks
     private CatalogController catalogController;
@@ -61,20 +56,20 @@ class CatalogControllerTest {
     @Test
     void getCatalog_ShouldReturnList() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(catalogLookupService.getCatalog(workshopId)).thenReturn(List.of(mockCategory));
+        when(catalogService.getCatalog(workshopId)).thenReturn(List.of(mockCategory));
 
         mockMvc.perform(get("/api/catalog/workshop/{workshopId}", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].displayName", is("Consumibles")));
 
-        verify(catalogLookupService, times(1)).getCatalog(workshopId);
+        verify(catalogService, times(1)).getCatalog(workshopId);
     }
 
     @Test
     void createCategory_ShouldReturnCreated() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(catalogAdminService.createCategory(workshopId, "Consumibles")).thenReturn(mockCategory);
+        when(catalogService.createCategory(workshopId, "Consumibles")).thenReturn(mockCategory);
 
         String payload = "{\"displayName\":\"Consumibles\"}";
 
@@ -84,14 +79,14 @@ class CatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.displayName", is("Consumibles")));
 
-        verify(catalogAdminService, times(1)).createCategory(workshopId, "Consumibles");
+        verify(catalogService, times(1)).createCategory(workshopId, "Consumibles");
     }
 
     @Test
     void createTask_ShouldReturnTask() throws Exception {
         UUID workshopId = UUID.randomUUID();
         UUID categoryId = mockCategory.getId();
-        when(catalogAdminService.createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class))).thenReturn(mockTask);
+        when(catalogService.createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class))).thenReturn(mockTask);
 
         String payload = "{\"name\":\"Cambio de aceite\",\"hours\":0.5}";
 
@@ -101,13 +96,13 @@ class CatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Cambio de aceite")));
 
-        verify(catalogAdminService, times(1)).createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class));
+        verify(catalogService, times(1)).createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class));
     }
 
     @Test
     void updateTask_ShouldReturnUpdatedTask() throws Exception {
         UUID taskId = mockTask.getId();
-        when(catalogAdminService.updateTask(eq(taskId), any(CatalogTask.class))).thenReturn(mockTask);
+        when(catalogService.updateTask(eq(taskId), any(CatalogTask.class))).thenReturn(mockTask);
 
         String payload = "{\"name\":\"Cambio de aceite Pro\",\"hours\":0.8}";
 
@@ -117,7 +112,7 @@ class CatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Cambio de aceite"))); // returns mockTask
 
-        verify(catalogAdminService, times(1)).updateTask(eq(taskId), any(CatalogTask.class));
+        verify(catalogService, times(1)).updateTask(eq(taskId), any(CatalogTask.class));
     }
 
     @Test
@@ -127,6 +122,6 @@ class CatalogControllerTest {
         mockMvc.perform(delete("/api/catalog/tasks/{taskId}", taskId))
                 .andExpect(status().isOk());
 
-        verify(catalogAdminService, times(1)).deleteTask(taskId);
+        verify(catalogService, times(1)).deleteTask(taskId);
     }
 }

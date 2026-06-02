@@ -91,4 +91,13 @@ public class WorkshopController {
     public ResponseEntity<WorkshopDTO> deleteLogo(@PathVariable UUID id) {
         return ResponseEntity.ok(workshopService.deleteLogo(id));
     }
+
+    /**
+     * Elimina un taller del sistema.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteWorkshop(@PathVariable UUID id) {
+        workshopService.deleteWorkshop(id);
+        return ResponseEntity.noContent().build();
+    }
 }

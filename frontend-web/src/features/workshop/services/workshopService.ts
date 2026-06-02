@@ -287,3 +287,14 @@ export const createWorkshop = async (payload: WorkshopCreationPayload): Promise<
     throw new Error(errorText || 'Error al crear taller');
   }
 };
+
+export const deleteWorkshop = async (workshopId: string): Promise<void> => {
+  const res = await fetch(`${API_BASE_URL}/workshops/${workshopId}`, {
+    method: 'DELETE',
+    headers: getAuthHeaders()
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(errorText || 'Error al eliminar el taller');
+  }
+};

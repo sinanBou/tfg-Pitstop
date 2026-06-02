@@ -27,6 +27,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 /**
  * Integration test for the Client Profile screen:
  * - Get own profile (GET /api/clients/me)
@@ -44,6 +47,9 @@ class ClientProfileIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -70,6 +76,11 @@ class ClientProfileIntegrationTest {
                                 .address("Calle del Perfil 10")
                                 .build())))
                 .andExpect(status().isOk());
+
+        // Verificar el cliente en la BD para poder loguear
+        User clientUser = userRepository.findByEmail(clientEmail).orElseThrow();
+        clientUser.setVerified(true);
+        userRepository.save(clientUser);
 
         // 2. Login
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
@@ -139,6 +150,11 @@ class ClientProfileIntegrationTest {
                                 .companyName("Taller Principal")
                                 .build())))
                 .andExpect(status().isOk());
+
+        // Verificar el dueño en la BD para poder loguear
+        User ownerUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        ownerUser.setVerified(true);
+        userRepository.save(ownerUser);
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

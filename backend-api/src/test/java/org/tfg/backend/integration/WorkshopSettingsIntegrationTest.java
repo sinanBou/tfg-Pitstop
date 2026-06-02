@@ -27,6 +27,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 /**
  * Integration test for Workshop configuration and search:
  * - Create workshop (POST /api/workshops)
@@ -46,6 +49,9 @@ class WorkshopSettingsIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -73,6 +79,11 @@ class WorkshopSettingsIntegrationTest {
                                 .companyName(workshopName)
                                 .build())))
                 .andExpect(status().isOk());
+
+        // Verificar dueño en BD
+        User ownerUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        ownerUser.setVerified(true);
+        userRepository.save(ownerUser);
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

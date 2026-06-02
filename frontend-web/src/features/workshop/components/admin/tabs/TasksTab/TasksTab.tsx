@@ -7,6 +7,7 @@ import { TaskFormInline } from './components/TaskFormInline';
 import { TaskItemRow } from './components/TaskItemRow';
 import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 export interface CatalogTask {
   id: string;
@@ -62,6 +63,49 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   const [editingHoursCilExtra, setEditingHoursCilExtra] = useState('');
   const [editingHours1Rueda, setEditingHours1Rueda] = useState('');
   const [savingEdit, setSavingEdit] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    type: 'task' | 'category' | null;
+    id: string | null;
+    title: string;
+    description: string;
+    confirmText?: string;
+    theme?: 'red' | 'blue' | 'green' | 'amber';
+  } | null>(null);
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal || !confirmModal.id) return;
+    const { type, id } = confirmModal;
+    setConfirmModal(null);
+
+    if (type === 'task') {
+      try {
+        const token = localStorage.getItem('jwt_token');
+        const res = await fetch(`${API_BASE_URL}/catalog/tasks/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('No se pudo eliminar la tarea');
+        toast.success('Tarea eliminada con éxito del catálogo.');
+        await fetchCatalog();
+      } catch (err: any) {
+        toast.error(err.message);
+      }
+    } else if (type === 'category') {
+      try {
+        const token = localStorage.getItem('jwt_token');
+        const res = await fetch(`${API_BASE_URL}/catalog/categories/${id}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error('No se pudo eliminar la categoría (comprueba que no contenga tareas)');
+        toast.success('Categoría de tareas eliminada con éxito.');
+        await fetchCatalog();
+      } catch (err: any) {
+        toast.error(err.message);
+      }
+    }
+  };
 
   const fetchCatalog = async () => {
     try {
@@ -226,20 +270,30 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   };
 
   // Delete task
-  const handleDeleteTask = async (taskId: string) => {
-    if (!window.confirm('¿Seguro que deseas eliminar esta tarea del catálogo de tu taller? Los citas pasadas no se verán afectadas.')) return;
+  const handleDeleteTask = (id: string) => {
+    setConfirmModal({
+      isOpen: true,
+      type: 'task',
+      id,
+      title: 'Eliminar Tarea',
+      description: '¿Seguro que deseas eliminar esta tarea del catálogo de tu taller? Las citas pasadas no se verán afectadas.',
+      confirmText: 'Sí, Eliminar',
+      theme: 'red'
+    });
+  };
 
-    try {
-      const token = localStorage.getItem('jwt_token');
-      const res = await fetch(`${API_BASE_URL}/catalog/tasks/${taskId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('No se pudo eliminar la tarea');
-      await fetchCatalog();
-    } catch (err: any) {
-      toast.error(err.message);
-    }
+  // Delete Category Handler
+  const handleDeleteCategory = (e: React.MouseEvent, categoryId: string) => {
+    e.stopPropagation();
+    setConfirmModal({
+      isOpen: true,
+      type: 'category',
+      id: categoryId,
+      title: 'Eliminar Categoría',
+      description: '¿Seguro que deseas eliminar esta categoría de tu catálogo? Debe estar vacía.',
+      confirmText: 'Sí, Eliminar',
+      theme: 'red'
+    });
   };
 
   // Filtered categories based on search term
@@ -351,6 +405,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                   isAddingPart={isAddingTaskHere}
                   onToggle={() => toggleCategory(cat.id)}
                   onToggleAddPart={() => setAddingTaskCatId(isAddingTaskHere ? null : cat.id)}
+                  onDelete={(e) => handleDeleteCategory(e, cat.id)}
                 />
 
                 {/* Add Task Form Inline */}
@@ -429,6 +484,17 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
           })
         )}
       </div>
+      {confirmModal && (
+        <ConfirmCardModal
+          isOpen={confirmModal.isOpen}
+          onClose={() => setConfirmModal(null)}
+          onConfirm={handleConfirmAction}
+          title={confirmModal.title}
+          description={confirmModal.description}
+          confirmText={confirmModal.confirmText}
+          theme={confirmModal.theme}
+        />
+      )}
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { AppointmentCard } from '@/components/common/Card/AppointmentCard';
 import { useToast } from '@/hooks/useToast';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface AppointmentBlockProps {
   appointment: any;
@@ -37,6 +38,30 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
   const toast = useToast();
   const isVehicleReceived = appointment.vehicleReceived === true;
   const [isResizing, setIsResizing] = useState(false);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    type: 'cancel' | 'delay' | null;
+    title: string;
+    description: string;
+    confirmText?: string;
+    theme?: 'red' | 'blue' | 'green' | 'amber';
+  } | null>(null);
+
+  const handleConfirmAction = async () => {
+    if (!confirmModal) return;
+    const { type } = confirmModal;
+    setConfirmModal(null);
+
+    if (type === 'cancel') {
+      if (appointment.isTask && onDeleteTask) {
+        await onDeleteTask(appointment.id);
+      } else if (onDeleteAppointment) {
+        await onDeleteAppointment(appointment.id);
+      }
+    } else if (type === 'delay' && onUpdateStatus) {
+      await onUpdateStatus(appointment.id, 'DELAYED', appointment.isTask);
+    }
+  };
   
   // La duración real la sacamos del backend. Si no hay, asignamos 60 mins.
   const initialDuration = appointment.estimatedDuration || 60;
@@ -153,20 +178,28 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
     }
   };
 
-  const handleCancel = async (e: React.MouseEvent) => {
+  const handleCancel = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (readOnly) return;
 
     if (appointment.isTask && onDeleteTask) {
-       if (window.confirm("¿Estás seguro de que deseas ELIMINAR esta tarea de forma permanente?")) {
-           await onDeleteTask(appointment.id);
-       }
+      setConfirmModal({
+        isOpen: true,
+        type: 'cancel',
+        title: 'Eliminar Tarea',
+        description: '¿Estás seguro de que deseas ELIMINAR esta tarea de forma permanente?',
+        confirmText: 'Sí, Eliminar',
+        theme: 'red'
+      });
     } else {
-       // CITA
-       const choice = window.confirm("¿Deseas ELIMINAR esta cita de forma permanente? (Se borrará también del panel del cliente).\n\nPulsa 'Aceptar' para ELIMINAR o 'Cancelar' para no hacer nada.");
-       if (choice && onDeleteAppointment) {
-           await onDeleteAppointment(appointment.id);
-       }
+      setConfirmModal({
+        isOpen: true,
+        type: 'cancel',
+        title: 'Eliminar Cita',
+        description: '¿Deseas ELIMINAR esta cita de forma permanente? (Se borrará también del panel del cliente).',
+        confirmText: 'Sí, Eliminar',
+        theme: 'red'
+      });
     }
   };
 
@@ -248,11 +281,16 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
               {/* Retrasar */}
               {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
                 <button
-                  onClick={async (e) => {
+                  onClick={(e) => {
                     e.stopPropagation();
-                    if (window.confirm("¿Seguro que deseas marcar esta cita/tarea como retrasada?")) {
-                      await onUpdateStatus(appointment.id, 'DELAYED', appointment.isTask);
-                    }
+                    setConfirmModal({
+                      isOpen: true,
+                      type: 'delay',
+                      title: 'Retrasar Cita/Tarea',
+                      description: '¿Seguro que deseas marcar esta cita/tarea como retrasada?',
+                      confirmText: 'Sí, Marcar',
+                      theme: 'amber'
+                    });
                   }}
                   className="w-7 h-7 bg-black/90 backdrop-blur-sm border border-amber-500/30 text-amber-500 rounded-full transition-all hover:bg-amber-500 hover:text-white shadow-xl flex items-center justify-center active:scale-95 cursor-pointer"
                   title="Marcar como Retrasada"
@@ -305,6 +343,17 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
             </div>
            )}
         </div>
+        {confirmModal && (
+           <ConfirmCardModal
+             isOpen={confirmModal.isOpen}
+             onClose={() => setConfirmModal(null)}
+             onConfirm={handleConfirmAction}
+             title={confirmModal.title}
+             description={confirmModal.description}
+             confirmText={confirmModal.confirmText}
+             theme={confirmModal.theme}
+           />
+        )}
     </div>
   );
 };

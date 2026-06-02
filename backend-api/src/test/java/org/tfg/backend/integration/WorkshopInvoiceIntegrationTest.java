@@ -29,6 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 @SpringBootTest
 class WorkshopInvoiceIntegrationTest {
 
@@ -39,6 +42,9 @@ class WorkshopInvoiceIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -72,6 +78,11 @@ class WorkshopInvoiceIntegrationTest {
                         .content(objectMapper.writeValueAsString(registerOwner)))
                 .andExpect(status().isOk());
 
+        // Verificar dueño en BD para loguear
+        User ownerUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        ownerUser.setVerified(true);
+        userRepository.save(ownerUser);
+
         LoginRequest loginOwner = new LoginRequest(ownerEmail, "ownerPassword123");
         MvcResult loginOwnerResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -96,6 +107,11 @@ class WorkshopInvoiceIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerClient)))
                 .andExpect(status().isOk());
+
+        // Verificar cliente en BD para loguear
+        User clientUser = userRepository.findByEmail(clientEmail).orElseThrow();
+        clientUser.setVerified(true);
+        userRepository.save(clientUser);
 
         LoginRequest loginClient = new LoginRequest(clientEmail, "clientPassword123");
         MvcResult loginClientResult = mockMvc.perform(post("/api/auth/login")

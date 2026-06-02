@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { useToast } from '@/hooks/useToast';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface UnassignedAppointment {
   id: string;
@@ -48,6 +49,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
 }) => {
   const toast = useToast();
   const [draggedId, setDraggedId] = useState<string | null>(null);
+  const [confirmDeleteApp, setConfirmDeleteApp] = useState<UnassignedAppointment | null>(null);
   const dragGhostRef = React.useRef<HTMLDivElement | null>(null);
 
   const sorted = [...appointments].sort(
@@ -105,18 +107,20 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
     }
   };
 
-  const handleDelete = async (e: React.MouseEvent, app: UnassignedAppointment) => {
+  const handleDelete = (e: React.MouseEvent, app: UnassignedAppointment) => {
     e.stopPropagation();
     if (readOnly) return;
+    setConfirmDeleteApp(app);
+  };
 
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteApp) return;
+    const app = confirmDeleteApp;
+    setConfirmDeleteApp(null);
     if (app.isTask && onDeleteTask) {
-      if (window.confirm('¿Eliminar esta tarea de forma permanente?')) {
-        await onDeleteTask(app.id);
-      }
+      await onDeleteTask(app.id);
     } else if (onDeleteAppointment) {
-      if (window.confirm('¿Eliminar esta cita de forma permanente?\n\nSe borrará también del panel del cliente.')) {
-        await onDeleteAppointment(app.id);
-      }
+      await onDeleteAppointment(app.id);
     }
   };
 
@@ -279,6 +283,21 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
             {sorted.length} {sorted.length === 1 ? 'cita' : 'citas'}
           </span>
         </div>
+      )}
+      {confirmDeleteApp && (
+        <ConfirmCardModal
+          isOpen={!!confirmDeleteApp}
+          onClose={() => setConfirmDeleteApp(null)}
+          onConfirm={handleConfirmDelete}
+          title={confirmDeleteApp.isTask ? "Eliminar Tarea" : "Eliminar Cita"}
+          description={
+            confirmDeleteApp.isTask
+              ? "¿Estás seguro de que deseas eliminar esta tarea de forma permanente?"
+              : "¿Estás seguro de que deseas eliminar esta cita de forma permanente?\n\nSe borrará también del panel de cliente."
+          }
+          confirmText="Sí, Eliminar"
+          theme="red"
+        />
       )}
     </div>
   );

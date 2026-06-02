@@ -27,6 +27,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 @SpringBootTest
 class VehicleIntegrationTest {
 
@@ -37,6 +40,9 @@ class VehicleIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -66,6 +72,11 @@ class VehicleIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerClient)))
                 .andExpect(status().isOk());
+
+        // Verificar el cliente en la BD para poder loguear
+        User user = userRepository.findByEmail(clientEmail).orElseThrow();
+        user.setVerified(true);
+        userRepository.save(user);
 
         // 2. Login del Cliente
         LoginRequest loginRequest = new LoginRequest(clientEmail, "clientPassword123");
