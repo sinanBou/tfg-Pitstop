@@ -27,6 +27,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 /**
  * Integration test for the Service Catalog screen of the workshop:
  * - Get the full catalog (GET /api/catalog/workshop/{id})
@@ -45,6 +48,9 @@ class WorkshopCatalogIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -71,6 +77,11 @@ class WorkshopCatalogIntegrationTest {
                                 .companyName("Taller Cat " + suffix)
                                 .build())))
                 .andExpect(status().isOk());
+
+        // Verificar el dueño en la base de datos para poder iniciar sesión
+        User ownerUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        ownerUser.setVerified(true);
+        userRepository.save(ownerUser);
 
         MvcResult loginResult = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)

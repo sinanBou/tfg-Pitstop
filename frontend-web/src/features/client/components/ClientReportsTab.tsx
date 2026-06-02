@@ -290,7 +290,7 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
       if (!res.ok) throw new Error('No se pudo encontrar la factura de este trabajo.');
       const inv = await res.json();
       const translated = translateServiceCodes(inv.serviceType || inv.description, inv.description);
-      printInvoicePDF(inv, translated);
+      printInvoicePDF(inv, translated, (msg) => toast.warning(msg));
     } catch (err: any) {
       toast.error(err.message || 'Error al descargar la factura.');
     } finally {

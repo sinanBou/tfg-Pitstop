@@ -79,6 +79,16 @@ export function useOwnerDashboard() {
     return false;
   };
 
+  const handleDeleteWorkshop = async (workshopId: string) => {
+    try {
+      await workshopService.deleteWorkshop(workshopId);
+      toast.success('Taller eliminado con éxito.');
+      await fetchData();
+    } catch (err: any) {
+      toast.error('Error al eliminar el taller: ' + err.message);
+    }
+  };
+
   return {
     loading,
     workshops,
@@ -87,6 +97,7 @@ export function useOwnerDashboard() {
     employeeProfile,
     handleProfileUpdate,
     handleUploadAvatar,
-    handleDeleteAvatar
+    handleDeleteAvatar,
+    handleDeleteWorkshop
   };
 }

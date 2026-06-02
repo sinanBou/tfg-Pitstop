@@ -1,7 +1,8 @@
-
+import { useState } from 'react';
 import { VehicleCard } from '@/components/common/Card/VehicleCard';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface ClientVehiclesTabProps {
   vehicles: any[];
@@ -10,6 +11,25 @@ interface ClientVehiclesTabProps {
 }
 
 export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: ClientVehiclesTabProps) {
+  // Estados para controlar el modal de confirmación premium
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState<string>('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteConfirm = async () => {
+    if (!confirmDeleteId) return;
+    setIsDeleting(true);
+    try {
+      await onDeleteVehicle(confirmDeleteId);
+      setConfirmDeleteId(null);
+      setConfirmDeleteName('');
+    } catch (err) {
+      console.error('Error deleting vehicle:', err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-10 animate-fade-in">
@@ -37,9 +57,8 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: C
                   index={index} 
                   variant="blue"
                   onDelete={() => {
-                     if (window.confirm(`¿Estás seguro de que deseas eliminar tu ${v.brand} ${v.model}? Esta acción también eliminará de forma permanente todas sus citas y tareas asociadas.`)) {
-                        onDeleteVehicle(v.id);
-                     }
+                     setConfirmDeleteId(v.id);
+                     setConfirmDeleteName(`${v.brand} ${v.model} (${v.licensePlate})`);
                   }}
                />
             ))}
@@ -50,6 +69,22 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: C
             <p className="text-neutral-600 font-black uppercase tracking-[0.3em] text-xs">Garaje Vacío</p>
          </Card>
       )}
+
+      {/* COMPONENTE DE CONFIRMACIÓN REUTILIZABLE */}
+      <ConfirmCardModal
+         isOpen={!!confirmDeleteId}
+         onClose={() => {
+            setConfirmDeleteId(null);
+            setConfirmDeleteName('');
+         }}
+         onConfirm={handleDeleteConfirm}
+         title="¿Eliminar Vehículo?"
+         description={`¿Estás seguro de que deseas eliminar permanentemente tu vehículo "${confirmDeleteName}"? Esta acción borrará todas sus citas y tareas asociadas.`}
+         confirmText="Sí, Confirmar"
+         cancelText="Cancelar"
+         theme="red"
+         isLoading={isDeleting}
+      />
     </div>
   );
 }

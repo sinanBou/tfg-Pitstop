@@ -144,7 +144,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
   }, [appointments, history]);
 
   const printInvoicePDF = (inv: any, translated?: string) => {
-    importPrintInvoicePDF(inv, translated);
+    importPrintInvoicePDF(inv, translated, (msg) => toast.warning(msg));
   };
   /*
   const old_printInvoicePDF = (inv: Invoice) => {

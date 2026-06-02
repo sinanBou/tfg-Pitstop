@@ -7,8 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.employee.Employee;
 import org.tfg.backend.employee.EmployeeRepository;
+import org.tfg.backend.invoice.InvoiceRepository;
+import org.tfg.backend.appointment.AppointmentRepository;
+import org.tfg.backend.workshoptask.WorkshopTaskRepository;
+import org.tfg.backend.taskcatalog.CatalogCategoryRepository;
+import org.tfg.backend.vehicle.Vehicle;
 
 import java.util.List;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -20,6 +26,10 @@ public class WorkshopService {
     private final EmployeeRepository employeeRepository;
     private final org.tfg.backend.taskcatalog.CatalogInitializationService catalogInitializationService;
     private final org.tfg.backend.storage.StorageService storageService;
+    private final CatalogCategoryRepository catalogCategoryRepository;
+    private final AppointmentRepository appointmentRepository;
+    private final WorkshopTaskRepository workshopTaskRepository;
+    private final InvoiceRepository invoiceRepository;
 
     /**
      * Registra un nuevo taller en el sistema.
@@ -27,6 +37,12 @@ public class WorkshopService {
      */
     @Transactional
     public WorkshopDTO saveWorkshop(WorkshopRequest request) {
+        if (request.getCif() == null || request.getCif().trim().isEmpty()) {
+            throw new RuntimeException("El CIF del taller es obligatorio.");
+        }
+        if (request.getAddress() == null || request.getAddress().trim().isEmpty()) {
+            throw new RuntimeException("La dirección del taller es obligatoria.");
+        }
         if (workshopRepository.existsByCif(request.getCif())) {
             throw new RuntimeException("Ya existe un taller registrado con el CIF: " + request.getCif());
         }
@@ -36,9 +52,9 @@ public class WorkshopService {
 
         // Construcción de la entidad incluyendo los nuevos campos de tiempo
         Workshop workshop = Workshop.builder()
-                .cif(request.getCif())
+                .cif(request.getCif().trim())
                 .companyName(request.getCompanyName())
-                .address(request.getAddress())
+                .address(request.getAddress().trim())
                 .owner(owner)
                 .openTime(request.getOpenTime()) // <-- NUEVO
                 .closeTime(request.getCloseTime()) // <-- NUEVO
@@ -53,6 +69,68 @@ public class WorkshopService {
         employeeRepository.save(owner);
         catalogInitializationService.initializeCatalogForWorkshop(savedWorkshop);
         return mapToDTO(savedWorkshop);
+    }
+
+    /**
+     * Elimina de forma segura un taller y desasocia a su dueño y empleados para evitar errores de clave foránea.
+     */
+    @Transactional
+    public void deleteWorkshop(UUID id) {
+        Workshop workshop = workshopRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+
+        // 1. Desasociar todos los vehículos dentro del taller para evitar el borrado catastrófico en cascada de vehículos
+        if (workshop.getVehiclesInside() != null) {
+            for (Vehicle vehicle : new ArrayList<>(workshop.getVehiclesInside())) {
+                vehicle.setCurrentWorkshop(null);
+            }
+            workshop.getVehiclesInside().clear();
+        }
+
+        // 2. Eliminar facturas asociadas a este taller
+        List<org.tfg.backend.invoice.Invoice> invoices = invoiceRepository.findByWorkshopIdOrderByCreatedAtDesc(id);
+        invoiceRepository.deleteAll(invoices);
+
+        // 3. Eliminar tareas de taller
+        List<org.tfg.backend.workshoptask.WorkshopTask> tasks = workshopTaskRepository.findByWorkshopId(id);
+        workshopTaskRepository.deleteAll(tasks);
+
+        // 4. Eliminar citas de taller (esto cascada-elimina las partes de citas debido a cascade = CascadeType.ALL en Appointment)
+        List<org.tfg.backend.appointment.Appointment> appointments = appointmentRepository.findByWorkshopIdOrderByDateTimeAsc(id);
+        appointmentRepository.deleteAll(appointments);
+
+        // 5. Eliminar categorías del catálogo de tareas (esto cascada-elimina los CatalogTask debido a CascadeType.ALL)
+        List<org.tfg.backend.taskcatalog.CatalogCategory> categories = catalogCategoryRepository.findByWorkshopIdOrderByNameAsc(id);
+        catalogCategoryRepository.deleteAll(categories);
+
+        // 6. Desasociar el taller del dueño
+        if (workshop.getOwner() != null) {
+            Employee owner = workshop.getOwner();
+            owner.setWorkshop(null);
+            employeeRepository.save(owner);
+            workshop.setOwner(null);
+        }
+
+        // 7. Desasociar a todos los empleados de este taller
+        if (workshop.getEmployees() != null) {
+            for (Employee employee : new ArrayList<>(workshop.getEmployees())) {
+                employee.setWorkshop(null);
+                employeeRepository.save(employee);
+            }
+            workshop.getEmployees().clear();
+        }
+
+        // 8. Eliminar el logo de S3 si existe
+        if (workshop.getLogoPictureUrl() != null) {
+            try {
+                storageService.deleteFile(workshop.getLogoPictureUrl());
+            } catch (Exception e) {
+                // Silenciar error si el archivo ya no existe en S3
+            }
+        }
+
+        // 9. Borrar el taller de la base de datos
+        workshopRepository.delete(workshop);
     }
 
     /**

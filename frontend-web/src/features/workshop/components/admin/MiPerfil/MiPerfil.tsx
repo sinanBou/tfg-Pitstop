@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface MiPerfilProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
   // Estados para cambio de contraseña
   const [currentPassword, setCurrentPassword] = useState('');
@@ -63,12 +65,15 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
   };
 
   /** Confirmación y borrado del avatar */
-  const handleDeleteClick = async () => {
-    if (confirm('¿Estás seguro de que deseas eliminar tu imagen de perfil?')) {
-      setUploadingAvatar(true);
-      await onDeleteAvatar();
-      setUploadingAvatar(false);
-    }
+  const handleDeleteClick = () => {
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsConfirmDeleteOpen(false);
+    setUploadingAvatar(true);
+    await onDeleteAvatar();
+    setUploadingAvatar(false);
   };
 
   /** Submit del formulario con feedback visual */
@@ -378,6 +383,17 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
           </section>
         </div>
       </div>
+      {isConfirmDeleteOpen && (
+        <ConfirmCardModal
+          isOpen={isConfirmDeleteOpen}
+          onClose={() => setIsConfirmDeleteOpen(false)}
+          onConfirm={handleConfirmDelete}
+          title="Eliminar Foto de Perfil"
+          description="¿Estás seguro de que deseas eliminar tu imagen de perfil? Esta acción es instantánea."
+          confirmText="Sí, Eliminar"
+          theme="red"
+        />
+      )}
     </div>,
     document.body
   );

@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button/Button';
+import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 
 interface PerfilTallerProps {
   isOpen: boolean;
@@ -48,6 +49,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
 
   if (!isOpen) return null;
 
@@ -59,8 +61,13 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
     }
   };
 
-  const handleDeleteClick = async () => {
-    if (confirm('¿Estás seguro de que deseas eliminar la foto de perfil del taller?') && onDeleteLogo) {
+  const handleDeleteClick = () => {
+    setIsConfirmDeleteOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    setIsConfirmDeleteOpen(false);
+    if (onDeleteLogo) {
       setUploadingLogo(true);
       await onDeleteLogo();
       setUploadingLogo(false);
@@ -276,6 +283,17 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
           </form>
         </div>
       </div>
+      {isConfirmDeleteOpen && (
+        <ConfirmCardModal
+          isOpen={isConfirmDeleteOpen}
+          onClose={() => setIsConfirmDeleteOpen(false)}
+          onConfirm={handleConfirmDelete}
+          title="Eliminar Logo del Taller"
+          description="¿Estás seguro de que deseas eliminar la foto de perfil del taller? Esta acción es instantánea."
+          confirmText="Sí, Eliminar"
+          theme="red"
+        />
+      )}
     </div>,
     document.body
   );

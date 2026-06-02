@@ -69,6 +69,18 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.companyName.trim()) {
+      toast.warning("El Nombre Comercial es obligatorio");
+      return;
+    }
+    if (!form.cif.trim()) {
+      toast.warning("El CIF es obligatorio");
+      return;
+    }
+    if (!form.address.trim()) {
+      toast.warning("La Sede Física (Dirección) es obligatoria");
+      return;
+    }
     if (form.workingDays.length === 0) {
       toast.warning("Debes seleccionar al menos un día de trabajo");
       return;

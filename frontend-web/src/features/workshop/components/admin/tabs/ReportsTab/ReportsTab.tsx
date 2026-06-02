@@ -5,6 +5,7 @@ import { MetricCard } from '@/components/common/MetricCard/MetricCard';
 import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { PartsStatsWidget } from '@/components/common/PartsStatsWidget/PartsStatsWidget';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
+import { useToast } from '@/hooks/useToast';
 
 interface PartItem {
   name: string;
@@ -32,6 +33,7 @@ interface ReportsTabProps {
 }
 
 export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
+  const toast = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -75,7 +77,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
 
   // Generar y descargar Factura PDF mediante impresión nativa maquetada de alta fidelidad
   const handlePrintPDF = (inv: Invoice) => {
-    printInvoicePDF(inv);
+    printInvoicePDF(inv, undefined, (msg) => toast.warning(msg));
   };
 
   // Filtrar facturas por mes seleccionado

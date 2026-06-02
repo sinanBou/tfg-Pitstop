@@ -274,6 +274,11 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
+        // Regla de Negocio: Si ya ha sido recogida y finalizada, no se permiten más cambios de estado
+        if (appointment.getStatus() == AppointmentStatus.PICKED_UP) {
+            throw new RuntimeException("La cita ya ha sido finalizada. No se permiten más cambios de estado.");
+        }
+
         // Regla de Negocio: No se puede cancelar una cita que ya está en curso, retrasada o finalizada
         if (newStatus == AppointmentStatus.CANCELLED && (appointment.getStatus() == AppointmentStatus.IN_PROGRESS || appointment.getStatus() == AppointmentStatus.DELAYED || appointment.getStatus() == AppointmentStatus.COMPLETED)) {
             throw new RuntimeException("No se puede cancelar una cita en este estado.");

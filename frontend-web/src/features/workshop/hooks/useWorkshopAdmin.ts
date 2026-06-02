@@ -102,7 +102,7 @@ export function useWorkshopAdmin() {
     } finally {
       setLoading(false);
     }
-  }, [id, navigate, selectedDate, toast]);
+  }, [id, navigate, selectedDate]);
 
   useEffect(() => {
     fetchWorkshopData();
@@ -137,14 +137,13 @@ export function useWorkshopAdmin() {
       toast.success("Empleado registrado con éxito");
       setEmployeeForm({ firstname: '', lastname: '', email: '', password: '', role: 'WORKSHOP_STAFF', address: '' });
       await fetchWorkshopData();
-    } catch (err) { 
+    } catch (err: any) { 
       console.error(err);
-      toast.error("Error al registrar empleado"); 
+      toast.error(err.message || "Error al registrar empleado"); 
     }
   };
 
   const handleDeleteEmployee = async (employeeId: string) => {
-    if (!window.confirm("¿Estás seguro de eliminar este empleado? Se borrará toda su información permanentemente.")) return;
     try {
       await workshopService.deleteEmployee(employeeId);
       toast.success("Empleado eliminado");
@@ -156,7 +155,6 @@ export function useWorkshopAdmin() {
   };
 
   const handlePromoteEmployee = async (employeeId: string) => {
-    if (!window.confirm("¿Estás seguro de ascender a este empleado a Gerente? Obtendrá permisos de administración.")) return;
     try {
       await workshopService.promoteEmployee(employeeId);
       toast.success("Empleado ascendido correctamente");
@@ -168,14 +166,13 @@ export function useWorkshopAdmin() {
   };
 
   const handleDemoteEmployee = async (employeeId: string) => {
-    if (!window.confirm("¿Seguro que quieres pasar a este Gerente a Mecánico de plantilla? Perderá privilegios de administración.")) return;
     try {
       await workshopService.demoteEmployee(employeeId);
       toast.success("Operación completada");
       await fetchWorkshopData();
     } catch (err) { 
       console.error(err);
-      toast.error("Error al demoler cargo"); 
+      toast.error("Error al degradar cargo"); 
     }
   };
 

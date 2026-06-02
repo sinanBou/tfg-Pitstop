@@ -20,7 +20,8 @@ export default function OwnerDashboard() {
     employeeProfile,
     handleProfileUpdate,
     handleUploadAvatar,
-    handleDeleteAvatar
+    handleDeleteAvatar,
+    handleDeleteWorkshop
   } = useOwnerDashboard();
 
   const [activeTab, setActiveTab] = useState(0);
@@ -70,7 +71,13 @@ export default function OwnerDashboard() {
                </div>
             </header>
 
-            {activeTab === 0 && <WorkshopManagementTab workshops={workshops} onAddWorkshop={() => setIsModalOpen(true)} />}
+            {activeTab === 0 && (
+              <WorkshopManagementTab 
+                workshops={workshops} 
+                onAddWorkshop={() => setIsModalOpen(true)} 
+                onDeleteWorkshop={handleDeleteWorkshop} 
+              />
+            )}
             {activeTab === 1 && <WorkshopReportsTab workshops={workshops} />}
          </div>
       </main>

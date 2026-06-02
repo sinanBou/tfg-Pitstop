@@ -2,13 +2,24 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import type { EmployeeProfile, Workshop } from '../types/workshop.types';
 
-const { mockNavigate } = vi.hoisted(() => ({
-  mockNavigate: vi.fn()
+const { mockNavigate, mockToast } = vi.hoisted(() => ({
+  mockNavigate: vi.fn(),
+  mockToast: {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+    dismiss: vi.fn()
+  }
 }));
 
 vi.mock('react-router-dom', () => ({
   useParams: () => ({ id: 'ws-1' }),
   useNavigate: () => mockNavigate
+}));
+
+vi.mock('@/hooks/useToast', () => ({
+  useToast: () => mockToast
 }));
 
 const mockEmployeeMe: EmployeeProfile = {
@@ -96,6 +107,8 @@ describe('useWorkshopAdmin', () => {
     dynamicWorkshop = { ...mockWorkshop };
     dynamicEmployee = { ...mockEmployeeMe };
     alertSpy.mockClear();
+    mockToast.success.mockClear();
+    mockToast.error.mockClear();
     vi.stubGlobal('alert', alertSpy);
     vi.stubGlobal('confirm', () => true);
 
@@ -123,7 +136,7 @@ describe('useWorkshopAdmin', () => {
       await Promise.resolve();
     });
 
-    expect(alertSpy).toHaveBeenCalledWith('Acceso denegado');
+    expect(mockToast.error).toHaveBeenCalledWith('Acceso denegado');
     expect(mockNavigate).toHaveBeenCalledWith('/client-dashboard');
   });
 
@@ -170,7 +183,7 @@ describe('useWorkshopAdmin', () => {
       hourlyRate: 75.0,
       includeOwnerInPlanning: true
     });
-    expect(alertSpy).toHaveBeenCalledWith('Ajustes actualizados correctamente');
+    expect(mockToast.success).toHaveBeenCalledWith('Ajustes actualizados correctamente');
   });
 
   it('debe registrar un empleado correctamente', async () => {
@@ -198,7 +211,7 @@ describe('useWorkshopAdmin', () => {
     });
 
     expect(workshopService.registerEmployee).toHaveBeenCalledWith('ws-1', empForm);
-    expect(alertSpy).toHaveBeenCalledWith('Empleado registrado con éxito');
+    expect(mockToast.success).toHaveBeenCalledWith('Empleado registrado con éxito');
   });
 
   it('debe eliminar empleado al confirmar', async () => {
@@ -213,7 +226,7 @@ describe('useWorkshopAdmin', () => {
     });
 
     expect(workshopService.deleteEmployee).toHaveBeenCalledWith('emp-staff-1');
-    expect(alertSpy).toHaveBeenCalledWith('Empleado eliminado');
+    expect(mockToast.success).toHaveBeenCalledWith('Empleado eliminado');
   });
 
   it('debe promover y degradar empleado correctamente', async () => {

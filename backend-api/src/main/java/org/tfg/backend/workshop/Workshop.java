@@ -39,11 +39,11 @@ public class Workshop {
     private Employee owner;
 
 
-    @OneToMany(mappedBy = "workshop", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workshop")
     @Builder.Default
     private List<Employee> employees = new ArrayList<>();
 
-    @OneToMany(mappedBy = "currentWorkshop", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "currentWorkshop")
     @Builder.Default
     private List<Vehicle> vehiclesInside = new ArrayList<>();
 

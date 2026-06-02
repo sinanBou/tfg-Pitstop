@@ -15,7 +15,6 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.tfg.backend.user.service.UserLookupService;
 
 import java.util.UUID;
 
@@ -31,7 +30,7 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private UserLookupService userLookupService;
+    private UserService userService;
 
     @InjectMocks
     private UserController userController;
@@ -69,7 +68,7 @@ class UserControllerTest {
 
     @Test
     void getMe_ShouldReturnUserDetails() throws Exception {
-        when(userLookupService.getUserDetails("john@example.com")).thenReturn(mockDTO);
+        when(userService.getUserDetails("john@example.com")).thenReturn(mockDTO);
 
         mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isOk())
@@ -77,6 +76,6 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstname", is("John")))
                 .andExpect(jsonPath("$.role", is("CLIENT")));
 
-        verify(userLookupService, times(1)).getUserDetails("john@example.com");
+        verify(userService, times(1)).getUserDetails("john@example.com");
     }
 }

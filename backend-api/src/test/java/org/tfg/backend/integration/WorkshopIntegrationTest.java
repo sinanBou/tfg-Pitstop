@@ -17,6 +17,9 @@ import org.tfg.backend.auth.LoginRequest;
 import org.tfg.backend.employee.EmployeeDTO;
 import org.tfg.backend.taskcatalog.CatalogCategory;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +44,9 @@ class WorkshopIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
@@ -64,10 +70,15 @@ class WorkshopIntegrationTest {
                 .address("Calle Taller 123")
                 .build();
 
-        mockMvc.perform(post("/api/auth/register/owner")
+        mockMvc.perform(post("/api/auth/register/workshop")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerOwner)))
                 .andExpect(status().isOk());
+
+        // Verificar el usuario para poder iniciar sesión
+        User registeredUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        registeredUser.setVerified(true);
+        userRepository.save(registeredUser);
 
         // 2. Login de Dueño
         LoginRequest loginRequest = new LoginRequest(ownerEmail, "workshopPassword123");

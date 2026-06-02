@@ -28,6 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.tfg.backend.user.UserRepository;
+import org.tfg.backend.user.User;
+
 /**
  * Tests that a client and a workshop see the exact same appointment state
  * at every transition step of the lifecycle.
@@ -43,6 +46,9 @@ class ClientWorkshopAppointmentSyncIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp() {
@@ -72,6 +78,11 @@ class ClientWorkshopAppointmentSyncIntegrationTest {
                                 .build())))
                 .andExpect(status().isOk());
 
+        // Verificar el dueño en la base de datos para poder iniciar sesión
+        User ownerUser = userRepository.findByEmail(ownerEmail).orElseThrow();
+        ownerUser.setVerified(true);
+        userRepository.save(ownerUser);
+
         String ownerJwt = login(ownerEmail, "pass1234");
 
         mockMvc.perform(post("/api/auth/register/client")
@@ -84,6 +95,11 @@ class ClientWorkshopAppointmentSyncIntegrationTest {
                                 .address("Calle Sync Client 1")
                                 .build())))
                 .andExpect(status().isOk());
+
+        // Verificar el cliente en la base de datos para poder iniciar sesión
+        User clientUser = userRepository.findByEmail(clientEmail).orElseThrow();
+        clientUser.setVerified(true);
+        userRepository.save(clientUser);
 
         String clientJwt = login(clientEmail, "pass1234");
 

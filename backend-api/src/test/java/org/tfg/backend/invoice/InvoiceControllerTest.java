@@ -27,10 +27,7 @@ class InvoiceControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private InvoiceAdminService invoiceAdminService;
-
-    @Mock
-    private InvoiceLookupService invoiceLookupService;
+    private InvoiceService invoiceService;
 
     @InjectMocks
     private InvoiceController invoiceController;
@@ -59,7 +56,7 @@ class InvoiceControllerTest {
 
     @Test
     void createInvoice_ShouldReturnDTO() throws Exception {
-        when(invoiceAdminService.createInvoice(any(InvoiceDTO.class))).thenReturn(mockDTO);
+        when(invoiceService.createInvoice(any(InvoiceDTO.class))).thenReturn(mockDTO);
 
         String payload = "{\"appointmentId\":\"" + mockDTO.getAppointmentId() + "\",\"laborRate\":50,\"totalLabor\":100,\"totalParts\":50,\"totalPrice\":150}";
 
@@ -70,42 +67,42 @@ class InvoiceControllerTest {
                 .andExpect(jsonPath("$.clientFullName", is("John Doe")))
                 .andExpect(jsonPath("$.vehicleDisplay", is("BMW M3 (1234BBB)")));
 
-        verify(invoiceAdminService, times(1)).createInvoice(any(InvoiceDTO.class));
+        verify(invoiceService, times(1)).createInvoice(any(InvoiceDTO.class));
     }
 
     @Test
     void getWorkshopInvoices_ShouldReturnList() throws Exception {
         UUID workshopId = mockDTO.getWorkshopId();
-        when(invoiceAdminService.getInvoicesByWorkshop(workshopId)).thenReturn(List.of(mockDTO));
+        when(invoiceService.getInvoicesByWorkshop(workshopId)).thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/invoices/workshop/{workshopId}", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].clientFullName", is("John Doe")));
 
-        verify(invoiceAdminService, times(1)).getInvoicesByWorkshop(workshopId);
+        verify(invoiceService, times(1)).getInvoicesByWorkshop(workshopId);
     }
 
     @Test
     void getInvoiceByAppointment_ShouldReturnDTO() throws Exception {
         UUID appointmentId = mockDTO.getAppointmentId();
-        when(invoiceLookupService.getInvoiceByAppointment(appointmentId)).thenReturn(mockDTO);
+        when(invoiceService.getInvoiceByAppointment(appointmentId)).thenReturn(mockDTO);
 
         mockMvc.perform(get("/api/invoices/appointment/{appointmentId}", appointmentId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.clientFullName", is("John Doe")));
 
-        verify(invoiceLookupService, times(1)).getInvoiceByAppointment(appointmentId);
+        verify(invoiceService, times(1)).getInvoiceByAppointment(appointmentId);
     }
 
     @Test
     void getInvoiceByAppointment_ShouldReturnNotFound() throws Exception {
         UUID randomId = UUID.randomUUID();
-        when(invoiceLookupService.getInvoiceByAppointment(randomId)).thenReturn(null);
+        when(invoiceService.getInvoiceByAppointment(randomId)).thenReturn(null);
 
         mockMvc.perform(get("/api/invoices/appointment/{appointmentId}", randomId))
                 .andExpect(status().isNotFound());
 
-        verify(invoiceLookupService, times(1)).getInvoiceByAppointment(randomId);
+        verify(invoiceService, times(1)).getInvoiceByAppointment(randomId);
     }
 }
