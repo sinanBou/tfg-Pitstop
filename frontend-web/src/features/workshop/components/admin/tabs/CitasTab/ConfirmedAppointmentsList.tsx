@@ -47,7 +47,11 @@ export const ConfirmedAppointmentsList = ({
 
     if (type === 'cancel') {
       try {
-        await onDeleteAppointment(appId);
+        if (onUpdateStatus) {
+          await onUpdateStatus(appId, 'CANCELLED');
+        } else {
+          await onDeleteAppointment(appId);
+        }
       } catch (err) {
         console.error("Error al cancelar la cita:", err);
         toast.error("No se pudo cancelar la cita. Puede que esté en un estado que no permite la cancelación.");
@@ -76,7 +80,7 @@ export const ConfirmedAppointmentsList = ({
       type: 'cancel',
       appId: id,
       title: 'Cancelar Cita',
-      description: '¿Deseas cancelar esta cita y todas las tareas relacionadas de forma permanente?',
+      description: '¿Deseas cancelar esta cita? El cliente verá la notificación de cancelación en su panel.',
       confirmText: 'Sí, Cancelar',
       theme: 'red'
     });

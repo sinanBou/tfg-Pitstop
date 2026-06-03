@@ -55,6 +55,8 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
     if (type === 'cancel') {
       if (appointment.isTask && onDeleteTask) {
         await onDeleteTask(appointment.id);
+      } else if (onUpdateStatus) {
+        await onUpdateStatus(appointment.id, 'CANCELLED', appointment.isTask);
       } else if (onDeleteAppointment) {
         await onDeleteAppointment(appointment.id);
       }
@@ -195,9 +197,9 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
       setConfirmModal({
         isOpen: true,
         type: 'cancel',
-        title: 'Eliminar Cita',
-        description: '¿Deseas ELIMINAR esta cita de forma permanente? (Se borrará también del panel del cliente).',
-        confirmText: 'Sí, Eliminar',
+        title: 'Cancelar Cita',
+        description: '¿Deseas cancelar esta cita? El cliente verá el aviso de cancelación en su panel de notificaciones.',
+        confirmText: 'Sí, Cancelar',
         theme: 'red'
       });
     }
