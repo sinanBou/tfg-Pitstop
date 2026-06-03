@@ -15,6 +15,7 @@ import { AvisosTab } from '@/features/workshop/components/admin/tabs/AvisosTab/A
 import { AppointmentsTab } from '@/features/workshop/components/admin/tabs/AppointmentsTab';
 import { CompletedJobsTab } from '@/features/workshop/components/admin/tabs/CompletedJobsTab';
 import { CitasTab } from '@/features/workshop/components/admin/tabs/CitasTab';
+import { ReportsTab } from '@/features/workshop/components/admin/tabs/ReportsTab';
 import { AppointmentSearch } from '@/features/workshop/components/admin/AppointmentSearch/index';
 import { MechanicSearch } from '@/features/workshop/components/admin/MechanicSearch/index';
 import { GenerateInvoiceModal } from '@/features/workshop/components/modals/GenerateInvoiceModal/index';
@@ -96,7 +97,8 @@ export default function WorkerDashboard() {
   if (allowed.includes('CITAS')) SECCIONES.push('CITAS');
   if (allowed.includes('TAREAS')) SECCIONES.push('TAREAS');
   if (allowed.includes('ALMACÉN')) SECCIONES.push('ALMACÉN');
-  if (allowed.includes('FACTURAS')) SECCIONES.push('FACTURAS');
+  if (allowed.includes('FINALIZADOS')) SECCIONES.push('FINALIZADOS');
+  if (allowed.includes('INFORMES')) SECCIONES.push('INFORMES');
 
   useEffect(() => {
     if (!loading && employeeProfile?.role === 'WORKSHOP_MANAGER') {
@@ -312,14 +314,21 @@ export default function WorkerDashboard() {
                 </div>
               )}
 
-              {/* TAB: FACTURAS (Habilitable opcionalmente - Como el Gerente) */}
-              {SECCIONES[activeTab] === 'FACTURAS' && (
+              {/* TAB: FINALIZADOS (Habilitable opcionalmente - Como el Gerente) */}
+              {SECCIONES[activeTab] === 'FINALIZADOS' && (
                 <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
                     onCompleteJob={(job) => setInvoicingJob(job)}
                     onMarkPickedUp={markPickedUp}
                   />
+                </div>
+              )}
+
+              {/* TAB: INFORMES (Habilitable opcionalmente) */}
+              {SECCIONES[activeTab] === 'INFORMES' && employeeProfile?.workshopId && (
+                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                  <ReportsTab workshopId={employeeProfile.workshopId} />
                 </div>
               )}
 
