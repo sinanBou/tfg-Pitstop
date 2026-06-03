@@ -6,6 +6,7 @@ import { getBrandLogo } from '@/assets/BrandLogos';
 interface PendingAppointmentsListProps {
   appointments: any[];
   onConfirmAppointment: (id: string) => void;
+  onRejectAppointment?: (id: string) => void;
 }
 
 /**
@@ -13,7 +14,8 @@ interface PendingAppointmentsListProps {
  */
 export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = ({
   appointments,
-  onConfirmAppointment
+  onConfirmAppointment,
+  onRejectAppointment
 }) => {
   return (
     <div className="space-y-6">
@@ -62,15 +64,29 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
                 </div>
               </div>
 
-              <Button
-                onClick={() => onConfirmAppointment(app.id)}
-                className="!px-5 !py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 group/btn"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
-                Confirmar Cita
-              </Button>
+              <div className="flex gap-2 w-full mt-4">
+                <Button
+                  onClick={() => onConfirmAppointment(app.id)}
+                  className="flex-1 !py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 group/btn !px-2 text-xs"
+                >
+                  <svg className="w-3.5 h-3.5 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Confirmar
+                </Button>
+                
+                {onRejectAppointment && (
+                  <Button
+                    onClick={() => onRejectAppointment(app.id)}
+                    variant="danger"
+                    glow={false}
+                    className="!py-3 border border-red-500/20 hover:border-red-500/40 flex items-center justify-center font-bold text-xs !px-3 shrink-0"
+                    title="Rechazar Cita"
+                  >
+                    Rechazar
+                  </Button>
+                )}
+              </div>
             </Card>
           ))
         ) : (

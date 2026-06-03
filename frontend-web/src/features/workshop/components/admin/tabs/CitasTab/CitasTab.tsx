@@ -56,6 +56,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
         <PendingAppointmentsList 
           appointments={pendingAppointments} 
           onConfirmAppointment={(id) => updateAppointmentStatus(id, 'CONFIRMED')}
+          onRejectAppointment={(id) => updateAppointmentStatus(id, 'CANCELLED')}
         />
         
         {pendingAppointments.length > 0 && (

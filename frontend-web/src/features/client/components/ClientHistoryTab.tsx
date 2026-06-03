@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/useToast';
 
 interface NotificationItem {
   id: string;
-  type: 'confirm' | 'complete' | 'invoice';
+  type: 'confirm' | 'complete' | 'invoice' | 'cancel';
   title: string;
   message: string;
   dateTime: Date;
@@ -82,6 +82,24 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
       const appDate = app.dateTime ? new Date(app.dateTime) : null;
       if (!appDate) return;
 
+      // 0. Cita Cancelada/Rechazada
+      if (app.status === 'CANCELLED') {
+        const cancelDate = app.actualEndTime 
+          ? new Date(app.actualEndTime) 
+          : app.confirmedAt 
+            ? new Date(app.confirmedAt) 
+            : new Date(appDate.getTime());
+
+        list.push({
+          id: `${app.id}-cancel`,
+          type: 'cancel',
+          title: 'Cita Rechazada/Cancelada',
+          message: `Su cita para el vehículo ${vehicleDisplay} ha sido rechazada o cancelada por el taller.`,
+          dateTime: cancelDate,
+          appointmentId: app.id
+        });
+      }
+
       // 1. Cita Confirmada (siempre que esté en CONFIRMED, IN_PROGRESS, COMPLETED, PICKED_UP)
       if (['CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'PICKED_UP'].includes(app.status)) {
         // Usar la fecha de confirmación real guardada en la base de datos si existe, de lo contrario estimar 24h antes
@@ -138,7 +156,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
     return list.sort((a, b) => {
       const diff = b.dateTime.getTime() - a.dateTime.getTime();
       if (diff !== 0) return diff;
-      const weights = { invoice: 3, complete: 2, confirm: 1 };
+      const weights = { invoice: 3, complete: 2, confirm: 1, cancel: 0 };
       return weights[b.type] - weights[a.type];
     });
   }, [appointments, history]);
@@ -496,6 +514,14 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
                 icon = (
                   <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                );
+              } else if (notif.type === 'cancel') {
+                borderClass = 'border-red-500/10 bg-red-500/5';
+                badgeColor = 'bg-red-600/10 border-red-500/20 text-red-400';
+                icon = (
+                  <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 );
               }
