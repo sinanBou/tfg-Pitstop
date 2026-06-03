@@ -144,7 +144,8 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                       { value: 'CITAS', label: 'Citas' },
                       { value: 'TAREAS', label: 'Tareas' },
                       { value: 'ALMACÉN', label: 'Almacén' },
-                      { value: 'FACTURAS', label: 'Facturas' }
+                      { value: 'FINALIZADOS', label: 'Finalizados' },
+                      { value: 'INFORMES', label: 'Informes' }
                     ].map((tab) => {
                       const allowedString = selectedEmp.allowedSections || '';
                       const currentAllowed = allowedString
