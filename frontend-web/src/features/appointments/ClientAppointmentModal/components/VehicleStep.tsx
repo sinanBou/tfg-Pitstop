@@ -1,5 +1,6 @@
 import React from 'react';
 import type { VehicleDTO } from '@/types/client';
+import { Car } from '@/assets/icons';
 
 interface VehicleStepProps {
   vehicles: VehicleDTO[];
@@ -24,7 +25,7 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
           >
             <div className="flex items-center gap-4 relative z-10">
               <div className={`p-3 rounded-xl transition-colors ${selectedVehicleId === v.id ? 'bg-blue-500/20 text-blue-400' : 'bg-neutral-800 text-neutral-400 group-hover:text-blue-400'}`}>
-                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 10h14l1.5 4H3.5L5 10z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 14v4h2v-4m10 0v4h2v-4M8 10V8c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" /></svg>
+                 <Car className="w-6 h-6" strokeWidth={1.5} />
               </div>
               <div>
                 <p className="text-lg text-white font-black tracking-wide group-hover:text-blue-400 transition-colors uppercase">{v.brand} {v.model}</p>

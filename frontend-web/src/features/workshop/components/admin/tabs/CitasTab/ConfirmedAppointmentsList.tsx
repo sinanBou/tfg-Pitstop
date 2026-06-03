@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { getBrandLogo } from '@/assets/BrandLogos';
+import { Search, Check, Upload, Clock, FileText } from '@/assets/icons';
 import { Card } from '@/components/common/Card/Card';
 import { InputField } from '@/components/common/InputField/InputField';
 import { Button } from '@/components/common/Button/Button';
@@ -139,7 +140,7 @@ export const ConfirmedAppointmentsList = ({
             onChange={(e) => setConfirmedSearch(e.target.value)}
             className="w-full bg-black/50 border border-neutral-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
           />
-          <svg className="w-4 h-4 text-neutral-600 absolute right-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <Search className="w-4 h-4 text-neutral-600 absolute right-4 top-1/2 -translate-y-1/2" />
         </div>
       </div>
       
@@ -187,7 +188,7 @@ export const ConfirmedAppointmentsList = ({
               {app.vehicleReceived ? (
                 <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl space-y-1.5">
                   <div className="flex items-center gap-2 text-emerald-400 font-black text-[9px] uppercase tracking-widest">
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    <Check className="w-3.5 h-3.5" strokeWidth={3} />
                     Vehículo Recibido
                   </div>
                   {app.receptionKilometers !== null && (
@@ -213,7 +214,7 @@ export const ConfirmedAppointmentsList = ({
                     }}
                     className="w-full !px-4 !py-2.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 flex items-center justify-center gap-1.5 mt-4 animate-pulse-subtle"
                   >
-                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                    <Upload className="w-3.5 h-3.5" strokeWidth={2.5} />
                     Recepcionar Vehículo
                   </Button>
                 )
@@ -237,9 +238,7 @@ export const ConfirmedAppointmentsList = ({
                   }}
                   className="flex-1 !px-3 !py-2 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 flex items-center justify-center gap-1 font-bold text-xs"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <Clock className="w-3.5 h-3.5" />
                   Retrasar
                 </Button>
               )}
@@ -270,7 +269,7 @@ export const ConfirmedAppointmentsList = ({
             className="max-w-md w-full shadow-2xl relative animate-scale-in border-neutral-800"
           >
             <h2 className="text-xl md:text-2xl font-black uppercase tracking-wider text-white mb-2 flex items-center gap-2">
-              <svg className="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 112-2h2a2 2 0 012 2" /></svg>
+              <FileText className="w-6 h-6 text-emerald-500" strokeWidth={2.5} />
               Recepcionar Vehículo
             </h2>
             {selectedAppointmentDetails && (

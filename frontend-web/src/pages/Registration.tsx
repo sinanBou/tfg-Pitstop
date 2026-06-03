@@ -5,6 +5,7 @@ import { useOwnerRegistration } from '@/features/auth/hooks/useOwnerRegistration
 import { RoleSelector } from '@/features/auth/components/RoleSelector';
 import { AuthFormFields } from '@/features/auth/components/AuthFormFields';
 import { useToast } from '@/hooks/useToast';
+import { ArrowLeft } from '@/assets/icons';
 
 export default function Registration() {
   const toast = useToast();
@@ -80,7 +81,7 @@ export default function Registration() {
           <div className="max-w-2xl mx-auto animate-fade-in-up">
 
             <button onClick={() => setRole(null)} className="flex items-center gap-2 text-neutral-500 hover:text-white mb-8 text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              <ArrowLeft className="w-4 h-4" />
               Cambiar Perfil
             </button>
 

@@ -4,6 +4,7 @@ import InputGroup from '@/components/common/InputGroup/InputGroup';
 import { Button } from '@/components/common/Button/Button';
 import { forgotPassword } from '@/features/auth/services/authService';
 import { useToast } from '@/hooks/useToast';
+import { ArrowLeft } from '@/assets/icons';
 
 function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -84,10 +85,10 @@ function ForgotPassword() {
         
         {/* Volver al inicio */}
         <div className="mt-8 text-center">
-           <Link to="/login" className="inline-flex items-center gap-2 text-neutral-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-              Volver al Login
-           </Link>
+            <Link to="/login" className="inline-flex items-center gap-2 text-neutral-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
+               <ArrowLeft className="w-4 h-4" />
+               Volver al Login
+            </Link>
         </div>
       </div>
       

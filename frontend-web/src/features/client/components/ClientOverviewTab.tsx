@@ -1,6 +1,7 @@
 import type { UserDTO } from '@/types/client';
 import { WorkshopVehicleCard } from '@/components/common/Card/WorkshopVehicleCard';
 import { Card } from '@/components/common/Card/Card';
+import { Mail, Car, Calendar } from '@/assets/icons';
 
 interface ClientOverviewTabProps {
   vehicles: any[];
@@ -43,7 +44,7 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
                  Hola, {userProfile?.firstname || 'Conductor'}
                </h2>
                <p className="text-neutral-400 font-medium tracking-wide flex items-center gap-2 text-sm">
-                  <svg className="w-4 h-4 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                  <Mail className="w-4 h-4 text-neutral-500" />
                   {userProfile?.email || 'Cargando perfil...'}
                </p>
             </div>
@@ -57,7 +58,7 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
             {vehicles.length > 0 ? (
                <Card variant="neutral" padding="none" rounded="2xl" className="p-6 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 hover:shadow-2xl">
                   <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
-                     <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 10h14l1.5 4H3.5L5 10zM5 14v4h2v-4m10 0v4h2v-4M8 10V8c0-1.1.9-2 2-2h4c1.1 0 2 .9 2 2v2" /></svg>
+                     <Car className="w-16 h-16 text-blue-500" strokeWidth={1} />
                   </div>
                   <div className="relative z-10 flex flex-col h-full">
                      <h4 className="text-neutral-400 font-bold uppercase tracking-widest text-xs mb-4">Tu Garaje</h4>
@@ -76,7 +77,7 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
             
             <Card variant="neutral" padding="none" rounded="2xl" className="p-6 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 hover:shadow-2xl">
                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
-                  <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <Calendar className="w-16 h-16 text-blue-500" strokeWidth={1} />
                </div>
                <div className="relative z-10 flex flex-col h-full">
                   <h4 className="text-neutral-400 font-bold uppercase tracking-widest text-xs mb-4">Citas</h4>

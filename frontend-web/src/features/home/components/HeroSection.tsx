@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button/Button';
+import { Building, User, FileText } from '@/assets/icons';
 
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ export const HeroSection: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-neutral-900/40 border border-neutral-800/80 p-8 rounded-[2rem] text-left relative overflow-hidden group hover:border-red-500/30 transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-red-600/10 border border-red-500/20 flex items-center justify-center mb-6">
-              <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+              <Building className="w-6 h-6 text-red-500" strokeWidth={2} />
             </div>
             <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">Panel del Taller</h4>
             <p className="text-neutral-400 text-sm leading-relaxed font-medium">Control absoluto sobre citas, asignación en directo de mecánicos, kilometraje y recepción de vehículos.</p>
@@ -50,7 +51,7 @@ export const HeroSection: React.FC = () => {
 
           <div className="bg-neutral-900/40 border border-neutral-800/80 p-8 rounded-[2rem] text-left relative overflow-hidden group hover:border-blue-500/30 transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-6">
-              <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+              <User className="w-6 h-6 text-blue-500" strokeWidth={2} />
             </div>
             <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">Área de Clientes</h4>
             <p className="text-neutral-400 text-sm leading-relaxed font-medium">Garaje virtual con estado en tiempo real, notificaciones automáticas y descarga de facturas en PDF.</p>
@@ -58,7 +59,7 @@ export const HeroSection: React.FC = () => {
 
           <div className="bg-neutral-900/40 border border-neutral-800/80 p-8 rounded-[2rem] text-left relative overflow-hidden group hover:border-yellow-500/30 transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-yellow-600/10 border border-yellow-500/20 flex items-center justify-center mb-6">
-              <svg className="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+              <FileText className="w-6 h-6 text-yellow-500" strokeWidth={2} />
             </div>
             <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">Inventario y Facturación</h4>
             <p className="text-neutral-400 text-sm leading-relaxed font-medium">Gestión inteligente de repuestos, stock del taller y generación de presupuestos / facturas simplificadas.</p>

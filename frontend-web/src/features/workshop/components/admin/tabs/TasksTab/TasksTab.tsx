@@ -8,6 +8,7 @@ import { TaskItemRow } from './components/TaskItemRow';
 import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { Search, X } from '@/assets/icons';
 
 export interface CatalogTask {
   id: string;
@@ -336,9 +337,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       {/* Search Input Bar */}
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-          <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search className="w-5 h-5 text-neutral-500" />
         </span>
         <input
           type="text"
@@ -352,9 +351,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
             onClick={() => setSearchTerm('')}
             className="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-500 hover:text-white cursor-pointer"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-5 h-5" />
           </button>
         )}
       </div>

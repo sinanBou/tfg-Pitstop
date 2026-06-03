@@ -1,6 +1,7 @@
 import { getBrandLogo } from '@/assets/BrandLogos';
 import type { SearchableSelectProps } from './SearchableSelect.types';
 import { useSearchableSelect } from './useSearchableSelect';
+import { ChevronDown } from '@/assets/icons';
 
 export const SearchableSelect = ({ 
   label, 
@@ -43,9 +44,7 @@ export const SearchableSelect = ({
             {value || placeholder}
           </span>
         </span>
-        <svg className={`w-4 h-4 text-neutral-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronDown className={`w-4 h-4 text-neutral-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
       {isOpen && (

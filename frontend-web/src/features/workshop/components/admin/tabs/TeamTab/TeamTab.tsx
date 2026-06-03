@@ -9,6 +9,7 @@ import { InputField } from '@/components/common/InputField/InputField';
 import { API_BASE_URL } from '@/config/api';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { Check, Plus, ChevronsUp, ChevronsDown, UserPlus } from '@/assets/icons';
 
 interface TeamTabProps {
   employeeForm: any;
@@ -166,9 +167,9 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                           }`}
                         >
                           {isAllowed ? (
-                            <svg className="w-3 h-3 text-red-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                            <Check className="w-3 h-3 text-red-400 shrink-0" strokeWidth={3} />
                           ) : (
-                            <svg className="w-3 h-3 text-neutral-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                            <Plus className="w-3 h-3 text-neutral-600 shrink-0" strokeWidth={3} />
                           )}
                           {tab.label}
                         </Button>
@@ -197,7 +198,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                   variant="primary"
                   className="w-full h-12 uppercase tracking-widest text-[9px] font-black"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 11l7-7 7 7M5 19l7-7 7 7" /></svg>
+                  <ChevronsUp className="w-4 h-4 mr-2" strokeWidth={2.5} />
                   Ascender a Gerente
                 </Button>
               )}
@@ -219,7 +220,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                   variant="secondary"
                   className="w-full h-12 uppercase tracking-widest text-[9px] font-black"
                 >
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 13l-7 7-7-7M19 5l-7 7-7-7" /></svg>
+                  <ChevronsDown className="w-4 h-4 mr-2" strokeWidth={2.5} />
                   Degradar a Mecánico
                 </Button>
               )}
@@ -252,7 +253,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
       <Card variant="neutral" padding="lg" className="!rounded-2xl">
         <h3 className="text-sm font-black uppercase tracking-widest text-white mb-8 flex items-center gap-3">
           <div className="p-2 bg-red-600/10 rounded-lg">
-            <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
+            <UserPlus className="w-4 h-4 text-red-500" strokeWidth={2.5} />
           </div>
           Añadir Miembro al Equipo
         </h3>

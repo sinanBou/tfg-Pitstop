@@ -1,5 +1,6 @@
 import React from 'react';
 import { getBrandLogo } from '@/assets/BrandLogos';
+import { Building } from '@/assets/icons';
 
 interface WorkshopVehicleCardProps {
   vehicle: any;
@@ -71,9 +72,7 @@ export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicl
     <div className={`bg-gradient-to-br from-neutral-900/80 to-black border ${colors.border} p-5 rounded-2xl relative overflow-hidden group transition-all duration-300 flex flex-col justify-between hover:shadow-2xl hover:-translate-y-1 w-[280px] h-[200px] shrink-0`}>
       {/* Icono de Fondo */}
       <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
-        <svg className="w-24 h-24 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-        </svg>
+        <Building className="w-24 h-24 text-blue-500" strokeWidth={0.5} />
       </div>
 
       <div className="absolute inset-0 bg-[linear-gradient(to_right,transparent_0%,rgba(59,130,246,0.05)_50%,transparent_100%)] group-hover:animate-[shimmer_2s_infinite] -skew-x-12 pointer-events-none"></div>

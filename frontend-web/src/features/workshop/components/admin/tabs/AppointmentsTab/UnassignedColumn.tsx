@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { CheckCircle, Edit, Lock, FileText, X } from '@/assets/icons';
 
 interface UnassignedAppointment {
   id: string;
@@ -132,9 +133,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
         {sorted.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4 py-12 opacity-50">
-            <svg className="w-10 h-10 text-neutral-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <CheckCircle className="w-10 h-10 text-neutral-600 mb-3" strokeWidth={1.5} />
             <p className="text-neutral-600 text-[10px] font-black uppercase tracking-widest">
               Sin citas pendientes
             </p>
@@ -227,13 +226,9 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                             title={isReceived ? 'Gestionar' : 'Recepciona el vehículo primero'}
                           >
                             {isReceived ? (
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
+                              <Edit className="w-3 h-3" />
                             ) : (
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                              </svg>
+                              <Lock className="w-3 h-3" />
                             )}
                             {isReceived ? 'Gestionar' : 'Recepción'}
                           </button>
@@ -249,9 +244,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                               }`}
                               title={isReceived ? 'Ver checklist' : 'Recepciona el vehículo primero'}
                             >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                              </svg>
+                              <FileText className="w-3 h-3" />
                             </button>
                           )}
 
@@ -261,9 +254,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                               className="flex items-center justify-center w-7 h-7 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all cursor-pointer"
                               title="Eliminar"
                             >
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
+                              <X className="w-3 h-3" strokeWidth={2.5} />
                             </button>
                           )}
                         </>

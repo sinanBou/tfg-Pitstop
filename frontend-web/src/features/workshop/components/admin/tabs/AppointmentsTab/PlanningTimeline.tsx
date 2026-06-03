@@ -3,6 +3,7 @@ import { AppointmentBlock } from './AppointmentBlock';
 import { UnassignedColumn } from './UnassignedColumn';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 import { useToast } from '@/hooks/useToast';
+import { ChevronLeft, ChevronRight, Calendar, Clock, User } from '@/assets/icons';
 
 interface Column {
   id: string;
@@ -174,14 +175,14 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
             className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-neutral-400 hover:text-white transition-all"
             title="Desplazar izquierda"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7"/></svg>
+            <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll('right')}
             className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-neutral-400 hover:text-white transition-all"
             title="Desplazar derecha"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/></svg>
+            <ChevronRight className="w-4 h-4" />
           </button>
         </div>
       )}
@@ -199,7 +200,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
                 className={`${fillContainer ? 'flex-1' : ''} p-4 border-r border-neutral-800/60 flex items-center justify-between bg-neutral-800/20 transition-all duration-500`}
               >
                 <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2 truncate">
-                  <svg className="w-4 h-4 text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  <Calendar className="w-4 h-4 text-blue-400 shrink-0" />
                   {unassignedCol.title}
                 </h3>
                 {unassignedApps.length > 0 && (
@@ -212,9 +213,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
             {/* Cabecera eje de horas (solo si hay columnas de mecánicos) */}
             {mechanicColumns.length > 0 && (
               <div className="w-20 shrink-0 p-4 border-r border-neutral-800/60 flex items-center justify-center">
-                <svg className="w-5 h-5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <Clock className="w-5 h-5 text-neutral-500" />
               </div>
             )}
             {mechanicColumns.map(col => (
@@ -234,7 +233,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
                         <img src={col.profilePictureUrl} alt={col.title} className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <svg className="w-4 h-4 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                      <User className="w-4 h-4 text-red-500 shrink-0" />
                     )}
                     {col.title}
                   </span>

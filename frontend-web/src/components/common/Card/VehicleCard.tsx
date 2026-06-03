@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { BRAND_LOGOS, getBrandLogo } from '@/assets/BrandLogos';
+import { Car, Trash } from '@/assets/icons';
 
 interface VehicleCardProps {
   brand: string;
@@ -32,12 +33,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                 {BRAND_LOGOS[cleanBrand]}
              </div>
           ) : (
-             <svg className="w-44 h-44" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={0.75}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
-                <circle cx="7" cy="17" r="2" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 17h6" />
-                <circle cx="17" cy="17" r="2" />
-             </svg>
+             <Car className="w-44 h-44" strokeWidth={0.75} />
           )}
        </div>
 
@@ -60,9 +56,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                       className="w-8 h-8 bg-red-500/10 border border-red-500/30 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-lg shadow-red-500/5 cursor-pointer ml-2 relative z-20"
                       title="Eliminar Vehículo"
                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      <Trash className="w-4 h-4" />
                    </button>
                 )}
              </div>

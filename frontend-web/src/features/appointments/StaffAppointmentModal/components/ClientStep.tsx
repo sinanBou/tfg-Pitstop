@@ -1,5 +1,6 @@
 import React from 'react';
 import { type ClientSearchDTO, type VehicleSearchDTO } from '@/types/client';
+import { Search, ChevronRight, AlertTriangle } from '@/assets/icons';
 
 interface ClientStepProps {
   searchQuery: string;
@@ -44,7 +45,7 @@ export const ClientStep: React.FC<ClientStepProps> = ({
               disabled={loading}
               className="p-3 bg-red-600 text-white hover:bg-neutral-900 rounded-2xl transition-all shadow-lg active:scale-95 disabled:opacity-50"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <Search className="w-5 h-5" strokeWidth={3} />
             </button>
           </div>
         </div>
@@ -67,7 +68,7 @@ export const ClientStep: React.FC<ClientStepProps> = ({
                         </div>
                       </div>
                       <div className="p-2 rounded-full border border-neutral-800 group-hover:border-red-600 transition-all group-hover:text-red-600 text-neutral-700">
-                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
+                         <ChevronRight className="w-4 h-4" strokeWidth={3} />
                       </div>
                     </button>
                   ))}
@@ -87,7 +88,7 @@ export const ClientStep: React.FC<ClientStepProps> = ({
                         </div>
                       </div>
                       <div className="p-2 rounded-full border border-neutral-800 group-hover:border-blue-600 transition-all group-hover:text-blue-600 text-neutral-700">
-                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
+                         <ChevronRight className="w-4 h-4" strokeWidth={3} />
                       </div>
                     </button>
                   ))}
@@ -116,7 +117,7 @@ export const ClientStep: React.FC<ClientStepProps> = ({
         {searchResults.clients.length === 0 && searchResults.vehicles.length === 0 && !loading && searchQuery.length > 3 && (
           <div className="mt-6 p-10 text-center bg-black/40 border border-dashed border-neutral-800 rounded-[2.5rem] animate-in zoom-in-95 duration-300">
              <div className="w-16 h-16 bg-neutral-900/50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-neutral-700">
-                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <AlertTriangle className="w-8 h-8" strokeWidth={1.5} />
              </div>
              <p className="text-neutral-500 text-xs font-black uppercase tracking-widest mb-6 italic opacity-80 leading-relaxed">No se han encontrado registros para<br/><span className="text-white not-italic">"{searchQuery}"</span></p>
              <button onClick={() => setIsNewClient(true)} className="px-8 py-4 bg-red-600 text-white font-black uppercase text-xs rounded-2xl hover:bg-neutral-900 transition-all shadow-2xl shadow-red-600/20 active:scale-95">Registrar Cliente Nuevo</button>

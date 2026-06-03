@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { X, Check, AlertTriangle, FileText, Calendar } from '@/assets/icons';
 import { API_BASE_URL } from '@/config/api';
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -289,9 +290,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
             <p className="text-neutral-400 text-xs mt-1">{appointment?.clientFullName}</p>
           </div>
           <button onClick={onClose} className="p-3 text-neutral-500 hover:text-white hover:bg-neutral-800/50 rounded-2xl transition-all">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -373,9 +372,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                             selected ? 'bg-blue-600 border-blue-600' : 'border-neutral-600 group-hover:border-neutral-400'
                           }`}>
                             {selected && (
-                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                              </svg>
+                              <Check className="w-3 h-3 text-white" strokeWidth={3} />
                             )}
                           </div>
                           <div className="min-w-0">
@@ -445,9 +442,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                 </div>
                 {totalHours > 8 && (
                   <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                    <svg className="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
-                    </svg>
+                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                     <p className="text-amber-400 text-[10px] font-black uppercase tracking-wider">
                       Se distribuirá en varios días
                     </p>
@@ -503,9 +498,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
               {selectedTasks.length === 0 ? (
                 <div className="text-center py-12">
-                  <svg className="w-10 h-10 text-neutral-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
+                  <FileText className="w-10 h-10 text-neutral-700 mx-auto mb-3" strokeWidth={1.5} />
                   <p className="text-neutral-600 text-xs">Selecciona tareas del catálogo</p>
                 </div>
               ) : (
@@ -521,9 +514,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                         onClick={() => toggleTask(task)}
                         className="w-5 h-5 flex items-center justify-center text-neutral-500 hover:text-red-400 transition-colors"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -545,9 +536,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <Calendar className="w-4 h-4" />
                     Planificar {totalHours.toFixed(1)}h
                   </>
                 )}

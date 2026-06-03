@@ -1,5 +1,6 @@
 import React from 'react';
 import type { AppointmentRequest, WorkshopMinDTO } from '@/types/client';
+import { Check } from '@/assets/icons';
 
 interface DetailsStepProps {
   formData: AppointmentRequest;
@@ -69,7 +70,7 @@ export const DetailsStep: React.FC<DetailsStepProps> = ({
           className="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white font-black rounded-xl uppercase tracking-widest shadow-[0_0_25px_rgba(59,130,246,0.4)] hover:bg-blue-500 hover:shadow-[0_0_35px_rgba(59,130,246,0.6)] transition-all active:scale-95 disabled:opacity-50 disabled:shadow-none disabled:hover:bg-blue-600 group"
         >
           Confirmar
-          <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          <Check className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
     </div>

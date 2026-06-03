@@ -1,6 +1,7 @@
 import React from 'react';
 import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
 import { type ClientSearchDTO, type VehicleSearchDTO, type VehicleRequest } from '@/types/client';
+import { Edit, Plus } from '@/assets/icons';
 
 const POPULAR_BRANDS = [
   "AUDI", "BMW", "CITROEN", "FORD", "HYUNDAI", "KIA", 
@@ -38,7 +39,7 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
           <p className="text-white font-black uppercase text-sm">{selectedClient?.firstname} {selectedClient?.lastname}</p>
         </div>
         <button onClick={onPrev} className="text-neutral-500 hover:text-white transition-colors">
-           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+          <Edit className="w-5 h-5" />
         </button>
       </div>
 
@@ -63,7 +64,7 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
         <div className="p-8 text-center bg-neutral-900/20 border border-dashed border-neutral-800 rounded-[2rem] hover:bg-neutral-900/40 transition-all">
             <p className="text-neutral-500 text-xs font-black uppercase tracking-widest mb-4 italic">¿Es un vehículo nuevo?</p>
             <button onClick={() => setIsNewVehicle(true)} className="px-6 py-3 bg-white text-black font-black uppercase text-[10px] rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2 mx-auto">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+              <Plus className="w-4 h-4" />
               Añadir Nuevo Vehículo
             </button>
         </div>

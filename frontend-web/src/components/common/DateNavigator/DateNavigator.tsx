@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { DateNavigatorProps } from './DateNavigator.types';
+import { ChevronLeft, ChevronRight } from '@/assets/icons';
 
 export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onChange, variant = 'red' }) => {
   const [showCalendar, setShowCalendar] = useState(false);
@@ -66,7 +67,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
              className={`p-3 bg-black/40 text-neutral-400 hover:text-white rounded-xl transition-all border border-transparent ${hoverBorderColor} ${hoverBgColor}`}
              data-testid="prev-day-btn"
           >
-             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+             <ChevronLeft className="w-5 h-5" />
           </button>
           
           <button 
@@ -87,7 +88,7 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
              className={`p-3 bg-black/40 text-neutral-400 hover:text-white rounded-xl transition-all border border-transparent ${hoverBorderColor} ${hoverBgColor}`}
              data-testid="next-day-btn"
           >
-             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+             <ChevronRight className="w-5 h-5" />
           </button>
        </div>
 
@@ -95,13 +96,13 @@ export const DateNavigator: React.FC<DateNavigatorProps> = ({ selectedDate, onCh
           <div className="absolute top-[110%] left-1/2 -translate-x-1/2 mt-2 w-64 bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl z-50 p-4">
              <div className="flex items-center justify-between mb-4">
                 <button onClick={prevMonth} className="p-1 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors" data-testid="prev-month-btn">
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="text-white font-bold text-xs uppercase tracking-widest">
                    {viewMonth.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                 </span>
                 <button onClick={nextMonth} className="p-1 hover:bg-white/10 rounded-lg text-neutral-400 hover:text-white transition-colors" data-testid="next-month-btn">
-                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                   <ChevronRight className="w-4 h-4" />
                 </button>
              </div>
              

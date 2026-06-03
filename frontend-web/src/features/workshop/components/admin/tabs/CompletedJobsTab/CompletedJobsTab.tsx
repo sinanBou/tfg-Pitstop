@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { CheckCircle, Check, Archive } from '@/assets/icons';
 
 interface CompletedJobsTabProps {
   readyJobs: any[];
@@ -43,9 +44,7 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
   if (visibleJobs.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-24 opacity-40">
-        <svg className="w-16 h-16 text-neutral-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <CheckCircle className="w-16 h-16 text-neutral-700 mb-4" strokeWidth={1.5} />
         <p className="text-neutral-500 text-sm font-black uppercase tracking-widest">
           No hay trabajos pendientes de aprobación
         </p>
@@ -201,16 +200,12 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
           ) : isApprove ? (
             <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
+              <Check className="w-4 h-4" strokeWidth={2.5} />
               Completar Trabajo — Avisar al Cliente
             </>
           ) : (
             <>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
+              <Archive className="w-4 h-4" strokeWidth={2} />
               Vehículo Recogido
             </>
           )}
