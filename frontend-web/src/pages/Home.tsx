@@ -16,7 +16,7 @@ export default function Home() {
       {/* --- NAVBAR --- */}
       <nav className="w-full fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-6 animate-fade-in-up">
          <div className="w-full max-w-6xl bg-neutral-900/50 backdrop-blur-xl border border-neutral-800 rounded-2xl px-6 py-4 flex justify-between items-center shadow-lg">
-            <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">PitStop <span className="text-red-600 text-[10px] tracking-[0.2em] ml-1">v2.0</span></h1>
+            <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">PitStop</h1>
             <div className="flex gap-4 items-center">
                <Button 
                  onClick={() => navigate('/login')} 
