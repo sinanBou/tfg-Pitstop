@@ -276,7 +276,7 @@ public class AppointmentService {
 
         // Regla de Negocio: Si ya ha sido recogida y finalizada, no se permiten más cambios de estado
         if (appointment.getStatus() == AppointmentStatus.PICKED_UP) {
-            throw new RuntimeException("La cita ya ha sido finalizada. No se permiten más cambios de estado.");
+            throw new RuntimeException("La cita ya ha sido recogida y finalizada. No se permiten más cambios de estado.");
         }
 
         // Regla de Negocio: No se puede cancelar una cita que ya está en curso, retrasada o finalizada
@@ -303,6 +303,7 @@ public class AppointmentService {
                 vehicleRepository.save(vehicle);
             }
         } else if (newStatus == AppointmentStatus.CANCELLED) {
+            appointment.setActualEndTime(LocalDateTime.now());
             org.tfg.backend.vehicle.Vehicle vehicle = appointment.getVehicle();
             if (vehicle != null) {
                 vehicle.setCurrentWorkshop(null);
