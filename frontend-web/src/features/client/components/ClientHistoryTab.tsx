@@ -4,6 +4,7 @@ import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { printInvoicePDF as importPrintInvoicePDF } from '@/utils/InvoicePdfPrinter';
 import { useToast } from '@/hooks/useToast';
+import { Calendar, Check, FileText, X } from '@/assets/icons';
 
 
 interface NotificationItem {
@@ -495,34 +496,26 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
               let borderClass = 'border-neutral-800 bg-neutral-900/20';
               let badgeColor = 'bg-blue-600/10 border-blue-500/20 text-blue-400';
               let icon = (
-                <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+                <Calendar className="w-4 h-4 text-blue-400" />
               );
 
               if (notif.type === 'complete') {
                 borderClass = 'border-green-500/10 bg-green-500/5';
                 badgeColor = 'bg-green-600/10 border-green-500/20 text-green-400';
                 icon = (
-                  <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-4 h-4 text-green-400" />
                 );
               } else if (notif.type === 'invoice') {
                 borderClass = 'border-emerald-500/10 bg-emerald-500/5';
                 badgeColor = 'bg-emerald-600/10 border-emerald-500/20 text-emerald-400';
                 icon = (
-                  <svg className="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
+                  <FileText className="w-4 h-4 text-emerald-400" />
                 );
               } else if (notif.type === 'cancel') {
                 borderClass = 'border-red-500/10 bg-red-500/5';
                 badgeColor = 'bg-red-600/10 border-red-500/20 text-red-400';
                 icon = (
-                  <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+                  <X className="w-4 h-4 text-red-400" />
                 );
               }
 
@@ -564,9 +557,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
                         <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
                         <>
-                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
+                          <FileText className="w-3 h-3" />
                           Descargar PDF
                         </>
                       )}

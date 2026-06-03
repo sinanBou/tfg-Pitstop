@@ -1,7 +1,6 @@
 import { ClientAppointmentCard } from '@/components/common/Card/ClientAppointmentCard';
 import { Button } from '@/components/common/Button/Button';
-
-const CalendarIcon = () => (<svg className="w-8 h-8 text-neutral-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>);
+import { Calendar } from '@/assets/icons';
 
 interface ClientAppointmentsTabProps {
   appointments: any[];
@@ -19,7 +18,7 @@ export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAp
             variant="primary"
             className="shadow-[0_0_20px_rgba(239,68,68,0.1)] hover:shadow-[0_0_30px_rgba(239,68,68,0.4)] flex items-center gap-2"
          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <Calendar className="w-4 h-4" />
             Nueva Cita
          </Button>
       </div>
@@ -35,7 +34,7 @@ export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAp
             ))
          ) : (
             <div className="col-span-full py-20 flex flex-col items-center justify-center opacity-40">
-               <CalendarIcon />
+               <Calendar className="w-8 h-8 text-neutral-600 mb-2" strokeWidth={1.5} />
                <p className="text-neutral-500 font-black uppercase tracking-widest mt-4">Sin citas programadas</p>
             </div>
          )}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Building, Plus, MapPin, Shield, ArrowRight, Trash } from '@/assets/icons';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
@@ -12,9 +13,7 @@ interface WorkshopManagementTabProps {
 }
 
 const WorkshopIcon = () => (
-  <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-  </svg>
+  <Building className="w-6 h-6 text-red-500" strokeWidth={1.5} />
 );
 
 export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorkshop }: WorkshopManagementTabProps) {
@@ -51,9 +50,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
             onClick={onAddWorkshop}
             className="!px-6 !py-3 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 font-black text-[10px] uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(220,38,38,0.1)] hover:shadow-[0_0_30px_rgba(220,38,38,0.4)] flex items-center gap-2"
          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
-            </svg>
+            <Plus className="w-4 h-4" />
             Nuevo Taller
          </Button>
       </div>
@@ -69,9 +66,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
                className="bg-neutral-900/40 p-6 md:p-8 border border-neutral-800 relative overflow-hidden group hover:border-red-500/40 transition-all duration-300 flex flex-col hover:shadow-2xl hover:-translate-y-1"
             >
                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500">
-                  <svg className="w-32 h-32 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
+                  <Building className="w-32 h-32 text-red-500" strokeWidth={0.5} />
                </div>
                
                <div className="relative z-10 flex-1">
@@ -99,18 +94,13 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
                   <div className="space-y-3 mb-8 bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
                      <div className="flex items-center gap-3">
                         <div className="p-1.5 bg-neutral-800/50 rounded-lg text-neutral-400 shrink-0 border border-neutral-700/50">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
+                            <MapPin className="w-4 h-4" />
                         </div>
                         <p className="text-sm font-medium text-neutral-300 leading-snug">{workshop.address}</p>
                      </div>
                      <div className="flex items-center gap-3">
                         <div className="p-1.5 bg-red-500/10 rounded-lg text-red-400 shrink-0 border border-red-500/20">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                            </svg>
+                            <Shield className="w-4 h-4" />
                         </div>
                         <p className="text-sm font-black text-red-400 font-mono tracking-widest">{workshop.cif}</p>
                      </div>
@@ -124,9 +114,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
                   >
                      <span className="flex items-center justify-center gap-2 relative z-10">
                         Gestionar
-                        <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                        </svg>
+                        <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                      </span>
                   </Button>
                   
@@ -139,9 +127,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
                      className="p-4 bg-red-950/20 hover:bg-red-600 border border-red-900/40 hover:border-red-500 text-red-500 hover:text-white rounded-xl transition-all cursor-pointer flex items-center justify-center group/trash"
                      title="Eliminar Taller"
                   >
-                     <svg className="w-4 h-4 group-hover/trash:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                     </svg>
+                     <Trash className="w-4 h-4 group-hover/trash:scale-110 transition-transform" />
                   </button>
                </div>
             </Card>

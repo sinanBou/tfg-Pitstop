@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { Badge } from '@/components/common/Badge/Badge';
+import { CheckCircle } from '@/assets/icons';
 
 interface AvisoPanelProps {
   title: string;
@@ -56,9 +57,7 @@ export const AvisoPanel: React.FC<AvisoPanelProps> = ({
       ) : isEmpty ? (
         <div className="flex-1 py-16 text-center text-neutral-500 text-[10px] uppercase tracking-widest font-black border border-dashed border-neutral-800/60 rounded-2xl flex flex-col items-center justify-center gap-3 bg-black/10">
           {emptyStateIcon || (
-            <svg className="w-8 h-8 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <CheckCircle className="w-8 h-8 text-neutral-700" strokeWidth={1.5} />
           )}
           <span>{emptyStateMessage}</span>
         </div>

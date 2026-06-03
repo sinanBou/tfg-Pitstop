@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Car, Lock, FileText, Clock } from '@/assets/icons';
 
 interface MechanicLiveTaskProps {
   appointment: any;
@@ -71,7 +72,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
         {/* Info Coche */}
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
-            <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            <Car className="w-6 h-6 text-red-500" />
           </div>
           <div>
             <h4 className="text-white font-black uppercase text-lg leading-tight tracking-tight">
@@ -91,9 +92,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
         {/* Detalles del Servicio */}
         {!isVehicleReceived && (
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-3">
-            <svg className="w-5 h-5 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
+            <Lock className="w-5 h-5 text-amber-400 shrink-0" />
             <div>
               <p className="text-amber-400 font-black text-[10px] uppercase tracking-widest">Pendiente de Recepción</p>
               <p className="text-amber-500/60 text-[10px] mt-0.5">Recepciona el vehículo desde la pestaña de Citas para poder gestionar.</p>
@@ -155,9 +154,9 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
               title={isVehicleReceived ? 'Gestionar Tareas y Piezas' : 'Recepciona el vehículo primero'}
             >
               {isVehicleReceived ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                <FileText className="w-5 h-5" />
               ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <Lock className="w-5 h-5" />
               )}
             </button>
           )}
@@ -169,7 +168,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
               className="px-4 py-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white rounded-2xl border border-red-600/20 transition-all group-hover:border-red-600"
               title="Informar Retraso"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <Clock className="w-5 h-5" />
             </button>
           )}
         </div>

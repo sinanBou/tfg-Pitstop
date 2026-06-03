@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useLogin } from '@/features/auth/hooks/useLogin'; 
 import InputGroup from '@/components/common/InputGroup/InputGroup'; 
 import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton';
+import { ArrowLeft } from '@/assets/icons';
 
 function Login() {
   const { formData, errors, isLoading, handleChange, handleLogin, handleGoogleLogin } = useLogin();
@@ -92,7 +93,7 @@ function Login() {
         {/* Botón volver inicio discretamente debajo */}
         <div className="mt-8 text-center">
            <Link to="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              <ArrowLeft className="w-4 h-4" />
               Volver al Inicio
            </Link>
         </div>

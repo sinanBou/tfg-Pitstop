@@ -3,6 +3,7 @@ import AddressAutocomplete from '@/components/common/AddressAutocomplete/Address
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../../services/workshopService';
+import { ArrowRight } from '@/assets/icons';
 
 interface WorkshopCreationModalProps {
   isOpen: boolean;
@@ -226,9 +227,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
             className="px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-widest text-white transition-all flex items-center gap-2 active:scale-95 shadow-[0_0_30px_rgba(220,38,38,0.3)]"
           >
             Activar Taller
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </form>

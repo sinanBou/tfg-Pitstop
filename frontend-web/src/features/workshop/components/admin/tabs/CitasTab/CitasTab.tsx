@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
+import { ChevronsRight } from '@/assets/icons';
 import { Button } from '@/components/common/Button/Button';
 import { AppointmentSearch } from '@/features/workshop/components/admin/AppointmentSearch/index';
 import { DateNavigator } from '@/components/common/DateNavigator/DateNavigator';
@@ -43,9 +44,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
             onClick={goToNextPendingDate}
             className="!px-5 !py-3 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 border border-yellow-600/20 hover:border-yellow-500/40 group/btn"
           >
-            <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
-            </svg>
+            <ChevronsRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
             Pendientes
           </Button>
           <div className="ml-auto">

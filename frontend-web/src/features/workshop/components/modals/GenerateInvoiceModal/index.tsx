@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Plus, AlertTriangle, Trash, Check } from '@/assets/icons';
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
@@ -287,9 +288,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                 type="submit"
                 className="px-3 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-extrabold text-xs transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
+                <Plus className="w-4 h-4" />
               </button>
             </form>
 
@@ -302,9 +301,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
               <div className="border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 max-h-[200px] overflow-y-auto custom-scrollbar">
                 {hasMissingPrices && (
                   <div className="bg-yellow-600/10 border-b border-yellow-500/20 px-4 py-2 flex items-center gap-2 text-[10px] text-yellow-400 font-bold uppercase tracking-wider">
-                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
+                    <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                     Hay repuestos sin precio — Introduce el importe para poder confirmar
                   </div>
                 )}
@@ -348,9 +345,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                         onClick={() => handleRemovePart(idx)}
                         className="text-neutral-500 hover:text-red-400 transition-all"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
@@ -399,9 +394,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
               <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
+                <Check className="w-4 h-4" />
                 Confirmar y Avisar al Cliente
               </>
             )}

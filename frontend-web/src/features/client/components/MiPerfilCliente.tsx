@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button';
 import { InputField } from '@/components/common/InputField';
+import { X, Check } from '@/assets/icons';
 
 interface MiPerfilClienteProps {
   isOpen: boolean;
@@ -138,9 +139,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
           onClick={onClose}
           className="absolute top-8 right-8 p-3 bg-black/40 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" />
         </button>
 
         {/* Contenido scrolleable */}
@@ -225,9 +224,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             <div className="pt-4 flex justify-end items-center gap-4">
               {profileSaved && (
                 <span className="text-emerald-500 text-xs font-black uppercase tracking-widest flex items-center gap-2 animate-fade-in-up">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-4 h-4" />
                   Perfil actualizado con éxito
                 </span>
               )}

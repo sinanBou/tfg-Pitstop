@@ -3,6 +3,7 @@ import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { Calendar, CheckCircle, X } from '@/assets/icons';
 
 interface ClientAppointmentCardProps {
   appointment: any;
@@ -34,9 +35,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
     >
       {/* Icono de Fondo */}
       <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-all transform group-hover:scale-110 group-hover:-rotate-3 duration-500 pointer-events-none">
-        <svg className="w-32 h-32 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={0.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
+        <Calendar className="w-32 h-32 text-blue-500" strokeWidth={0.5} />
       </div>
 
       <div className="flex-1 flex flex-col">
@@ -74,9 +73,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
         {/* Banner de Vehículo Listo */}
         {appointment.status === 'COMPLETED' && (
           <div className="flex items-center gap-3 px-5 py-4 bg-green-500/10 border border-green-500/20 rounded-2xl mb-4 animate-pulse">
-            <svg className="w-6 h-6 text-green-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
             <div>
               <p className="text-green-400 text-xs font-black uppercase tracking-widest">Vehículo Listo</p>
               <p className="text-green-300/70 text-[11px] mt-0.5 font-bold">Tu coche está preparado. Ya puedes pasar a recogerlo.</p>
@@ -110,9 +107,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
             className="w-full !py-4 shadow-sm mt-auto"
           >
             Cancelar Cita
-            <svg className="w-4 h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
           </Button>
         ) : (
           <div className={`w-full py-4 border rounded-xl text-[10px] font-black uppercase tracking-widest text-center mt-auto cursor-not-allowed ${

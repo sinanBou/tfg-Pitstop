@@ -1,5 +1,6 @@
 import React from 'react';
 import type { WorkshopMinDTO } from '@/types/client';
+import { ChevronLeft, ChevronRight, Calendar, Info } from '@/assets/icons';
 
 interface ScheduleStepProps {
   viewDate: Date;
@@ -62,10 +63,10 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
               </h3>
               <div className="flex gap-1">
                 <button type="button" onClick={prevMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+                  <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button type="button" onClick={nextMonth} className="p-2 hover:bg-neutral-800 rounded-xl transition-colors text-neutral-400 hover:text-white">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                  <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -119,9 +120,7 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
           <div className="flex-1 w-full min-h-[250px] bg-neutral-900/30 border border-neutral-800/50 rounded-3xl p-6">
             {!selectedDate ? (
               <div className="h-full flex flex-col items-center justify-center text-center py-12">
-                <svg className="w-12 h-12 text-neutral-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+                <Calendar className="w-12 h-12 text-neutral-600 mb-3" strokeWidth={1.5} />
                 <p className="text-neutral-500 text-xs font-black uppercase tracking-widest leading-relaxed">
                   Selecciona un día del calendario<br/>para ver las horas disponibles
                 </p>
@@ -173,12 +172,12 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
 
                           return isClosed ? (
                             <div className="col-span-3 py-12 text-center border border-dashed border-blue-900/50 bg-blue-900/10 rounded-2xl flex flex-col items-center justify-center gap-2">
-                              <svg className="w-8 h-8 text-blue-500/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                              <Info className="w-8 h-8 text-blue-500/70" strokeWidth={1.5} />
                               <p className="text-blue-400/80 text-[10px] font-black uppercase tracking-widest">Taller cerrado este día</p>
                             </div>
                           ) : (
                             <div className="col-span-3 py-12 text-center border border-dashed border-neutral-800 bg-neutral-900/30 rounded-2xl flex flex-col items-center justify-center gap-2">
-                              <svg className="w-8 h-8 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                              <Info className="w-8 h-8 text-neutral-600" strokeWidth={1.5} />
                               <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Sin huecos disponibles</p>
                             </div>
                           );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
+import { Users, Clock } from '@/assets/icons';
 import { WelcomeHeader } from './WelcomeHeader';
 import { WorkshopProfileCard } from './WorkshopProfileCard';
 import { WorkingDaysSelector } from './WorkingDaysSelector';
@@ -58,9 +59,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                {/* Employees Summary Card */}
                <Card variant="neutral" glow={false} border={false} padding="md" className="h-[160px] flex flex-col justify-between transition-all duration-300 group !rounded-2xl">
                   <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-neutral-800/60 text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
-                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                     </svg>
+                      <Users className="w-6 h-6" strokeWidth={1.5} />
                   </div>
                   <div>
                      <p className="text-5xl font-black text-white tracking-tighter">{workshopData?.totalEmployees || 0}</p>
@@ -71,9 +70,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                {/* Schedule Brief Card */}
                <Card variant="neutral" glow={false} border={false} padding="md" className="h-[160px] flex flex-col justify-between transition-all duration-300 group !rounded-2xl">
                   <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-neutral-800/60 text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
-                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                     </svg>
+                      <Clock className="w-6 h-6" strokeWidth={1.5} />
                   </div>
                   <div>
                      <p className="text-3xl font-black text-white font-mono tracking-tight">

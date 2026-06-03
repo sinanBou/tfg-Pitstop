@@ -9,6 +9,7 @@ import { InputField } from '@/components/common/InputField/InputField';
 import { AvisoMetricCard } from './AvisoMetricCard';
 import { AvisoPanel } from './AvisoPanel';
 import { useToast } from '@/hooks/useToast';
+import { Calendar, Edit } from '@/assets/icons';
 
 interface AvisosTabProps {
   workshopId: string;
@@ -222,9 +223,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                   }}
                   className="w-full py-2.5 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 mt-2"
                 >
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+                  <Calendar className="w-3.5 h-3.5" strokeWidth={2.5} />
                   Ir a Planificación
                 </button>
               )}
@@ -264,9 +263,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                     </Badge>
                     <h4 className="text-sm font-extrabold text-white group-hover:text-red-500 transition-colors flex items-center gap-1.5 mt-2 truncate">
                       {item.part.name}
-                      <svg className="w-3.5 h-3.5 text-neutral-500 group-hover:text-red-500 opacity-40 group-hover:opacity-100 transition-all shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                      </svg>
+                      <Edit className="w-3.5 h-3.5 text-neutral-500 group-hover:text-red-500 opacity-40 group-hover:opacity-100 transition-all shrink-0" strokeWidth={2.5} />
                     </h4>
                     <p className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider truncate">
                       OEM: {item.part.oemReference || 'N/A'} • Fab: {item.part.manufacturer || 'N/A'}

@@ -1,5 +1,6 @@
 import React from 'react';
 import type { BackButtonProps } from './BackButton.types';
+import { ChevronLeft } from '@/assets/icons';
 
 export const BackButton: React.FC<BackButtonProps> = ({ 
   onClick, 
@@ -20,9 +21,7 @@ export const BackButton: React.FC<BackButtonProps> = ({
         <span className={`absolute top-1 right-1 w-1.5 h-1.5 rounded-full opacity-60 group-hover:opacity-100 transition-opacity ${dotColor}`} />
       )}
       
-      <svg className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
-      </svg>
+      <ChevronLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
     </button>
   );
 };

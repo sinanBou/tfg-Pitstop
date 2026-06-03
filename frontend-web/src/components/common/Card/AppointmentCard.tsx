@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { getBrandLogo } from '@/assets/BrandLogos';
+import { Calendar, Lock, Check } from '@/assets/icons';
 
 interface AppointmentCardProps {
   type: string;
@@ -33,7 +34,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
       className={`w-full h-full hover:border-red-500/40 group relative overflow-hidden flex flex-col justify-start ${isCompact ? 'p-4 pt-5' : 'p-6 justify-center'}`}
     >
       <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
-        <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+        <Calendar className="w-16 h-16" strokeWidth={1} />
       </div>
 
       <div className={`relative flex-1 ${isCompact ? 'flex flex-col justify-start' : 'space-y-4'}`}>
@@ -109,13 +110,13 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
             )}
             {vehicleReceived === false && (
               <span className="text-[7px] font-black px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 uppercase tracking-wider shrink-0 flex items-center gap-0.5">
-                <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                <Lock className="w-2 h-2" />
                 Sin recep.
               </span>
             )}
             {vehicleReceived === true && (
               <span className="text-[7px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 uppercase tracking-wider shrink-0 flex items-center gap-0.5">
-                <svg className="w-2 h-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7"/></svg>
+                <Check className="w-2 h-2" />
                 En taller
               </span>
             )}
@@ -130,7 +131,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
         {!isCompact && (
            <div className="flex flex-col gap-1">
              <div className="text-[10px] font-mono text-neutral-500 uppercase flex items-center gap-1.5 font-bold">
-               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+               <Calendar className="w-3 h-3" />
                {dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: 'long' })}
              </div>
              {description && <div className="text-xs text-neutral-400 font-medium line-clamp-1 italic mt-1 opacity-80 group-hover:opacity-100 transition-opacity">"{description}"</div>}

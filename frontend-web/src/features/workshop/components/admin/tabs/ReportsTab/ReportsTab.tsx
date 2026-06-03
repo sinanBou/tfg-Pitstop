@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { PartsStatsWidget } from '@/components/common/PartsStatsWidget/PartsStatsWidget';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
 import { useToast } from '@/hooks/useToast';
+import { Search, FileText, ChevronDown, Download } from '@/assets/icons';
 
 interface PartItem {
   name: string;
@@ -209,9 +210,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
             className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-11 pr-10 py-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-red-500/50 transition-all shadow-inner"
           />
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search className="w-4 h-4" strokeWidth={2.5} />
           </div>
           {searchTerm && (
             <button
@@ -227,9 +226,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
       {/* Listado de Informes */}
       {filteredInvoices.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 opacity-40 border border-dashed border-neutral-850 rounded-2xl">
-          <svg className="w-12 h-12 text-neutral-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+          <FileText className="w-12 h-12 text-neutral-600 mb-3" strokeWidth={1.5} />
           <p className="text-neutral-500 text-sm font-black uppercase tracking-widest">
             No se han encontrado informes
           </p>
@@ -282,14 +279,10 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                         className="w-10 h-10 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-850 flex items-center justify-center text-neutral-400 hover:text-white transition-all active:scale-95 cursor-pointer"
                         title={isExpanded ? "Ocultar detalle" : "Ver detalle"}
                       >
-                        <svg 
+                        <ChevronDown 
                           className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
-                          fill="none" 
-                          stroke="currentColor" 
-                          viewBox="0 0 24 24"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
-                        </svg>
+                          strokeWidth={2.5}
+                        />
                       </button>
 
                       {/* Botón Descargar PDF */}
@@ -297,9 +290,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                         onClick={() => handlePrintPDF(inv)}
                         className="h-10 px-4 rounded-xl bg-green-950/20 hover:bg-green-950/40 border border-green-500/20 hover:border-green-500/30 text-green-400 flex items-center gap-2 text-xs font-black uppercase tracking-widest transition-all active:scale-95 shadow-[0_0_15px_rgba(34,197,94,0.05)] cursor-pointer"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                        <Download className="w-4 h-4" strokeWidth={2} />
                         PDF
                       </button>
                     </div>

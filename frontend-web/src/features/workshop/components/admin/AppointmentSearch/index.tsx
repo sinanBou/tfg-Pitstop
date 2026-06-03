@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Search, X, Building2, ArrowRight } from '@/assets/icons';
 
 interface AppointmentSearchProps {
   appointments: any[];
@@ -39,7 +40,7 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
     <div className="relative group" ref={containerRef}>
       <div className="relative flex items-center">
         <div className="absolute left-4 text-neutral-500 group-hover:text-red-500 transition-colors pointer-events-none">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <Search className="w-4 h-4" />
         </div>
         <input 
           type="text"
@@ -54,7 +55,7 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
             onClick={() => setQuery('')}
             className="absolute right-4 text-neutral-600 hover:text-white transition-colors"
           >
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
+            <X className="w-3 h-3" strokeWidth={3} />
           </button>
         )}
       </div>
@@ -69,7 +70,7 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
                 className="w-full flex items-center gap-4 p-3 hover:bg-red-600/10 rounded-xl transition-all group/item text-left border border-transparent hover:border-red-500/20"
               >
                 <div className="w-10 h-10 bg-neutral-800/50 rounded-lg flex items-center justify-center shrink-0 border border-neutral-700 group-hover/item:border-red-500/30">
-                  <svg className="w-5 h-5 text-neutral-500 group-hover/item:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-10V4m0 10V4m-4 11h.01" /></svg>
+                  <Building2 className="w-5 h-5 text-neutral-500 group-hover/item:text-red-500 transition-colors" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-0.5">
@@ -81,7 +82,7 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
                   </div>
                 </div>
                 <div className="shrink-0 opacity-0 group-hover/item:opacity-100 transition-opacity pr-2">
-                   <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                   <ArrowRight className="w-4 h-4 text-red-500" />
                 </div>
               </button>
             ))}

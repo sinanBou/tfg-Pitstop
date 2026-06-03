@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
+import { Check } from '@/assets/icons';
 import { Button } from '@/components/common/Button/Button';
 import { getBrandLogo } from '@/assets/BrandLogos';
 
@@ -69,9 +70,7 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
                   onClick={() => onConfirmAppointment(app.id)}
                   className="flex-1 !py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 group/btn !px-2 text-xs"
                 >
-                  <svg className="w-3.5 h-3.5 mr-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-3.5 h-3.5 mr-1 shrink-0" strokeWidth={2.5} />
                   Confirmar
                 </Button>
                 

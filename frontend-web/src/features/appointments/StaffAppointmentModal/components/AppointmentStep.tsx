@@ -1,5 +1,6 @@
 import React from 'react';
 import { type VehicleSearchDTO } from '@/types/client';
+import { Edit, ChevronLeft, ChevronRight, Calendar, ArrowRight } from '@/assets/icons';
 
 interface AppointmentStepProps {
   selectedVehicle: VehicleSearchDTO | null;
@@ -50,7 +51,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
           <p className="text-white font-black uppercase text-sm">{selectedVehicle?.brand} {selectedVehicle?.model} • {selectedVehicle?.licensePlate}</p>
         </div>
         <button onClick={onPrev} className="text-neutral-500 hover:text-white transition-colors">
-           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+           <Edit className="w-5 h-5" />
         </button>
       </div>
 
@@ -64,10 +65,10 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
             </h3>
             <div className="flex gap-2">
               <button onClick={prevMonth} className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white border border-transparent hover:border-neutral-700">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+                <ChevronLeft className="w-3.5 h-3.5" strokeWidth={2.5} />
               </button>
               <button onClick={nextMonth} className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white border border-transparent hover:border-neutral-700">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+                <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
               </button>
             </div>
           </div>
@@ -149,9 +150,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
             <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block ml-1 italic">Horas Disponibles</label>
             {!appointmentForm.date ? (
               <div className="text-center py-4 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl flex flex-col items-center justify-center p-4">
-                <svg className="w-5 h-5 text-neutral-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
+                <Calendar className="w-5 h-5 text-neutral-600 mb-1" />
                 <p className="text-[9px] text-neutral-600 font-bold uppercase tracking-wider">Selecciona un día en el calendario</p>
               </div>
             ) : (
@@ -219,9 +218,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
           {loading ? 'Sincronizando Agenda...' : (
             <>
               Registrar Cita Presencial
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <ArrowRight className="w-4 h-4" strokeWidth={2.5} />
             </>
           )}
         </button>

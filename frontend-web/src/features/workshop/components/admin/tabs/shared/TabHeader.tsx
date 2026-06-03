@@ -1,4 +1,5 @@
 import React from 'react';
+import { Plus } from '@/assets/icons';
 
 interface TabHeaderProps {
   title: string;
@@ -29,9 +30,7 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
         onClick={onActionClick}
         className={`px-5 py-3 rounded-2xl bg-gradient-to-r text-xs font-black uppercase tracking-wider hover:scale-[1.02] transition-all active:scale-95 flex items-center gap-2 cursor-pointer text-white ${gradientClass}`}
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-        </svg>
+        <Plus className="w-4 h-4" strokeWidth={2.5} />
         {actionLabel}
       </button>
     </div>

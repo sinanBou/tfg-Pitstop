@@ -1,5 +1,6 @@
 import React from 'react';
 import type { WorkshopMinDTO } from '@/types/client';
+import { Search, Building, MapPin } from '@/assets/icons';
 
 interface WorkshopStepProps {
   searchTerm: string;
@@ -36,7 +37,7 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
           onChange={(e) => onSearchTermChange(e.target.value)}
           className="w-full bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-white focus:outline-none focus:border-blue-600/50 focus:bg-black transition-all placeholder-neutral-600"
         />
-        <svg className="w-5 h-5 text-neutral-600 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <Search className="w-5 h-5 text-neutral-600 absolute left-4 top-1/2 -translate-y-1/2" />
       </div>
 
       <div className="grid gap-3 flex-1 overflow-y-auto pr-1 max-h-[350px] custom-scrollbar scroll-smooth">
@@ -61,7 +62,7 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
                      className="w-full h-full object-cover cursor-zoom-in hover:scale-110 transition-transform duration-300"
                   />
                ) : (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                  <Building className="w-6 h-6" strokeWidth={1.5} />
                )}
             </div>
             <div className="flex-1">
@@ -71,7 +72,7 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
               </div>
               {w.address && (
                  <p className="text-xs text-neutral-400 font-mono tracking-tight flex items-center gap-1.5 mb-2">
-                   <svg className="w-3.5 h-3.5 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                   <MapPin className="w-3.5 h-3.5 text-neutral-500" />
                    {w.address}
                  </p>
               )}

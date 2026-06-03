@@ -1,6 +1,7 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
 import type { ImagePreviewModalProps } from './ImagePreviewModal.types';
+import { X } from '@/assets/icons';
 
 export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
   isOpen,
@@ -26,9 +27,7 @@ export const ImagePreviewModal: React.FC<ImagePreviewModalProps> = ({
         title="Cerrar vista previa"
         data-testid="image-modal-close-btn"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X className="w-6 h-6" />
       </button>
 
       {/* Main Image Container */}
