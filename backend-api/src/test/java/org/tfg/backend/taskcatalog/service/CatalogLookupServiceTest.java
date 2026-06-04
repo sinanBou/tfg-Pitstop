@@ -6,8 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tfg.backend.taskcatalog.CatalogCategory;
-import org.tfg.backend.taskcatalog.CatalogCategoryRepository;
+import org.tfg.backend.taskcatalog.TaskCategory;
+import org.tfg.backend.taskcatalog.TaskCategoryRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,16 +19,16 @@ import static org.mockito.Mockito.*;
 class CatalogLookupServiceTest {
 
     @Mock
-    private CatalogCategoryRepository categoryRepository;
+    private TaskCategoryRepository categoryRepository;
 
     @InjectMocks
     private CatalogLookupService catalogLookupService;
 
-    private CatalogCategory mockCategory;
+    private TaskCategory mockCategory;
 
     @BeforeEach
     void setUp() {
-        mockCategory = CatalogCategory.builder()
+        mockCategory = TaskCategory.builder()
                 .id(UUID.randomUUID())
                 .name("1_consumibles")
                 .displayName("Consumibles")
@@ -40,7 +40,7 @@ class CatalogLookupServiceTest {
         UUID workshopId = UUID.randomUUID();
         when(categoryRepository.findByWorkshopIdOrderByNameAsc(workshopId)).thenReturn(List.of(mockCategory));
 
-        List<CatalogCategory> result = catalogLookupService.getCatalog(workshopId);
+        List<TaskCategory> result = catalogLookupService.getCatalog(workshopId);
 
         assertNotNull(result);
         assertEquals(1, result.size());

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
 class CatalogAdminServiceTest {
 
     @Mock
-    private CatalogCategoryRepository categoryRepository;
+    private TaskCategoryRepository categoryRepository;
 
     @Mock
     private CatalogTaskRepository taskRepository;
@@ -34,7 +34,7 @@ class CatalogAdminServiceTest {
     private CatalogAdminService catalogAdminService;
 
     private Workshop mockWorkshop;
-    private CatalogCategory mockCategory;
+    private TaskCategory mockCategory;
     private CatalogTask mockTask;
 
     @BeforeEach
@@ -44,7 +44,7 @@ class CatalogAdminServiceTest {
                 .companyName("PitStop Taller")
                 .build();
 
-        mockCategory = CatalogCategory.builder()
+        mockCategory = TaskCategory.builder()
                 .id(UUID.randomUUID())
                 .workshop(mockWorkshop)
                 .name("1_consumibles")
@@ -66,12 +66,12 @@ class CatalogAdminServiceTest {
         UUID workshopId = mockWorkshop.getId();
         when(workshopRepository.findById(workshopId)).thenReturn(Optional.of(mockWorkshop));
         when(categoryRepository.existsByWorkshopIdAndName(workshopId, "consumibles")).thenReturn(false);
-        when(categoryRepository.save(any(CatalogCategory.class))).thenReturn(mockCategory);
+        when(categoryRepository.save(any(TaskCategory.class))).thenReturn(mockCategory);
 
-        CatalogCategory result = catalogAdminService.createCategory(workshopId, "Consumibles");
+        TaskCategory result = catalogAdminService.createCategory(workshopId, "Consumibles");
 
         assertNotNull(result);
-        verify(categoryRepository, times(1)).save(any(CatalogCategory.class));
+        verify(categoryRepository, times(1)).save(any(TaskCategory.class));
     }
 
     @Test

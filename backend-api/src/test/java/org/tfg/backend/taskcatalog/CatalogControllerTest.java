@@ -32,12 +32,12 @@ class CatalogControllerTest {
     @InjectMocks
     private CatalogController catalogController;
 
-    private CatalogCategory mockCategory;
+    private TaskCategory mockCategory;
     private CatalogTask mockTask;
 
     @BeforeEach
     void setUp() {
-        mockCategory = CatalogCategory.builder()
+        mockCategory = TaskCategory.builder()
                 .id(UUID.randomUUID())
                 .name("1_consumibles")
                 .displayName("Consumibles")
