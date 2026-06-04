@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface PartCatalogRepository extends JpaRepository<PartCatalog, UUID> {
-    Optional<PartCatalog> findByOemReference(String oemReference);
+    Optional<PartCatalog> findByOemReferenceAndCategoryWorkshopId(String oemReference, UUID workshopId);
     List<PartCatalog> findByName(String name);
 }

@@ -9,13 +9,15 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "part_catalog")
+@Table(name = "part_catalog", uniqueConstraints = {
+    @UniqueConstraint(name = "UK_part_catalog_category_oem", columnNames = {"category_id", "oem_reference"})
+})
 public class PartCatalog {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "oem_reference", unique = true)
+    @Column(name = "oem_reference")
     private String oemReference;
 
     @Column(nullable = false)

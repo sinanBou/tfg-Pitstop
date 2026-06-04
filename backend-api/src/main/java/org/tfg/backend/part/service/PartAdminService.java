@@ -55,7 +55,7 @@ public class PartAdminService {
     private void createPartDemo(String oemRef, String name, String manufacturer, String specs, String categoryName,
                                 double costPrice, double retailPrice, int stock, org.tfg.backend.workshop.Workshop workshop) {
         PartCategory category = findOrCreateCategory(categoryName, workshop);
-        PartCatalog part = partCatalogRepository.findByOemReference(oemRef)
+        PartCatalog part = partCatalogRepository.findByOemReferenceAndCategoryWorkshopId(oemRef, workshop.getId())
                 .orElseGet(() -> {
                     PartCatalog p = PartCatalog.builder()
                             .oemReference(oemRef)
@@ -93,7 +93,7 @@ public class PartAdminService {
 
         PartCatalog part = null;
         if (cleanOem != null) {
-            part = partCatalogRepository.findByOemReference(cleanOem).orElse(null);
+            part = partCatalogRepository.findByOemReferenceAndCategoryWorkshopId(cleanOem, workshopId).orElse(null);
         }
 
         if (part == null) {

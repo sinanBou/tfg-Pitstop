@@ -86,7 +86,7 @@ class PartAdminServiceTest {
         UUID workshopId = mockWorkshop.getId();
         when(partCategoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
         when(workshopRepository.findById(workshopId)).thenReturn(Optional.of(mockWorkshop));
-        when(partCatalogRepository.findByOemReference("REF-123")).thenReturn(Optional.empty());
+        when(partCatalogRepository.findByOemReferenceAndCategoryWorkshopId("REF-123", workshopId)).thenReturn(Optional.empty());
         when(partCatalogRepository.save(any(PartCatalog.class))).thenReturn(mockPart);
         when(workshopInventoryRepository.findByPartIdAndWorkshopId(any(), any())).thenReturn(Optional.empty());
         when(workshopInventoryRepository.save(any(WorkshopInventory.class))).thenReturn(mockInventory);
