@@ -20,7 +20,7 @@ export interface CatalogTask {
   hours1Rueda?: number;
 }
 
-export interface CatalogCategory {
+export interface TaskCategory {
   id: string;
   name: string;
   displayName: string;
@@ -33,7 +33,7 @@ interface TasksTabProps {
 
 export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   const toast = useToast();
-  const [categories, setCategories] = useState<CatalogCategory[]>([]);
+  const [categories, setCategories] = useState<TaskCategory[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Search and expand states
@@ -312,7 +312,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       };
     }
     return null;
-  }).filter((cat): cat is CatalogCategory => cat !== null);
+  }).filter((cat): cat is TaskCategory => cat !== null);
 
   if (loading) {
     return (
