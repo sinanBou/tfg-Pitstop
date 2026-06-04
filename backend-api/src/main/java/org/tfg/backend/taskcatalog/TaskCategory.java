@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "catalog_categories")
+@Table(name = "task_categories")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = {"workshop", "tasks"})
-public class CatalogCategory {
+public class TaskCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

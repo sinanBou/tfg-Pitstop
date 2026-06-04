@@ -16,17 +16,17 @@ import java.util.UUID;
 @Slf4j
 public class CatalogService {
 
-    private final CatalogCategoryRepository categoryRepository;
+    private final TaskCategoryRepository categoryRepository;
     private final CatalogTaskRepository taskRepository;
     private final WorkshopRepository workshopRepository;
 
     @Transactional(readOnly = true)
-    public List<CatalogCategory> getCatalog(UUID workshopId) {
+    public List<TaskCategory> getCatalog(UUID workshopId) {
         return categoryRepository.findByWorkshopIdOrderByNameAsc(workshopId);
     }
 
     @Transactional
-    public CatalogCategory createCategory(UUID workshopId, String displayName) {
+    public TaskCategory createCategory(UUID workshopId, String displayName) {
         Workshop workshop = workshopRepository.findById(workshopId)
                 .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
@@ -46,7 +46,7 @@ public class CatalogService {
             uniqueName = name + "_" + counter++;
         }
 
-        CatalogCategory category = CatalogCategory.builder()
+        TaskCategory category = TaskCategory.builder()
                 .workshop(workshop)
                 .name(uniqueName)
                 .displayName(displayName)
@@ -57,7 +57,7 @@ public class CatalogService {
 
     @Transactional
     public CatalogTask createTask(UUID workshopId, UUID categoryId, CatalogTask taskDto) {
-        CatalogCategory category = categoryRepository.findById(categoryId)
+        TaskCategory category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
         if (!category.getWorkshop().getId().equals(workshopId)) {
@@ -107,7 +107,7 @@ public class CatalogService {
 
     @Transactional
     public void deleteCategory(UUID categoryId) {
-        CatalogCategory category = categoryRepository.findById(categoryId)
+        TaskCategory category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
         if (!category.getTasks().isEmpty()) {
             throw new RuntimeException("No se puede eliminar la categoría porque contiene tareas");
@@ -115,7 +115,7 @@ public class CatalogService {
         categoryRepository.delete(category);
     }
 
-    private String generateNextCode(CatalogCategory category) {
+    private String generateNextCode(TaskCategory category) {
         List<CatalogTask> tasks = category.getTasks();
         if (tasks == null || tasks.isEmpty()) {
             // Si la categoría tiene un prefijo numérico (ej. "12_neumaticos"), usamos ese prefijo

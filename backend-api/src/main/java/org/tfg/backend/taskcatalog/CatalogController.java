@@ -16,12 +16,12 @@ public class CatalogController {
     private final CatalogService catalogService;
 
     @GetMapping("/workshop/{workshopId}")
-    public ResponseEntity<List<CatalogCategory>> getCatalog(@PathVariable UUID workshopId) {
+    public ResponseEntity<List<TaskCategory>> getCatalog(@PathVariable UUID workshopId) {
         return ResponseEntity.ok(catalogService.getCatalog(workshopId));
     }
 
     @PostMapping("/workshop/{workshopId}/categories")
-    public ResponseEntity<CatalogCategory> createCategory(
+    public ResponseEntity<TaskCategory> createCategory(
             @PathVariable UUID workshopId,
             @RequestBody Map<String, String> body) {
         String displayName = body.get("displayName");

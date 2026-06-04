@@ -3,8 +3,8 @@ package org.tfg.backend.taskcatalog.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.tfg.backend.taskcatalog.CatalogCategory;
-import org.tfg.backend.taskcatalog.CatalogCategoryRepository;
+import org.tfg.backend.taskcatalog.TaskCategory;
+import org.tfg.backend.taskcatalog.TaskCategoryRepository;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,10 +13,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CatalogLookupService {
 
-    private final CatalogCategoryRepository categoryRepository;
+    private final TaskCategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<CatalogCategory> getCatalog(UUID workshopId) {
+    public List<TaskCategory> getCatalog(UUID workshopId) {
         return categoryRepository.findByWorkshopIdOrderByNameAsc(workshopId);
     }
 }

@@ -18,7 +18,7 @@ import java.util.Map;
 @Slf4j
 public class CatalogInitializationService {
 
-    private final CatalogCategoryRepository categoryRepository;
+    private final TaskCategoryRepository categoryRepository;
     private final CatalogTaskRepository taskRepository;
     private final ObjectMapper objectMapper;
 
@@ -74,7 +74,7 @@ public class CatalogInitializationService {
     private void createCategoryAndTasks(String categoryKey, JsonNode tasksArray, Workshop workshop) {
         String displayName = CATEGORY_DISPLAY_NAMES.getOrDefault(categoryKey, categoryKey);
         
-        CatalogCategory category = CatalogCategory.builder()
+        TaskCategory category = TaskCategory.builder()
                 .name(categoryKey)
                 .displayName(displayName)
                 .workshop(workshop)

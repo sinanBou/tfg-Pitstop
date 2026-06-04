@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CatalogCategoryRepository extends JpaRepository<CatalogCategory, UUID> {
-    List<CatalogCategory> findByWorkshopIdOrderByNameAsc(UUID workshopId);
-    Optional<CatalogCategory> findByWorkshopIdAndName(UUID workshopId, String name);
+public interface TaskCategoryRepository extends JpaRepository<TaskCategory, UUID> {
+    List<TaskCategory> findByWorkshopIdOrderByNameAsc(UUID workshopId);
+    Optional<TaskCategory> findByWorkshopIdAndName(UUID workshopId, String name);
     boolean existsByWorkshopIdAndName(UUID workshopId, String name);
 }

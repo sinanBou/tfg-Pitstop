@@ -14,12 +14,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CatalogAdminService {
 
-    private final CatalogCategoryRepository categoryRepository;
+    private final TaskCategoryRepository categoryRepository;
     private final CatalogTaskRepository taskRepository;
     private final WorkshopRepository workshopRepository;
 
     @Transactional
-    public CatalogCategory createCategory(UUID workshopId, String displayName) {
+    public TaskCategory createCategory(UUID workshopId, String displayName) {
         Workshop workshop = workshopRepository.findById(workshopId)
                 .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
@@ -37,7 +37,7 @@ public class CatalogAdminService {
             uniqueName = name + "_" + counter++;
         }
 
-        CatalogCategory category = CatalogCategory.builder()
+        TaskCategory category = TaskCategory.builder()
                 .workshop(workshop)
                 .name(uniqueName)
                 .displayName(displayName)
@@ -48,7 +48,7 @@ public class CatalogAdminService {
 
     @Transactional
     public CatalogTask createTask(UUID workshopId, UUID categoryId, CatalogTask taskDto) {
-        CatalogCategory category = categoryRepository.findById(categoryId)
+        TaskCategory category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
 
         if (!category.getWorkshop().getId().equals(workshopId)) {
@@ -95,7 +95,7 @@ public class CatalogAdminService {
         taskRepository.deleteById(taskId);
     }
 
-    private String generateNextCode(CatalogCategory category) {
+    private String generateNextCode(TaskCategory category) {
         List<CatalogTask> tasks = category.getTasks();
         if (tasks == null || tasks.isEmpty()) {
             String prefix = extractNumericPrefix(category.getName());

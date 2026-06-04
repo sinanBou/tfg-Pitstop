@@ -15,7 +15,7 @@ import java.util.List;
 public class CatalogDataSeeder implements CommandLineRunner {
 
     private final WorkshopRepository workshopRepository;
-    private final CatalogCategoryRepository categoryRepository;
+    private final TaskCategoryRepository categoryRepository;
     private final CatalogInitializationService initializationService;
 
     @Override

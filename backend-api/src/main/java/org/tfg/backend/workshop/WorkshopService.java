@@ -10,7 +10,7 @@ import org.tfg.backend.employee.EmployeeRepository;
 import org.tfg.backend.invoice.InvoiceRepository;
 import org.tfg.backend.appointment.AppointmentRepository;
 import org.tfg.backend.workshoptask.WorkshopTaskRepository;
-import org.tfg.backend.taskcatalog.CatalogCategoryRepository;
+import org.tfg.backend.taskcatalog.TaskCategoryRepository;
 import org.tfg.backend.vehicle.Vehicle;
 
 import java.util.List;
@@ -26,7 +26,7 @@ public class WorkshopService {
     private final EmployeeRepository employeeRepository;
     private final org.tfg.backend.taskcatalog.CatalogInitializationService catalogInitializationService;
     private final org.tfg.backend.storage.StorageService storageService;
-    private final CatalogCategoryRepository catalogCategoryRepository;
+    private final TaskCategoryRepository catalogCategoryRepository;
     private final AppointmentRepository appointmentRepository;
     private final WorkshopTaskRepository workshopTaskRepository;
     private final InvoiceRepository invoiceRepository;
@@ -100,7 +100,7 @@ public class WorkshopService {
         appointmentRepository.deleteAll(appointments);
 
         // 5. Eliminar categorías del catálogo de tareas (esto cascada-elimina los CatalogTask debido a CascadeType.ALL)
-        List<org.tfg.backend.taskcatalog.CatalogCategory> categories = catalogCategoryRepository.findByWorkshopIdOrderByNameAsc(id);
+        List<org.tfg.backend.taskcatalog.TaskCategory> categories = catalogCategoryRepository.findByWorkshopIdOrderByNameAsc(id);
         catalogCategoryRepository.deleteAll(categories);
 
         // 6. Desasociar el taller del dueño

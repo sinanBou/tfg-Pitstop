@@ -39,5 +39,5 @@ public class CatalogTask {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     @JsonBackReference
-    private CatalogCategory category;
+    private TaskCategory category;
 }
