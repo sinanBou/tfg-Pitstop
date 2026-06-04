@@ -12,6 +12,7 @@ import org.tfg.backend.appointment.AppointmentRepository;
 import org.tfg.backend.workshoptask.WorkshopTaskRepository;
 import org.tfg.backend.taskcatalog.TaskCategoryRepository;
 import org.tfg.backend.vehicle.Vehicle;
+import org.tfg.backend.part.service.PartAdminService;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class WorkshopService {
     private final AppointmentRepository appointmentRepository;
     private final WorkshopTaskRepository workshopTaskRepository;
     private final InvoiceRepository invoiceRepository;
+    private final PartAdminService partAdminService;
 
     /**
      * Registra un nuevo taller en el sistema.
@@ -68,6 +70,7 @@ public class WorkshopService {
         owner.setWorkshop(savedWorkshop);
         employeeRepository.save(owner);
         catalogInitializationService.initializeCatalogForWorkshop(savedWorkshop);
+        partAdminService.initializeInventoryForWorkshop(savedWorkshop);
         return mapToDTO(savedWorkshop);
     }
 

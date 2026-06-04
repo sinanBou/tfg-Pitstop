@@ -23,6 +23,17 @@ public class EmailService {
     @Value("${app.backend.url:http://localhost:9091}")
     private String backendUrl;
 
+    private boolean isMockEmail(String email) {
+        if (email == null) return true;
+        String lower = email.toLowerCase();
+        return lower.endsWith("@pitstop.com")
+                || lower.endsWith("@example.com")
+                || lower.contains("test")
+                || lower.contains("mock")
+                || lower.endsWith(".local")
+                || lower.endsWith(".test");
+    }
+
     public void sendVerificationEmail(String toEmail, String token) {
         String verificationUrl = backendUrl + "/api/auth/verify?token=" + token;
         String subject = "Verifica tu cuenta - PitStop";
@@ -31,6 +42,15 @@ public class EmailService {
                 verificationUrl + "\n\n" +
                 "Este enlace es necesario para poder iniciar sesión.\n\n" +
                 "Atentamente,\nEl equipo de PitStop";
+
+        if (isMockEmail(toEmail)) {
+            log.info("[MOCK EMAIL] Simulación de envío de correo de verificación a {}", toEmail);
+            log.warn("\n==================================================\n" +
+                     "TOKEN DE VERIFICACIÓN (MOCK) PARA {}: {}\n" +
+                     "ENLACE: {}\n" +
+                     "==================================================", toEmail, token, verificationUrl);
+            return;
+        }
 
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
@@ -60,6 +80,15 @@ public class EmailService {
                 "Si no has solicitado este cambio, por favor ignora este correo.\n\n" +
                 "Atentamente,\nEl equipo de PitStop";
 
+        if (isMockEmail(toEmail)) {
+            log.info("[MOCK EMAIL] Simulación de envío de correo de restablecimiento a {}", toEmail);
+            log.warn("\n==================================================\n" +
+                     "TOKEN DE RESET (MOCK) PARA {}: {}\n" +
+                     "ENLACE: {}\n" +
+                     "==================================================", toEmail, token, resetUrl);
+            return;
+        }
+
         try {
             SimpleMailMessage mailMessage = new SimpleMailMessage();
             mailMessage.setTo(toEmail);
@@ -78,3 +107,4 @@ public class EmailService {
         }
     }
 }
+

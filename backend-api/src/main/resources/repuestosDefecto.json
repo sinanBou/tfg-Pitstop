@@ -1,0 +1,134 @@
+{
+  "categorias": {
+    "frenos": {
+      "displayName": "Frenos",
+      "repuestos": [
+        {
+          "oemReference": "REF-BREM-001",
+          "name": "Pastillas de freno Brembo",
+          "manufacturer": "Brembo",
+          "technicalSpecs": "Kit de pastillas de freno delantero de alto rendimiento",
+          "costPrice": 45.0,
+          "retailPrice": 75.0,
+          "stockQuantity": 10,
+          "avisoThreshold": 3
+        },
+        {
+          "oemReference": "REF-BREM-002",
+          "name": "Discos de freno Brembo",
+          "manufacturer": "Brembo",
+          "technicalSpecs": "Pareja de discos de freno ventilados delanteros",
+          "costPrice": 80.0,
+          "retailPrice": 135.0,
+          "stockQuantity": 4,
+          "avisoThreshold": 2
+        }
+      ]
+    },
+    "filtros": {
+      "displayName": "Filtros",
+      "repuestos": [
+        {
+          "oemReference": "REF-BOSCH-101",
+          "name": "Filtro de aceite Bosch",
+          "manufacturer": "Bosch",
+          "technicalSpecs": "Filtro purificador metálico de aceite de motor",
+          "costPrice": 8.0,
+          "retailPrice": 15.0,
+          "stockQuantity": 15,
+          "avisoThreshold": 5
+        },
+        {
+          "oemReference": "REF-BOSCH-102",
+          "name": "Filtro de aire Bosch",
+          "manufacturer": "Bosch",
+          "technicalSpecs": "Filtro de aire de celulosa de alta eficiencia",
+          "costPrice": 12.0,
+          "retailPrice": 22.0,
+          "stockQuantity": 10,
+          "avisoThreshold": 3
+        },
+        {
+          "oemReference": "REF-BOSCH-103",
+          "name": "Filtro de habitáculo Bosch",
+          "manufacturer": "Bosch",
+          "technicalSpecs": "Filtro de carbón activo para purificación de cabina",
+          "costPrice": 15.0,
+          "retailPrice": 28.0,
+          "stockQuantity": 8,
+          "avisoThreshold": 3
+        }
+      ]
+    },
+    "lubricantes": {
+      "displayName": "Lubricantes",
+      "repuestos": [
+        {
+          "oemReference": "REF-CAST-201",
+          "name": "Aceite Castrol EDGE 5W-30",
+          "manufacturer": "Castrol",
+          "technicalSpecs": "Garrafa de 5 litros de aceite sintético avanzado",
+          "costPrice": 25.0,
+          "retailPrice": 48.0,
+          "stockQuantity": 12,
+          "avisoThreshold": 4
+        },
+        {
+          "oemReference": "REF-CAST-202",
+          "name": "Aceite Castrol Magnatec 10W-40",
+          "manufacturer": "Castrol",
+          "technicalSpecs": "Garrafa de 5 litros de aceite semisintético para motor",
+          "costPrice": 20.0,
+          "retailPrice": 38.0,
+          "stockQuantity": 8,
+          "avisoThreshold": 3
+        }
+      ]
+    },
+    "iluminacion": {
+      "displayName": "Iluminación",
+      "repuestos": [
+        {
+          "oemReference": "REF-PHIL-301",
+          "name": "Bombilla H7 Philips X-tremeVision",
+          "manufacturer": "Philips",
+          "technicalSpecs": "Lámpara halógena para faros principales de alta luminosidad",
+          "costPrice": 9.0,
+          "retailPrice": 18.0,
+          "stockQuantity": 20,
+          "avisoThreshold": 5
+        }
+      ]
+    },
+    "electricidad": {
+      "displayName": "Electricidad",
+      "repuestos": [
+        {
+          "oemReference": "REF-TUD-401",
+          "name": "Batería Tudor High Tech 74Ah",
+          "manufacturer": "Tudor",
+          "technicalSpecs": "Batería de arranque de alta capacidad libre de mantenimiento",
+          "costPrice": 55.0,
+          "retailPrice": 95.0,
+          "stockQuantity": 5,
+          "avisoThreshold": 2
+        }
+      ]
+    },
+    "neumaticos": {
+      "displayName": "Neumáticos",
+      "repuestos": [
+        {
+          "oemReference": "REF-MICH-501",
+          "name": "Neumático Michelin Primacy 4",
+          "manufacturer": "Michelin",
+          "technicalSpecs": "Neumático de verano 205/55 R16 de larga duración",
+          "costPrice": 65.0,
+          "retailPrice": 110.0,
+          "stockQuantity": 8,
+          "avisoThreshold": 4
+        }
+      ]
+    }
+  }
+}

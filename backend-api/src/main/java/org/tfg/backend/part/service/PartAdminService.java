@@ -2,6 +2,7 @@ package org.tfg.backend.part.service;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.part.*;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PartAdminService {
 
     private final PartCatalogRepository partCatalogRepository;
@@ -18,6 +20,7 @@ public class PartAdminService {
     private final AppointmentPartRepository appointmentPartRepository;
     private final PartAssignmentService partAssignmentService;
     private final org.tfg.backend.workshop.WorkshopRepository workshopRepository;
+    private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
     public PartCategory findOrCreateCategory(String displayName, org.tfg.backend.workshop.Workshop workshop) {
         String slug = displayName.toLowerCase().trim()
@@ -41,20 +44,50 @@ public class PartAdminService {
     @Transactional
     public void initializeInventoryForWorkshop(org.tfg.backend.workshop.Workshop workshop) {
         findOrCreateCategory("Recambios personalizados", workshop);
-        seedDemoPartsForWorkshop(workshop);
+        
+        log.info("Inicializando catálogo de repuestos por defecto para el taller: {}", workshop.getCompanyName());
+        try {
+            org.springframework.core.io.ClassPathResource resource = new org.springframework.core.io.ClassPathResource("repuestosDefecto.json");
+            try (java.io.InputStream is = resource.getInputStream()) {
+                com.fasterxml.jackson.databind.JsonNode root = objectMapper.readTree(is);
+                com.fasterxml.jackson.databind.JsonNode categorias = root.get("categorias");
+                if (categorias != null) {
+                    java.util.Iterator<java.util.Map.Entry<String, com.fasterxml.jackson.databind.JsonNode>> fields = categorias.fields();
+                    while (fields.hasNext()) {
+                        java.util.Map.Entry<String, com.fasterxml.jackson.databind.JsonNode> field = fields.next();
+                        String categoryKey = field.getKey();
+                        com.fasterxml.jackson.databind.JsonNode categoryNode = field.getValue();
+                        
+                        String displayName = categoryNode.has("displayName") ? categoryNode.get("displayName").asText() : categoryKey;
+                        PartCategory category = findOrCreateCategory(displayName, workshop);
+                        
+                        com.fasterxml.jackson.databind.JsonNode repuestos = categoryNode.get("repuestos");
+                        if (repuestos != null && repuestos.isArray()) {
+                            for (com.fasterxml.jackson.databind.JsonNode partNode : repuestos) {
+                                String oemRef = partNode.get("oemReference").asText();
+                                String name = partNode.get("name").asText();
+                                String manufacturer = partNode.get("manufacturer").asText();
+                                String specs = partNode.has("technicalSpecs") ? partNode.get("technicalSpecs").asText() : "";
+                                double costPrice = partNode.get("costPrice").asDouble();
+                                double retailPrice = partNode.get("retailPrice").asDouble();
+                                int stock = partNode.get("stockQuantity").asInt();
+                                int avisoThreshold = partNode.has("avisoThreshold") ? partNode.get("avisoThreshold").asInt() : 5;
+                                
+                                createPartInInventory(oemRef, name, manufacturer, specs, category, costPrice, retailPrice, stock, avisoThreshold, workshop);
+                            }
+                        }
+                    }
+                }
+            }
+            log.info("Catálogo de repuestos inicializado con éxito para el taller: {}", workshop.getCompanyName());
+        } catch (Exception e) {
+            log.error("Error al inicializar el catálogo de repuestos para el taller {}", workshop.getCompanyName(), e);
+            throw new RuntimeException("No se pudo cargar el catálogo de repuestos por defecto", e);
+        }
     }
 
-    private void seedDemoPartsForWorkshop(org.tfg.backend.workshop.Workshop workshop) {
-        createPartDemo("REF-1020", "Pastillas de freno Brembo", "Brembo", "Kit de pastillas de alto rendimiento", "Frenos", 45.0, 75.0, 5, workshop);
-        createPartDemo("REF-3040", "Filtro de aceite Bosch", "Bosch", "Filtro purificador metálico", "Filtros", 8.0, 15.0, 10, workshop);
-        createPartDemo("REF-5060", "Aceite Castrol EDGE 5W-30", "Castrol", "Garrafa de 5 litros de aceite sintético", "Lubricantes", 25.0, 48.0, 3, workshop);
-        createPartDemo("REF-7080", "Filtro de aire Bosch", "Bosch", "Filtro de cabina lavable", "Filtros", 12.0, 22.0, 5, workshop);
-        createPartDemo("REF-9010", "Bujía NGK Iridium", "NGK", "Bujía de alto rendimiento de iridio", "Encendido", 6.5, 12.0, 12, workshop);
-    }
-
-    private void createPartDemo(String oemRef, String name, String manufacturer, String specs, String categoryName,
-                                double costPrice, double retailPrice, int stock, org.tfg.backend.workshop.Workshop workshop) {
-        PartCategory category = findOrCreateCategory(categoryName, workshop);
+    private void createPartInInventory(String oemRef, String name, String manufacturer, String specs, PartCategory category,
+                                       double costPrice, double retailPrice, int stock, int avisoThreshold, org.tfg.backend.workshop.Workshop workshop) {
         PartCatalog part = partCatalogRepository.findByOemReferenceAndCategoryWorkshopId(oemRef, workshop.getId())
                 .orElseGet(() -> {
                     PartCatalog p = PartCatalog.builder()
@@ -73,7 +106,7 @@ public class PartAdminService {
                     .stockQuantity(stock)
                     .costPrice(costPrice)
                     .retailPrice(retailPrice)
-                    .avisoThreshold(5)
+                    .avisoThreshold(avisoThreshold)
                     .workshop(workshop)
                     .build();
             workshopInventoryRepository.save(inventory);
