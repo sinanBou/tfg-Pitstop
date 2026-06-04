@@ -49,10 +49,10 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
       setLoadingInv(true);
       const token = localStorage.getItem('jwt_token');
       const [invRes, catsRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/parts/inventory`, {
+        fetch(`${API_BASE_URL}/parts/workshop/${workshopId}/inventory`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        fetch(`${API_BASE_URL}/parts/categories`, {
+        fetch(`${API_BASE_URL}/parts/workshop/${workshopId}/categories`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);

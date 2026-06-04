@@ -9,15 +9,21 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "workshop_inventory")
+@ToString(exclude = "workshop")
+@Table(name = "workshop_inventory", uniqueConstraints = {@UniqueConstraint(columnNames = {"workshop_id", "part_id"})})
 public class WorkshopInventory {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "part_id", nullable = false)
     private PartCatalog part;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "workshop_id", nullable = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private org.tfg.backend.workshop.Workshop workshop;
 
 
     @Column(name = "stock_quantity", nullable = false)

@@ -104,10 +104,10 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       const token = localStorage.getItem('jwt_token');
       
       const [catsRes, invRes] = await Promise.all([
-        fetch(`${API_BASE_URL}/parts/categories`, {
+        fetch(`${API_BASE_URL}/parts/workshop/${workshopId}/categories`, {
           headers: { 'Authorization': `Bearer ${token}` }
         }),
-        fetch(`${API_BASE_URL}/parts/inventory`, {
+        fetch(`${API_BASE_URL}/parts/workshop/${workshopId}/inventory`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
       ]);
@@ -186,7 +186,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
     setAddingCategory(true);
     try {
       const token = localStorage.getItem('jwt_token');
-      const res = await fetch(`${API_BASE_URL}/parts/categories`, {
+      const res = await fetch(`${API_BASE_URL}/parts/workshop/${workshopId}/categories`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -230,7 +230,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
         avisoThreshold: parseInt(newAvisoThreshold) || 5
       };
 
-      const res = await fetch(`${API_BASE_URL}/parts/inventory`, {
+      const res = await fetch(`${API_BASE_URL}/parts/workshop/${workshopId}/inventory`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

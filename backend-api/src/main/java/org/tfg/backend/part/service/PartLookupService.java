@@ -23,8 +23,8 @@ public class PartLookupService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkshopInventory> getAllInventory() {
-        return workshopInventoryRepository.findAll();
+    public List<WorkshopInventory> getInventoryByWorkshop(UUID workshopId) {
+        return workshopInventoryRepository.findByWorkshopId(workshopId);
     }
 
     @Transactional(readOnly = true)
@@ -33,7 +33,7 @@ public class PartLookupService {
     }
 
     @Transactional(readOnly = true)
-    public List<PartCategory> getAllCategories() {
-        return partCategoryRepository.findAll();
+    public List<PartCategory> getCategoriesByWorkshop(UUID workshopId) {
+        return partCategoryRepository.findByWorkshopIdOrderByNameAsc(workshopId);
     }
 }

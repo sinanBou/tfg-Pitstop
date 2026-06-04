@@ -17,6 +17,8 @@ public class CatalogDataSeeder implements CommandLineRunner {
     private final WorkshopRepository workshopRepository;
     private final TaskCategoryRepository categoryRepository;
     private final CatalogInitializationService initializationService;
+    private final org.tfg.backend.part.service.PartAdminService partAdminService;
+    private final org.tfg.backend.part.PartCategoryRepository partCategoryRepository;
 
     @Override
     public void run(String... args) {
@@ -27,6 +29,12 @@ public class CatalogDataSeeder implements CommandLineRunner {
             if (!hasCategories) {
                 log.info("El taller {} no tiene catálogo. Inicializando catálogo por defecto...", workshop.getCompanyName());
                 initializationService.initializeCatalogForWorkshop(workshop);
+            }
+
+            boolean hasPartCategories = !partCategoryRepository.findByWorkshopId(workshop.getId()).isEmpty();
+            if (!hasPartCategories) {
+                log.info("El taller {} no tiene catálogo de repuestos. Inicializando...", workshop.getCompanyName());
+                partAdminService.initializeInventoryForWorkshop(workshop);
             }
         }
     }

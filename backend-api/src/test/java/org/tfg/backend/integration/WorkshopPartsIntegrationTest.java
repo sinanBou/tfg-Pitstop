@@ -157,7 +157,7 @@ class WorkshopPartsIntegrationTest {
         Map<String, Object> categoryPayload = new HashMap<>();
         categoryPayload.put("displayName", "Filtros " + randomSuffix);
 
-        MvcResult categoryResult = mockMvc.perform(post("/api/parts/categories")
+        MvcResult categoryResult = mockMvc.perform(post("/api/parts/workshop/" + workshopId + "/categories")
                         .header("Authorization", "Bearer " + ownerJwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(categoryPayload)))
@@ -179,7 +179,7 @@ class WorkshopPartsIntegrationTest {
         partPayload.put("stockQuantity", 15);
         partPayload.put("avisoThreshold", 3);
 
-        MvcResult partResult = mockMvc.perform(post("/api/parts/inventory")
+        MvcResult partResult = mockMvc.perform(post("/api/parts/workshop/" + workshopId + "/inventory")
                         .header("Authorization", "Bearer " + ownerJwt)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(partPayload)))
@@ -195,12 +195,12 @@ class WorkshopPartsIntegrationTest {
         UUID partId = UUID.fromString((String) partItem.get("id"));
 
         // 7. Consultar categorías e inventario
-        mockMvc.perform(get("/api/parts/categories")
+        mockMvc.perform(get("/api/parts/workshop/" + workshopId + "/categories")
                         .header("Authorization", "Bearer " + ownerJwt))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))));
 
-        mockMvc.perform(get("/api/parts/inventory")
+        mockMvc.perform(get("/api/parts/workshop/" + workshopId + "/inventory")
                         .header("Authorization", "Bearer " + ownerJwt))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(greaterThanOrEqualTo(1))));

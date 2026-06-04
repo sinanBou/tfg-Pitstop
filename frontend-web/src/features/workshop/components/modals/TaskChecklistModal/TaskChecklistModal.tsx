@@ -182,8 +182,9 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   }, [inventory, partQuery]);
 
   const loadInventory = useCallback(() => {
+    if (!item?.workshopId) return;
     const token = localStorage.getItem('jwt_token');
-    fetch(`${API_BASE_URL}/parts/inventory`, {
+    fetch(`${API_BASE_URL}/parts/workshop/${item.workshopId}/inventory`, {
       headers: { 'Authorization': `Bearer ${token}` }
     })
       .then(res => res.json())
@@ -191,7 +192,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         setInventory(data || []);
       })
       .catch(err => console.error("Error loading inventory:", err));
-  }, []);
+  }, [item?.workshopId]);
 
   const loadAssignedParts = useCallback(() => {
     if (!jobId) return;

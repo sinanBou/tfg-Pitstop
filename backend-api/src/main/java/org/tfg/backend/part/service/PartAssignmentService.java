@@ -23,7 +23,7 @@ public class PartAssignmentService {
     private final ApplicationEventPublisher eventPublisher;
     private final PartCategoryRepository partCategoryRepository;
 
-    private PartCategory findOrCreateCategory(String displayName) {
+    private PartCategory findOrCreateCategory(String displayName, org.tfg.backend.workshop.Workshop workshop) {
         String slug = displayName.toLowerCase().trim()
                 .replace(" ", "_")
                 .replace("á", "a")
@@ -31,11 +31,12 @@ public class PartAssignmentService {
                 .replace("í", "i")
                 .replace("ó", "o")
                 .replace("ú", "u");
-        return partCategoryRepository.findByName(slug)
+        return partCategoryRepository.findByNameAndWorkshopId(slug, workshop.getId())
                 .orElseGet(() -> {
                     PartCategory newCat = PartCategory.builder()
                             .name(slug)
                             .displayName(displayName)
+                            .workshop(workshop)
                             .build();
                     return partCategoryRepository.save(newCat);
                 });
@@ -49,7 +50,7 @@ public class PartAssignmentService {
         PartCatalog part = partCatalogRepository.findById(partId)
                 .orElseThrow(() -> new RuntimeException("Pieza no encontrada en catálogo"));
 
-        WorkshopInventory inventory = workshopInventoryRepository.findByPartId(partId)
+        WorkshopInventory inventory = workshopInventoryRepository.findByPartIdAndWorkshopId(partId, appointment.getWorkshop().getId())
                 .orElseThrow(() -> new RuntimeException("Pieza no disponible en inventario del taller"));
 
         if (inventory.getStockQuantity() < quantity) {
@@ -91,7 +92,7 @@ public class PartAssignmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
 
-        PartCategory category = findOrCreateCategory("Recambios personalizados");
+        PartCategory category = findOrCreateCategory("Recambios personalizados", appointment.getWorkshop());
 
         PartCatalog part = partCatalogRepository.findByName(customName.trim())
                 .stream().findFirst().orElseGet(() -> {
@@ -103,7 +104,7 @@ public class PartAssignmentService {
                     return partCatalogRepository.save(p);
                 });
 
-        WorkshopInventory inventory = workshopInventoryRepository.findByPartId(part.getId())
+        WorkshopInventory inventory = workshopInventoryRepository.findByPartIdAndWorkshopId(part.getId(), appointment.getWorkshop().getId())
                 .orElseGet(() -> {
                     WorkshopInventory inv = WorkshopInventory.builder()
                             .part(part)
@@ -111,6 +112,7 @@ public class PartAssignmentService {
                             .costPrice(0.0)
                             .retailPrice(0.0)
                             .avisoThreshold(0)
+                            .workshop(appointment.getWorkshop())
                             .build();
                     return workshopInventoryRepository.save(inv);
                 });
@@ -142,7 +144,7 @@ public class PartAssignmentService {
         AppointmentPart appointmentPart = appointmentPartRepository.findByAppointmentIdAndPartId(appointmentId, partId)
                 .orElseThrow(() -> new RuntimeException("La pieza no está asignada a esta cita"));
 
-        Optional<WorkshopInventory> inventoryOpt = workshopInventoryRepository.findByPartId(partId);
+        Optional<WorkshopInventory> inventoryOpt = workshopInventoryRepository.findByPartIdAndWorkshopId(partId, appointment.getWorkshop().getId());
         if (inventoryOpt.isPresent()) {
             WorkshopInventory inventory = inventoryOpt.get();
             inventory.setStockQuantity(inventory.getStockQuantity() + appointmentPart.getQuantityUsed());

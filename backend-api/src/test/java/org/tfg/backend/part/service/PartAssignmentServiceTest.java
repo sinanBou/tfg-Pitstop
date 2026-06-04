@@ -43,6 +43,7 @@ class PartAssignmentServiceTest {
     @InjectMocks
     private PartAssignmentService partAssignmentService;
 
+    private org.tfg.backend.workshop.Workshop mockWorkshop;
     private Appointment mockAppointment;
     private PartCatalog mockPart;
     private WorkshopInventory mockInventory;
@@ -51,15 +52,22 @@ class PartAssignmentServiceTest {
 
     @BeforeEach
     void setUp() {
+        mockWorkshop = org.tfg.backend.workshop.Workshop.builder()
+                .id(UUID.randomUUID())
+                .companyName("Taller Test")
+                .build();
+
         mockAppointment = Appointment.builder()
                 .id(UUID.randomUUID())
                 .estimatedDuration(120)
+                .workshop(mockWorkshop)
                 .build();
 
         mockCategory = PartCategory.builder()
                 .id(UUID.randomUUID())
                 .name("frenos")
                 .displayName("Frenos")
+                .workshop(mockWorkshop)
                 .parts(new ArrayList<>())
                 .build();
 
@@ -78,6 +86,7 @@ class PartAssignmentServiceTest {
                 .costPrice(20.0)
                 .retailPrice(35.0)
                 .avisoThreshold(5)
+                .workshop(mockWorkshop)
                 .build();
 
         mockAppointmentPart = AppointmentPart.builder()
@@ -94,7 +103,7 @@ class PartAssignmentServiceTest {
         UUID partId = mockPart.getId();
         when(appointmentRepository.findById(mockAppointment.getId())).thenReturn(Optional.of(mockAppointment));
         when(partCatalogRepository.findById(partId)).thenReturn(Optional.of(mockPart));
-        when(workshopInventoryRepository.findByPartId(partId)).thenReturn(Optional.of(mockInventory));
+        when(workshopInventoryRepository.findByPartIdAndWorkshopId(partId, mockWorkshop.getId())).thenReturn(Optional.of(mockInventory));
         when(appointmentPartRepository.findByAppointmentIdAndPartId(mockAppointment.getId(), partId)).thenReturn(Optional.empty());
         when(appointmentPartRepository.save(any(AppointmentPart.class))).thenReturn(mockAppointmentPart);
 
@@ -113,7 +122,7 @@ class PartAssignmentServiceTest {
         UUID partId = mockPart.getId();
         when(appointmentRepository.findById(mockAppointment.getId())).thenReturn(Optional.of(mockAppointment));
         when(partCatalogRepository.findById(partId)).thenReturn(Optional.of(mockPart));
-        when(workshopInventoryRepository.findByPartId(partId)).thenReturn(Optional.of(mockInventory));
+        when(workshopInventoryRepository.findByPartIdAndWorkshopId(partId, mockWorkshop.getId())).thenReturn(Optional.of(mockInventory));
 
         assertThrows(RuntimeException.class, () -> partAssignmentService.assignPartToAppointment(
                 mockAppointment.getId(), partId, 20, new StandardPricingStrategy()
@@ -123,10 +132,10 @@ class PartAssignmentServiceTest {
     @Test
     void assignCustomPartToAppointment_ShouldCreateOrUseCustomPart() {
         when(appointmentRepository.findById(mockAppointment.getId())).thenReturn(Optional.of(mockAppointment));
-        when(partCategoryRepository.findByName("recambios_personalizados")).thenReturn(Optional.of(mockCategory));
+        when(partCategoryRepository.findByNameAndWorkshopId("recambios_personalizados", mockWorkshop.getId())).thenReturn(Optional.of(mockCategory));
         when(partCatalogRepository.findByName("Pastillas Custom")).thenReturn(new ArrayList<>());
         when(partCatalogRepository.save(any(PartCatalog.class))).thenReturn(mockPart);
-        when(workshopInventoryRepository.findByPartId(any())).thenReturn(Optional.empty());
+        when(workshopInventoryRepository.findByPartIdAndWorkshopId(any(), eq(mockWorkshop.getId()))).thenReturn(Optional.empty());
         when(workshopInventoryRepository.save(any(WorkshopInventory.class))).thenReturn(mockInventory);
         when(appointmentPartRepository.findByAppointmentIdAndPartId(any(), any())).thenReturn(Optional.empty());
         when(appointmentPartRepository.save(any(AppointmentPart.class))).thenReturn(mockAppointmentPart);
@@ -146,7 +155,7 @@ class PartAssignmentServiceTest {
         UUID partId = mockPart.getId();
         when(appointmentRepository.findById(mockAppointment.getId())).thenReturn(Optional.of(mockAppointment));
         when(appointmentPartRepository.findByAppointmentIdAndPartId(mockAppointment.getId(), partId)).thenReturn(Optional.of(mockAppointmentPart));
-        when(workshopInventoryRepository.findByPartId(partId)).thenReturn(Optional.of(mockInventory));
+        when(workshopInventoryRepository.findByPartIdAndWorkshopId(partId, mockWorkshop.getId())).thenReturn(Optional.of(mockInventory));
 
         partAssignmentService.removePartFromAppointment(mockAppointment.getId(), partId);
 

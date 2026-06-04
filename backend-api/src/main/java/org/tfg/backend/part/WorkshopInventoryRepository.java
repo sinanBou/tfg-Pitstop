@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 import java.util.Optional;
 
+import java.util.List;
+
 @Repository
 public interface WorkshopInventoryRepository extends JpaRepository<WorkshopInventory, UUID> {
-    Optional<WorkshopInventory> findByPartId(UUID partId);
+    Optional<WorkshopInventory> findByPartIdAndWorkshopId(UUID partId, UUID workshopId);
+    List<WorkshopInventory> findByWorkshopId(UUID workshopId);
 }

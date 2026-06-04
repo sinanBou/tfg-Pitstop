@@ -17,8 +17,9 @@ public class PartAdminService {
     private final PartCategoryRepository partCategoryRepository;
     private final AppointmentPartRepository appointmentPartRepository;
     private final PartAssignmentService partAssignmentService;
+    private final org.tfg.backend.workshop.WorkshopRepository workshopRepository;
 
-    private PartCategory findOrCreateCategory(String displayName) {
+    public PartCategory findOrCreateCategory(String displayName, org.tfg.backend.workshop.Workshop workshop) {
         String slug = displayName.toLowerCase().trim()
                 .replace(" ", "_")
                 .replace("á", "a")
@@ -26,61 +27,67 @@ public class PartAdminService {
                 .replace("í", "i")
                 .replace("ó", "o")
                 .replace("ú", "u");
-        return partCategoryRepository.findByName(slug)
+        return partCategoryRepository.findByNameAndWorkshopId(slug, workshop.getId())
                 .orElseGet(() -> {
                     PartCategory newCat = PartCategory.builder()
                             .name(slug)
                             .displayName(displayName)
+                            .workshop(workshop)
                             .build();
                     return partCategoryRepository.save(newCat);
                 });
     }
 
-    @PostConstruct
     @Transactional
-    public void ensureFixedCategoryExists() {
-        findOrCreateCategory("Recambios personalizados");
+    public void initializeInventoryForWorkshop(org.tfg.backend.workshop.Workshop workshop) {
+        findOrCreateCategory("Recambios personalizados", workshop);
+        seedDemoPartsForWorkshop(workshop);
     }
 
-    @PostConstruct
-    @Transactional
-    public void initDemoParts() {
-        if (partCatalogRepository.count() > 0) return;
-
-        createPartDemo("REF-1020", "Pastillas de freno Brembo", "Brembo", "Kit de pastillas de alto rendimiento", "Frenos", 45.0, 75.0, 5);
-        createPartDemo("REF-3040", "Filtro de aceite Bosch", "Bosch", "Filtro purificador metálico", "Filtros", 8.0, 15.0, 10);
-        createPartDemo("REF-5060", "Aceite Castrol EDGE 5W-30", "Castrol", "Garrafa de 5 litros de aceite sintético", "Lubricantes", 25.0, 48.0, 3);
-        createPartDemo("REF-7080", "Filtro de aire Bosch", "Bosch", "Filtro de cabina lavable", "Filtros", 12.0, 22.0, 5);
-        createPartDemo("REF-9010", "Bujía NGK Iridium", "NGK", "Bujía de alto rendimiento de iridio", "Encendido", 6.5, 12.0, 12);
+    private void seedDemoPartsForWorkshop(org.tfg.backend.workshop.Workshop workshop) {
+        createPartDemo("REF-1020", "Pastillas de freno Brembo", "Brembo", "Kit de pastillas de alto rendimiento", "Frenos", 45.0, 75.0, 5, workshop);
+        createPartDemo("REF-3040", "Filtro de aceite Bosch", "Bosch", "Filtro purificador metálico", "Filtros", 8.0, 15.0, 10, workshop);
+        createPartDemo("REF-5060", "Aceite Castrol EDGE 5W-30", "Castrol", "Garrafa de 5 litros de aceite sintético", "Lubricantes", 25.0, 48.0, 3, workshop);
+        createPartDemo("REF-7080", "Filtro de aire Bosch", "Bosch", "Filtro de cabina lavable", "Filtros", 12.0, 22.0, 5, workshop);
+        createPartDemo("REF-9010", "Bujía NGK Iridium", "NGK", "Bujía de alto rendimiento de iridio", "Encendido", 6.5, 12.0, 12, workshop);
     }
 
     private void createPartDemo(String oemRef, String name, String manufacturer, String specs, String categoryName,
-                                double costPrice, double retailPrice, int stock) {
-        PartCategory category = findOrCreateCategory(categoryName);
-        PartCatalog part = PartCatalog.builder()
-                .oemReference(oemRef)
-                .name(name)
-                .manufacturer(manufacturer)
-                .technicalSpecs(specs)
-                .category(category)
-                .build();
-        partCatalogRepository.save(part);
+                                double costPrice, double retailPrice, int stock, org.tfg.backend.workshop.Workshop workshop) {
+        PartCategory category = findOrCreateCategory(categoryName, workshop);
+        PartCatalog part = partCatalogRepository.findByOemReference(oemRef)
+                .orElseGet(() -> {
+                    PartCatalog p = PartCatalog.builder()
+                            .oemReference(oemRef)
+                            .name(name)
+                            .manufacturer(manufacturer)
+                            .technicalSpecs(specs)
+                            .category(category)
+                            .build();
+                    return partCatalogRepository.save(p);
+                });
 
-        WorkshopInventory inventory = WorkshopInventory.builder()
-                .part(part)
-                .stockQuantity(stock)
-                .costPrice(costPrice)
-                .retailPrice(retailPrice)
-                .avisoThreshold(5)
-                .build();
-        workshopInventoryRepository.save(inventory);
+        if (workshopInventoryRepository.findByPartIdAndWorkshopId(part.getId(), workshop.getId()).isEmpty()) {
+            WorkshopInventory inventory = WorkshopInventory.builder()
+                    .part(part)
+                    .stockQuantity(stock)
+                    .costPrice(costPrice)
+                    .retailPrice(retailPrice)
+                    .avisoThreshold(5)
+                    .workshop(workshop)
+                    .build();
+            workshopInventoryRepository.save(inventory);
+        }
     }
 
     @Transactional
     public WorkshopInventory addPartToInventory(String oemReference, String name, String manufacturer, String technicalSpecs, UUID categoryId,
-                                                double costPrice, double retailPrice, int stockQuantity, int avisoThreshold) {
+                                                double costPrice, double retailPrice, int stockQuantity, int avisoThreshold, UUID workshopId) {
         PartCategory category = partCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        org.tfg.backend.workshop.Workshop workshop = workshopRepository.findById(workshopId)
+                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
         String cleanOem = (oemReference != null && !oemReference.trim().isEmpty()) ? oemReference.trim() : null;
 
@@ -100,12 +107,21 @@ public class PartAdminService {
             partCatalogRepository.save(part);
         }
 
-        WorkshopInventory inventory = WorkshopInventory.builder()
+        WorkshopInventory inventory = workshopInventoryRepository.findByPartIdAndWorkshopId(part.getId(), workshopId)
+                .orElse(null);
+
+        if (inventory != null) {
+            inventory.setStockQuantity(inventory.getStockQuantity() + stockQuantity);
+            return workshopInventoryRepository.save(inventory);
+        }
+
+        inventory = WorkshopInventory.builder()
                 .part(part)
                 .stockQuantity(stockQuantity)
                 .costPrice(costPrice)
                 .retailPrice(retailPrice)
                 .avisoThreshold(avisoThreshold)
+                .workshop(workshop)
                 .build();
         return workshopInventoryRepository.save(inventory);
     }
@@ -159,7 +175,10 @@ public class PartAdminService {
     }
 
     @Transactional
-    public PartCategory createCategory(String displayName) {
+    public PartCategory createCategory(String displayName, UUID workshopId) {
+        org.tfg.backend.workshop.Workshop workshop = workshopRepository.findById(workshopId)
+                .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
+
         String slug = displayName.toLowerCase().trim()
                 .replace(" ", "_")
                 .replace("á", "a")
@@ -167,12 +186,13 @@ public class PartAdminService {
                 .replace("í", "i")
                 .replace("ó", "o")
                 .replace("ú", "u");
-        if (partCategoryRepository.findByName(slug).isPresent()) {
+        if (partCategoryRepository.findByNameAndWorkshopId(slug, workshopId).isPresent()) {
             throw new RuntimeException("Ya existe una categoría con este nombre");
         }
         PartCategory newCat = PartCategory.builder()
                 .name(slug)
                 .displayName(displayName)
+                .workshop(workshop)
                 .build();
         return partCategoryRepository.save(newCat);
     }
@@ -181,7 +201,7 @@ public class PartAdminService {
     public void deleteCategory(UUID categoryId) {
         PartCategory category = partCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
-        if ("recambios_personalizados".equals(category.getName()) || "recambios_peronalizados".equals(category.getName())) {
+        if ("recambios_personalizados".equals(category.getName())) {
             throw new RuntimeException("La categoría 'Recambios personalizados' es fija y no se puede eliminar");
         }
         if (!category.getParts().isEmpty()) {

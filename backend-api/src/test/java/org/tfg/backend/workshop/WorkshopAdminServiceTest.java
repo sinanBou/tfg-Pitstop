@@ -34,6 +34,9 @@ class WorkshopAdminServiceTest {
     private CatalogInitializationService catalogInitializationService;
 
     @Mock
+    private org.tfg.backend.part.service.PartAdminService partAdminService;
+
+    @Mock
     private StorageService storageService;
 
     @Mock
@@ -108,6 +111,7 @@ class WorkshopAdminServiceTest {
         verify(workshopRepository, times(1)).save(any(Workshop.class));
         verify(employeeRepository, times(1)).save(mockOwner);
         verify(catalogInitializationService, times(1)).initializeCatalogForWorkshop(any(Workshop.class));
+        verify(partAdminService, times(1)).initializeInventoryForWorkshop(any(Workshop.class));
         verify(workshopMapper, times(1)).mapToDTO(mockWorkshop);
     }
 

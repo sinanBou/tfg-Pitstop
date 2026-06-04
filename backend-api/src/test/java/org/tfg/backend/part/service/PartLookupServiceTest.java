@@ -55,12 +55,13 @@ class PartLookupServiceTest {
     }
 
     @Test
-    void getAllInventory_ShouldReturnList() {
-        when(workshopInventoryRepository.findAll()).thenReturn(List.of(mockInventory));
-        List<WorkshopInventory> result = partLookupService.getAllInventory();
+    void getInventoryByWorkshop_ShouldReturnList() {
+        UUID workshopId = UUID.randomUUID();
+        when(workshopInventoryRepository.findByWorkshopId(workshopId)).thenReturn(List.of(mockInventory));
+        List<WorkshopInventory> result = partLookupService.getInventoryByWorkshop(workshopId);
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(workshopInventoryRepository, times(1)).findAll();
+        verify(workshopInventoryRepository, times(1)).findByWorkshopId(workshopId);
     }
 
     @Test
@@ -74,11 +75,12 @@ class PartLookupServiceTest {
     }
 
     @Test
-    void getAllCategories_ShouldReturnList() {
-        when(partCategoryRepository.findAll()).thenReturn(List.of(mockCategory));
-        List<PartCategory> result = partLookupService.getAllCategories();
+    void getCategoriesByWorkshop_ShouldReturnList() {
+        UUID workshopId = UUID.randomUUID();
+        when(partCategoryRepository.findByWorkshopIdOrderByNameAsc(workshopId)).thenReturn(List.of(mockCategory));
+        List<PartCategory> result = partLookupService.getCategoriesByWorkshop(workshopId);
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(partCategoryRepository, times(1)).findAll();
+        verify(partCategoryRepository, times(1)).findByWorkshopIdOrderByNameAsc(workshopId);
     }
 }

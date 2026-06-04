@@ -35,19 +35,29 @@ class PartAdminServiceTest {
     @Mock
     private PartAssignmentService partAssignmentService;
 
+    @Mock
+    private org.tfg.backend.workshop.WorkshopRepository workshopRepository;
+
     @InjectMocks
     private PartAdminService partAdminService;
 
+    private org.tfg.backend.workshop.Workshop mockWorkshop;
     private PartCategory mockCategory;
     private PartCatalog mockPart;
     private WorkshopInventory mockInventory;
 
     @BeforeEach
     void setUp() {
+        mockWorkshop = org.tfg.backend.workshop.Workshop.builder()
+                .id(UUID.randomUUID())
+                .companyName("Taller Test")
+                .build();
+
         mockCategory = PartCategory.builder()
                 .id(UUID.randomUUID())
                 .name("frenos")
                 .displayName("Frenos")
+                .workshop(mockWorkshop)
                 .parts(new ArrayList<>())
                 .build();
 
@@ -66,23 +76,28 @@ class PartAdminServiceTest {
                 .costPrice(20.0)
                 .retailPrice(35.0)
                 .avisoThreshold(5)
+                .workshop(mockWorkshop)
                 .build();
     }
 
     @Test
     void addPartToInventory_ShouldCreateItem() {
         UUID categoryId = mockCategory.getId();
+        UUID workshopId = mockWorkshop.getId();
         when(partCategoryRepository.findById(categoryId)).thenReturn(Optional.of(mockCategory));
+        when(workshopRepository.findById(workshopId)).thenReturn(Optional.of(mockWorkshop));
         when(partCatalogRepository.findByOemReference("REF-123")).thenReturn(Optional.empty());
         when(partCatalogRepository.save(any(PartCatalog.class))).thenReturn(mockPart);
+        when(workshopInventoryRepository.findByPartIdAndWorkshopId(any(), any())).thenReturn(Optional.empty());
         when(workshopInventoryRepository.save(any(WorkshopInventory.class))).thenReturn(mockInventory);
 
         WorkshopInventory result = partAdminService.addPartToInventory(
-                "REF-123", "Pastillas Brembo", "Brembo", "Specs", categoryId, 20.0, 35.0, 10, 5
+                "REF-123", "Pastillas Brembo", "Brembo", "Specs", categoryId, 20.0, 35.0, 10, 5, workshopId
         );
 
         assertNotNull(result);
         verify(partCategoryRepository, times(1)).findById(categoryId);
+        verify(workshopRepository, times(1)).findById(workshopId);
         verify(partCatalogRepository, times(1)).save(any(PartCatalog.class));
         verify(workshopInventoryRepository, times(1)).save(any(WorkshopInventory.class));
     }
@@ -121,10 +136,12 @@ class PartAdminServiceTest {
 
     @Test
     void createCategory_ShouldSaveNewCategory() {
-        when(partCategoryRepository.findByName("filtros")).thenReturn(Optional.empty());
+        UUID workshopId = mockWorkshop.getId();
+        when(workshopRepository.findById(workshopId)).thenReturn(Optional.of(mockWorkshop));
+        when(partCategoryRepository.findByNameAndWorkshopId("filtros", workshopId)).thenReturn(Optional.empty());
         when(partCategoryRepository.save(any(PartCategory.class))).thenReturn(mockCategory);
 
-        PartCategory result = partAdminService.createCategory("Filtros");
+        PartCategory result = partAdminService.createCategory("Filtros", workshopId);
 
         assertNotNull(result);
         verify(partCategoryRepository, times(1)).save(any(PartCategory.class));
@@ -132,9 +149,11 @@ class PartAdminServiceTest {
 
     @Test
     void createCategory_ShouldThrowExceptionWhenDuplicate() {
-        when(partCategoryRepository.findByName("frenos")).thenReturn(Optional.of(mockCategory));
+        UUID workshopId = mockWorkshop.getId();
+        when(workshopRepository.findById(workshopId)).thenReturn(Optional.of(mockWorkshop));
+        when(partCategoryRepository.findByNameAndWorkshopId("frenos", workshopId)).thenReturn(Optional.of(mockCategory));
 
-        assertThrows(RuntimeException.class, () -> partAdminService.createCategory("Frenos"));
+        assertThrows(RuntimeException.class, () -> partAdminService.createCategory("Frenos", workshopId));
         verify(partCategoryRepository, never()).save(any());
     }
 

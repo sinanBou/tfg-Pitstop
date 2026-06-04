@@ -19,6 +19,7 @@ public class WorkshopAdminService {
     private final WorkshopRepository workshopRepository;
     private final EmployeeRepository employeeRepository;
     private final CatalogInitializationService catalogInitializationService;
+    private final org.tfg.backend.part.service.PartAdminService partAdminService;
     private final StorageService storageService;
     private final WorkshopMapper workshopMapper;
 
@@ -48,6 +49,7 @@ public class WorkshopAdminService {
         owner.setWorkshop(savedWorkshop);
         employeeRepository.save(owner);
         catalogInitializationService.initializeCatalogForWorkshop(savedWorkshop);
+        partAdminService.initializeInventoryForWorkshop(savedWorkshop);
         return workshopMapper.mapToDTO(savedWorkshop);
     }
 

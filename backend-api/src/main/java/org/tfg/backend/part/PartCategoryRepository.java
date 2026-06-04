@@ -5,7 +5,11 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 import java.util.Optional;
 
+import java.util.List;
+
 @Repository
 public interface PartCategoryRepository extends JpaRepository<PartCategory, UUID> {
-    Optional<PartCategory> findByName(String name);
+    Optional<PartCategory> findByNameAndWorkshopId(String name, UUID workshopId);
+    List<PartCategory> findByWorkshopId(UUID workshopId);
+    List<PartCategory> findByWorkshopIdOrderByNameAsc(UUID workshopId);
 }
