@@ -15,6 +15,7 @@ import org.tfg.backend.auth.AuthResponse;
 import org.tfg.backend.auth.OwnerRegisterRequest;
 import org.tfg.backend.auth.LoginRequest;
 import org.tfg.backend.employee.EmployeeDTO;
+import org.tfg.backend.taskcatalog.TaskCategory;
 
 import org.tfg.backend.user.UserRepository;
 import org.tfg.backend.user.User;
