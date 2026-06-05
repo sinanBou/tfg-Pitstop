@@ -13,6 +13,10 @@ import org.tfg.backend.workshoptask.WorkshopTaskRepository;
 import org.tfg.backend.taskcatalog.TaskCategoryRepository;
 import org.tfg.backend.vehicle.Vehicle;
 import org.tfg.backend.part.service.PartAdminService;
+import org.tfg.backend.part.PartCategory;
+import org.tfg.backend.part.PartCategoryRepository;
+import org.tfg.backend.part.WorkshopInventory;
+import org.tfg.backend.part.WorkshopInventoryRepository;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -32,6 +36,8 @@ public class WorkshopService {
     private final WorkshopTaskRepository workshopTaskRepository;
     private final InvoiceRepository invoiceRepository;
     private final PartAdminService partAdminService;
+    private final PartCategoryRepository partCategoryRepository;
+    private final WorkshopInventoryRepository workshopInventoryRepository;
 
     /**
      * Registra un nuevo taller en el sistema.
@@ -58,8 +64,8 @@ public class WorkshopService {
                 .companyName(request.getCompanyName())
                 .address(request.getAddress().trim())
                 .owner(owner)
-                .openTime(request.getOpenTime()) // <-- NUEVO
-                .closeTime(request.getCloseTime()) // <-- NUEVO
+                .openTime(request.getOpenTime())
+                .closeTime(request.getCloseTime()) 
                 .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60) // <-- NUEVO
                 .workingDays(request.getWorkingDays())
                 .hourlyRate(request.getHourlyRate() != null ? request.getHourlyRate() : 50.0)
@@ -105,6 +111,14 @@ public class WorkshopService {
         // 5. Eliminar categorías del catálogo de tareas (esto cascada-elimina los CatalogTask debido a CascadeType.ALL)
         List<org.tfg.backend.taskcatalog.TaskCategory> categories = catalogCategoryRepository.findByWorkshopIdOrderByNameAsc(id);
         catalogCategoryRepository.deleteAll(categories);
+
+        // 5.1. Eliminar inventario de repuestos del taller
+        List<WorkshopInventory> inventory = workshopInventoryRepository.findByWorkshopId(id);
+        workshopInventoryRepository.deleteAll(inventory);
+
+        // 5.2. Eliminar categorías de repuestos del taller (esto cascada-elimina los repuestos asociados debido a CascadeType.ALL)
+        List<PartCategory> partCategories = partCategoryRepository.findByWorkshopId(id);
+        partCategoryRepository.deleteAll(partCategories);
 
         // 6. Desasociar el taller del dueño
         if (workshop.getOwner() != null) {

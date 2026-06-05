@@ -1,13 +1,18 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { X, Camera, Check } from '@/assets/icons';
+import { DeleteAccountSection } from '@/components/common/DeleteAccountSection';
+import { useToast } from '@/hooks/useToast';
+import { API_BASE_URL } from '@/config/api';
 
 interface MiPerfilProps {
   isOpen: boolean;
   onClose: () => void;
   employeeProfile: {
+    id?: string;
+    employeeId?: string;
     profilePictureUrl?: string;
     firstname: string;
     lastname: string;
@@ -42,6 +47,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
   onPreviewImage,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -53,6 +59,40 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const userRole = localStorage.getItem('role') || '';
+  const isOwner = userRole === 'WORKSHOP_OWNER';
+  const [hasWorkshops, setHasWorkshops] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const ownerId = employeeProfile?.id || employeeProfile?.employeeId;
+    if (userRole === 'WORKSHOP_OWNER' && ownerId && isOpen) {
+      const fetchOwnerWorkshops = async () => {
+        try {
+          const token = localStorage.getItem('jwt_token');
+          const response = await fetch(`${API_BASE_URL}/workshops/owner/${ownerId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            setHasWorkshops(data && data.length > 0);
+          } else {
+            setHasWorkshops(true);
+          }
+        } catch {
+          setHasWorkshops(true);
+        }
+      };
+      fetchOwnerWorkshops();
+    } else if (!isOpen) {
+      setHasWorkshops(null);
+    } else if (userRole !== 'WORKSHOP_OWNER') {
+      setHasWorkshops(false);
+    }
+  }, [userRole, employeeProfile?.id, employeeProfile?.employeeId, isOpen]);
 
   if (!isOpen) return null;
 
@@ -104,7 +144,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
     setPasswordLoading(true);
     try {
       const token = localStorage.getItem('jwt_token');
-      const response = await fetch('http://localhost:9091/api/users/change-password', {
+      const response = await fetch(`${API_BASE_URL}/users/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -134,6 +174,41 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
       setPasswordError('Error de conexión con el servidor.');
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const response = await fetch(`${API_BASE_URL}/users/me`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        toast.success('Tu cuenta ha sido eliminada correctamente.');
+        setTimeout(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = '/login';
+        }, 1500);
+      } else {
+        const text = await response.text();
+        let errorMsg = 'Error al eliminar la cuenta.';
+        try {
+          const json = JSON.parse(text);
+          errorMsg = json.message || errorMsg;
+        } catch {
+          errorMsg = text || errorMsg;
+        }
+        toast.error(errorMsg);
+      }
+    } catch {
+      toast.error('Error de conexión con el servidor.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -375,6 +450,20 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                 </Button>
               </div>
             </form>
+          </section>
+
+          {/* Separador */}
+          <div className="my-10 border-b border-white/5"></div>
+
+          {/* Sección crítica: Eliminación de Cuenta */}
+          <section className="relative z-10 pb-6">
+            <DeleteAccountSection
+              onDeleteAccount={handleDeleteAccount}
+              isLoading={deleteLoading}
+              isDisabled={isOwner && hasWorkshops !== false}
+              disabledMessage="Los propietarios de taller no pueden eliminar su cuenta directamente. Debes dar de baja tus talleres primero."
+              warningMessage="Esta acción es irreversible. Se eliminarán permanentemente tus credenciales y te desvinculará de toda la gestión del taller."
+            />
           </section>
         </div>
       </div>

@@ -59,7 +59,7 @@ export const ConfirmCardModal: React.FC<ConfirmCardModalProps> = ({
     'bg-blue-500/10 border-blue-500/20';
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Overlay de fondo difuminado */}
       <div 
         className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300" 
