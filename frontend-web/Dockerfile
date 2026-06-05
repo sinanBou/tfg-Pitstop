@@ -24,8 +24,15 @@ FROM nginx:alpine
 # Copiar los recursos compilados de la SPA
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copiar la configuración de Nginx para soportar React Router (SPA) en puerto 80
+# Copiar la configuración de Nginx para soportar React Router (SPA) en puerto 8080
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+# Configurar permisos para que el usuario nginx (sin privilegios) pueda iniciar el servicio y escribir ficheros temporales
+RUN touch /var/run/nginx.pid && \
+    chown -R nginx:nginx /var/run/nginx.pid /var/cache/nginx /usr/share/nginx/html
+
+# Cambiar contexto al usuario no-root 'nginx'
+USER nginx
+
+EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
