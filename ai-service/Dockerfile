@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     sqlite3 \
     && rm -rf /var/lib/apt/lists/*
 
-# 4. Instalación de dependencias de Python (hacemos esto antes de copiar el código)
+# 4. Instalación de dependencias de Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
@@ -18,7 +18,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 6. Crear el usuario y asignar permisos
-# Creamos el grupo y el usuario, y cambiamos el dueño de la carpeta /app
 RUN useradd -m usuario && chown -R usuario:usuario /app
 
 # 7. Cambiar al usuario recién creado
