@@ -3,6 +3,9 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button';
 import { InputField } from '@/components/common/InputField';
 import { X, Check } from '@/assets/icons';
+import { DeleteAccountSection } from '@/components/common/DeleteAccountSection';
+import { useToast } from '@/hooks/useToast';
+import { API_BASE_URL } from '@/config/api';
 
 interface MiPerfilClienteProps {
   isOpen: boolean;
@@ -38,6 +41,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
   onSubmit,
 }) => {
   const [profileSaved, setProfileSaved] = useState(false);
+  const toast = useToast();
 
   // Estados para cambio de contraseña
   const [currentPassword, setCurrentPassword] = useState('');
@@ -46,6 +50,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
   const [passwordLoading, setPasswordLoading] = useState(false);
   const [passwordError, setPasswordError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   if (!isOpen) return null;
 
@@ -76,7 +81,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
     setPasswordLoading(true);
     try {
       const token = localStorage.getItem('jwt_token');
-      const response = await fetch('http://localhost:9091/api/users/change-password', {
+      const response = await fetch(`${API_BASE_URL}/users/change-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,6 +111,42 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
       setPasswordError('Error de conexión con el servidor.');
     } finally {
       setPasswordLoading(false);
+    }
+  };
+
+
+  const handleDeleteAccount = async () => {
+    setDeleteLoading(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const response = await fetch(`${API_BASE_URL}/users/me`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (response.ok) {
+        toast.success('Tu cuenta ha sido eliminada correctamente.');
+        setTimeout(() => {
+          localStorage.clear();
+          sessionStorage.clear();
+          window.location.href = '/login';
+        }, 1500);
+      } else {
+        const text = await response.text();
+        let errorMsg = 'Error al eliminar la cuenta.';
+        try {
+          const json = JSON.parse(text);
+          errorMsg = json.message || errorMsg;
+        } catch {
+          errorMsg = text || errorMsg;
+        }
+        toast.error(errorMsg);
+      }
+    } catch {
+      toast.error('Error de conexión con el servidor.');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -302,6 +343,18 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
                 </Button>
               </div>
             </form>
+          </section>
+
+          {/* Separador */}
+          <div className="my-10 border-b border-white/5"></div>
+
+          {/* Sección crítica: Eliminación de Cuenta */}
+          <section className="relative z-10 pb-6">
+            <DeleteAccountSection
+              onDeleteAccount={handleDeleteAccount}
+              isLoading={deleteLoading}
+              warningMessage="Esta acción es irreversible. Se eliminarán de forma permanente todos tus vehículos, citas pendientes e historial de reparaciones."
+            />
           </section>
         </div>
       </div>

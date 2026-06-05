@@ -52,7 +52,7 @@ public class SecurityConfig {
             "http://localhost",
             "http://localhost:80",
             "http://localhost:5173",
-            "http://localhost:3000",
+            "http://localhost:8080",
             "https://pitstop.solutions"
         ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));

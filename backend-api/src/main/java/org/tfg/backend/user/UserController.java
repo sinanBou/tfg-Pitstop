@@ -40,4 +40,10 @@ public class UserController {
         userService.changePassword(userDetails.getUsername(), request);
         return ResponseEntity.ok("Contraseña cambiada correctamente.");
     }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<String> deleteMe(@AuthenticationPrincipal UserDetails userDetails) {
+        userService.deleteUser(userDetails.getUsername());
+        return ResponseEntity.ok("Usuario eliminado correctamente.");
+    }
 }
