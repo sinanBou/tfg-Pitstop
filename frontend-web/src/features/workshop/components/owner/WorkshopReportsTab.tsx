@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
+import { formatCurrency } from '@/utils/formatters';
 import { ReportsTab } from '@/features/workshop/components/admin/tabs/ReportsTab';
 import { MonthSelector } from '@/components/common/MonthSelector/MonthSelector';
 import { MetricCard } from '@/components/common/MetricCard/MetricCard';
@@ -195,7 +196,7 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <MetricCard 
           label="Ingresos Totales" 
-          value={`${globalStats.combinedRevenue.toFixed(2)}€`} 
+          value={formatCurrency(globalStats.combinedRevenue)} 
         />
         <MetricCard 
           label="Citas Completadas" 
@@ -203,7 +204,7 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
         />
         <MetricCard 
           label="Precio Medio" 
-          value={`${globalStats.avgTicket.toFixed(2)}€`} 
+          value={formatCurrency(globalStats.avgTicket)} 
         />
         <MetricCard 
           label="Número de Talleres" 
@@ -245,7 +246,7 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
                     <ProgressBar
                       label={w.name}
                       sublabel={w.address}
-                      valueText={`${w.revenue.toFixed(2)}€`}
+                      valueText={formatCurrency(w.revenue)}
                       percentage={percent}
                     />
                     <div className="text-right mt-1">

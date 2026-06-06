@@ -39,7 +39,7 @@ export function useAddressSuggestions() {
           });
           setSuggestions(addresses.filter((a: string) => a.length > 5));
           resultsFound = true;
-          console.log("✅ Photon obtuvo resultados:", addresses.length);
+          console.log("Photon obtuvo resultados:", addresses.length);
         }
       }
     } catch (e: any) {

@@ -2,6 +2,8 @@ import React from 'react';
 import type { CatalogTask } from '../TasksTab';
 import { Edit, Trash } from '@/assets/icons';
 
+import { formatHours } from '@/utils/formatters';
+
 interface TaskItemRowProps {
   task: CatalogTask;
   onStartEdit: () => void;
@@ -26,9 +28,9 @@ export const TaskItemRow: React.FC<TaskItemRowProps> = ({
       <div className="flex items-center gap-3 shrink-0">
         {/* Hours Info Badge */}
         <div className="px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded-xl text-[10px] font-bold text-neutral-400 font-mono">
-          {task.hours !== undefined && task.hours !== null && `${task.hours.toFixed(2)}h (fijas)`}
-          {task.hours4Cil !== undefined && task.hours4Cil !== null && `${task.hours4Cil.toFixed(2)}h (base) ${task.hoursCilExtra ? `+ ${task.hoursCilExtra.toFixed(2)}h/cil` : ''}`}
-          {task.hours1Rueda !== undefined && task.hours1Rueda !== null && `${task.hours1Rueda.toFixed(2)}h (por rueda)`}
+          {task.hours !== undefined && task.hours !== null && `${formatHours(task.hours)} (fijas)`}
+          {task.hours4Cil !== undefined && task.hours4Cil !== null && `${formatHours(task.hours4Cil)} (base) ${task.hoursCilExtra ? `+ ${formatHours(task.hoursCilExtra)}/cil` : ''}`}
+          {task.hours1Rueda !== undefined && task.hours1Rueda !== null && `${formatHours(task.hours1Rueda)} (por rueda)`}
         </div>
 
         {/* Edit Action Button */}

@@ -248,3 +248,10 @@ En esta refactorización integral del sistema de repuestos y control de almacén
   - Se crearon DTOs específicos y fuertemente tipados: `ClientRegisterRequest` (para clientes independientes) y `OwnerRegisterRequest` (para gerentes/propietarios de talleres).
   - Se adaptaron los endpoints del controlador `/api/auth/register/client` y `/api/auth/register/workshop` para recibir sus DTOs correspondientes con validaciones `@Valid` estrictas e independientes.
 - Propósito: Sigue los principios de robustez y Security-First del Clean Code. Evita el uso de campos nulos ambiguos, mejora la claridad y auto-documentación de la API de registro, e impide que un cliente registre de forma fraudulenta campos exclusivos de administradores de taller o viceversa.
+
+
+29. HELPER / UTILITY PATTERN (Estructura) - Centralización de Formateadores
+-------------------------------------------------------------------------
+- Cómo se creó: Se creó el módulo `formatters.ts` en `src/utils/` agrupando funciones puras de formateo (`formatCurrency`, `formatHours`, `formatDate`) que antes se calculaban e inyectaban de forma redundante e inline en múltiples vistas y modales de React (ej: con `.toFixed(2)€` o conversiones ad-hoc de fechas).
+- Propósito: Sigue el principio DRY (Don't Repeat Yourself) y de separación de responsabilidades. Centraliza en un solo punto la representación de divisas con formato local español (€), unidades de tiempo y fechas ISO, facilitando la mantenibilidad, consistencia estilística y la realización de pruebas unitarias sobre el formateo de datos de presentación.
+

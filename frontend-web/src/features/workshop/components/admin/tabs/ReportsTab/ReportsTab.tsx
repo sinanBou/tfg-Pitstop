@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
+import { formatCurrency } from '@/utils/formatters';
 import { MonthSelector } from '@/components/common/MonthSelector/MonthSelector';
 import { MetricCard } from '@/components/common/MetricCard/MetricCard';
 import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
@@ -144,11 +145,11 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <MetricCard 
           label="Facturación Total" 
-          value={`${analytics.totalRevenue.toFixed(2)}€`} 
+          value={formatCurrency(analytics.totalRevenue)} 
         />
         <MetricCard 
           label="Precio Medio" 
-          value={`${analytics.avgInvoice.toFixed(2)}€`} 
+          value={formatCurrency(analytics.avgInvoice)} 
         />
         <MetricCard 
           label="Citas Facturadas" 
@@ -177,12 +178,12 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
           <div className="space-y-6 py-2">
             <ProgressBar
               label="Total Mano de Obra"
-              valueText={`${analytics.totalLabor.toFixed(2)}€`}
+              valueText={formatCurrency(analytics.totalLabor)}
               percentage={analytics.laborPercentage}
             />
             <ProgressBar
               label="Total Repuestos y Materiales"
-              valueText={`${analytics.totalParts.toFixed(2)}€`}
+              valueText={formatCurrency(analytics.totalParts)}
               percentage={analytics.partsPercentage}
             />
           </div>
@@ -269,7 +270,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                   <div className="flex items-center gap-4 self-end md:self-center">
                     <div className="text-right">
                       <p className="text-xs font-black uppercase tracking-widest text-neutral-500">Total Liquidado</p>
-                      <p className="text-lg font-black font-mono text-green-400 mt-0.5">{inv.totalPrice.toFixed(2)}€</p>
+                      <p className="text-lg font-black font-mono text-green-400 mt-0.5">{formatCurrency(inv.totalPrice)}</p>
                     </div>
 
                     <div className="flex items-center gap-2">
@@ -307,11 +308,11 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                         <span className="text-xs font-black uppercase tracking-widest text-neutral-500 block mb-1">Cálculo Mano de Obra</span>
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-neutral-400">Tarifa por hora:</span>
-                          <span className="text-white font-mono">{inv.laborRate.toFixed(2)}€/h</span>
+                          <span className="text-white font-mono">{formatCurrency(inv.laborRate)}/h</span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-neutral-400">Total Mano de Obra:</span>
-                          <span className="text-white font-mono font-bold">{inv.totalLabor.toFixed(2)}€</span>
+                          <span className="text-white font-mono font-bold">{formatCurrency(inv.totalLabor)}</span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-neutral-400">Servicios:</span>
@@ -331,7 +332,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                             {partsList.map((p, idx) => (
                               <div key={idx} className="flex justify-between items-center text-xs">
                                 <span className="text-neutral-400 truncate max-w-[70%]">{p.name}</span>
-                                <span className="text-white font-mono">{p.price.toFixed(2)}€</span>
+                                <span className="text-white font-mono">{formatCurrency(p.price)}</span>
                               </div>
                             ))}
                           </div>
@@ -339,7 +340,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                         {partsList.length > 0 && (
                           <div className="flex justify-between items-center text-xs pt-1.5 border-t border-neutral-900/60 font-bold">
                             <span className="text-neutral-400">Total Materiales:</span>
-                            <span className="text-white font-mono">{inv.totalParts.toFixed(2)}€</span>
+                            <span className="text-white font-mono">{formatCurrency(inv.totalParts)}</span>
                           </div>
                         )}
                       </div>

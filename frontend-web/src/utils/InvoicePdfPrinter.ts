@@ -1,3 +1,5 @@
+import { formatCurrency } from './formatters';
+
 export interface PartItem {
   name: string;
   price: number;
@@ -248,17 +250,17 @@ export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string, onEr
             <td>
               <strong>Mano de Obra y Diagnóstico Especializado</strong>
               <div style="font-size: 11px; color: #6b7280; margin-top: 2px;">
-                Tasa horaria aplicada: ${inv.laborRate.toFixed(2)}€/h
+                Tasa horaria aplicada: ${formatCurrency(inv.laborRate)}/h
               </div>
             </td>
-            <td class="price">${inv.totalLabor.toFixed(2)}€</td>
+            <td class="price">${formatCurrency(inv.totalLabor)}</td>
           </tr>
           ${parsedParts.map(p => `
             <tr>
               <td>
                 <span>Repuesto: ${p.name}</span>
               </td>
-              <td class="price">${p.price.toFixed(2)}€</td>
+              <td class="price">${formatCurrency(p.price)}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -267,15 +269,15 @@ export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string, onEr
       <div class="invoice-summary">
         <div class="summary-row">
           <span>Base Imponible Mano de Obra</span>
-          <span class="val">${inv.totalLabor.toFixed(2)}€</span>
+          <span class="val">${formatCurrency(inv.totalLabor)}</span>
         </div>
         <div class="summary-row">
           <span>Base Imponible Repuestos</span>
-          <span class="val">${inv.totalParts.toFixed(2)}€</span>
+          <span class="val">${formatCurrency(inv.totalParts)}</span>
         </div>
         <div class="summary-row total">
           <span>Importe Total (IVA Incl.)</span>
-          <span class="val">${inv.totalPrice.toFixed(2)}€</span>
+          <span class="val">${formatCurrency(inv.totalPrice)}</span>
         </div>
       </div>
 

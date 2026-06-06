@@ -2,6 +2,8 @@ import React from 'react';
 import type { WorkshopInventory } from '@/types/client';
 import { Edit, Trash } from '@/assets/icons';
 
+import { formatCurrency } from '@/utils/formatters';
+
 interface PartItemRowProps {
   item: WorkshopInventory;
   onStartEdit: () => void;
@@ -56,9 +58,9 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
 
         {/* Prices details */}
         <div className="px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded-xl text-[10px] font-bold flex gap-3 text-neutral-400 font-mono">
-          <div><span className="text-[8px] text-neutral-600 font-sans uppercase">Coste:</span> {item.costPrice.toFixed(2)}€</div>
+          <div><span className="text-[8px] text-neutral-600 font-sans uppercase">Coste:</span> {formatCurrency(item.costPrice)}</div>
           <div className="border-l border-neutral-800 pl-3">
-            <span className="text-[8px] text-neutral-600 font-sans uppercase">Venta:</span> <span className="text-white font-bold">{item.retailPrice.toFixed(2)}€</span>
+            <span className="text-[8px] text-neutral-600 font-sans uppercase">Venta:</span> <span className="text-white font-bold">{formatCurrency(item.retailPrice)}</span>
           </div>
         </div>
 
