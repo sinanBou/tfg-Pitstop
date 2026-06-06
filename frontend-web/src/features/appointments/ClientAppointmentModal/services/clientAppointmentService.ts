@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '@/config/api';
-import type { WorkshopMinDTO } from '@/types/client';
+import type { WorkshopMinDTO } from '@/features/client';
 
 export interface SearchWorkshopsResponse {
   content: WorkshopMinDTO[];

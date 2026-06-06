@@ -31,7 +31,7 @@ public class VehicleCatalogService {
 
     @PostConstruct
     public void init() throws IOException {
-        InputStream inputStream = new ClassPathResource("json_data.json").getInputStream();
+        InputStream inputStream = new ClassPathResource("vehicle_catalog.json").getInputStream();
         catalog = objectMapper.readValue(inputStream, new TypeReference<List<CatalogEntry>>() {});
     }
 

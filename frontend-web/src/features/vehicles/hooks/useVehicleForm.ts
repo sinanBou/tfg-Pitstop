@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { type VehicleRequest } from '@/types/client';
+import { type VehicleRequest } from '@/features/client';
 
 interface UseVehicleFormProps {
   isOpen: boolean;

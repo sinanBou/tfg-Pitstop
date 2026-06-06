@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/useToast';
-import type { ClientSearchDTO, VehicleSearchDTO, VehicleRequest } from '@/types/client';
+import type { ClientSearchDTO, VehicleSearchDTO, VehicleRequest } from '@/features/client';
 import * as service from '../services/staffAppointmentService';
 
 export function useStaffAppointment(workshopId: string, onSuccess: () => void, isOpen: boolean) {

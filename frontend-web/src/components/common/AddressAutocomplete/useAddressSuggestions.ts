@@ -21,7 +21,7 @@ export function useAddressSuggestions() {
 
     try {
       const photonRes = await fetch(
-        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8&lang=es&lat=40.41&lon=-3.70`,
+        `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=8&lat=40.41&lon=-3.70`,
         { signal: abortControllerRef.current.signal }
       );
       
@@ -39,7 +39,7 @@ export function useAddressSuggestions() {
           });
           setSuggestions(addresses.filter((a: string) => a.length > 5));
           resultsFound = true;
-          console.log("✅ Photon obtuvo resultados:", addresses.length);
+          console.log("Photon obtuvo resultados:", addresses.length);
         }
       }
     } catch (e: any) {

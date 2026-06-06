@@ -19,6 +19,7 @@ import org.tfg.backend.taskcatalog.TaskCategory;
 
 import org.tfg.backend.user.UserRepository;
 import org.tfg.backend.user.User;
+import org.tfg.backend.taskcatalog.TaskCategory;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WorkshopMinDTO } from '@/types/client';
+import type { WorkshopMinDTO } from '@/features/client';
 import { Search, Building, MapPin } from '@/assets/icons';
 
 interface WorkshopStepProps {

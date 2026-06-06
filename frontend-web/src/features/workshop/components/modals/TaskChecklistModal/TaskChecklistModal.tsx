@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
-import type { WorkshopInventory } from '@/types/client';
+import type { WorkshopInventory } from '@/features/workshop';
 import { Check, Plus, Trash, Box } from '@/assets/icons';
 
 /* ─────────────────────────────────────────────

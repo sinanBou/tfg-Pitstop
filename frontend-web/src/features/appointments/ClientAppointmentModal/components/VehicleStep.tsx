@@ -1,5 +1,5 @@
 import React from 'react';
-import type { VehicleDTO } from '@/types/client';
+import type { VehicleDTO } from '@/features/client';
 import { Car } from '@/assets/icons';
 
 interface VehicleStepProps {

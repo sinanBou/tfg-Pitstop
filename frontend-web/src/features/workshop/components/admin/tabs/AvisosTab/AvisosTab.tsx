@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import type { WorkshopInventory } from '@/types/client';
+import type { WorkshopInventory } from '@/features/workshop';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
 import { Badge } from '@/components/common/Badge/Badge';

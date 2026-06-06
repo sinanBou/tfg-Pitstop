@@ -1,4 +1,4 @@
-import type { UserDTO } from '@/types/client';
+import type { UserDTO } from '../types/client.types';
 import { WorkshopVehicleCard } from '@/components/common/Card/WorkshopVehicleCard';
 import { Card } from '@/components/common/Card/Card';
 import { Mail, Car, Calendar } from '@/assets/icons';
