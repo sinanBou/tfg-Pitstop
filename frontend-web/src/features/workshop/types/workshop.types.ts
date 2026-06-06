@@ -66,3 +66,27 @@ export interface UpdateProfilePayload {
   nif?: string;
   phoneNumber?: string;
 }
+
+export interface PartCategory {
+  id: string;
+  name: string;
+  displayName: string;
+}
+
+export interface PartCatalog {
+  id: string;
+  oemReference: string;
+  name: string;
+  manufacturer: string;
+  technicalSpecs?: string;
+  category: PartCategory;
+}
+
+export interface WorkshopInventory {
+  id: string;
+  part: PartCatalog;
+  stockQuantity: number;
+  costPrice: number;
+  retailPrice: number;
+  avisoThreshold: number;
+}

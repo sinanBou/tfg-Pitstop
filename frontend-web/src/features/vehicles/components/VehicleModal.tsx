@@ -1,4 +1,4 @@
-import { type VehicleRequest } from '@/types/client.ts';
+import { type VehicleRequest } from '@/features/client';
 import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useVehicleForm } from '../hooks/useVehicleForm';

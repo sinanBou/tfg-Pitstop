@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
-import type { WorkshopInventory, PartCategory } from '@/types/client';
+import type { WorkshopInventory, PartCategory } from '@/features/workshop';
 import { CategoryHeader } from './components/CategoryHeader';
 import { AddCategoryForm } from '../shared/AddCategoryForm';
 import { TabHeader } from '../shared/TabHeader';

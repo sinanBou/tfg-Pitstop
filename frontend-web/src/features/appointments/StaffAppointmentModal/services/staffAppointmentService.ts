@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '@/config/api';
-import type { VehicleRequest } from '@/types/client';
+import type { VehicleRequest } from '@/features/client';
 
 const getHeaders = () => {
   const token = localStorage.getItem('jwt_token');

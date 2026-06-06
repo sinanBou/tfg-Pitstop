@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WorkshopMinDTO } from '@/types/client';
+import type { WorkshopMinDTO } from '@/features/client';
 import { ChevronLeft, ChevronRight, Calendar, Info } from '@/assets/icons';
 
 interface ScheduleStepProps {

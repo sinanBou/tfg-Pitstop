@@ -1,6 +1,6 @@
 import React from 'react';
 import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
-import { type ClientSearchDTO, type VehicleSearchDTO, type VehicleRequest } from '@/types/client';
+import { type ClientSearchDTO, type VehicleSearchDTO, type VehicleRequest } from '@/features/client';
 import { Edit, Plus } from '@/assets/icons';
 
 const POPULAR_BRANDS = [

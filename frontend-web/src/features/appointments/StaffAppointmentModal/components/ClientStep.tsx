@@ -1,5 +1,5 @@
 import React from 'react';
-import { type ClientSearchDTO, type VehicleSearchDTO } from '@/types/client';
+import { type ClientSearchDTO, type VehicleSearchDTO } from '@/features/client';
 import { Search, ChevronRight, AlertTriangle } from '@/assets/icons';
 
 interface ClientStepProps {

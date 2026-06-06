@@ -1,5 +1,5 @@
 import React from 'react';
-import type { WorkshopInventory } from '@/types/client';
+import type { WorkshopInventory } from '@/features/workshop';
 import { Edit, Trash } from '@/assets/icons';
 
 import { formatCurrency } from '@/utils/formatters';

@@ -1,4 +1,4 @@
-import type { VehicleDTO, AppointmentRequest, WorkshopMinDTO } from '@/types/client';
+import type { VehicleDTO, AppointmentRequest, WorkshopMinDTO } from '@/features/client';
 
 export interface ClientAppointmentModalProps {
   isOpen: boolean;

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { AppointmentRequest, WorkshopMinDTO } from '@/types/client';
+import type { AppointmentRequest, WorkshopMinDTO } from '@/features/client';
 import { Check } from '@/assets/icons';
 
 interface DetailsStepProps {

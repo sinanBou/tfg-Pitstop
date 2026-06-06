@@ -1,5 +1,5 @@
 import React from 'react';
-import { type VehicleSearchDTO } from '@/types/client';
+import { type VehicleSearchDTO } from '@/features/client';
 import { Edit, ChevronLeft, ChevronRight, Calendar, ArrowRight } from '@/assets/icons';
 
 interface AppointmentStepProps {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { AppointmentRequest, WorkshopMinDTO } from '@/types/client';
+import type { AppointmentRequest, WorkshopMinDTO } from '@/features/client';
 import { searchWorkshopsApi } from '../services/clientAppointmentService';
 
 interface UseClientAppointmentProps {
