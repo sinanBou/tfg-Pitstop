@@ -54,6 +54,7 @@ services:
       context: ./frontend-web
       args:
         - VITE_API_BASE_URL=/api
+        - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
     restart: always
     ports:
       - "127.0.0.1:8080:8080"
