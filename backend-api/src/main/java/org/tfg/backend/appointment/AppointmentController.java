@@ -37,9 +37,16 @@ public class AppointmentController {
     }
 
     @PostMapping("/staff")
-    public ResponseEntity<String> createManualAppointment(@RequestBody AppointmentRequest request) {
-        appointmentService.createManualAppointment(request);
-        return ResponseEntity.ok("Cita manual registrada con éxito");
+    public ResponseEntity<?> createManualAppointment(@RequestBody AppointmentRequest request) {
+        try {
+            appointmentService.createManualAppointment(request);
+            return ResponseEntity.ok("Cita manual registrada con éxito");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error inesperado al crear la cita");
+        }
     }
 
     @GetMapping("/my-appointments")

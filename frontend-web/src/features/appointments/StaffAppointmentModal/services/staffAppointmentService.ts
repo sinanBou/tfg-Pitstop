@@ -112,6 +112,9 @@ export const createStaffAppointment = async (req: CreateStaffAppointmentRequest)
     headers: getHeaders(),
     body: JSON.stringify(req)
   });
-  if (!res.ok) throw new Error('Error al crear la cita presencial');
+  if (!res.ok) {
+    const errorText = await res.text().catch(() => '');
+    throw new Error(errorText || 'Error al crear la cita presencial');
+  }
   return res.ok;
 };

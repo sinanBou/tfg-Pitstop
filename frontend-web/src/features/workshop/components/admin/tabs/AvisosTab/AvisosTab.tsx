@@ -14,6 +14,7 @@ import { Calendar, Edit } from '@/assets/icons';
 interface AvisosTabProps {
   workshopId: string;
   appointments: any[];
+  workshopTasks?: any[];
   readyJobs: any[];
   fetchWorkshopData: () => Promise<void>;
   onGoToPlanning?: () => void;
@@ -22,6 +23,7 @@ interface AvisosTabProps {
 export const AvisosTab: React.FC<AvisosTabProps> = ({
   workshopId,
   appointments,
+  workshopTasks = [],
   readyJobs,
   fetchWorkshopData,
   onGoToPlanning,
@@ -143,9 +145,12 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
   const confirmedApps = appointments.filter((a) => a.status === 'CONFIRMED' || a.status === 'IN_PROGRESS');
 
-  // Delayed appointments list
+  // Delayed appointments and tasks list — merge both sources
   const dismissedWarnings = JSON.parse(localStorage.getItem('dismissed_delay_warnings') || '[]');
-  const delayedApps = appointments.filter((a) => a.status === 'DELAYED' && !dismissedWarnings.includes(a.id));
+  const delayedApps = [
+    ...appointments,
+    ...workshopTasks.map((t) => ({ ...t, isTask: true })),
+  ].filter((item) => item.status === 'DELAYED' && !dismissedWarnings.includes(item.id));
 
   return (
     <div className="space-y-8 animate-fade-in-up relative">

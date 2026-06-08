@@ -28,6 +28,7 @@ export function useWorkshopAdmin() {
   const [readyForCompletion, setReadyForCompletion] = useState<any[]>([]);
   const [employeeProfile, setEmployeeProfile] = useState<EmployeeProfile | null>(null);
   const [workshopTasks, setWorkshopTasks] = useState<any[]>([]);
+  const [delayedTasks, setDelayedTasks] = useState<any[]>([]);
 
   const [settingsForm, setSettingsForm] = useState({
     openTime: '',
@@ -88,6 +89,10 @@ export function useWorkshopAdmin() {
       const dateIso = `${selectedDate.getFullYear()}-${(selectedDate.getMonth() + 1).toString().padStart(2, '0')}-${selectedDate.getDate().toString().padStart(2, '0')}`;
       const taskData = await workshopService.getTasksByWorkshopAndDate(id, dateIso);
       setWorkshopTasks(taskData);
+
+      // Fetch ALL delayed tasks (regardless of date) for the warnings panel
+      const delayedData = await workshopService.getDelayedTasksByWorkshop(id);
+      setDelayedTasks(delayedData);
 
       // Fetch employees
       const empData = await workshopService.getEmployeesByWorkshop(id);
@@ -432,6 +437,7 @@ export function useWorkshopAdmin() {
     handleDeleteAppointment,
     employeeProfile,
     workshopTasks,
+    delayedTasks,
     handleProfileUpdate,
     handleUploadAvatar,
     handleDeleteAvatar,
