@@ -215,9 +215,9 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
         return true;
       }
       return false;
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      toast.error("Error al registrar la cita");
+      toast.error(err?.message || 'Error al registrar la cita');
       return false;
     } finally {
       setLoading(false);

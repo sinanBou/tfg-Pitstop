@@ -25,6 +25,11 @@ public class WorkshopTaskController {
         return taskService.getTasksByWorkshopAndDate(workshopId, start, end);
     }
 
+    @GetMapping("/workshop/{workshopId}/delayed")
+    public List<WorkshopTaskDTO> getDelayedTasks(@PathVariable UUID workshopId) {
+        return taskService.getDelayedTasksByWorkshop(workshopId);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<WorkshopTaskDTO> updateTask(@PathVariable UUID id, @RequestBody WorkshopTaskDTO dto) {
         return ResponseEntity.ok(taskService.updateTask(id, dto));

@@ -90,6 +90,15 @@ export const getTasksByWorkshopAndDate = async (workshopId: string, dateIso: str
   return res.json();
 };
 
+/** Fetches all DELAYED workshop tasks for the given workshop, regardless of date. */
+export const getDelayedTasksByWorkshop = async (workshopId: string): Promise<any[]> => {
+  const res = await fetch(`${API_BASE_URL}/workshop-tasks/workshop/${workshopId}/delayed`, {
+    headers: getAuthHeaders()
+  });
+  if (!res.ok) throw new Error('Error al obtener tareas retrasadas del taller');
+  return res.json();
+};
+
 export const getEmployeesByWorkshop = async (workshopId: string): Promise<EmployeeProfile[]> => {
   const res = await fetch(`${API_BASE_URL}/employees/workshop/${workshopId}`, {
     headers: getAuthHeaders()

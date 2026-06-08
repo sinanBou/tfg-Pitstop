@@ -37,6 +37,13 @@ public class WorkshopTaskService {
                 .collect(Collectors.toList());
     }
 
+    public List<WorkshopTaskDTO> getDelayedTasksByWorkshop(UUID workshopId) {
+        return taskRepository.findByWorkshopIdAndStatus(workshopId, WorkshopTaskStatus.DELAYED)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     public List<WorkshopTaskDTO> getTasksByEmployeeAndDate(UUID employeeId, LocalDateTime start, LocalDateTime end) {
         return taskRepository.findByAssignedEmployeeIdAndDateTimeBetween(employeeId, start, end)
                 .stream()

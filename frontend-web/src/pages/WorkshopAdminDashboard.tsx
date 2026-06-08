@@ -80,6 +80,7 @@ export default function WorkshopAdminDashboard() {
     goToNextPendingDate,
     employeeProfile,
     workshopTasks,
+    delayedTasks,
     handleProfileUpdate,
     handleUploadAvatar,
     handleDeleteAvatar,
@@ -222,6 +223,7 @@ export default function WorkshopAdminDashboard() {
                 <AvisosTab
                   workshopId={id}
                   appointments={appointments}
+                  workshopTasks={delayedTasks}
                   readyJobs={readyForCompletion}
                   fetchWorkshopData={fetchWorkshopData}
                   onGoToPlanning={() => setActiveTab(3)}
