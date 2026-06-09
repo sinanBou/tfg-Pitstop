@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Objeto de petición para solicitar un cambio de contraseña por parte de un usuario.
+ * Contiene la contraseña actual y la nueva contraseña con sus restricciones de validación.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

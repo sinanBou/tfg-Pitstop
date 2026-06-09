@@ -1,3 +1,16 @@
+package org.tfg.backend.part;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.tfg.backend.part.service.PartAdminService;
+import org.tfg.backend.part.service.PartLookupService;
+import org.tfg.backend.part.service.PartAssignmentService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * Controlador REST para gestionar operaciones relacionadas con repuestos,
  * catálogo de piezas, inventario y su asignación a citas.

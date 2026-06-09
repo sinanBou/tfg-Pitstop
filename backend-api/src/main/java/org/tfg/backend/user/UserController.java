@@ -7,6 +7,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Controlador REST que gestiona las operaciones del perfil del usuario actualmente autenticado,
+ * como consultar su información personal, cambiar la contraseña o solicitar la baja de su cuenta.
+ */
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
@@ -55,6 +59,13 @@ public class UserController {
         return ResponseEntity.ok("Contraseña cambiada correctamente.");
     }
 
+    /**
+     * Da de baja y elimina por completo la cuenta y el perfil del usuario autenticado del sistema,
+     * liberando los recursos asociados.
+     *
+     * @param userDetails Detalles del usuario autenticado.
+     * @return Respuesta HTTP con confirmación del borrado.
+     */
     @DeleteMapping("/me")
     public ResponseEntity<String> deleteMe(@AuthenticationPrincipal UserDetails userDetails) {
         userService.deleteUser(userDetails.getUsername());

@@ -13,6 +13,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entidad de persistencia que representa a un Usuario en la base de datos de PitStop.
+ * Implementa UserDetails de Spring Security para integrarse con el sistema de autenticación
+ * y autorización basado en roles, tokens JWT y autenticación de terceros (OAuth2 con Google).
+ */
 @Data
 @Builder
 @NoArgsConstructor

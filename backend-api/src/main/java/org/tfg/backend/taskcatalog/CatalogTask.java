@@ -6,6 +6,11 @@ import lombok.*;
 
 import java.util.UUID;
 
+/**
+ * Entidad de persistencia que representa una Tarea del Catálogo oficial de servicios del taller.
+ * Cada tarea pertenece a una categoría y almacena los tiempos estimados (horas base, horas según cilindros, ruedas, etc.)
+ * para el cálculo automatizado de presupuestos y duración del trabajo.
+ */
 @Entity
 @Table(name = "catalog_tasks")
 @Data

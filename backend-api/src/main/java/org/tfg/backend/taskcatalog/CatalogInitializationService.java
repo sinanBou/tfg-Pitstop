@@ -13,6 +13,11 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Servicio encargado de la inicialización por defecto del catálogo de tareas y categorías
+ * de trabajo para un taller. Carga la información estructurada desde un archivo JSON estático (cargaTrabajo.json)
+ * y la mapea a la base de datos relacional para el taller especificado.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -37,6 +42,12 @@ public class CatalogInitializationService {
             Map.entry("neumaticos_y_ruedas", "Neumáticos y Ruedas")
     );
 
+    /**
+     * Carga e inicializa el catálogo de tareas base a partir del JSON estático 'cargaTrabajo.json'
+     * y las vincula al taller provisto.
+     *
+     * @param workshop Taller que recibirá el catálogo inicial.
+     */
     @Transactional
     public void initializeCatalogForWorkshop(Workshop workshop) {
         log.info("Inicializando catálogo de tareas por defecto para el taller: {}", workshop.getCompanyName());
@@ -72,13 +83,13 @@ public class CatalogInitializationService {
     }
 
     /**
-    * Helper que procesa una secciÃ³n de tareas de un archivo JSON, crea la categorÃ­a
-    * correspondiente si es necesario y guarda todas sus tareas asociadas.
-    *
-    * @param categoryKey Identificador Ãºnico clave de la categorÃ­a.
-    * @param tasksArray Nodo JSON array que contiene las tareas de la categorÃ­a.
-    * @param workshop Taller asociado.
-    */
+     * Helper que procesa una sección de tareas de un archivo JSON, crea la categoría
+     * correspondiente si es necesario y guarda todas sus tareas asociadas.
+     *
+     * @param categoryKey Identificador único clave de la categoría.
+     * @param tasksArray Nodo JSON array que contiene las tareas de la categoría.
+     * @param workshop Taller asociado.
+     */
     private void createCategoryAndTasks(String categoryKey, JsonNode tasksArray, Workshop workshop) {
         String displayName = CATEGORY_DISPLAY_NAMES.getOrDefault(categoryKey, categoryKey);
         

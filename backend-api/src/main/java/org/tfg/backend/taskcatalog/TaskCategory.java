@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entidad de persistencia que representa una Categoría de Tareas (como revisiones, frenos, motor, etc.)
+ * dentro del catálogo de servicios de un taller mecánico específico.
+ */
 @Entity
 @Table(name = "task_categories")
 @Data

@@ -7,6 +7,11 @@ import org.tfg.backend.workshop.Workshop;
 
 import java.util.UUID;
 
+/**
+ * Entidad de persistencia que representa a un Vehículo en la base de datos de PitStop.
+ * Almacena los datos del coche (marca, modelo, matrícula, año, VIN), su estado operativo
+ * en el taller ("status") y sus relaciones con el cliente y el taller actual.
+ */
 @Entity
 @Table(name = "vehicles")
 @Data

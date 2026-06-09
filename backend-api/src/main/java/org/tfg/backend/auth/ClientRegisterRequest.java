@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request DTO para el registro de un nuevo cliente (Client).
+ * Incluye la validación de entrada para los campos obligatorios del perfil y de la cuenta.
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -41,7 +45,7 @@ public class ClientRegisterRequest {
     private String phoneNumber;
 
     /**
-    * DirecciÃ³n postal o residencial del cliente (opcional).
-    */
+     * Dirección postal o residencial del cliente (opcional).
+     */
     private String address;
 }

@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Objeto de petición para la creación o modificación parcial de información
+ * básica del usuario (nombre, apellidos y correo electrónico).
+ */
 @Data
 @Builder
 @AllArgsConstructor

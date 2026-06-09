@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request DTO para el registro de un nuevo propietario de taller (Owner).
+ * Incluye la validación de entrada para los campos obligatorios del perfil y de la cuenta.
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -41,7 +45,7 @@ public class OwnerRegisterRequest {
     private String phoneNumber;
 
     /**
-    * DirecciÃ³n de contacto o comercial del propietario (opcional).
-    */
+     * Dirección de contacto o comercial del propietario (opcional).
+     */
     private String address;
 }
