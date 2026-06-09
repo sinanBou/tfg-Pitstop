@@ -13,6 +13,11 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * Servicio encargado de la inicialización de catálogos por defecto para los talleres.
+ * Carga un archivo JSON de recursos (`cargaTrabajo.json`) que contiene la estructura estándar
+ * de tiempos y códigos de tareas de reparación de automóviles.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -37,6 +42,13 @@ public class CatalogInitializationService {
             Map.entry("neumaticos_y_ruedas", "Neumáticos y Ruedas")
     );
 
+    /**
+     * Inicializa el catálogo de tareas de referencia para un taller cargando las categorías
+     * y tareas definidas en el archivo JSON `cargaTrabajo.json`.
+     *
+     * @param workshop Taller para el que se inicializará el catálogo.
+     * @throws RuntimeException Si el archivo de recursos no puede ser cargado o procesado.
+     */
     @Transactional
     public void initializeCatalogForWorkshop(Workshop workshop) {
         log.info("Inicializando catálogo de tareas por defecto para el taller: {}", workshop.getCompanyName());
@@ -71,6 +83,14 @@ public class CatalogInitializationService {
         }
     }
 
+    /**
+     * Helper que procesa una sección de tareas de un archivo JSON, crea la categoría
+     * correspondiente si es necesario y guarda todas sus tareas asociadas.
+     *
+     * @param categoryKey Identificador único clave de la categoría.
+     * @param tasksArray Nodo JSON array que contiene las tareas de la categoría.
+     * @param workshop Taller asociado.
+     */
     private void createCategoryAndTasks(String categoryKey, JsonNode tasksArray, Workshop workshop) {
         String displayName = CATEGORY_DISPLAY_NAMES.getOrDefault(categoryKey, categoryKey);
         

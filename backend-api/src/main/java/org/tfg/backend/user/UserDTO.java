@@ -6,6 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.UUID;
 
+/**
+ * DTO para la transferencia de información básica de un usuario.
+ * Facilita el transporte seguro de IDs de perfiles asociados (cliente, empleado, taller).
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -16,7 +20,13 @@ public class UserDTO {
     private String lastname;
     private String email;
     private String role;
-    private UUID clientId;    // ID de perfil de cliente si existe
-    private UUID employeeId;  // ID de perfil de empleado si existe
-    private UUID workshopId;  // ID del taller si es dueño/empleado
+
+    /** Identificador del perfil de cliente asociado, si aplica. */
+    private UUID clientId;
+
+    /** Identificador del perfil de empleado asociado, si aplica. */
+    private UUID employeeId;
+
+    /** Identificador del taller asociado, si el usuario es dueño o empleado. */
+    private UUID workshopId;
 }

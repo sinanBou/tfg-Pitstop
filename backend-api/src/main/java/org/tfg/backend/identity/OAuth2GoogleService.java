@@ -13,6 +13,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
+/**
+ * Servicio encargado de interactuar con las APIs de Google para validar
+ * tokens de identidad (ID Tokens) obtenidos en el flujo de OAuth2.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +27,9 @@ public class OAuth2GoogleService {
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
+    /**
+     * Objeto de transferencia que representa los detalles del perfil del usuario obtenidos desde Google API.
+     */
     @Data
     @Builder
     public static class GoogleUserInfo {
@@ -32,6 +39,14 @@ public class OAuth2GoogleService {
         private String lastname;
     }
 
+    /**
+     * Valida un ID Token recibido desde Google utilizando la API pública oauth2.googleapis.com.
+     * Verifica la validez del token, la coincidencia del Client ID asignado y el estado de verificación del email.
+     *
+     * @param idToken Token de identidad en formato JWT proporcionado por Google.
+     * @return Perfil de información del usuario obtenido si la validación es exitosa.
+     * @throws ResponseStatusException Si la validación falla (token inválido, mala audiencia, etc.).
+     */
     public GoogleUserInfo validateToken(String idToken) {
         String url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
         

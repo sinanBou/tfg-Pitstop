@@ -13,6 +13,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entidad de persistencia principal que representa a un usuario registrado en el sistema.
+ * Implementa la interfaz {@link UserDetails} de Spring Security para el flujo de autenticación y control de accesos.
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -74,14 +78,48 @@ public class User implements UserDetails {
     @ToString.Exclude
     private Employee employee;
 
+    /**
+     * Devuelve las autoridades concedidas al usuario a partir de su rol.
+     *
+     * @return Colección de GrantedAuthority con el rol del usuario con prefijo 'ROLE_'.
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
-    @Override public String getUsername() { return email; } // Autenticación por email
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return isVerified; }
+    /**
+     * Devuelve el nombre de usuario utilizado para la autenticación (en este caso, el email).
+     *
+     * @return Dirección de correo electrónico del usuario.
+     */
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    /**
+     * Indica si el usuario está habilitado. Un usuario solo está habilitado si su cuenta está verificada.
+     *
+     * @return true si la cuenta está verificada, false en caso contrario.
+     */
+    @Override
+    public boolean isEnabled() {
+        return isVerified;
+    }
 }

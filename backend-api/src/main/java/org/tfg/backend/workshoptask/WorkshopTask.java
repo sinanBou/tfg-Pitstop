@@ -10,6 +10,11 @@ import org.tfg.backend.workshop.Workshop;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Entidad de persistencia que representa una tarea individual de reparación o mantenimiento
+ * a realizar en el taller sobre un vehículo específico, normalmente asociada a una cita general
+ * y asignada a un mecánico de la plantilla.
+ */
 @Entity
 @Data
 @Builder

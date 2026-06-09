@@ -16,7 +16,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
+/**
+ * Servicio unificado para gestionar perfiles de cliente, búsquedas paginadas
+ * y registros manuales iniciados por el personal administrativo del taller.
+ */
 @Service
 @RequiredArgsConstructor
 public class ClientService {
@@ -25,9 +28,12 @@ public class ClientService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-
     /**
-     * Obtiene el perfil del cliente logueado a través de su email.
+     * Obtiene la información del perfil del cliente en base a su email de sesión.
+     *
+     * @param email Correo electrónico de inicio de sesión.
+     * @return DTO con los datos del perfil del cliente.
+     * @throws RuntimeException si el usuario no existe o no tiene un perfil de cliente asociado.
      */
     @Transactional(readOnly = true)
     public ClientDTO getClientProfile(String email) {
@@ -43,7 +49,10 @@ public class ClientService {
     }
 
     /**
-     * Mapea la entidad Client a ClientDTO.
+     * Convierte una entidad {@link Client} a un DTO {@link ClientDTO}.
+     *
+     * @param client Entidad cliente de origen.
+     * @return DTO representativo con la información del cliente.
      */
     public ClientDTO mapToDTO(Client client) {
         return ClientDTO.builder()
@@ -58,7 +67,11 @@ public class ClientService {
     }
 
     /**
-     * Actualiza el perfil del cliente autenticado.
+     * Actualiza la información personal, de contacto y dirección postal del cliente autenticado.
+     *
+     * @param email Correo electrónico del usuario logueado.
+     * @param request Datos actualizados.
+     * @return DTO con el estado final del cliente actualizado.
      */
     @Transactional
     public ClientDTO updateProfile(String email, ClientDTO request) {
@@ -92,12 +105,26 @@ public class ClientService {
         return mapToDTO(client);
     }
 
+    /**
+     * Realiza una búsqueda paginada de clientes según filtros de búsqueda.
+     *
+     * @param query Término de búsqueda (nombre, email, NIF).
+     * @param page Número de página solicitado.
+     * @param size Cantidad de registros por página.
+     * @return Página de resultados convertida a {@link ClientSearchDTO}.
+     */
     @Transactional(readOnly = true)
     public Page<ClientSearchDTO> searchClientsPaginated(String query, int page, int size) {
         return clientRepository.searchClients(query, PageRequest.of(page, size))
                 .map(this::mapToSearchDTO);
     }
 
+    /**
+     * Método auxiliar para transformar un cliente en DTO de búsqueda rápida.
+     *
+     * @param client Entidad cliente.
+     * @return DTO simplificado.
+     */
     private ClientSearchDTO mapToSearchDTO(Client client) {
         return ClientSearchDTO.builder()
                 .id(client.getId())
@@ -109,6 +136,14 @@ public class ClientService {
                 .build();
     }
 
+    /**
+     * Permite al personal del taller registrar de forma manual a un cliente en el sistema.
+     * Crea un usuario provisional con contraseña aleatoria y su perfil de cliente asociado.
+     *
+     * @param request Datos del cliente a registrar manualmente.
+     * @return DTO simplificado del cliente registrado.
+     * @throws RuntimeException si el NIF o email ya están registrados, o por algún error técnico.
+     */
     @Transactional
     public ClientSearchDTO registerManualClient(ClientSearchDTO request) {
         // Validaciones básicas
@@ -154,4 +189,4 @@ public class ClientService {
             throw new RuntimeException("Error técnico al guardar el cliente: " + e.getMessage());
         }
     }
-}
+}

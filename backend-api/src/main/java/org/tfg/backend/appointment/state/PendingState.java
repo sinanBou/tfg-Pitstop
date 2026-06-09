@@ -7,17 +7,26 @@ import org.tfg.backend.vehicle.VehicleRepository;
 import java.time.LocalDateTime;
 
 /**
- * Estado que representa una cita solicitada pero pendiente de confirmación.
+ * Estado que representa una cita solicitada pero pendiente de confirmación por el taller.
  */
 public class PendingState implements AppointmentState {
 
+    /**
+     * Realiza las transiciones desde el estado PENDING a estados posteriores.
+     * Gestiona el registro temporal de confirmación o inicio y libera/cancela
+     * el estado del vehículo en caso de cancelación de cita.
+     *
+     * @param appointment Cita sobre la cual se realiza la transición.
+     * @param newStatus Estado destino de la transición.
+     * @param vehicleRepository Repositorio para actualizar estados del vehículo asociado.
+     */
     @Override
     public void transitionTo(Appointment appointment, AppointmentStatus newStatus, VehicleRepository vehicleRepository) {
         if (newStatus == AppointmentStatus.PENDING) {
-            return; // Ya está en este estado
+            return; // Ya se encuentra en este estado
         }
 
-        // Lógica de fechado automático
+        // Lógica de fechado automático según transiciones
         if (newStatus == AppointmentStatus.CONFIRMED || newStatus == AppointmentStatus.IN_PROGRESS || newStatus == AppointmentStatus.COMPLETED) {
             if (appointment.getConfirmedAt() == null) {
                 appointment.setConfirmedAt(LocalDateTime.now());
@@ -34,6 +43,7 @@ public class PendingState implements AppointmentState {
             }
         }
 
+        // Si se cancela la cita, restablece el estado del vehículo a CANCELADO
         if (newStatus == AppointmentStatus.CANCELLED) {
             Vehicle vehicle = appointment.getVehicle();
             if (vehicle != null) {
@@ -46,3 +56,4 @@ public class PendingState implements AppointmentState {
         appointment.setStatus(newStatus);
     }
 }
+

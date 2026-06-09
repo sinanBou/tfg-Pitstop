@@ -10,6 +10,11 @@ import org.tfg.backend.workshoptask.mapper.WorkshopTaskMapper;
 
 import java.util.UUID;
 
+/**
+ * Servicio administrativo encargado de las operaciones de modificación y eliminación de tareas de taller,
+ * incluyendo la actualización del progreso de las tareas, reasignación de mecánicos y reglas de cancelación
+ * u optimización de las citas.
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkshopTaskAdminService {
@@ -19,6 +24,13 @@ public class WorkshopTaskAdminService {
     private final AppointmentRepository appointmentRepository;
     private final WorkshopTaskMapper taskMapper;
 
+    /**
+     * Modifica los datos de progreso, duración estimada o la asignación de mecánico de una tarea.
+     *
+     * @param taskId Identificador de la tarea.
+     * @param dto Datos modificados.
+     * @return El DTO de la tarea actualizada.
+     */
     @Transactional
     public WorkshopTaskDTO updateTask(UUID taskId, WorkshopTaskDTO dto) {
         WorkshopTask task = taskRepository.findById(taskId)
@@ -40,6 +52,12 @@ public class WorkshopTaskAdminService {
         return taskMapper.convertToDTO(taskRepository.save(task));
     }
 
+    /**
+     * Aplica la regla de eliminación/cancelación de tareas en función de si están vinculadas a una cita activa
+     * dividida o son una tarea única (caso en el cual se restaura el estado original de la cita).
+     *
+     * @param taskId Identificador único de la tarea a procesar.
+     */
     @Transactional
     public void deleteTask(UUID taskId) {
         WorkshopTask task = taskRepository.findById(taskId).orElse(null);

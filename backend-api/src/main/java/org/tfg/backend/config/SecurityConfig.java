@@ -16,6 +16,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * Clase de configuración principal de seguridad web (Spring Security).
+ * Configura los accesos públicos/privados, desactiva CSRF por ser stateless, y configura políticas de CORS.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,6 +28,14 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    /**
+     * Define la cadena de filtros de seguridad web HTTP (SecurityFilterChain)
+     * indicando qué endpoints requieren autenticación y configurando la sesión stateless.
+     *
+     * @param http Instancia de {@link HttpSecurity} a configurar.
+     * @return La cadena de filtros configurada.
+     * @throws Exception ante fallos en la configuración.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -42,6 +54,12 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Define el origen y cabeceras admitidas para las peticiones CORS.
+     * Habilita los dominios autorizados de Pitstop y los métodos HTTP estándar.
+     *
+     * @return El bean de {@link CorsConfigurationSource}.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -54,4 +72,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-}
+}

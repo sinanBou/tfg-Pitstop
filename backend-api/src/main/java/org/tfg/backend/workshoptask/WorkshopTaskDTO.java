@@ -7,6 +7,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Objeto de transferencia de datos (DTO) que representa de forma estructurada los detalles
+ * de una tarea de taller, incluyendo metadatos formateados de vehículos, mecánicos,
+ * clientes e información sobre su estado, duración e hitos completados.
+ */
 @Data
 @Builder
 @AllArgsConstructor

@@ -8,6 +8,11 @@ import org.tfg.backend.part.*;
 
 import java.util.UUID;
 
+/**
+ * Servicio encargado de la administración y configuración de repuestos, categorías y existencias en el inventario.
+ * Proporciona métodos para registrar nuevos artículos, modificar precios, actualizar existencias y eliminar
+ * piezas o categorías del catálogo.
+ */
 @Service
 @RequiredArgsConstructor
 public class PartAdminService {
@@ -18,6 +23,12 @@ public class PartAdminService {
     private final AppointmentPartRepository appointmentPartRepository;
     private final PartAssignmentService partAssignmentService;
 
+    /**
+     * Busca una categoría por su nombre normalizado (slug) o la crea si no existe.
+     *
+     * @param displayName Nombre a mostrar de la categoría.
+     * @return La categoría encontrada o creada.
+     */
     private PartCategory findOrCreateCategory(String displayName) {
         String slug = displayName.toLowerCase().trim()
                 .replace(" ", "_")
@@ -36,12 +47,18 @@ public class PartAdminService {
                 });
     }
 
+    /**
+     * Asegura que exista la categoría fija para repuestos personalizados genéricos.
+     */
     @PostConstruct
     @Transactional
     public void ensureFixedCategoryExists() {
         findOrCreateCategory("Recambios personalizados");
     }
 
+    /**
+     * Inicializa repuestos y categorías de prueba si la base de datos no contiene elementos.
+     */
     @PostConstruct
     @Transactional
     public void initDemoParts() {
@@ -54,6 +71,9 @@ public class PartAdminService {
         createPartDemo("REF-9010", "Bujía NGK Iridium", "NGK", "Bujía de alto rendimiento de iridio", "Encendido", 6.5, 12.0, 12);
     }
 
+    /**
+     * Crea un repuesto auxiliar en catálogo e inventario para propósitos de prueba o demostración.
+     */
     private void createPartDemo(String oemRef, String name, String manufacturer, String specs, String categoryName,
                                 double costPrice, double retailPrice, int stock) {
         PartCategory category = findOrCreateCategory(categoryName);
@@ -76,6 +96,20 @@ public class PartAdminService {
         workshopInventoryRepository.save(inventory);
     }
 
+    /**
+     * Registra un nuevo repuesto en el catálogo y define su inventario inicial en el taller.
+     *
+     * @param oemReference Código o referencia del fabricante original (OEM).
+     * @param name Nombre comercial o descriptivo del artículo.
+     * @param manufacturer Fabricante de la pieza.
+     * @param technicalSpecs Ficha o especificaciones técnicas del producto.
+     * @param categoryId Identificador único de la categoría.
+     * @param costPrice Precio de costo.
+     * @param retailPrice Precio sugerido de venta al público.
+     * @param stockQuantity Unidades iniciales en stock.
+     * @param avisoThreshold Umbral para alertas de stock bajo.
+     * @return El registro de inventario creado {@link WorkshopInventory}.
+     */
     @Transactional
     public WorkshopInventory addPartToInventory(String oemReference, String name, String manufacturer, String technicalSpecs, UUID categoryId,
                                                 double costPrice, double retailPrice, int stockQuantity, int avisoThreshold) {
@@ -110,6 +144,22 @@ public class PartAdminService {
         return workshopInventoryRepository.save(inventory);
     }
 
+    /**
+     * Modifica los campos de catálogo e inventario para un artículo registrado.
+     * Si la pieza posee asignaciones históricas con precio pendiente, actualiza su valor al nuevo precio de venta.
+     *
+     * @param inventoryId Identificador único de inventario.
+     * @param oemReference Nueva referencia OEM.
+     * @param name Nuevo nombre comercial.
+     * @param manufacturer Nuevo fabricante.
+     * @param technicalSpecs Nuevas especificaciones técnicas.
+     * @param categoryId Identificador de la nueva categoría.
+     * @param costPrice Nuevo precio de costo.
+     * @param retailPrice Nuevo precio de venta al público.
+     * @param stockQuantity Nueva cantidad disponible.
+     * @param avisoThreshold Nuevo umbral de aviso.
+     * @return El registro de inventario modificado {@link WorkshopInventory}.
+     */
     @Transactional
     public WorkshopInventory updateInventoryItem(UUID inventoryId, String oemReference, String name, String manufacturer, String technicalSpecs, UUID categoryId,
                                                  double costPrice, double retailPrice, int stockQuantity, int avisoThreshold) {
@@ -146,6 +196,11 @@ public class PartAdminService {
         return workshopInventoryRepository.save(inventory);
     }
 
+    /**
+     * Elimina un artículo del inventario y del catálogo general, limpiando previamente todas sus asignaciones a citas.
+     *
+     * @param inventoryId Identificador del artículo en inventario.
+     */
     @Transactional
     public void deleteInventoryItem(UUID inventoryId) {
         WorkshopInventory inventory = workshopInventoryRepository.findById(inventoryId)
@@ -158,6 +213,12 @@ public class PartAdminService {
         partCatalogRepository.delete(inventory.getPart());
     }
 
+    /**
+     * Registra una nueva categoría de repuestos en el sistema a partir de su nombre.
+     *
+     * @param displayName Nombre visible de la categoría.
+     * @return La categoría creada {@link PartCategory}.
+     */
     @Transactional
     public PartCategory createCategory(String displayName) {
         String slug = displayName.toLowerCase().trim()
@@ -177,6 +238,11 @@ public class PartAdminService {
         return partCategoryRepository.save(newCat);
     }
 
+    /**
+     * Elimina una categoría del sistema si no contiene repuestos y no es una categoría protegida.
+     *
+     * @param categoryId Identificador de la categoría.
+     */
     @Transactional
     public void deleteCategory(UUID categoryId) {
         PartCategory category = partCategoryRepository.findById(categoryId)

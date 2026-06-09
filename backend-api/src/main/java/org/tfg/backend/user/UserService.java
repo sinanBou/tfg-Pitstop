@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+/**
+ * Servicio unificado que implementa la lógica de negocio para la gestión de usuarios,
+ * consultas seguras de detalles y flujo de cambio de contraseña con validación de seguridad.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -16,6 +20,10 @@ public class UserService {
 
     /**
      * Busca un usuario por su email y devuelve su DTO seguro.
+     *
+     * @param email Correo electrónico del usuario.
+     * @return DTO con la información pública del usuario.
+     * @throws RuntimeException Si el usuario no se encuentra.
      */
     @Transactional(readOnly = true)
     public UserDTO getUserDetails(String email) {
@@ -27,7 +35,11 @@ public class UserService {
     /**
      * Cambia la contraseña de un usuario autenticado tras validar la contraseña actual.
      * Si el usuario fue registrado con Google y no tiene contraseña local previa, se le permite
-     * establecer una contraseña por primera vez directamente.
+     * establecer una contraseña por primera vez directamente sin validar la actual.
+     *
+     * @param email Correo electrónico del usuario.
+     * @param request Datos de la petición con la contraseña actual y la nueva.
+     * @throws ResponseStatusException Si el usuario no existe o la contraseña actual es incorrecta.
      */
     @Transactional
     public void changePassword(String email, ChangePasswordRequest request) {
@@ -47,7 +59,10 @@ public class UserService {
     }
 
     /**
-     * Mapea la entidad User a UserDTO de forma segura.
+     * Mapea la entidad User a UserDTO de forma segura, resolviendo referencias inversas.
+     *
+     * @param user Entidad del usuario.
+     * @return DTO resultante.
      */
     public UserDTO mapToDTO(User user) {
         return UserDTO.builder()

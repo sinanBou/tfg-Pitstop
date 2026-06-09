@@ -14,6 +14,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Controlador REST que expone los servicios y endpoints para la gestión de citas en Pitstop.
+ * Permite reservar, reprogramar, recepcionar vehículos, asignar mecánicos y planificar tareas.
+ */
 @RestController
 @RequestMapping("/api/appointments")
 @RequiredArgsConstructor
@@ -21,6 +25,13 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+    /**
+     * Obtiene los intervalos de tiempo disponibles (slots) para un taller en una fecha concreta.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param date Fecha para la que se consulta la disponibilidad.
+     * @return ResponseEntity con la lista de slots y su estado de disponibilidad.
+     */
     @GetMapping("/availability/{workshopId}")
     public ResponseEntity<List<AvailableSlotDTO>> getAvailability(
             @PathVariable UUID workshopId,
@@ -28,6 +39,13 @@ public class AppointmentController {
         return ResponseEntity.ok(appointmentService.getAvailableSlots(workshopId, date));
     }
 
+    /**
+     * Crea y reserva una nueva cita iniciada por un cliente autenticado en el sistema.
+     *
+     * @param request Datos de la cita solicitada.
+     * @param userDetails Detalles del usuario autenticado que realiza la solicitud.
+     * @return ResponseEntity con mensaje de éxito de la reservación.
+     */
     @PostMapping
     public ResponseEntity<String> createAppointment(
             @RequestBody AppointmentRequest request,
@@ -36,31 +54,62 @@ public class AppointmentController {
         return ResponseEntity.ok("Cita reservada con éxito");
     }
 
+    /**
+     * Registra una cita de forma manual (creada internamente por el personal del taller).
+     *
+     * @param request Datos de la cita a registrar.
+     * @return ResponseEntity con mensaje de confirmación del registro.
+     */
     @PostMapping("/staff")
     public ResponseEntity<String> createManualAppointment(@RequestBody AppointmentRequest request) {
         appointmentService.createManualAppointment(request);
         return ResponseEntity.ok("Cita manual registrada con éxito");
     }
 
+    /**
+     * Recupera todas las citas del cliente autenticado actualmente en sesión.
+     *
+     * @param userDetails Detalles del usuario autenticado.
+     * @return ResponseEntity con el listado de DTOs de las citas del usuario.
+     */
     @GetMapping("/my-appointments")
     public ResponseEntity<List<AppointmentDTO>> getMyAppointments(
             @AuthenticationPrincipal UserDetails userDetails) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByUser(userDetails.getUsername()));
     }
 
+    /**
+     * Recupera el histórico y agenda de citas programadas asociadas a un taller concreto.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return ResponseEntity con el listado de citas pertenecientes al taller.
+     */
     @GetMapping("/workshop/{workshopId}")
     public ResponseEntity<List<AppointmentDTO>> getWorkshopAppointments(
             @PathVariable UUID workshopId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsByWorkshop(workshopId));
     }
 
-    /** Appointments that are IN_PROGRESS and have ALL their tasks COMPLETED */
+    /**
+     * Obtiene el listado de citas que están en progreso y cuyas tareas asociadas se han completado,
+     * quedando listas para finalizar el servicio.
+     *
+     * @param workshopId Identificador del taller.
+     * @return ResponseEntity con la lista de citas listas para ser completadas.
+     */
     @GetMapping("/workshop/{workshopId}/ready-for-completion")
     public ResponseEntity<List<AppointmentDTO>> getReadyForCompletion(
             @PathVariable UUID workshopId) {
         return ResponseEntity.ok(appointmentService.getAppointmentsReadyForCompletion(workshopId));
     }
 
+    /**
+     * Actualiza el estado operativo de una cita concreta.
+     *
+     * @param id Identificador único de la cita.
+     * @param status Nuevo estado a aplicar.
+     * @return ResponseEntity con la confirmación de la actualización de estado.
+     */
     @PatchMapping("/{id}/status")
     public ResponseEntity<String> updateStatus(
             @PathVariable UUID id,
@@ -69,6 +118,15 @@ public class AppointmentController {
         return ResponseEntity.ok("Estado actualizado: " + status);
     }
 
+    /**
+     * Registra la entrada física de un vehículo al taller (recepción del vehículo), indicando
+     * el kilometraje actual y notas sobre desperfectos o requerimientos adicionales.
+     *
+     * @param id Identificador único de la cita.
+     * @param kilometers Kilómetros que marca el odómetro del vehículo.
+     * @param notes Observaciones físicas del estado del vehículo en la entrada.
+     * @return ResponseEntity con mensaje de éxito o de error en la operación.
+     */
     @PatchMapping("/{id}/check-in")
     public ResponseEntity<?> checkInVehicle(
             @PathVariable UUID id,
@@ -83,7 +141,13 @@ public class AppointmentController {
         }
     }
 
-
+    /**
+     * Asigna o reasigna un empleado (mecánico) específico a una cita.
+     *
+     * @param id Identificador único de la cita.
+     * @param employeeId Identificador del empleado (opcional, permite desasignar).
+     * @return ResponseEntity confirmando la asignación.
+     */
     @PatchMapping("/{id}/assign")
     public ResponseEntity<String> assignEmployee(
             @PathVariable UUID id,
@@ -92,6 +156,15 @@ public class AppointmentController {
         return ResponseEntity.ok("Empleado asignado");
     }
 
+    /**
+     * Reprograma una cita establecida, permitiendo cambiar de fecha, cambiar de mecánico asignado y redefinir su duración estimada.
+     *
+     * @param id Identificador único de la cita.
+     * @param employeeId Identificador del empleado/mecánico asignado (opcional).
+     * @param dateTime Nueva fecha y hora propuestas para el inicio de la cita.
+     * @param duration Nueva duración estimada expresada en minutos (opcional).
+     * @return ResponseEntity de éxito tras reprogramar la cita.
+     */
     @PatchMapping("/{id}/reschedule")
     public ResponseEntity<String> rescheduleAppointment(
             @PathVariable UUID id,
@@ -102,7 +175,14 @@ public class AppointmentController {
         return ResponseEntity.ok("Cita re-programada");
     }
 
-    /** Mechanic submits selected tasks -> distributes work across calendar days */
+    /**
+     * Endpoint utilizado por los mecánicos para enviar tareas seleccionadas y distribuir
+     * la carga de trabajo en el calendario.
+     *
+     * @param id Identificador único de la cita.
+     * @param request Contiene información del tipo de servicio, comentarios del mecánico, estado y la planificación de tareas.
+     * @return ResponseEntity indicando que el trabajo ha sido planificado.
+     */
     @PatchMapping("/{id}/manage")
     public ResponseEntity<?> manageAppointmentTasks(
             @PathVariable UUID id,
@@ -117,6 +197,12 @@ public class AppointmentController {
         }
     }
 
+    /**
+     * Elimina físicamente del sistema una cita identificada por su ID.
+     *
+     * @param id Identificador de la cita a eliminar.
+     * @return ResponseEntity con código HTTP 200 si tiene éxito o código de error en caso de fallo.
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         try {
@@ -129,4 +215,4 @@ public class AppointmentController {
                     .body("Error al eliminar la cita");
         }
     }
-}
+}

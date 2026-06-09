@@ -13,6 +13,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio encargado de realizar consultas y lecturas de tareas de taller por taller o por empleado.
+ * Todas sus operaciones se ejecutan bajo transacciones de sólo lectura para optimizar el rendimiento de la aplicación.
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkshopTaskLookupService {
@@ -20,6 +24,15 @@ public class WorkshopTaskLookupService {
     private final WorkshopTaskRepository taskRepository;
     private final WorkshopTaskMapper taskMapper;
 
+    /**
+     * Recupera las tareas programadas para un taller en un rango de fecha determinado, agregando aquellas tareas
+     * huérfanas sin mecánico asignado para facilitar su visibilidad.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param start Fecha inicial.
+     * @param end Fecha límite.
+     * @return Lista de tareas programadas mapeadas a DTOs.
+     */
     @Transactional(readOnly = true)
     public List<WorkshopTaskDTO> getTasksByWorkshopAndDate(UUID workshopId, LocalDateTime start, LocalDateTime end) {
         List<WorkshopTask> list = new ArrayList<>(taskRepository.findByWorkshopIdAndDateTimeBetween(workshopId, start, end));
@@ -43,6 +56,14 @@ public class WorkshopTaskLookupService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera todas las tareas asignadas a un mecánico específico en un rango de fechas.
+     *
+     * @param employeeId Identificador único del mecánico (empleado).
+     * @param start Fecha inicial.
+     * @param end Fecha límite.
+     * @return Lista de tareas asignadas.
+     */
     @Transactional(readOnly = true)
     public List<WorkshopTaskDTO> getTasksByEmployeeAndDate(UUID employeeId, LocalDateTime start, LocalDateTime end) {
         return taskRepository.findByAssignedEmployeeIdAndDateTimeBetween(employeeId, start, end)

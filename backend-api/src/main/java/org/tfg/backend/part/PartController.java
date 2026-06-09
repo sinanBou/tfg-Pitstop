@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Controlador REST que expone los endpoints de la API para la gestión de repuestos,
+ * abarcando operaciones sobre el catálogo general, control del inventario y la
+ * asignación o retirada de piezas de las citas del taller.
+ */
 @RestController
 @RequestMapping("/api/parts")
 public class PartController {
@@ -15,26 +20,56 @@ public class PartController {
     private final PartService partService;
     private final PartInventoryFacade partInventoryFacade;
 
+    /**
+     * Construye el controlador con las dependencias necesarias.
+     *
+     * @param partService Servidor de repuestos.
+     * @param partInventoryFacade Fachada del inventario de repuestos.
+     */
     public PartController(PartService partService, PartInventoryFacade partInventoryFacade) {
         this.partService = partService;
         this.partInventoryFacade = partInventoryFacade;
     }
 
+    /**
+     * Obtiene el catálogo completo de repuestos registrados en el sistema.
+     *
+     * @return Respuesta HTTP con la lista de repuestos del catálogo.
+     */
     @GetMapping("/catalog")
     public ResponseEntity<List<PartCatalog>> getCatalog() {
         return ResponseEntity.ok(partService.getAllCatalog());
     }
 
+    /**
+     * Obtiene el inventario completo de existencias en almacén del taller.
+     *
+     * @return Respuesta HTTP con la lista de artículos y stock en inventario.
+     */
     @GetMapping("/inventory")
     public ResponseEntity<List<WorkshopInventory>> getInventory() {
         return ResponseEntity.ok(partService.getAllInventory());
     }
 
+    /**
+     * Obtiene todos los repuestos asociados a una cita específica.
+     *
+     * @param appointmentId Identificador único de la cita.
+     * @return Respuesta HTTP con la lista de repuestos asignados a la cita.
+     */
     @GetMapping("/appointments/{appointmentId}")
     public ResponseEntity<List<AppointmentPart>> getAppointmentParts(@PathVariable UUID appointmentId) {
         return ResponseEntity.ok(partService.getPartsByAppointment(appointmentId));
     }
 
+    /**
+     * Asigna un repuesto a una cita concreta. Soporta repuestos estándar, con descuento aplicado
+     * o repuestos personalizados genéricos.
+     *
+     * @param appointmentId Identificador único de la cita.
+     * @param payload Datos del repuesto a asignar (partId, quantity, discount, o customName).
+     * @return Respuesta HTTP con el repuesto asignado o detalles del error.
+     */
     @PostMapping("/appointments/{appointmentId}")
     public ResponseEntity<?> addPartToAppointment(
             @PathVariable UUID appointmentId,
@@ -64,6 +99,13 @@ public class PartController {
         }
     }
 
+    /**
+     * Elimina la asignación de un repuesto de una cita y devuelve la cantidad al inventario del almacén.
+     *
+     * @param appointmentId Identificador único de la cita.
+     * @param partId Identificador único del repuesto a retirar.
+     * @return Respuesta HTTP de éxito o código de error.
+     */
     @DeleteMapping("/appointments/{appointmentId}/parts/{partId}")
     public ResponseEntity<?> removePartFromAppointment(
             @PathVariable UUID appointmentId,
@@ -78,6 +120,12 @@ public class PartController {
         }
     }
 
+    /**
+     * Añade un nuevo artículo al inventario del taller (y al catálogo si es necesario).
+     *
+     * @param payload Información del repuesto y stock (oemReference, name, manufacturer, precios, stock, etc.).
+     * @return Respuesta HTTP con el objeto de inventario creado.
+     */
     @PostMapping("/inventory")
     public ResponseEntity<?> addInventoryItem(@RequestBody Map<String, Object> payload) {
         try {
@@ -102,6 +150,13 @@ public class PartController {
         }
     }
 
+    /**
+     * Actualiza los datos de existencias, precios y características de un artículo de inventario.
+     *
+     * @param id Identificador único del artículo en inventario.
+     * @param payload Nuevos valores para el inventario y catálogo.
+     * @return Respuesta HTTP con el objeto de inventario modificado.
+     */
     @PutMapping("/inventory/{id}")
     public ResponseEntity<?> updateInventoryItem(
             @PathVariable UUID id,
@@ -128,6 +183,12 @@ public class PartController {
         }
     }
 
+    /**
+     * Elimina un artículo del inventario del almacén y sus relaciones asociadas.
+     *
+     * @param id Identificador único del artículo en inventario.
+     * @return Respuesta HTTP de éxito o detalles del error.
+     */
     @DeleteMapping("/inventory/{id}")
     public ResponseEntity<?> deleteInventoryItem(@PathVariable UUID id) {
         try {
@@ -138,11 +199,22 @@ public class PartController {
         }
     }
 
+    /**
+     * Obtiene la lista de todas las categorías lógicas de repuestos.
+     *
+     * @return Respuesta HTTP con la lista de categorías.
+     */
     @GetMapping("/categories")
     public ResponseEntity<List<PartCategory>> getCategories() {
         return ResponseEntity.ok(partService.getAllCategories());
     }
 
+    /**
+     * Crea una nueva categoría para clasificar repuestos en el sistema.
+     *
+     * @param payload Datos de la categoría (displayName).
+     * @return Respuesta HTTP con la categoría creada.
+     */
     @PostMapping("/categories")
     public ResponseEntity<?> createCategory(@RequestBody Map<String, Object> payload) {
         try {
@@ -154,6 +226,12 @@ public class PartController {
         }
     }
 
+    /**
+     * Elimina una categoría del sistema si no contiene repuestos asociados y no es protegida.
+     *
+     * @param id Identificador único de la categoría.
+     * @return Respuesta HTTP de éxito o detalles del error.
+     */
     @DeleteMapping("/categories/{id}")
     public ResponseEntity<?> deleteCategory(@PathVariable UUID id) {
         try {

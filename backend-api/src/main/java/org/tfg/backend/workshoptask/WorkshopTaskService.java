@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio de negocio principal para la gestión de tareas dentro del taller mecánico.
+ * Coordina la obtención de tareas por taller y fecha (incluyendo tareas sin asignar pendientes),
+ * búsquedas por mecánico, actualizaciones de estados operativos o hitos completados y la aplicación de las
+ * reglas de eliminación (cancelación temporal o eliminación física restaurando el estado de la cita).
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkshopTaskService {
@@ -15,6 +21,15 @@ public class WorkshopTaskService {
     private final org.tfg.backend.employee.EmployeeRepository employeeRepository;
     private final org.tfg.backend.appointment.AppointmentRepository appointmentRepository;
 
+    /**
+     * Recupera las tareas planificadas en un taller para un rango horario de un día.
+     * Añade automáticamente aquellas tareas que no tienen mecánico asignado para que no se pierdan.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param start Fecha y hora inicial del día.
+     * @param end Fecha y hora límite del día.
+     * @return Lista de DTOs de las tareas del taller.
+     */
     public List<WorkshopTaskDTO> getTasksByWorkshopAndDate(UUID workshopId, LocalDateTime start, LocalDateTime end) {
         List<WorkshopTask> list = new java.util.ArrayList<>(taskRepository.findByWorkshopIdAndDateTimeBetween(workshopId, start, end));
         List<WorkshopTask> allTasks = taskRepository.findByWorkshopId(workshopId);
@@ -37,6 +52,14 @@ public class WorkshopTaskService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera todas las tareas asignadas a un mecánico específico en un rango de fechas.
+     *
+     * @param employeeId Identificador del empleado/mecánico.
+     * @param start Rango inicial.
+     * @param end Rango final.
+     * @return Lista de tareas asignadas.
+     */
     public List<WorkshopTaskDTO> getTasksByEmployeeAndDate(UUID employeeId, LocalDateTime start, LocalDateTime end) {
         return taskRepository.findByAssignedEmployeeIdAndDateTimeBetween(employeeId, start, end)
                 .stream()
@@ -44,6 +67,13 @@ public class WorkshopTaskService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Modifica los datos de una tarea (duración, fecha, hitos, estado o reasignación de mecánico).
+     *
+     * @param taskId Identificador de la tarea.
+     * @param dto Datos modificados.
+     * @return La tarea actualizada y mapeada a DTO.
+     */
     @Transactional
     public WorkshopTaskDTO updateTask(UUID taskId, WorkshopTaskDTO dto) {
         WorkshopTask task = taskRepository.findById(taskId)
@@ -54,7 +84,7 @@ public class WorkshopTaskService {
         if (dto.getEstimatedDuration() != null) task.setEstimatedDuration(dto.getEstimatedDuration());
         if (dto.getCompletedTasks() != null) task.setCompletedTasks(dto.getCompletedTasks());
         
-        // Only modify employee assignment when explicitly requested via flag
+        // Modifica la asignación del empleado solo cuando se solicita explícitamente mediante el flag
         if (Boolean.TRUE.equals(dto.getReassignEmployee())) {
             if (dto.getAssignedEmployeeId() != null) {
                 task.setAssignedEmployee(employeeRepository.findById(dto.getAssignedEmployeeId()).orElse(null));
@@ -66,6 +96,13 @@ public class WorkshopTaskService {
         return convertToDTO(taskRepository.save(task));
     }
 
+    /**
+     * Aplica la lógica de eliminación/cancelación de tareas:
+     * Si la cita origen tiene múltiples tareas activas, simplemente cancela la tarea para ese período del día.
+     * Si es la única tarea activa, elimina físicamente la tarea y devuelve la cita origen al estado "confirmado sin asignar".
+     *
+     * @param taskId Identificador de la tarea a procesar.
+     */
     @Transactional
     public void deleteTask(UUID taskId) {
         WorkshopTask task = taskRepository.findById(taskId).orElse(null);
@@ -81,11 +118,11 @@ public class WorkshopTaskService {
             }
 
             if (activeTasksCount > 1) {
-                // "si esta dividida que se cancele la tarea ese period del dia"
+                // Si está dividida, se cancela la tarea para ese período del día
                 task.setStatus(WorkshopTaskStatus.CANCELLED);
                 taskRepository.save(task);
             } else {
-                // "si esta en solo un dia que se elimine la tarea por completa y vuelva la cita a sin asignar"
+                // Si está en un solo día, se elimina la tarea por completo y vuelve la cita a sin asignar
                 if (origin != null && origin.getTasks() != null) {
                     origin.getTasks().remove(task);
                 }
@@ -100,6 +137,13 @@ public class WorkshopTaskService {
         }
     }
 
+    /**
+     * Convierte una entidad {@link WorkshopTask} a su objeto de transferencia {@link WorkshopTaskDTO},
+     * enriqueciendo el resultado con detalles del vehículo, cliente y taller.
+     *
+     * @param task Entidad de la tarea a convertir.
+     * @return El DTO de la tarea.
+     */
     public WorkshopTaskDTO convertToDTO(WorkshopTask task) {
         return WorkshopTaskDTO.builder()
                 .id(task.getId())

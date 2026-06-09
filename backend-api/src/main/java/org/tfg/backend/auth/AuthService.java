@@ -24,6 +24,10 @@ import org.tfg.backend.workshop.WorkshopRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Servicio encargado de gestionar los procesos de autenticación, generación de tokens JWT,
+ * registro de usuarios (clientes y dueños) y envío de correos electrónicos de verificación de cuenta.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -37,6 +41,14 @@ public class AuthService {
     private final JwtService jwtService;
     private final EmailService emailService;
 
+    /**
+     * Realiza el proceso de login. Verifica la existencia de usuario, validad el estado de verificación
+     * de cuenta, autentica las credenciales y genera un token JWT de sesión.
+     *
+     * @param request Datos con el email y contraseña provistos.
+     * @return {@link AuthResponse} con el token JWT y el rol del usuario.
+     * @throws ResponseStatusException si el usuario/contraseña son inválidos (UNAUTHORIZED) o la cuenta no está verificada (FORBIDDEN).
+     */
     public AuthResponse login(LoginRequest request) {
         String cleanEmail = request.getEmail().trim().toLowerCase();
         var user = userRepository.findByEmail(cleanEmail)
@@ -61,6 +73,14 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * Registra un nuevo cliente localmente en base de datos en estado no verificado, y dispara
+     * el envío de un correo de verificación con un token aleatorio.
+     *
+     * @param request Datos de registro del cliente.
+     * @return Mensaje de confirmación del registro e indicación de verificar email.
+     * @throws ResponseStatusException si el email ya está en uso o el NIF ya está registrado (BAD_REQUEST).
+     */
     @Transactional
     public String registerClient(ClientRegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail().trim().toLowerCase())) {
@@ -98,6 +118,14 @@ public class AuthService {
         return "Cliente registrado. Por favor, verifica tu cuenta en el correo electrónico enviado.";
     }
 
+    /**
+     * Registra un nuevo dueño de taller (Workshop Owner) en estado no verificado, y dispara
+     * el envío de un correo de verificación.
+     *
+     * @param request Datos de registro del propietario.
+     * @return Mensaje de confirmación del registro e indicación de verificar email.
+     * @throws ResponseStatusException si el email ya está en uso (BAD_REQUEST).
+     */
     @Transactional
     public String registerWorkshop(OwnerRegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail().trim().toLowerCase())) {
@@ -131,4 +159,4 @@ public class AuthService {
 
         return "Dueño registrado. Por favor, verifica tu cuenta en el correo electrónico enviado.";
     }
-}
+}

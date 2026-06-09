@@ -8,6 +8,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalTime;
 import java.util.UUID;
 
+/**
+ * Objeto de transferencia de datos (DTO) para exponer la información de un taller,
+ * incluyendo estadísticas agregadas (total de empleados, vehículos actuales dentro)
+ * y URLs firmadas de su logotipo para la vista del cliente.
+ */
 @Data
 @Builder
 @AllArgsConstructor

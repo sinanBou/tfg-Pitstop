@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
 
+/**
+ * Entidad que representa la disponibilidad física, stock y precios de un repuesto del catálogo
+ * en el inventario/almacén del taller. También define el umbral para las alertas de falta de stock.
+ */
 @Entity
 @Data
 @Builder

@@ -7,14 +7,23 @@ import org.tfg.backend.vehicle.VehicleRepository;
 import java.time.LocalDateTime;
 
 /**
- * Estado que representa una cita confirmada y con mecánico asignado.
+ * Estado que representa una cita confirmada por el taller y con mecánico asignado.
  */
 public class ConfirmedState implements AppointmentState {
 
+    /**
+     * Realiza las transiciones desde el estado CONFIRMED.
+     * Registra el inicio real de la reparación si cambia a IN_PROGRESS, o la finalización si cambia a COMPLETED.
+     * Si pasa a CANCELLED, libera la vinculación del vehículo al taller.
+     *
+     * @param appointment Cita sobre la cual se realiza la transición.
+     * @param newStatus Estado destino de la transición.
+     * @param vehicleRepository Repositorio para actualizar estados del vehículo asociado.
+     */
     @Override
     public void transitionTo(Appointment appointment, AppointmentStatus newStatus, VehicleRepository vehicleRepository) {
         if (newStatus == AppointmentStatus.CONFIRMED) {
-            return;
+            return; // Ya se encuentra en este estado
         }
 
         if (newStatus == AppointmentStatus.IN_PROGRESS) {
@@ -39,3 +48,4 @@ public class ConfirmedState implements AppointmentState {
         appointment.setStatus(newStatus);
     }
 }
+

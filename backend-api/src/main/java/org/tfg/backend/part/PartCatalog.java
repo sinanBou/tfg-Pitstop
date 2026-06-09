@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
 
+/**
+ * Entidad que representa la definición general de un repuesto o recambio en el catálogo global del sistema.
+ * Contiene información descriptiva, fabricante, especificaciones técnicas y su categoría asociada.
+ */
 @Entity
 @Data
 @Builder

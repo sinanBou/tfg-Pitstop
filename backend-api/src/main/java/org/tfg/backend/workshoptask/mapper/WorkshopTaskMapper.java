@@ -4,9 +4,20 @@ import org.springframework.stereotype.Component;
 import org.tfg.backend.workshoptask.WorkshopTask;
 import org.tfg.backend.workshoptask.WorkshopTaskDTO;
 
+/**
+ * Componente mapeador encargado de transformar instancias de la entidad {@link WorkshopTask}
+ * en objetos de transferencia de datos {@link WorkshopTaskDTO}, resolviendo y formateando
+ * relaciones complejas para simplificar la respuesta del backend.
+ */
 @Component
 public class WorkshopTaskMapper {
 
+    /**
+     * Convierte una entidad de tarea de taller a su DTO correspondiente.
+     *
+     * @param task Entidad de la tarea.
+     * @return DTO simplificado y formateado de la tarea de taller.
+     */
     public WorkshopTaskDTO convertToDTO(WorkshopTask task) {
         if (task == null) return null;
 

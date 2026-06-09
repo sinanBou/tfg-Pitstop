@@ -4,6 +4,10 @@ import lombok.Data;
 import java.time.LocalTime;
 import java.util.UUID;
 
+/**
+ * Objeto que encapsula la solicitud enviada por los clientes de la API para crear o
+ * actualizar los detalles y parámetros de configuración operativa de un taller.
+ */
 @Data
 public class WorkshopRequest {
     private String cif;

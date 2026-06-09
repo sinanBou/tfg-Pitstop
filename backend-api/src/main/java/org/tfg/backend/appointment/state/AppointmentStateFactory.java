@@ -7,9 +7,13 @@ import java.util.Map;
 /**
  * Fábrica y Registro Flyweight para mapear eficientemente los enums
  * de estado a sus respectivas instancias de implementación del patrón State.
+ * Mantiene instancias únicas de cada estado para optimizar el uso de memoria.
  */
 public class AppointmentStateFactory {
 
+    /**
+     * Mapa interno que almacena las instancias únicas reutilizables de cada estado.
+     */
     private static final Map<AppointmentStatus, AppointmentState> STATE_MAP = new EnumMap<>(AppointmentStatus.class);
 
     static {
@@ -22,6 +26,13 @@ public class AppointmentStateFactory {
         STATE_MAP.put(AppointmentStatus.CANCELLED, new CancelledState());
     }
 
+    /**
+     * Obtiene la instancia del estado correspondiente al enum de estado proporcionado.
+     *
+     * @param status Enum del estado solicitado.
+     * @return Implementación concreta de {@link AppointmentState}.
+     * @throws IllegalArgumentException si el estado solicitado no está registrado en la fábrica.
+     */
     public static AppointmentState getState(AppointmentStatus status) {
         AppointmentState state = STATE_MAP.get(status);
         if (state == null) {
@@ -30,3 +41,4 @@ public class AppointmentStateFactory {
         return state;
     }
 }
+

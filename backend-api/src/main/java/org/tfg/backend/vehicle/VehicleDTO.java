@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * DTO para la transferencia de información detallada de un vehículo.
+ * Utilizado principalmente para consultas del cliente e integraciones de frontend.
+ */
 @Data
 @Builder
 public class VehicleDTO {

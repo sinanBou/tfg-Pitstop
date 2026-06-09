@@ -4,9 +4,19 @@ import org.springframework.stereotype.Component;
 import org.tfg.backend.user.User;
 import org.tfg.backend.user.UserDTO;
 
+/**
+ * Componente encargado de realizar la conversión entre la entidad {@link User}
+ * y su Objeto de Transferencia de Datos {@link UserDTO}, resolviendo las relaciones con perfiles asociados.
+ */
 @Component
 public class UserMapper {
 
+    /**
+     * Convierte una entidad {@link User} en un DTO {@link UserDTO}.
+     *
+     * @param user Entidad del usuario a mapear. Puede ser nula.
+     * @return El DTO con los detalles mapeados, o null si la entidad es nula.
+     */
     public UserDTO mapToDTO(User user) {
         if (user == null) return null;
 

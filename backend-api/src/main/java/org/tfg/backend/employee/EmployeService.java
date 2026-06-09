@@ -15,6 +15,14 @@ import org.tfg.backend.workshop.Workshop;
 import org.tfg.backend.appointment.Appointment;
 import org.tfg.backend.appointment.AppointmentRepository;
 
+/**
+ * Servicio unificado para la gestión de empleados en el sistema.
+ * Agrupa las funcionalidades de consulta y edición del perfil propio del empleado,
+ * así como las funciones administrativas para dar de alta, baja, ascensos/descensos
+ * de empleados y asignación de permisos de secciones dentro de un taller.
+ *
+ * NOTA: Esta clase combina las tareas de perfil y administración para su consumo directo en controladores.
+ */
 @Service
 @RequiredArgsConstructor
 public class EmployeService {
@@ -26,9 +34,12 @@ public class EmployeService {
     private final AppointmentRepository appointmentRepository;
     private final org.tfg.backend.storage.StorageService storageService;
 
-
     /**
-     * Obtiene el perfil del empleado logueado.
+     * Obtiene el perfil del empleado logueado a partir de su correo electrónico.
+     *
+     * @param email Correo electrónico del empleado.
+     * @return DTO del perfil del empleado correspondiente.
+     * @throws RuntimeException Si el usuario no existe o no tiene perfil de empleado.
      */
     @Transactional(readOnly = true)
     public EmployeeDTO getEmployeeProfile(String email) {
@@ -45,6 +56,11 @@ public class EmployeService {
 
     /**
      * Actualiza el perfil del empleado autenticado (solo campos seguros).
+     *
+     * @param email Correo electrónico del empleado.
+     * @param request Datos del perfil a actualizar.
+     * @return DTO del empleado con la información actualizada.
+     * @throws RuntimeException Si el usuario no existe.
      */
     @Transactional
     public EmployeeDTO updateProfile(String email, UpdateProfileRequest request) {
@@ -67,6 +83,12 @@ public class EmployeService {
 
     /**
      * Sube una imagen de perfil a S3 y la asocia al empleado autenticado.
+     *
+     * @param email Correo electrónico del empleado.
+     * @param file Archivo de imagen multimedia.
+     * @return DTO del empleado actualizado con la URL de la imagen.
+     * @throws java.io.IOException Si ocurre un error al subir el archivo.
+     * @throws RuntimeException Si el usuario no existe.
      */
     @Transactional
     public EmployeeDTO uploadProfilePicture(String email, org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
@@ -86,6 +108,10 @@ public class EmployeService {
 
     /**
      * Elimina la imagen de perfil de un empleado de S3 y de la base de datos.
+     *
+     * @param email Correo electrónico del empleado.
+     * @return DTO del empleado actualizado sin la URL del avatar.
+     * @throws RuntimeException Si el usuario no existe.
      */
     @Transactional
     public EmployeeDTO deleteProfilePicture(String email) {
@@ -101,10 +127,12 @@ public class EmployeService {
         return mapToDTO(user.getEmployee());
     }
 
-
     /**
      * Lista todos los empleados de un taller específico por su ID.
      * Incluye una lógica de autocuración para asegurar que el propietario (Owner) siempre esté en la lista.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return Lista de DTOs de los empleados pertenecientes al taller.
      */
     @Transactional
     public List<EmployeeDTO> getEmployeesByWorkshopId(java.util.UUID workshopId) {
@@ -130,6 +158,13 @@ public class EmployeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Registra y añade un nuevo empleado a un taller específico.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param request Datos del empleado a registrar.
+     * @throws RuntimeException Si el correo electrónico ya está en uso o el taller no existe.
+     */
     @Transactional
     public void addEmployeeToWorkshop(java.util.UUID workshopId, AddEmployeeRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -157,6 +192,13 @@ public class EmployeService {
         employeeRepository.save(employee);
     }
 
+    /**
+     * Elimina a un empleado del sistema dado su ID.
+     * Libera previamente las citas asignadas para evitar violaciones de clave foránea.
+     *
+     * @param employeeId Identificador del empleado a eliminar.
+     * @throws RuntimeException Si el empleado no existe.
+     */
     @Transactional
     public void deleteEmployee(java.util.UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -180,6 +222,12 @@ public class EmployeService {
         }
     }
 
+    /**
+     * Asciende a un empleado al rol de Gerente (WORKSHOP_MANAGER).
+     *
+     * @param employeeId Identificador del empleado.
+     * @throws RuntimeException Si el empleado no existe.
+     */
     @Transactional
     public void promoteToManager(java.util.UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -192,6 +240,12 @@ public class EmployeService {
         }
     }
 
+    /**
+     * Degrada a un empleado al rol de personal de taller/mecánico (WORKSHOP_STAFF).
+     *
+     * @param employeeId Identificador del empleado.
+     * @throws RuntimeException Si el empleado no existe.
+     */
     @Transactional
     public void demoteToStaff(java.util.UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -204,6 +258,13 @@ public class EmployeService {
         }
     }
 
+    /**
+     * Actualiza la lista de secciones o áreas a las que el empleado tiene permitido acceder.
+     *
+     * @param employeeId Identificador del empleado.
+     * @param allowedSections Cadena de texto con las secciones permitidas.
+     * @throws RuntimeException Si el empleado no existe.
+     */
     @Transactional
     public void updateAllowedSections(java.util.UUID employeeId, String allowedSections) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -212,6 +273,12 @@ public class EmployeService {
         employeeRepository.save(employee);
     }
 
+    /**
+     * Mapea una entidad {@link Employee} a su correspondiente {@link EmployeeDTO}.
+     *
+     * @param employee Entidad del empleado.
+     * @return DTO del empleado con la información mapeada.
+     */
     public EmployeeDTO mapToDTO(Employee employee) {
         return EmployeeDTO.builder()
                 .id(employee.getId())

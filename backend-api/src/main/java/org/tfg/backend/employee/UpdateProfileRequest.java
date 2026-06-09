@@ -14,9 +14,28 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateProfileRequest {
+    /**
+     * Nombre de pila del empleado.
+     */
     private String firstname;
+
+    /**
+     * Apellidos del empleado.
+     */
     private String lastname;
+
+    /**
+     * Dirección de contacto o residencia del empleado.
+     */
     private String address;
+
+    /**
+     * Número de Identificación Fiscal (NIF) del empleado.
+     */
     private String nif;
+
+    /**
+     * Teléfono personal o de contacto del empleado.
+     */
     private String phoneNumber;
 }

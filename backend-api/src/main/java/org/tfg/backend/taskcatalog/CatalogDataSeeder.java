@@ -9,6 +9,11 @@ import org.tfg.backend.workshop.WorkshopRepository;
 
 import java.util.List;
 
+/**
+ * Componente que se ejecuta al iniciar la aplicación para comprobar
+ * si los talleres existentes cuentan con un catálogo de tareas.
+ * Si algún taller no posee categorías registradas, inicia el proceso de carga por defecto.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -18,6 +23,11 @@ public class CatalogDataSeeder implements CommandLineRunner {
     private final CatalogCategoryRepository categoryRepository;
     private final CatalogInitializationService initializationService;
 
+    /**
+     * Ejecuta la comprobación de catálogos al arranque del sistema.
+     *
+     * @param args Argumentos de la línea de comandos.
+     */
     @Override
     public void run(String... args) {
         log.info("Verificando catálogos de talleres registrados...");

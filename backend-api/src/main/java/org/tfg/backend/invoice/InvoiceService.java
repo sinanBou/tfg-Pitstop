@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio central para la lógica de negocio de facturas.
+ * Realiza el proceso de completar una cita de taller al mismo tiempo que genera
+ * e inserta su correspondiente documento de factura en la base de datos de manera atómica.
+ */
 @Service
 @RequiredArgsConstructor
 public class InvoiceService {
@@ -18,6 +23,15 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final AppointmentRepository appointmentRepository;
 
+    /**
+     * Completa una cita y genera su correspondiente factura.
+     * Cambia de manera transaccional el estado de la cita a {@link AppointmentStatus#COMPLETED}
+     * y registra los costes de mano de obra y de repuestos.
+     *
+     * @param dto Datos de la factura a crear.
+     * @return DTO de la factura generada con información detallada de la cita.
+     * @throws RuntimeException Si el ID de la cita es nulo o la cita no se encuentra.
+     */
     @Transactional
     public InvoiceDTO createInvoice(InvoiceDTO dto) {
         if (dto.getAppointmentId() == null) {
@@ -50,6 +64,12 @@ public class InvoiceService {
         return mapToDTO(saved);
     }
 
+    /**
+     * Obtiene el historial de facturas generadas para un taller determinado.
+     *
+     * @param workshopId Identificador del taller.
+     * @return Lista de DTOs con las facturas del taller.
+     */
     @Transactional
     public List<InvoiceDTO> getInvoicesByWorkshop(UUID workshopId) {
         return invoiceRepository.findByWorkshopIdOrderByCreatedAtDesc(workshopId)
@@ -58,6 +78,12 @@ public class InvoiceService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene la factura correspondiente a una cita específica.
+     *
+     * @param appointmentId Identificador de la cita asociada.
+     * @return DTO de la factura encontrada, o null si la cita no tiene factura registrada.
+     */
     @Transactional
     public InvoiceDTO getInvoiceByAppointment(UUID appointmentId) {
         return invoiceRepository.findByAppointmentId(appointmentId)
@@ -65,6 +91,13 @@ public class InvoiceService {
                 .orElse(null); // Return null instead of throwing to be graceful in frontend
     }
 
+    /**
+     * Mapea de manera privada una entidad {@link Invoice} a su {@link InvoiceDTO},
+     * rellenando los datos de la cita y tolerando eliminaciones físicas previas.
+     *
+     * @param invoice Entidad de la factura.
+     * @return DTO de la factura listo para el frontend.
+     */
     private InvoiceDTO mapToDTO(Invoice invoice) {
         InvoiceDTO dto = InvoiceDTO.builder()
                 .id(invoice.getId())

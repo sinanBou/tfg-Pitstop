@@ -6,6 +6,10 @@ import lombok.*;
 import org.tfg.backend.appointment.Appointment;
 import java.util.UUID;
 
+/**
+ * Entidad que representa la asociación de un repuesto del catálogo a una cita del taller.
+ * Registra la cantidad de unidades consumidas y el precio de venta final aplicado.
+ */
 @Entity
 @Data
 @Builder
@@ -13,6 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "appointment_parts")
 public class AppointmentPart {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;

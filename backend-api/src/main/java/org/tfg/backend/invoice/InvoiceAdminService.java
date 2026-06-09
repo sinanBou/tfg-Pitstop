@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio administrativo para la gestión y creación de facturas, utilizado en
+ * flujos avanzados de supervisión del negocio.
+ */
 @Service
 @RequiredArgsConstructor
 public class InvoiceAdminService {
@@ -20,6 +24,14 @@ public class InvoiceAdminService {
     private final AppointmentRepository appointmentRepository;
     private final InvoiceMapper invoiceMapper;
 
+    /**
+     * Crea una nueva factura asociada a una cita de taller a nivel administrativo.
+     * Marca la cita asociada como completada de forma atómica.
+     *
+     * @param dto DTO con la información de facturación de la cita.
+     * @return DTO de la factura generada.
+     * @throws RuntimeException Si el ID de la cita no es provisto o la cita no existe.
+     */
     @Transactional
     public InvoiceDTO createInvoice(InvoiceDTO dto) {
         if (dto.getAppointmentId() == null) {
@@ -52,6 +64,12 @@ public class InvoiceAdminService {
         return invoiceMapper.mapToDTO(saved, appointment);
     }
 
+    /**
+     * Recupera el histórico de facturas para un taller específico a nivel administrativo.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return Lista de DTOs de las facturas pertenecientes al taller.
+     */
     @Transactional(readOnly = true)
     public List<InvoiceDTO> getInvoicesByWorkshop(UUID workshopId) {
         return invoiceRepository.findByWorkshopIdOrderByCreatedAtDesc(workshopId)

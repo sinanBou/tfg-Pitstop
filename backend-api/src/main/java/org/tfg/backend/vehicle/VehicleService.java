@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * Servicio unificado que implementa la lógica de negocio principal para vehículos.
+ * Ofrece funcionalidades para el registro, eliminación, búsqueda por matrícula y relación
+ * con clientes y talleres.
+ */
 @Service
 @RequiredArgsConstructor
 public class VehicleService {
@@ -24,8 +29,14 @@ public class VehicleService {
     private final ClientRepository clientRepository;
     private final AppointmentRepository appointmentRepository;
 
-
-
+    /**
+     * Registra un nuevo vehículo para un cliente determinado por su correo electrónico.
+     *
+     * @param request Datos del vehículo.
+     * @param email Correo electrónico del cliente.
+     * @return DTO detallado del vehículo registrado.
+     * @throws RuntimeException Si el usuario no existe o no tiene un perfil de cliente.
+     */
     @Transactional
     public VehicleDTO registerVehicle(VehicleRequest request, String email) {
         // 1. Buscamos al usuario
@@ -55,6 +66,12 @@ public class VehicleService {
         return mapToDTO(savedVehicle);
     }
 
+    /**
+     * Obtiene el listado de vehículos registrados a nombre de un cliente a través de su email.
+     *
+     * @param email Correo electrónico del cliente.
+     * @return Lista de DTOs detallados de los vehículos.
+     */
     @Transactional(readOnly = true)
     public List<VehicleDTO> getVehiclesByClient(String email) {
         var user = userRepository.findByEmail(email)
@@ -68,6 +85,12 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Mapea un objeto {@link Vehicle} a su versión {@link VehicleDTO}.
+     *
+     * @param vehicle Entidad del vehículo.
+     * @return DTO correspondiente.
+     */
     private VehicleDTO mapToDTO(Vehicle vehicle) {
         return VehicleDTO.builder()
                 .id(vehicle.getId())
@@ -82,6 +105,12 @@ public class VehicleService {
                 .build();
     }
 
+    /**
+     * Busca vehículos a partir de una matrícula en particular.
+     *
+     * @param licensePlate Matrícula del vehículo.
+     * @return Lista de DTOs simplificados que coinciden.
+     */
     @Transactional(readOnly = true)
     public List<VehicleSearchDTO> searchVehicles(String licensePlate) {
         return vehicleRepository.findByLicensePlate(licensePlate)
@@ -90,6 +119,12 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene la lista de vehículos de un cliente en particular dado su identificador único.
+     *
+     * @param clientId Identificador de perfil de cliente.
+     * @return Lista de DTOs simplificados de vehículos.
+     */
     @Transactional(readOnly = true)
     public List<VehicleSearchDTO> getVehiclesByClientId(UUID clientId) {
         return vehicleRepository.findByClientId(clientId)
@@ -98,6 +133,12 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Mapea un objeto {@link Vehicle} a su versión simplificada {@link VehicleSearchDTO}.
+     *
+     * @param vehicle Entidad de vehículo.
+     * @return DTO simplificado resultante.
+     */
     private VehicleSearchDTO mapToSearchDTO(Vehicle vehicle) {
         return VehicleSearchDTO.builder()
                 .id(vehicle.getId())
@@ -108,6 +149,13 @@ public class VehicleService {
                 .build();
     }
 
+    /**
+     * Registra un vehículo y lo asocia a un cliente determinado por su identificador único de perfil.
+     *
+     * @param clientId Identificador único del cliente.
+     * @param request Datos del vehículo.
+     * @return DTO simplificado de búsqueda del vehículo creado.
+     */
     @Transactional
     public VehicleSearchDTO registerVehicleForClient(UUID clientId, VehicleRequest request) {
         Client client = clientRepository.findById(clientId)
@@ -127,6 +175,14 @@ public class VehicleService {
         return mapToSearchDTO(saved);
     }
 
+    /**
+     * Elimina un vehículo y todas sus citas de taller asociadas en cascada para mantener la integridad física.
+     * Requiere validar que el vehículo pertenece al cliente autenticado.
+     *
+     * @param id Identificador único del vehículo.
+     * @param email Correo electrónico del cliente autenticado.
+     * @throws RuntimeException Si el vehículo o usuario no existen, o si el cliente no está autorizado.
+     */
     @Transactional
     public void deleteVehicle(UUID id, String email) {
         var user = userRepository.findByEmail(email)

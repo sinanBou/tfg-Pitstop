@@ -12,6 +12,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio de negocio encargado de la lógica de creación, actualización y gestión de talleres.
+ * Valida la unicidad del CIF, vincula propietarios, gestiona los horarios y tarifas,
+ * inicializa el catálogo específico para cada taller y administra los archivos de logotipos
+ * almacenados en S3.
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkshopService {
@@ -22,8 +28,11 @@ public class WorkshopService {
     private final org.tfg.backend.storage.StorageService storageService;
 
     /**
-     * Registra un nuevo taller en el sistema.
-     * Verifica que el CIF no esté duplicado y asigna un empleado como dueño.
+     * Registra un nuevo taller en el sistema, validando que el CIF sea único y vinculando
+     * al empleado propietario designado. Inicializa también el catálogo de tareas por defecto.
+     *
+     * @param request Datos de la solicitud para el nuevo taller.
+     * @return El DTO del taller recién guardado.
      */
     @Transactional
     public WorkshopDTO saveWorkshop(WorkshopRequest request) {
@@ -34,15 +43,15 @@ public class WorkshopService {
         Employee owner = employeeRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("No se encontró el empleado con ID: " + request.getOwnerId()));
 
-        // Construcción de la entidad incluyendo los nuevos campos de tiempo
+        // Construcción de la entidad incluyendo los campos de tiempo
         Workshop workshop = Workshop.builder()
                 .cif(request.getCif())
                 .companyName(request.getCompanyName())
                 .address(request.getAddress())
                 .owner(owner)
-                .openTime(request.getOpenTime()) // <-- NUEVO
-                .closeTime(request.getCloseTime()) // <-- NUEVO
-                .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60) // <-- NUEVO
+                .openTime(request.getOpenTime())
+                .closeTime(request.getCloseTime())
+                .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60)
                 .workingDays(request.getWorkingDays())
                 .hourlyRate(request.getHourlyRate() != null ? request.getHourlyRate() : 50.0)
                 .includeOwnerInPlanning(request.getIncludeOwnerInPlanning() != null ? request.getIncludeOwnerInPlanning() : false)
@@ -56,7 +65,9 @@ public class WorkshopService {
     }
 
     /**
-     * Recupera todos los talleres registrados y los convierte a DTO.
+     * Recupera la lista completa de todos los talleres en la base de datos.
+     *
+     * @return Lista de talleres mapeados a DTOs.
      */
     @Transactional(readOnly = true)
     public List<WorkshopDTO> getAllWorkshops() {
@@ -66,6 +77,12 @@ public class WorkshopService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera todos los talleres pertenecientes a un propietario (empleado) específico.
+     *
+     * @param ownerId Identificador del empleado propietario.
+     * @return Lista de talleres asociados a ese propietario.
+     */
     @Transactional(readOnly = true)
     public List<WorkshopDTO> getWorkshopsByOwnerId(UUID ownerId) {
         return workshopRepository.findByOwnerId(ownerId)
@@ -74,6 +91,14 @@ public class WorkshopService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca talleres de forma paginada a partir de un término de coincidencia.
+     *
+     * @param query Término o filtro de búsqueda.
+     * @param page Número de página actual.
+     * @param size Registros por página.
+     * @return Página con los DTOs de talleres coincidentes.
+     */
     @Transactional(readOnly = true)
     public Page<WorkshopDTO> searchWorkshops(String query, int page, int size) {
         return workshopRepository.searchWorkshops(query, PageRequest.of(page, size))
@@ -81,7 +106,10 @@ public class WorkshopService {
     }
 
     /**
-     * Obtiene la información de un taller específico por su UUID.
+     * Obtiene los detalles de un taller a partir de su identificador único.
+     *
+     * @param id Identificador único del taller.
+     * @return El DTO del taller encontrado.
      */
     @Transactional(readOnly = true)
     public WorkshopDTO getWorkshopById(UUID id) {
@@ -90,12 +118,18 @@ public class WorkshopService {
         return mapToDTO(workshop);
     }
 
+    /**
+     * Actualiza la configuración operativa y física de un taller (horario, tarifa, dirección, etc.).
+     *
+     * @param workshopId Identificador único del taller.
+     * @param request Parámetros nuevos del taller.
+     * @return El DTO del taller modificado.
+     */
     @Transactional
     public WorkshopDTO updateWorkshopSettings(UUID workshopId, WorkshopRequest request) {
         Workshop workshop = workshopRepository.findById(workshopId)
                 .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
-        // El dueño ahora puede cambiar la duración a 30, 45, 120 min, etc.
         if (request.getOpenTime() != null) workshop.setOpenTime(request.getOpenTime());
         if (request.getCloseTime() != null) workshop.setCloseTime(request.getCloseTime());
         if (request.getSlotDurationMinutes() != null) {
@@ -110,11 +144,10 @@ public class WorkshopService {
     }
 
     /**
-     * Método privado para transformar la entidad Workshop al objeto de transferencia WorkshopDTO.
-     * Maneja la lógic7a de conteo de empleados y vehículos, así como la obtención del nombre del dueño.
+     * Transforma una entidad {@link Workshop} al objeto de transferencia {@link WorkshopDTO}.
+     * Maneja la lógica de conteo de empleados y vehículos, así como la obtención del nombre del dueño.
      */
     private WorkshopDTO mapToDTO(Workshop workshop) {
-        // Obtenemos el nombre completo del dueño navegando desde Employee -> User
         String ownerName = "Sin dueño";
         if (workshop.getOwner() != null && workshop.getOwner().getUser() != null) {
             ownerName = workshop.getOwner().getUser().getFirstname() + " " +
@@ -127,21 +160,25 @@ public class WorkshopService {
                 .companyName(workshop.getCompanyName())
                 .address(workshop.getAddress())
                 .ownerName(ownerName)
-                .openTime(workshop.getOpenTime()) // Mapeo de hora apertura
-                .closeTime(workshop.getCloseTime()) // Mapeo de hora cierre
+                .openTime(workshop.getOpenTime())
+                .closeTime(workshop.getCloseTime())
                 .slotDurationMinutes(workshop.getSlotDurationMinutes())
                 .workingDays(workshop.getWorkingDays())
                 .hourlyRate(workshop.getHourlyRate())
                 .includeOwnerInPlanning(workshop.getIncludeOwnerInPlanning() != null ? workshop.getIncludeOwnerInPlanning() : false)
                 .logoPictureUrl(storageService.generatePresignedUrl(workshop.getLogoPictureUrl()))
-                // Calculamos el tamaño de las listas para las estadísticas del DTO
                 .totalEmployees(workshop.getEmployees() != null ? workshop.getEmployees().size() : 0)
                 .vehiclesCurrentCount(workshop.getVehiclesInside() != null ? workshop.getVehiclesInside().size() : 0)
                 .build();
     }
 
     /**
-     * Sube un logo para el taller a S3 y guarda la referencia en la BD.
+     * Sube y asocia una imagen de logotipo a un taller en el almacenamiento persistente en la nube (S3).
+     *
+     * @param workshopId Identificador único del taller.
+     * @param file Archivo de imagen subido.
+     * @return DTO del taller actualizado con la URL de la imagen.
+     * @throws java.io.IOException Si ocurre un error al procesar el archivo.
      */
     @Transactional
     public WorkshopDTO uploadLogo(UUID workshopId, org.springframework.web.multipart.MultipartFile file) throws java.io.IOException {
@@ -160,7 +197,10 @@ public class WorkshopService {
     }
 
     /**
-     * Elimina el logo del taller de S3 y de la BD.
+     * Elimina el logotipo de un taller, borrando el archivo físico del storage y limpiando su referencia en BD.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return DTO del taller con la URL del logotipo a nulo.
      */
     @Transactional
     public WorkshopDTO deleteLogo(UUID workshopId) {

@@ -1,4 +1,4 @@
-package org.tfg.backend.workshop;// En src/main/java/org/tfg/backend/workshop/Workshop.java
+package org.tfg.backend.workshop;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -13,6 +13,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entidad que representa un taller mecánico en el sistema.
+ * Almacena los datos identificativos del taller (CIF, razón social, dirección),
+ * su dueño/administrador, la lista de empleados y vehículos activos en el taller,
+ * y los parámetros operativos de planificación (horario de apertura y cierre,
+ * duración de citas, días laborables, tarifa horaria y visibilidad del dueño).
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,6 +27,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "workshop")
 public class Workshop {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

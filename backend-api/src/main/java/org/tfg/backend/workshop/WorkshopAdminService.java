@@ -12,6 +12,11 @@ import org.tfg.backend.taskcatalog.CatalogInitializationService;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Servicio administrativo encargado de las operaciones de escritura y modificación de talleres,
+ * tales como dar de alta talleres, cambiar configuraciones operativas de horarios y tarifas,
+ * y gestionar el almacenamiento de logotipos en S3.
+ */
 @Service
 @RequiredArgsConstructor
 public class WorkshopAdminService {
@@ -22,6 +27,13 @@ public class WorkshopAdminService {
     private final StorageService storageService;
     private final WorkshopMapper workshopMapper;
 
+    /**
+     * Registra un nuevo taller en el sistema, validando que el CIF sea único y vinculando
+     * al empleado propietario designado. Inicializa también el catálogo de tareas por defecto.
+     *
+     * @param request Datos de la solicitud para el nuevo taller.
+     * @return El DTO del taller recién guardado.
+     */
     @Transactional
     public WorkshopDTO saveWorkshop(WorkshopRequest request) {
         if (workshopRepository.existsByCif(request.getCif())) {
@@ -51,6 +63,13 @@ public class WorkshopAdminService {
         return workshopMapper.mapToDTO(savedWorkshop);
     }
 
+    /**
+     * Actualiza la configuración operativa y física de un taller (horario, tarifa, dirección, etc.).
+     *
+     * @param workshopId Identificador único del taller.
+     * @param request Parámetros nuevos del taller.
+     * @return El DTO del taller modificado.
+     */
     @Transactional
     public WorkshopDTO updateWorkshopSettings(UUID workshopId, WorkshopRequest request) {
         Workshop workshop = workshopRepository.findById(workshopId)
@@ -69,6 +88,14 @@ public class WorkshopAdminService {
         return workshopMapper.mapToDTO(workshopRepository.save(workshop));
     }
 
+    /**
+     * Sube y asocia una imagen de logotipo a un taller en el almacenamiento persistente en la nube (S3).
+     *
+     * @param workshopId Identificador único del taller.
+     * @param file Archivo de imagen subido.
+     * @return DTO del taller actualizado con la URL de la imagen.
+     * @throws IOException Si ocurre un error al procesar el archivo.
+     */
     @Transactional
     public WorkshopDTO uploadLogo(UUID workshopId, MultipartFile file) throws IOException {
         Workshop workshop = workshopRepository.findById(workshopId)
@@ -85,6 +112,12 @@ public class WorkshopAdminService {
         return workshopMapper.mapToDTO(workshop);
     }
 
+    /**
+     * Elimina el logotipo de un taller, borrando el archivo físico del storage y limpiando su referencia en BD.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return DTO del taller con la URL del logotipo a nulo.
+     */
     @Transactional
     public WorkshopDTO deleteLogo(UUID workshopId) {
         Workshop workshop = workshopRepository.findById(workshopId)

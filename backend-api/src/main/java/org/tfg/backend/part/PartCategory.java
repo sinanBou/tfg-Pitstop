@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Entidad que representa una categoría o clasificación lógica de repuestos (por ejemplo: Frenos, Filtros, Motor).
+ * Agrupa diferentes artículos del catálogo general.
+ */
 @Entity
 @Table(name = "part_categories")
 @Data
