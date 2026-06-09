@@ -233,9 +233,6 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
            {/* Visual Card con overlay de botones dentro */}
            <div className={`w-full h-full overflow-hidden relative ${isResizing ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''} rounded-2xl`}>
 
-               {/* Gradiente superior — visible en hover para dar contraste a los botones */}
-               <div className="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-black/70 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-t-2xl pointer-events-none" />
-
                {/* Botones de acción — overlay dentro de la tarjeta, esquina superior derecha */}
                <div className="absolute top-1.5 right-1.5 z-30 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
 
