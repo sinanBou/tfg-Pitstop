@@ -2,15 +2,33 @@ import { useState, useEffect } from 'react';
 import type { AppointmentRequest, WorkshopMinDTO } from '@/features/client';
 import { searchWorkshopsApi } from '../services/clientAppointmentService';
 
+/**
+ * Propiedades de configuración para el hook useClientAppointment.
+ */
 interface UseClientAppointmentProps {
+  /** Indica si la modal de cita está abierta. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
+  /** Listado estático inicial de talleres (para validaciones de workingDays). */
   workshops: WorkshopMinDTO[];
+  /** Callback para enviar los datos de la nueva cita al servidor. */
   onSubmit: (data: AppointmentRequest) => Promise<boolean>;
+  /** Callback asíncrono para obtener las horas/slots disponibles de un taller y fecha concreta. */
   fetchSlots: (workshopId: string, date: string) => Promise<string[]>;
+  /** Listado de citas existentes del cliente para evitar duplicados en el mismo taller (opcional). */
   existingAppointments?: any[];
 }
 
+/**
+ * Hook de negocio para gestionar el estado, validaciones y la navegación entre pasos
+ * del flujo de creación de citas del cliente.
+ * 
+ * Controla:
+ * - Selección de vehículo y taller (con paginación y retardo de búsqueda).
+ * - Carga de disponibilidad del calendario y días festivos.
+ * - Prevención de citas duplicadas para el mismo vehículo y taller.
+ */
 export const useClientAppointment = ({
   isOpen,
   onClose,

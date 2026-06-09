@@ -5,25 +5,50 @@ import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
 
 
+/**
+ * Representa una pieza de repuesto agregada manualmente o importada para la facturación.
+ */
 interface PartItem {
+  /** Nombre descriptivo del repuesto. */
   name: string;
+  /** Precio de venta asignado a la pieza, o null si está pendiente de cotización. */
   price: number | null;
+  /** Cantidad utilizada (opcional). Por defecto 1. */
   quantityUsed?: number;
 }
 
+/**
+ * Representa una tarea de catálogo resuelta y valorada para la liquidación.
+ */
 interface ResolvedTask {
+  /** Código único del servicio. */
   code: string;
+  /** Nombre comercial o descripción de la tarea. */
   name: string;
+  /** Número de horas asignado para la tarea. */
   hours: number;
 }
 
+/**
+ * Propiedades del componente GenerateInvoiceModal.
+ */
 interface GenerateInvoiceModalProps {
+  /** Determina si la modal está abierta. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
-  job: any; // Cita / AppointmentDTO
+  /** Objeto de la cita (AppointmentDTO) finalizada que se va a facturar. */
+  job: any;
+  /** Callback que se ejecuta cuando la factura se crea con éxito en el servidor. */
   onSuccess: () => void;
 }
 
+/**
+ * Modal para el registro final de facturas y liquidación de servicios.
+ * Permite desglosar las horas de mano de obra según los códigos de servicios de la cita,
+ * añadir repuestos adicionales utilizados durante la reparación (con precios ajustables)
+ * y registrar la factura final en el backend, gatillando notificaciones de recogida de vehículo.
+ */
 export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   isOpen,
   onClose,

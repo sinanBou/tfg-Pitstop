@@ -15,24 +15,44 @@ import { Check, Plus, Trash, Box } from '@/assets/icons';
  * ───────────────────────────────────────────── */
 
 // ── Types ──
+/**
+ * Item individual de la lista de verificación (checklist).
+ */
 interface ChecklistItem {
+  /** Código único de la tarea o subservicio. */
   code: string;
+  /** Nombre descriptivo del subservicio. */
   label: string;
+  /** Estado de realización del ítem. */
   completed: boolean;
 }
 
+/**
+ * Propiedades del componente TaskChecklistModal.
+ */
 interface TaskChecklistModalProps {
+  /** Determina si la modal está abierta. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
-  /** The appointment or workshopTask being inspected */
+  /** Objeto de la cita (AppointmentDTO) o tarea de taller (WorkshopTaskDTO) inspeccionada. */
   item: any;
-  /** Callback to mark the whole item as COMPLETED */
+  /** Callback para actualizar el estado general (ej: pasar a COMPLETED). */
   onUpdateStatus: (id: string, status: string, isTask?: boolean) => Promise<boolean | void>;
-  /** Optional: refresh parent data after completion */
+  /** Callback opcional para refrescar los datos del componente padre tras completar operaciones. */
   onSuccess?: () => void;
 }
 
-/** Parse service codes and mark completed ones from persisted data */
+/**
+ * Parsea los códigos de servicio concatenados por comas, cruzándolos con el catálogo
+ * dinámico para obtener etiquetas legibles y marcando como completados aquellos que figuren
+ * en la lista de tareas ya realizadas.
+ * 
+ * @param serviceType Cadena de códigos de servicio (ej: "1.10, 2.05").
+ * @param completedTasks Cadena de códigos de servicios ya completados.
+ * @param catalogMap Diccionario de mapeo Código -> Nombre de Servicio.
+ * @returns Listado de objetos ChecklistItem formateados.
+ */
 function parseServiceCodes(
   serviceType: string | undefined, 
   completedTasks: string | undefined, 
@@ -53,7 +73,13 @@ function parseServiceCodes(
     }));
 }
 
-// ── Component ──
+/**
+ * Modal de Checklist de Operaciones y Repuestos para mecánicos.
+ * Desglosa las operaciones específicas de la cita/tarea (ej: cambio de aceite, pastillas)
+ * en una lista de verificación interactiva donde el mecánico puede marcar sus avances de forma persistente.
+ * Adicionalmente, permite buscar y asociar repuestos del inventario físico consumidos durante la reparación,
+ * controlando y descontando el stock disponible del almacén.
+ */
 export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   isOpen,
   onClose,

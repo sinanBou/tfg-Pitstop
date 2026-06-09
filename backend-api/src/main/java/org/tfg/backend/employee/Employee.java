@@ -6,6 +6,12 @@ import org.tfg.backend.user.User;
 import org.tfg.backend.workshop.Workshop;
 import java.util.UUID;
 
+/**
+ * Entidad que representa a un empleado en el sistema de Pitstop.
+ * Puede corresponder a un mecánico, gestor o al propietario del taller.
+ * Vincula al empleado con su usuario de acceso, el taller al que pertenece,
+ * secciones permitidas en el sistema y sus datos personales (NIF, teléfono, dirección).
+ */
 @Data
 @Builder
 @NoArgsConstructor

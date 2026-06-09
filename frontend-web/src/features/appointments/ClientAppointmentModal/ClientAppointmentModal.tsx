@@ -10,6 +10,14 @@ import { ScheduleStep } from './components/ScheduleStep';
 import { DetailsStep } from './components/DetailsStep';
 import type { ClientAppointmentModalProps } from './types/ClientAppointmentModal.types';
 
+/**
+ * Modal multi-paso para la creación de citas por parte del Cliente.
+ * Guía al usuario a través de 4 pasos interactivos:
+ * 1. Selección de uno de sus vehículos registrados.
+ * 2. Búsqueda y selección del taller de la red.
+ * 3. Elección de fecha y hora basándose en los huecos disponibles devueltos por el servidor.
+ * 4. Introducción del tipo de servicio, descripción y confirmación final de la reserva.
+ */
 export const ClientAppointmentModal: React.FC<ClientAppointmentModalProps> = (props) => {
   const { isOpen, onClose, vehicles, workshops } = props;
   

@@ -7,6 +7,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Servicio encargado del envío de correos electrónicos del sistema (verificación de cuentas, restablecimiento de contraseña).
+ * Incluye un simulador de envío (Mock) para direcciones de correo de prueba o desarrollo local.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -23,6 +27,12 @@ public class EmailService {
     @Value("${app.backend.url:http://localhost:9091}")
     private String backendUrl;
 
+    /**
+     * Determina si un correo electrónico corresponde a una dirección de prueba o de simulación (Mock).
+     *
+     * @param email Correo electrónico a evaluar.
+     * @return True si es una dirección simulada, False de lo contrario.
+     */
     private boolean isMockEmail(String email) {
         if (email == null) return true;
         String lower = email.toLowerCase();
@@ -34,6 +44,13 @@ public class EmailService {
                 || lower.endsWith(".test");
     }
 
+    /**
+     * Envía un correo electrónico de verificación al usuario recién registrado.
+     * En caso de error, el token se imprime en el log del servidor para depuración local.
+     *
+     * @param toEmail Correo electrónico del destinatario.
+     * @param token Token de verificación único.
+     */
     public void sendVerificationEmail(String toEmail, String token) {
         String verificationUrl = backendUrl + "/api/auth/verify?token=" + token;
         String subject = "Verifica tu cuenta - PitStop";
@@ -70,6 +87,13 @@ public class EmailService {
         }
     }
 
+    /**
+     * Envía un correo electrónico para restablecer la contraseña del usuario.
+     * En caso de error, el token se imprime en el log del servidor para depuración local.
+     *
+     * @param toEmail Correo electrónico del destinatario.
+     * @param token Token de restablecimiento único.
+     */
     public void sendPasswordResetEmail(String toEmail, String token) {
         String resetUrl = frontendUrl + "/reset-password?token=" + token;
         String subject = "Recuperación de contraseña - PitStop";
@@ -107,4 +131,3 @@ public class EmailService {
         }
     }
 }
-

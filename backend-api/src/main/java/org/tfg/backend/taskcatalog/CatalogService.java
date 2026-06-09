@@ -11,6 +11,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Servicio encargado de gestionar el catálogo de tareas y categorías de servicios del taller.
+ * Permite buscar categorías, dar de alta nuevas categorías personalizadas, crear tareas dentro de una categoría,
+ * actualizar los tiempos y borrar tareas o categorías vacías.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -20,11 +25,25 @@ public class CatalogService {
     private final CatalogTaskRepository taskRepository;
     private final WorkshopRepository workshopRepository;
 
+    /**
+     * Obtiene el listado completo de categorías y tareas del catálogo asociadas al taller dado.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return Lista de categorías con sus respectivas tareas del catálogo cargadas.
+     */
     @Transactional(readOnly = true)
     public List<TaskCategory> getCatalog(UUID workshopId) {
         return categoryRepository.findByWorkshopIdOrderByNameAsc(workshopId);
     }
 
+    /**
+     * Crea una categoría de tareas dentro del catálogo de un taller, asegurando un nombre técnico único.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param displayName Nombre visible para mostrar en el frontend.
+     * @return La categoría creada.
+     * @throws RuntimeException si el taller no existe.
+     */
     @Transactional
     public TaskCategory createCategory(UUID workshopId, String displayName) {
         Workshop workshop = workshopRepository.findById(workshopId)
@@ -55,6 +74,15 @@ public class CatalogService {
         return categoryRepository.save(category);
     }
 
+    /**
+     * Registra una nueva tarea dentro de una categoría del catálogo, autogenerando el código secuencial si no se provee.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param categoryId Identificador único de la categoría.
+     * @param taskDto DTO con la información de la tarea.
+     * @return La tarea creada e insertada en la base de datos.
+     * @throws RuntimeException si la categoría no existe o no pertenece al taller especificado.
+     */
     @Transactional
     public CatalogTask createTask(UUID workshopId, UUID categoryId, CatalogTask taskDto) {
         TaskCategory category = categoryRepository.findById(categoryId)
@@ -83,6 +111,14 @@ public class CatalogService {
         return taskRepository.save(task);
     }
 
+    /**
+     * Modifica los datos (nombre y tiempos estimados de ejecución) de una tarea existente.
+     *
+     * @param taskId Identificador único de la tarea.
+     * @param taskDto Datos nuevos.
+     * @return La tarea de catálogo modificada y persistida.
+     * @throws RuntimeException si la tarea no se encuentra.
+     */
     @Transactional
     public CatalogTask updateTask(UUID taskId, CatalogTask taskDto) {
         CatalogTask task = taskRepository.findById(taskId)
@@ -97,6 +133,12 @@ public class CatalogService {
         return taskRepository.save(task);
     }
 
+    /**
+     * Elimina una tarea de catálogo del sistema.
+     *
+     * @param taskId Identificador único de la tarea.
+     * @throws RuntimeException si la tarea no se encuentra.
+     */
     @Transactional
     public void deleteTask(UUID taskId) {
         if (!taskRepository.existsById(taskId)) {
@@ -105,6 +147,12 @@ public class CatalogService {
         taskRepository.deleteById(taskId);
     }
 
+    /**
+     * Elimina una categoría del catálogo si y solo si no contiene ninguna tarea vinculada.
+     *
+     * @param categoryId Identificador único de la categoría.
+     * @throws RuntimeException si la categoría no existe o tiene tareas asociadas.
+     */
     @Transactional
     public void deleteCategory(UUID categoryId) {
         TaskCategory category = categoryRepository.findById(categoryId)
@@ -144,6 +192,12 @@ public class CatalogService {
         return prefix + "." + nextSuffix;
     }
 
+    /**
+     * Helper que extrae el prefijo numérico inicial de un nombre de categoría.
+     *
+     * @param categoryName Nombre técnico de la categoría.
+     * @return El prefijo numérico como cadena o un hash ligero si no posee números.
+     */
     private String extractNumericPrefix(String categoryName) {
         // Busca si el nombre de la categoría empieza por número seguido de guión (ej: "1_consumibles" -> "1")
         if (categoryName.contains("_")) {

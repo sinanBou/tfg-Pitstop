@@ -10,6 +10,11 @@ import org.tfg.backend.workshop.WorkshopRepository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Servicio de administración del catálogo de tareas.
+ * Se encarga de la lógica de negocio para la creación y edición de categorías y tareas,
+ * así como de la asignación automática de códigos secuenciales.
+ */
 @Service
 @RequiredArgsConstructor
 public class CatalogAdminService {
@@ -18,6 +23,14 @@ public class CatalogAdminService {
     private final CatalogTaskRepository taskRepository;
     private final WorkshopRepository workshopRepository;
 
+    /**
+     * Crea una categoría de tareas dentro del catálogo de un taller, asegurando un nombre técnico único.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param displayName Nombre visible para mostrar en el frontend.
+     * @return La categoría creada.
+     * @throws RuntimeException si el taller no existe.
+     */
     @Transactional
     public TaskCategory createCategory(UUID workshopId, String displayName) {
         Workshop workshop = workshopRepository.findById(workshopId)
@@ -46,6 +59,15 @@ public class CatalogAdminService {
         return categoryRepository.save(category);
     }
 
+    /**
+     * Registra una nueva tarea dentro de una categoría del catálogo, autogenerando el código secuencial si no se provee.
+     *
+     * @param workshopId Identificador único del taller.
+     * @param categoryId Identificador único de la categoría.
+     * @param taskDto DTO con la información de la tarea.
+     * @return La tarea creada.
+     * @throws RuntimeException si la categoría no existe o no pertenece al taller.
+     */
     @Transactional
     public CatalogTask createTask(UUID workshopId, UUID categoryId, CatalogTask taskDto) {
         TaskCategory category = categoryRepository.findById(categoryId)
@@ -73,6 +95,14 @@ public class CatalogAdminService {
         return taskRepository.save(task);
     }
 
+    /**
+     * Modifica los datos (nombre y tiempos estimados de ejecución) de una tarea existente.
+     *
+     * @param taskId Identificador único de la tarea.
+     * @param taskDto Datos nuevos.
+     * @return La tarea de catálogo modificada y persistida.
+     * @throws RuntimeException si la tarea no se encuentra.
+     */
     @Transactional
     public CatalogTask updateTask(UUID taskId, CatalogTask taskDto) {
         CatalogTask task = taskRepository.findById(taskId)
@@ -87,6 +117,12 @@ public class CatalogAdminService {
         return taskRepository.save(task);
     }
 
+    /**
+     * Elimina una tarea de catálogo del sistema.
+     *
+     * @param taskId Identificador único de la tarea a borrar.
+     * @throws RuntimeException si la tarea no se encuentra.
+     */
     @Transactional
     public void deleteTask(UUID taskId) {
         if (!taskRepository.existsById(taskId)) {
@@ -123,6 +159,12 @@ public class CatalogAdminService {
         return prefix + "." + nextSuffix;
     }
 
+    /**
+     * Helper que extrae el prefijo numérico inicial de un nombre de categoría.
+     *
+     * @param categoryName Nombre técnico de la categoría.
+     * @return El prefijo numérico como cadena o un hash ligero si no posee números.
+     */
     private String extractNumericPrefix(String categoryName) {
         if (categoryName.contains("_")) {
             String firstPart = categoryName.split("_")[0];

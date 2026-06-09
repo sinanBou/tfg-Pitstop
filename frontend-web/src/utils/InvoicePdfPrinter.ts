@@ -20,7 +20,13 @@ export interface InvoiceData {
 }
 
 /**
- * Genera y descarga una factura PDF maquetada nativamente en alta fidelidad y estética seria.
+ * Genera, maqueta y descarga una factura oficial en formato PDF en una nueva pestaña del navegador.
+ * Estructura la información del taller (emisor), el cliente/vehículo (receptor), el desglose de mano de obra
+ * y la lista de repuestos utilizados con cálculo automático del importe total.
+ * 
+ * @param inv Objeto con los datos de facturación e importes del taller.
+ * @param translatedTasks Operaciones o tareas adicionales completadas en formato traducido/resumido (opcional).
+ * @param onError Callback para manejar la denegación de ventanas emergentes en el navegador (opcional).
  */
 export function printInvoicePDF(inv: InvoiceData, translatedTasks?: string, onError?: (message: string) => void) {
   const parsedParts: PartItem[] = JSON.parse(inv.partsJson || '[]');

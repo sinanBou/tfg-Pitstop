@@ -2,6 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button/Button';
 import { Building, User, FileText } from '@/assets/icons';
 
+/**
+ * Componente de la sección principal (HeroSection) para la página de bienvenida (Landing Page).
+ * 
+ * Presenta la propuesta de valor de Pitstop, proporcionando accesos directos e intuitivos
+ * para el registro e inicio de sesión de usuarios. Destaca las tres principales
+ * vertientes del sistema: panel de taller, portal del cliente y el control de inventario/facturación.
+ */
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
 

@@ -37,6 +37,12 @@ const handleResponseError = async (res: Response, defaultMessage: string): Promi
   throw new Error(finalMessage);
 };
 
+/**
+ * Inicia sesión con credenciales de email y contraseña.
+ * 
+ * @param formData Datos de inicio de sesión.
+ * @returns Promesa con los datos de respuesta y el token JWT de la sesión.
+ */
 export const login = async (formData: LoginFormData): Promise<LoginResponse> => {
   const res = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
@@ -53,6 +59,12 @@ export const login = async (formData: LoginFormData): Promise<LoginResponse> => 
   return res.json();
 };
 
+/**
+ * Inicia sesión utilizando el ID Token obtenido del flujo de inicio de sesión con Google.
+ * 
+ * @param idToken Token de Google OAuth.
+ * @returns Promesa con la respuesta de login y token JWT.
+ */
 export const loginWithGoogle = async (idToken: string): Promise<LoginResponse> => {
   const res = await fetch(`${API_BASE_URL}/auth/google`, {
     method: 'POST',
@@ -66,6 +78,11 @@ export const loginWithGoogle = async (idToken: string): Promise<LoginResponse> =
   return res.json();
 };
 
+/**
+ * Registra una cuenta nueva de tipo Cliente (Conductor) en la plataforma.
+ * 
+ * @param formData Formulario con la información de datos personales y credenciales.
+ */
 export const registerClient = async (formData: ClientRegistrationFormData): Promise<void> => {
   // Excluir confirmPassword del envío al backend
   const { confirmPassword, ...payload } = formData;
@@ -81,6 +98,11 @@ export const registerClient = async (formData: ClientRegistrationFormData): Prom
   }
 };
 
+/**
+ * Registra una cuenta nueva de tipo Propietario (Owner) y configura su taller correspondiente.
+ * 
+ * @param formData Formulario del dueño del taller y datos comerciales básicos.
+ */
 export const registerOwner = async (formData: OwnerRegistrationFormData): Promise<void> => {
   // Excluir confirmPassword del envío al backend
   const { confirmPassword, ...payload } = formData;
@@ -96,6 +118,12 @@ export const registerOwner = async (formData: OwnerRegistrationFormData): Promis
   }
 };
 
+/**
+ * Confirma y verifica el correo electrónico del usuario mediante un token único recibido por email.
+ * 
+ * @param token Token de verificación.
+ * @returns Texto de confirmación devuelto por la API.
+ */
 export const verifyAccount = async (token: string): Promise<string> => {
   const res = await fetch(`${API_BASE_URL}/auth/verify?token=${encodeURIComponent(token)}`, {
     method: 'GET'
@@ -107,6 +135,12 @@ export const verifyAccount = async (token: string): Promise<string> => {
   return res.text();
 };
 
+/**
+ * Solicita el envío de un enlace de recuperación de contraseña al correo electrónico.
+ * 
+ * @param email Correo electrónico de la cuenta del usuario.
+ * @returns Mensaje de confirmación del envío.
+ */
 export const forgotPassword = async (email: string): Promise<string> => {
   const res = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
     method: 'POST',
@@ -120,6 +154,13 @@ export const forgotPassword = async (email: string): Promise<string> => {
   return res.text();
 };
 
+/**
+ * Establece una contraseña nueva utilizando el token de restablecimiento enviado por correo.
+ * 
+ * @param token Token de seguridad de restablecimiento.
+ * @param newPassword Nueva contraseña.
+ * @returns Mensaje de éxito devuelto por la API.
+ */
 export const resetPassword = async (token: string, newPassword: string): Promise<string> => {
   const res = await fetch(`${API_BASE_URL}/auth/reset-password`, {
     method: 'POST',
@@ -132,3 +173,4 @@ export const resetPassword = async (token: string, newPassword: string): Promise
   }
   return res.text();
 };
+

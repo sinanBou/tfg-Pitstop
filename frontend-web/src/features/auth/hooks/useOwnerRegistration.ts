@@ -4,6 +4,10 @@ import * as authService from '../services/authService';
 import type { OwnerRegistrationFormData } from '../types/auth.types';
 import { useToast } from '@/hooks/useToast';
 
+/**
+ * Hook personalizado para controlar el formulario y proceso de registro de nuevos Propietarios de Talleres (Owners).
+ * Envía la información al backend y redirige al inicio de sesión.
+ */
 export function useOwnerRegistration() {
   const toast = useToast();
   const navigate = useNavigate();

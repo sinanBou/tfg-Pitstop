@@ -5,24 +5,45 @@ import { API_BASE_URL } from '@/config/api';
 // ──────────────────────────────────────────────────────────────────────────────
 // Types
 // ──────────────────────────────────────────────────────────────────────────────
+/**
+ * Representa una tarea genérica cargada desde el catálogo del taller.
+ */
 interface CatalogTask {
+  /** Código único identificador de la tarea en el catálogo. */
   codigo: string;
+  /** Nombre descriptivo del trabajo o servicio. */
   tarea: string;
+  /** Tiempo base en horas estimado para un motor estándar de 4 cilindros. */
   horas_4_cil?: number;
+  /** Incremento o decremento de horas por cada cilindro extra de desviación respecto a 4 cilindros. */
   horas_cil_extra?: number | null;
-  horas?: number;         // Fixed hours (not cylinder or wheel based)
-  horas_1_rueda?: number; // Per-wheel base hours
+  /** Duración fija estándar en horas (para tareas de tiempo invariable). */
+  horas?: number;
+  /** Tiempo base en horas estimado por cada rueda individual en tareas de neumáticos. */
+  horas_1_rueda?: number;
 }
 
+/**
+ * Agrupación de tarea seleccionada junto a su identificador de categoría.
+ */
 interface SelectedTask {
+  /** Objeto de tarea de catálogo. */
   task: CatalogTask;
+  /** Categoría a la que pertenece la tarea. */
   category: string;
 }
 
+/**
+ * Propiedades del componente MechanicTaskModal.
+ */
 interface MechanicTaskModalProps {
+  /** Determina si la modal de planificación de tareas está abierta. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
-  appointment: any; // The appointment being managed
+  /** Objeto de la cita actual a la que se le definirán las tareas específicas. */
+  appointment: any;
+  /** Callback ejecutado tras guardar con éxito las tareas y tiempos de mano de obra en el servidor. */
   onSuccess: () => void;
 }
 
@@ -30,17 +51,35 @@ interface MechanicTaskModalProps {
 // Helpers
 // ──────────────────────────────────────────────────────────────────────────────
 
-/** Detect if a task scales by number of wheels */
+/**
+ * Comprueba si una tarea escala su duración en función del número de ruedas a sustituir.
+ * 
+ * @param task Tarea a verificar.
+ * @returns true si tiene definido el campo horas_1_rueda.
+ */
 function isWheelTask(task: CatalogTask): boolean {
   return task.horas_1_rueda !== undefined;
 }
 
-/** Detect if a task scales by number of cylinders */
+/**
+ * Comprueba si una tarea escala su duración en función del número de cilindros del motor.
+ * 
+ * @param task Tarea a verificar.
+ * @returns true si tiene definido el campo horas_4_cil.
+ */
 function isCylinderTask(task: CatalogTask): boolean {
   return task.horas_4_cil !== undefined;
 }
 
-/** Calculate hours for a task based on cylinder count or wheel count */
+/**
+ * Calcula dinámicamente las horas totales estimadas para una tarea mecánica,
+ * considerando parámetros de configuración del motor (cilindros) o del tren de rodaje (ruedas).
+ * 
+ * @param task Tarea de catálogo.
+ * @param cylinders Número de cilindros del motor.
+ * @param wheels Número de ruedas a sustituir.
+ * @returns Tiempo calculado en horas para la mano de obra.
+ */
 function calcHoursForTask(task: CatalogTask, cylinders: number, wheels: number = 0): number {
   // Wheel-based tasks
   if (task.horas_1_rueda !== undefined) {
@@ -72,6 +111,12 @@ function calcHoursForTask(task: CatalogTask, cylinders: number, wheels: number =
   return 0;
 }
 
+/**
+ * Modal para la asignación y planificación de tareas del catálogo de servicios del taller.
+ * Permite buscar servicios del catálogo, modularizar su duración según el número de cilindros o ruedas,
+ * calcular estimaciones de tiempos de mano de obra en tiempo real y persistir el presupuesto temporal
+ * de la cita/tarea en el servidor.
+ */
 export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
   isOpen, onClose, appointment, onSuccess,
 }) => {

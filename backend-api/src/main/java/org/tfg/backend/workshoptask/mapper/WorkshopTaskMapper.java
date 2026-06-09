@@ -7,6 +7,12 @@ import org.tfg.backend.workshoptask.WorkshopTaskDTO;
 @Component
 public class WorkshopTaskMapper {
 
+    /**
+    * Convierte una entidad de tarea de taller a su DTO correspondiente.
+    *
+    * @param task Entidad de la tarea.
+    * @return DTO simplificado y formateado de la tarea de taller.
+    */
     public WorkshopTaskDTO convertToDTO(WorkshopTask task) {
         if (task == null) return null;
 

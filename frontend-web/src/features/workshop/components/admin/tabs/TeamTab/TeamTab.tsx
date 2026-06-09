@@ -11,18 +11,36 @@ import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Check, Plus, ChevronsUp, ChevronsDown, UserPlus } from '@/assets/icons';
 
+/**
+ * Propiedades del componente TeamTab.
+ */
 interface TeamTabProps {
+  /** Estructura de datos del formulario para dar de alta un nuevo empleado. */
   employeeForm: any;
+  /** Callback para actualizar el estado del formulario de alta en la vista contenedora. */
   setEmployeeForm: (f: any) => void;
+  /** Callback para enviar la solicitud de alta del empleado al servidor. */
   onSubmit: (e: React.FormEvent) => void;
+  /** Callback para dar de baja definitiva a un empleado por su ID. */
   onDelete: (id: string) => void;
+  /** Callback para promover a un mecánico al rango de Gerente. */
   onPromote: (id: string) => void;
+  /** Callback para degradar a un Gerente al rango de Mecánico. */
   onDemote: (id: string) => void;
+  /** Colección de empleados que pertenecen actualmente al taller. */
   employees: any[];
+  /** Callback opcional para refrescar el listado de empleados tras un cambio (opcional). */
   onRefreshEmployees?: () => void;
 }
 
+/**
+ * Pestaña de Gestión del Equipo en el panel de Administración de Taller.
+ * Permite al propietario dar de alta nuevos mecánicos y gerentes, consultar las fichas de personal,
+ * ascender o degradar roles jerárquicos y configurar los permisos granulares de sección del Dashboard
+ * para los mecánicos del taller.
+ */
 export const TeamTab: React.FC<TeamTabProps> = ({ 
+
   employeeForm, 
   setEmployeeForm, 
   onSubmit, 

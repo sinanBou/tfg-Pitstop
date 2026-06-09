@@ -11,15 +11,31 @@ import { AvisoPanel } from './AvisoPanel';
 import { useToast } from '@/hooks/useToast';
 import { Calendar, Edit } from '@/assets/icons';
 
+/**
+ * Propiedades del componente AvisosTab.
+ */
 interface AvisosTabProps {
+  /** Identificador único del taller actual. */
   workshopId: string;
+  /** Colección completa de citas para filtrar solicitudes pendientes e indicadores de volumen. */
   appointments: any[];
+  /** Colección opcional de tareas del taller para calcular alertas de retrasos (opcional). */
   workshopTasks?: any[];
+  /** Colección de trabajos/citas finalizadas y listas para facturar o recoger. */
   readyJobs: any[];
+  /** Callback asíncrono para recargar los datos generales del taller tras modificaciones. */
   fetchWorkshopData: () => Promise<void>;
+  /** Callback para cambiar la pestaña activa de administración hacia el timeline de planificación (opcional). */
   onGoToPlanning?: () => void;
 }
 
+/**
+ * Pestaña de Avisos y Alertas Críticas de Taller.
+ * Centraliza las notificaciones de stock bajo mínimos en el almacén de repuestos,
+ * gestionando el inventario directamente mediante una ventana modal interna.
+ * Asimismo, detecta y advierte sobre citas y tareas retrasadas con enlaces de desvío
+ * directo al planning de distribución del taller.
+ */
 export const AvisosTab: React.FC<AvisosTabProps> = ({
   workshopId,
   appointments,

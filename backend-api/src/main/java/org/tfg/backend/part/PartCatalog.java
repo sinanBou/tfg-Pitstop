@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.util.UUID;
 
+/**
+ * Entidad que representa un repuesto genérico en el catálogo global del sistema.
+ * Define la información descriptiva, fabricante, especificaciones técnicas y su categoría.
+ */
 @Entity
 @Data
 @Builder
@@ -13,22 +17,40 @@ import java.util.UUID;
     @UniqueConstraint(name = "UK_part_catalog_category_oem", columnNames = {"category_id", "oem_reference"})
 })
 public class PartCatalog {
+    /**
+     * Identificador único del repuesto en el catálogo.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    /**
+     * Referencia OEM (Original Equipment Manufacturer) del repuesto.
+     */
     @Column(name = "oem_reference")
     private String oemReference;
 
+    /**
+     * Nombre descriptivo del repuesto.
+     */
     @Column(nullable = false)
     private String name;
 
+    /**
+     * Fabricante del repuesto.
+     */
     @Column(nullable = false)
     private String manufacturer;
 
+    /**
+     * Especificaciones técnicas detalladas en formato de texto largo.
+     */
     @Column(name = "technical_specs", columnDefinition = "LONGTEXT")
     private String technicalSpecs;
 
+    /**
+     * Categoría a la que pertenece el repuesto.
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     @com.fasterxml.jackson.annotation.JsonIgnoreProperties("parts")

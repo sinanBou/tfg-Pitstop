@@ -19,6 +19,9 @@ const getAuthHeaders = (isMultipart = false) => {
   return headers;
 };
 
+/**
+ * Obtiene el perfil del empleado (mecánico o administrador) actualmente autenticado.
+ */
 export const getEmployeeMe = async (): Promise<EmployeeProfile> => {
   const res = await fetch(`${API_BASE_URL}/employees/me`, {
     headers: getAuthHeaders()
@@ -74,6 +77,11 @@ export const deleteAvatar = async (): Promise<EmployeeProfile> => {
   return res.json();
 };
 
+/**
+ * Obtiene la lista completa de citas asociadas a un taller específico.
+ * 
+ * @param workshopId ID del taller.
+ */
 export const getAppointmentsByWorkshop = async (workshopId: string): Promise<any[]> => {
   const res = await fetch(`${API_BASE_URL}/appointments/workshop/${workshopId}`, {
     headers: getAuthHeaders()
@@ -82,6 +90,12 @@ export const getAppointmentsByWorkshop = async (workshopId: string): Promise<any
   return res.json();
 };
 
+/**
+ * Obtiene las tareas programadas en el taller para una fecha concreta.
+ * 
+ * @param workshopId ID del taller.
+ * @param dateIso Fecha de consulta en formato ISO (YYYY-MM-DD).
+ */
 export const getTasksByWorkshopAndDate = async (workshopId: string, dateIso: string): Promise<any[]> => {
   const res = await fetch(`${API_BASE_URL}/workshop-tasks/workshop/${workshopId}?date=${dateIso}`, {
     headers: getAuthHeaders()
@@ -91,6 +105,11 @@ export const getTasksByWorkshopAndDate = async (workshopId: string, dateIso: str
 };
 
 /** Fetches all DELAYED workshop tasks for the given workshop, regardless of date. */
+/**
+ * Obtiene todas las tareas retrasadas del taller, independientemente de su fecha de programación.
+ * 
+ * @param workshopId ID del taller.
+ */
 export const getDelayedTasksByWorkshop = async (workshopId: string): Promise<any[]> => {
   const res = await fetch(`${API_BASE_URL}/workshop-tasks/workshop/${workshopId}/delayed`, {
     headers: getAuthHeaders()
@@ -123,6 +142,12 @@ export const getAppointmentsReadyForCompletion = async (workshopId: string): Pro
   return res.json();
 };
 
+/**
+ * Asigna (o desasigna) un empleado a una cita concreta.
+ * 
+ * @param appointmentId ID de la cita.
+ * @param employeeId ID del empleado, o `null` si se desea desasignar.
+ */
 export const assignAppointment = async (appointmentId: string, employeeId: string | null): Promise<void> => {
   const url = `${API_BASE_URL}/appointments/${appointmentId}/assign` + (employeeId ? `?employeeId=${employeeId}` : '');
   const res = await fetch(url, {
@@ -135,6 +160,14 @@ export const assignAppointment = async (appointmentId: string, employeeId: strin
   }
 };
 
+/**
+ * Reprograma la fecha/hora, duración y asignación de un empleado para una cita concreta.
+ * 
+ * @param appointmentId ID de la cita.
+ * @param employeeId ID del nuevo empleado asignado (opcional).
+ * @param dateTimeIso Nueva fecha y hora en formato ISO.
+ * @param duration Nueva duración estimada en minutos (opcional).
+ */
 export const rescheduleAppointment = async (
   appointmentId: string,
   employeeId: string | null,
@@ -154,6 +187,9 @@ export const rescheduleAppointment = async (
   }
 };
 
+/**
+ * Actualiza el estado actual de una cita de reparación (ej. PENDING, CONFIRMED, COMPLETED).
+ */
 export const updateAppointmentStatus = async (appointmentId: string, status: string): Promise<void> => {
   const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/status?status=${status}`, {
     method: 'PATCH',
@@ -162,6 +198,9 @@ export const updateAppointmentStatus = async (appointmentId: string, status: str
   if (!res.ok) throw new Error('Error al actualizar estado de la cita');
 };
 
+/**
+ * Actualiza el estado de progreso de una tarea individual.
+ */
 export const updateTaskStatus = async (taskId: string, status: string): Promise<void> => {
   const res = await fetch(`${API_BASE_URL}/workshop-tasks/${taskId}`, {
     method: 'PATCH',
@@ -202,6 +241,9 @@ export const deleteAppointment = async (appointmentId: string): Promise<void> =>
   if (!res.ok) throw new Error('Error al eliminar cita');
 };
 
+/**
+ * Registra el ingreso del vehículo en el taller, almacenando kilometraje e indicaciones iniciales.
+ */
 export const checkInVehicle = async (appointmentId: string, kilometers: number, notes: string): Promise<void> => {
   const res = await fetch(`${API_BASE_URL}/appointments/${appointmentId}/check-in?kilometers=${kilometers}&notes=${encodeURIComponent(notes)}`, {
     method: 'PATCH',
@@ -210,6 +252,9 @@ export const checkInVehicle = async (appointmentId: string, kilometers: number, 
   if (!res.ok) throw new Error('Error al recepcionar vehículo');
 };
 
+/**
+ * Guarda la configuración del taller en el servidor (duración de slots, tarifa por hora, etc.).
+ */
 export const updateWorkshopSettings = async (workshopId: string, payload: WorkshopSettingsPayload): Promise<void> => {
   const res = await fetch(`${API_BASE_URL}/workshops/${workshopId}/settings`, {
     method: 'PUT',
@@ -222,6 +267,9 @@ export const updateWorkshopSettings = async (workshopId: string, payload: Worksh
   }
 };
 
+/**
+ * Registra un nuevo empleado asignándolo al taller indicado.
+ */
 export const registerEmployee = async (workshopId: string, payload: EmployeeRegistrationPayload): Promise<void> => {
   const res = await fetch(`${API_BASE_URL}/employees/register/${workshopId}`, {
     method: 'POST',

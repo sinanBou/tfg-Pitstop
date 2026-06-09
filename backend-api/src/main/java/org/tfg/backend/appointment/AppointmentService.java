@@ -23,6 +23,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio encargado de la lógica de negocio de las citas (Appointments) en Pitstop.
+ * Administra la obtención de slots libres, reservas, reprogramaciones, entrada física de vehículos,
+ * asignación de personal y distribución de carga de trabajo (WorkshopTasks) en el calendario.
+ */
 @Service
 @RequiredArgsConstructor
 public class AppointmentService {
@@ -36,12 +41,23 @@ public class AppointmentService {
     private final InvoiceRepository invoiceRepository;
 
     // Configuración: Citas cada 1 hora, de 9 a 14 y 16 a 19
+    /**
+    * Horario estÃ¡ndar predeterminado de franjas de trabajo del taller.
+    */
     private final List<LocalTime> WORKING_HOURS = List.of(
             LocalTime.of(9,0), LocalTime.of(10,0), LocalTime.of(11,0),
             LocalTime.of(12,0), LocalTime.of(13,0), LocalTime.of(16,0),
             LocalTime.of(17,0), LocalTime.of(18,0)
     );
 
+    /**
+     * Calcula los intervalos de tiempo disponibles (slots) de un taller para una fecha concreta,
+     * teniendo en cuenta el horario comercial del taller y el número de mecánicos disponibles en ese momento.
+     *
+     * @param workshopId Identificador del taller.
+     * @param date Fecha para la que se consulta la disponibilidad.
+     * @return Listado de slots y su estado de disponibilidad.
+     */
     @Transactional(readOnly = true)
     public List<AvailableSlotDTO> getAvailableSlots(UUID workshopId, LocalDate date) {
         var workshop = workshopRepository.findById(workshopId)
@@ -114,15 +130,26 @@ public class AppointmentService {
         return slots;
     }
 
+    /**
+     * Registra una nueva cita iniciada por el cliente.
+     *
+     * @param request Datos del formulario de la cita.
+     * @param userEmail Correo electrónico del usuario autenticado.
+     */
     @Transactional
     public void createAppointment(AppointmentRequest request, String userEmail) {
         var user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
+ 
         Client client = user.getClient();
         createBaseAppointment(request, client);
     }
-
+ 
+    /**
+     * Registra una cita de manera manual por el personal del taller para un vehículo específico.
+     *
+     * @param request Datos de la solicitud de la cita.
+     */
     @Transactional
     public void createManualAppointment(AppointmentRequest request) {
         // En el caso manual (staff), el cliente viene por su ID (UUID)
@@ -138,6 +165,12 @@ public class AppointmentService {
         createBaseAppointment(request, client);
     }
 
+    /**
+     * Método interno auxiliar para validar y crear una cita en la base de datos a partir de un cliente asociado.
+     *
+     * @param request Datos de la cita.
+     * @param client Cliente solicitante.
+     */
     private void createBaseAppointment(AppointmentRequest request, Client client) {
         var vehicle = vehicleRepository.findById(request.getVehicleId())
                 .orElseThrow(() -> new RuntimeException("Vehículo no encontrado"));
@@ -215,6 +248,13 @@ public class AppointmentService {
     }
 
 
+    /**
+     * Mapea una entidad {@link Appointment} a su correspondiente {@link AppointmentDTO}.
+     * Calcula también el coste de mano de obra y repuestos de la cita.
+     *
+     * @param appointment Entidad de la cita.
+     * @return El DTO mapeado y completado.
+     */
     public AppointmentDTO mapToDTO(Appointment appointment) {
         Double price = null;
         if (appointment.getStatus() == AppointmentStatus.COMPLETED || appointment.getStatus() == AppointmentStatus.PICKED_UP) {
@@ -269,6 +309,13 @@ public class AppointmentService {
                 .build();
     }
 
+    /**
+     * Actualiza el estado de una cita y registra de forma automática los tiempos reales de inicio y fin,
+     * además de gestionar la desvinculación y estado del vehículo en el taller si procede.
+     *
+     * @param appointmentId Identificador de la cita.
+     * @param newStatus Nuevo estado operativo a asignar.
+     */
     @Transactional
     public void updateAppointmentStatus(UUID appointmentId, AppointmentStatus newStatus) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -317,6 +364,14 @@ public class AppointmentService {
         // Aquí se podría disparar la lógica de notificación al cliente si el estado es DELAYED
     }
 
+    /**
+     * Registra la recepción física de un vehículo en el taller, almacenando los kilómetros del odómetro y notas de recepción,
+     * y actualizando el taller actual y estado del vehículo.
+     *
+     * @param appointmentId Identificador de la cita.
+     * @param kilometers Kilómetros marcados.
+     * @param notes Notas sobre el estado de entrega del vehículo.
+     */
     @Transactional
     public void checkInVehicle(UUID appointmentId, Integer kilometers, String notes) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -337,6 +392,12 @@ public class AppointmentService {
     }
 
 
+    /**
+     * Asigna o reasigna un empleado (mecánico) responsable a una cita concreta.
+     *
+     * @param appointmentId Identificador de la cita.
+     * @param employeeId Identificador del empleado (nulo si se desea desasignar).
+     */
     @Transactional
     public void assignAppointment(UUID appointmentId, UUID employeeId) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -353,6 +414,14 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    /**
+     * Reprograma una cita existente, permitiendo cambiar su fecha y hora, el empleado asignado y su duración estimada.
+     *
+     * @param appointmentId Identificador de la cita.
+     * @param employeeId Identificador del mecánico responsable (opcional).
+     * @param dateTime Nueva fecha y hora propuestas.
+     * @param duration Nueva duración estimada en minutos (opcional).
+     */
     @Transactional
     public void rescheduleAppointment(UUID appointmentId, UUID employeeId, LocalDateTime dateTime, Integer duration) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -374,9 +443,11 @@ public class AppointmentService {
     }
 
     /**
-     * Mechanic selects tasks from the catalog -> store planned work as PENDING/unassigned.
-     * If the estimated minutes exceed the remaining minutes on the original day,
-     * the overflow is distributed across subsequent working days.
+     * Método para la planificación y distribución de tareas de una cita por parte de los mecánicos.
+     * Si las tareas estimadas superan la jornada laboral restante, las distribuye en días laborables posteriores.
+     *
+     * @param appointmentId Identificador de la cita.
+     * @param request Datos de la planificación (tareas y minutos estimados).
      */
     @Transactional
     public void manageAppointmentTasks(UUID appointmentId, AppointmentManagementRequest request) {
@@ -472,6 +543,12 @@ public class AppointmentService {
     }
 
 
+    /**
+     * Recupera todas las citas asociadas a un cliente identificado por su correo electrónico.
+     *
+     * @param email Email del usuario/cliente.
+     * @return Listado de DTOs correspondientes a sus citas.
+     */
     public List<AppointmentDTO> getAppointmentsByUser(String email) {
         var user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
@@ -484,6 +561,13 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Obtiene el listado de citas que están en progreso y listas para ser finalizadas
+     * (con todas sus sub-tareas completadas).
+     *
+     * @param workshopId Identificador del taller.
+     * @return Listado de DTOs de las citas listas para entrega.
+     */
     @Transactional(readOnly = true)
     public List<AppointmentDTO> getAppointmentsReadyForCompletion(UUID workshopId) {
         return appointmentRepository.findByWorkshopIdOrderByDateTimeAsc(workshopId)
@@ -503,6 +587,12 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Recupera el listado completo de citas asociadas a un taller concreto.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return Listado de DTOs de las citas del taller.
+     */
     @Transactional(readOnly = true)
     public List<AppointmentDTO> getAppointmentsByWorkshop(UUID workshopId) {
         return appointmentRepository.findByWorkshopIdOrderByDateTimeAsc(workshopId)
@@ -511,6 +601,12 @@ public class AppointmentService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Elimina físicamente una cita del sistema, limpiando previamente sus tareas
+     * y facturas asociadas y liberando el vehículo.
+     *
+     * @param id Identificador único de la cita a eliminar.
+     */
     @Transactional
     public void deleteAppointment(UUID id) {
         Appointment appointment = appointmentRepository.findById(id)

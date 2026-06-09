@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateProfileRequest {
+    /**
+    * Nombre de pila del empleado.
+    */
     private String firstname;
     private String lastname;
     private String address;

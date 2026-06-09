@@ -27,10 +27,20 @@ export interface TaskCategory {
   tasks: CatalogTask[];
 }
 
+/**
+ * Propiedades del componente TasksTab.
+ */
 interface TasksTabProps {
+  /** Identificador único del taller para consultar y actualizar el catálogo de servicios. */
   workshopId: string;
 }
 
+/**
+ * Pestaña de Catálogo de Servicios en el panel de Administración de Taller.
+ * Permite gestionar todas las tareas mecánicas que el taller puede realizar (servicios).
+ * Admite la creación de categorías/carpetas de tareas y la configuración de cálculos de horas
+ * según tipos flexibles (horas fijas, tarifa progresiva por cilindros o por número de ruedas).
+ */
 export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   const toast = useToast();
   const [categories, setCategories] = useState<TaskCategory[]>([]);

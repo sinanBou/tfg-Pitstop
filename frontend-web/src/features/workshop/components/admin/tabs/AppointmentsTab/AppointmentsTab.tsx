@@ -2,22 +2,43 @@ import React from 'react';
 import { PlanningTimeline } from './PlanningTimeline';
 import { Card } from '@/components/common/Card/Card';
 
+/**
+ * Propiedades del componente AppointmentsTab.
+ */
 interface AppointmentsTabProps {
+  /** Colección de citas y tareas registradas en el sistema. */
   appointments: any[];
+  /** Día seleccionado para visualizar la agenda. */
   selectedDate: Date;
+  /** Plantilla de empleados asociados al taller. */
   employees: any[];
+  /** Hora de apertura comercial. Por defecto '09:00'. */
   openTime?: string;
+  /** Hora de cierre comercial. Por defecto '18:00'. */
   closeTime?: string;
+  /** Callback para cambiar de fecha/hora/mecánico una tarea. */
   onRescheduleTask?: (appointmentId: string, employeeId: string | null, newDateTime: Date, newDuration?: number) => Promise<void>;
+  /** Callback para actualizar el estado de una cita/tarea. */
   onUpdateStatus?: (id: string, status: string) => Promise<boolean | void>;
+  /** Callback para eliminar permanentemente una cita de cliente. */
   onDeleteAppointment?: (id: string) => Promise<boolean | void>;
+  /** Callback para borrar una tarea de taller. */
   onDeleteTask?: (id: string) => Promise<boolean | void>;
+  /** Callback para abrir la modal de gestión del vehículo. */
   onManage?: (app: any) => void;
+  /** Callback para visualizar la checklist de la tarea asignada. */
   onViewChecklist?: (app: any) => void;
+  /** Permite al propietario actuar como mecánico y aparecer en la agenda general. */
   includeOwnerInPlanning?: boolean;
 }
 
+/**
+ * Pestaña de Agenda/Planning del panel de Administración de Taller.
+ * Filtra el listado de empleados elegibles para planificación de citas (Mecánicos,
+ * Gestores, Propietarios si está habilitado) y monta el PlanningTimeline interactivo.
+ */
 export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({ 
+
     appointments, 
     selectedDate, 
     employees, 

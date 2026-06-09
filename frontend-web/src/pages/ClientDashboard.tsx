@@ -14,6 +14,17 @@ import { MiPerfilCliente } from '@/features/client/components/MiPerfilCliente';
 
 const SECCIONES = ['INICIO', 'VEHÍCULOS', 'CITAS', 'NOTIFICACIONES', 'INFORMES'];
 
+/**
+ * Panel Principal de Clientes (ClientDashboard).
+ * 
+ * Permite a los clientes registrados interactuar con el taller realizando las siguientes acciones:
+ * - Consultar el estado en tiempo real de sus vehículos e intervenciones en curso (ClientOverviewTab).
+ * - Dar de alta, consultar y dar de baja sus vehículos (ClientVehiclesTab / VehicleModal).
+ * - Solicitar y gestionar citas cruzando horarios disponibles con el calendario del taller (ClientAppointmentsTab / ClientAppointmentModal).
+ * - Consultar el historial de reparaciones y facturas completadas en el taller (ClientHistoryTab).
+ * - Visualizar informes de mantenimiento y estadísticas de gastos acumulados (ClientReportsTab).
+ * - Modificar sus datos personales y preferencias de contacto (MiPerfilCliente).
+ */
 export default function ClientDashboard() {
   const { 
     loading, 

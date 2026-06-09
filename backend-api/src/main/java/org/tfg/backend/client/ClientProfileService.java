@@ -6,6 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.tfg.backend.user.User;
 import org.tfg.backend.user.UserRepository;
 
+/**
+ * Servicio para la gestión del perfil personal del cliente.
+ * Permite obtener y actualizar los datos de contacto, dirección y nombre del cliente autenticado.
+ */
 @Service
 @RequiredArgsConstructor
 public class ClientProfileService {
@@ -14,6 +18,12 @@ public class ClientProfileService {
     private final ClientRepository clientRepository;
     private final ClientMapper clientMapper;
 
+    /**
+     * Recupera el perfil del cliente a partir de su correo electrónico.
+     *
+     * @param email Correo electrónico del usuario/cliente.
+     * @return DTO conteniendo la información del perfil del cliente.
+     */
     @Transactional(readOnly = true)
     public ClientDTO getClientProfile(String email) {
         User user = userRepository.findByEmail(email)
@@ -27,6 +37,13 @@ public class ClientProfileService {
         return clientMapper.mapToDTO(client);
     }
 
+    /**
+     * Actualiza la información personal del cliente (nombre, apellidos, teléfono y dirección).
+     *
+     * @param email Correo electrónico del usuario/cliente.
+     * @param request Datos del perfil con las modificaciones deseadas.
+     * @return DTO del perfil del cliente actualizado.
+     */
     @Transactional
     public ClientDTO updateProfile(String email, ClientDTO request) {
         User user = userRepository.findByEmail(email)

@@ -1,6 +1,10 @@
 import React from 'react';
 import type { ProgressBarProps } from './ProgressBar.types';
 
+/**
+ * Componente común de barra de progreso lineal.
+ * Muestra el progreso actual con animación CSS, etiquetas explicativas y valores descriptivos a la derecha.
+ */
 export const ProgressBar: React.FC<ProgressBarProps> = ({ label, sublabel, valueText, percentage }) => {
   return (
     <div className="space-y-2">

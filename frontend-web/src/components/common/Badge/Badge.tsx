@@ -1,6 +1,10 @@
 import React from 'react';
 import type { BadgeProps } from './Badge.types';
 
+/**
+ * Componente de etiqueta o chapa (Badge) para indicar estados.
+ * Diseñado con tipografía monoespacio en mayúsculas, bordes sutiles y transparencias en fondos.
+ */
 export const Badge: React.FC<BadgeProps> = ({
   children,
   variant = 'neutral',

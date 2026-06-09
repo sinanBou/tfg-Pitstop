@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.util.UUID;
 
+/**
+ * Data Transfer Object (DTO) que contiene la información completa de un Vehículo,
+ * incluyendo su estado y el nombre del taller donde está siendo atendido si aplica.
+ */
 @Data
 @Builder
 public class VehicleDTO {

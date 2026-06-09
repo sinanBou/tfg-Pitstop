@@ -3,6 +3,14 @@ import { HeroSection } from "@/features/home/components/HeroSection";
 import { Footer } from "@/features/home/components/FooterSection";
 import { Button } from "@/components/common/Button/Button";
 
+/**
+ * Página de Bienvenida y Landing Page de PitStop (Home).
+ * 
+ * Es el punto de entrada público para usuarios no autenticados.
+ * Integra la barra de navegación superior (Navbar) con accesos directos,
+ * la sección Hero de presentación del producto (HeroSection) y el pie de página (Footer).
+ * Implementa animaciones suaves de entrada y un fondo visual futurista con luces y texturas de carbono.
+ */
 export default function Home() {
   const navigate = useNavigate();
   return (

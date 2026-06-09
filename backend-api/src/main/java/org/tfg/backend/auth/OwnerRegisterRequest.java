@@ -8,6 +8,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request DTO para el registro de un nuevo propietario de taller (Owner).
+ * Incluye la validación de entrada para los campos obligatorios del perfil y de la cuenta.
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -24,6 +28,9 @@ public class OwnerRegisterRequest {
     @Email(message = "El formato del email es incorrecto")
     private String email;
 
+    /**
+    * Contraseña elegida por el propietario para acceder a la aplicación. Mínimo de 6 caracteres.
+    */
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
@@ -31,8 +38,14 @@ public class OwnerRegisterRequest {
     @NotBlank(message = "El NIF es obligatorio")
     private String nif;
 
+    /**
+    * Teléfono móvil o fijo del propietario. Obligatorio.
+    */
     @NotBlank(message = "El teléfono es obligatorio")
     private String phoneNumber;
 
+    /**
+     * Dirección de contacto o comercial del propietario (opcional).
+     */
     private String address;
 }

@@ -18,6 +18,11 @@ import java.util.List;
 
 import org.springframework.http.HttpMethod;
 
+/**
+ * Configuración de la seguridad web de Spring Security de Pitstop.
+ * Deshabilita CSRF, establece la política de sesiones stateless para REST APIs,
+ * aplica el filtro de autenticación JWT y restringe los endpoints requiriendo token JWT.
+ */
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -26,6 +31,15 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    /**
+     * Define la cadena de filtros de seguridad HTTP, estableciendo CORS, CSRF deshabilitado,
+     * las reglas de autorización para los endpoints (permitiendo accesos anónimos a /api/auth)
+     * e inyectando el filtro JwtAuthenticationFilter.
+     *
+     * @param http Configuración HttpSecurity.
+     * @return El filtro SecurityFilterChain configurado.
+     * @throws Exception Si ocurre un error de configuración.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -45,6 +59,12 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Define el origen y las reglas CORS para solicitudes cruzadas, autorizando métodos HTTP,
+     * credenciales y cabeceras de origen.
+     *
+     * @return CorsConfigurationSource configurado.
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

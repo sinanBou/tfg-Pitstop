@@ -10,6 +10,12 @@ public class WorkshopMapper {
 
     private final StorageService storageService;
 
+    /**
+    * Mapea una entidad {@link Workshop} a su DTO correspondiente.
+    *
+    * @param workshop Entidad del taller.
+    * @return DTO con los detalles estructurados del taller.
+    */
     public WorkshopDTO mapToDTO(Workshop workshop) {
         if (workshop == null) return null;
 

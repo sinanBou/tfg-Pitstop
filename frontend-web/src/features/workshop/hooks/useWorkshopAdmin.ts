@@ -4,6 +4,11 @@ import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../services/workshopService';
 import type { EmployeeProfile, Workshop } from '../types/workshop.types';
 
+/**
+ * Hook de administración global para talleres mecánicos.
+ * Proporciona el estado y manejadores para la vista de Dueño y Gestor:
+ * citas, tareas, empleados, ajustes, timeline interactivo y métricas.
+ */
 export function useWorkshopAdmin() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -48,6 +53,10 @@ export function useWorkshopAdmin() {
     address: ''
   });
 
+  /**
+   * Consulta toda la información del taller desde el servidor, incluyendo citas,
+   * empleados, tareas en la fecha seleccionada, tareas retrasadas y citas completadas listas para entrega.
+   */
   const fetchWorkshopData = useCallback(async () => {
     if (!id) return;
     const role = localStorage.getItem('role');
@@ -113,16 +122,48 @@ export function useWorkshopAdmin() {
     fetchWorkshopData();
   }, [fetchWorkshopData]);
 
+  /**
+   * Guarda los ajustes del taller (horas de apertura/cierre, precio por hora de mano de obra,
+   * duración del slot, días hábiles, y si se incluye al dueño en la asignación).
+   */
   const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+
+    if (!settingsForm.openTime || !settingsForm.closeTime) {
+      toast.warning("Las horas de apertura y cierre son obligatorias.");
+      return;
+    }
+
+    const [openH, openM] = settingsForm.openTime.split(':').map(Number);
+    const [closeH, closeM] = settingsForm.closeTime.split(':').map(Number);
+    const openInMinutes = openH * 60 + openM;
+    const closeInMinutes = closeH * 60 + closeM;
+
+    if (closeInMinutes <= openInMinutes) {
+      toast.warning("La hora de cierre debe ser posterior a la hora de apertura.");
+      return;
+    }
+
+    const slotMins = parseInt(settingsForm.slotDurationMinutes) || 0;
+    if (slotMins <= 0) {
+      toast.warning("La duración de la cita debe ser mayor a 0 minutos.");
+      return;
+    }
+
+    const rate = parseFloat(settingsForm.hourlyRate) || 0;
+    if (rate < 0) {
+      toast.warning("El precio de la mano de obra no puede ser negativo.");
+      return;
+    }
+
     try {
       const payload = {
         openTime: settingsForm.openTime,
         closeTime: settingsForm.closeTime,
-        slotDurationMinutes: parseInt(settingsForm.slotDurationMinutes) || 30,
+        slotDurationMinutes: slotMins,
         workingDays: settingsForm.workingDays.join(', '),
-        hourlyRate: parseFloat(settingsForm.hourlyRate) || 50.0,
+        hourlyRate: rate,
         includeOwnerInPlanning: settingsForm.includeOwnerInPlanning
       };
       await workshopService.updateWorkshopSettings(id, payload);
@@ -134,6 +175,9 @@ export function useWorkshopAdmin() {
     }
   };
 
+  /**
+   * Registra un nuevo empleado (operario o gestor) vinculándolo al taller actual.
+   */
   const handleEmployeeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
@@ -148,6 +192,11 @@ export function useWorkshopAdmin() {
     }
   };
 
+  /**
+   * Elimina un empleado del taller por su identificador.
+   * 
+   * @param employeeId ID del empleado a eliminar.
+   */
   const handleDeleteEmployee = async (employeeId: string) => {
     try {
       await workshopService.deleteEmployee(employeeId);
@@ -181,6 +230,12 @@ export function useWorkshopAdmin() {
     }
   };
 
+  /**
+   * Asigna un empleado específico a una cita. Si `employeeId` es `null`, se desasigna.
+   * 
+   * @param appointmentId ID de la cita.
+   * @param employeeId ID del empleado asignado.
+   */
   const handleAssignAppointment = async (appointmentId: string, employeeId: string | null) => {
     try {
       await workshopService.assignAppointment(appointmentId, employeeId);
@@ -191,6 +246,14 @@ export function useWorkshopAdmin() {
     }
   };
 
+  /**
+   * Cambia la fecha/hora y el empleado asignado de una cita (reprogramación).
+   * 
+   * @param appointmentId ID de la cita.
+   * @param employeeId ID del nuevo empleado asignado (opcional).
+   * @param newDateTime Nueva fecha y hora.
+   * @param duration Duración estimada (opcional).
+   */
   const handleRescheduleAppointment = async (appointmentId: string, employeeId: string | null, newDateTime: Date, duration?: number) => {
     const localIso = new Date(newDateTime.getTime() - newDateTime.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
     try {
@@ -202,6 +265,11 @@ export function useWorkshopAdmin() {
     }
   };
 
+  /**
+   * Elimina una cita de forma optimista en la interfaz y realiza la llamada de borrado en el servidor.
+   * 
+   * @param appointmentId ID de la cita.
+   */
   const handleDeleteAppointment = async (appointmentId: string) => {
     // Optimistic UI update
     setAppointments(prev => prev.filter(app => app.id !== appointmentId));
@@ -216,6 +284,12 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  /**
+   * Actualiza el estado de una tarea asignada en el taller (ej. PENDING, IN_PROGRESS, COMPLETED, DELAYED).
+   * 
+   * @param taskId ID de la tarea.
+   * @param newStatus Nuevo estado.
+   */
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
       await workshopService.updateTaskStatus(taskId, newStatus);
@@ -227,6 +301,9 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  /**
+   * Reprograma una tarea específica, pudiendo cambiar el empleado, la fecha/hora y duración.
+   */
   const handleRescheduleTask = async (taskId: string, employeeId: string | null, newDateTime: Date, duration?: number) => {
     const localIso = new Date(newDateTime.getTime() - newDateTime.getTimezoneOffset() * 60000).toISOString().slice(0, 19);
     try {
@@ -254,6 +331,9 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  /**
+   * Actualiza el estado de una cita en el backend.
+   */
   const updateAppointmentStatus = async (id: string, newStatus: string) => {
     try {
       await workshopService.updateAppointmentStatus(id, newStatus);
@@ -287,6 +367,13 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  /**
+   * Registra la recepción inicial del vehículo en el taller, almacenando los kilómetros actuales y notas del cliente.
+   * 
+   * @param appointmentId ID de la cita asociada.
+   * @param kilometers Kilometraje del vehículo.
+   * @param notes Observaciones del estado del coche o la queja del cliente.
+   */
   const checkInVehicle = async (appointmentId: string, kilometers: number, notes: string) => {
     try {
       await workshopService.checkInVehicle(appointmentId, kilometers, notes);
@@ -298,6 +385,9 @@ export function useWorkshopAdmin() {
     return false;
   };
 
+  /**
+   * Busca citas sin asignar programadas en fechas futuras y mueve la vista de calendario a la fecha más próxima encontrada.
+   */
   const goToNextUnassignedDate = useCallback(() => {
     if (!appointments.length) return;
 

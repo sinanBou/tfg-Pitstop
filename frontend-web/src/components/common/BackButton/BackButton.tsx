@@ -2,6 +2,10 @@ import React from 'react';
 import type { BackButtonProps } from './BackButton.types';
 import { ChevronLeft } from '@/assets/icons';
 
+/**
+ * Componente de botón de retorno ("atrás") circular o cuadrado con chevron.
+ * Admite estados activos, animaciones de micro-desplazamiento y un dot opcional.
+ */
 export const BackButton: React.FC<BackButtonProps> = ({ 
   onClick, 
   title = 'Volver',

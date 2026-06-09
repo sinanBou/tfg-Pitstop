@@ -22,6 +22,13 @@ public class AppointmentStateFactory {
         STATE_MAP.put(AppointmentStatus.CANCELLED, new CancelledState());
     }
 
+    /**
+    * Obtiene la instancia del estado correspondiente al enum de estado proporcionado.
+    *
+    * @param status Enum del estado solicitado.
+    * @return ImplementaciÃ³n concreta de {@link AppointmentState}.
+    * @throws IllegalArgumentException si el estado solicitado no estÃ¡ registrado en la fÃ¡brica.
+    */
     public static AppointmentState getState(AppointmentStatus status) {
         AppointmentState state = STATE_MAP.get(status);
         if (state == null) {

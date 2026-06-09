@@ -11,6 +11,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClientRequest {
+    /**
+    * Nuevo NIF a actualizar para el cliente.
+    */
     private String nif;
     private String phoneNumber;
     private String address;

@@ -7,9 +7,15 @@ import { DeleteAccountSection } from '@/components/common/DeleteAccountSection';
 import { useToast } from '@/hooks/useToast';
 import { API_BASE_URL } from '@/config/api';
 
+/**
+ * Propiedades del componente MiPerfilCliente.
+ */
 interface MiPerfilClienteProps {
+  /** Determina si la modal del perfil está visible o no. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
+  /** Datos inalterables del perfil del cliente (email, NIF). */
   clientProfile: {
     firstname: string;
     lastname: string;
@@ -18,19 +24,24 @@ interface MiPerfilClienteProps {
     phoneNumber?: string;
     address?: string;
   };
+  /** Modelo de datos del formulario con campos editables. */
   profileForm: {
     firstname: string;
     lastname: string;
     address: string;
     phoneNumber: string;
   };
+  /** Callback para actualizar el estado del formulario de perfil local. */
   setProfileForm: (form: { firstname: string; lastname: string; address: string; phoneNumber: string }) => void;
+  /** Callback asíncrono enviado al servidor al guardar los datos del perfil. */
   onSubmit: (form: { firstname: string; lastname: string; address: string; phoneNumber: string }) => Promise<void>;
 }
 
 /**
  * Modal de perfil personal para el cliente con estética premium azul.
  * Se renderiza mediante portal para evitar problemas de stacking context.
+ * Permite cambiar datos personales (nombre, teléfono, dirección), cambiar la clave de acceso
+ * y realizar la eliminación permanente de la cuenta de usuario.
  */
 export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
   isOpen,

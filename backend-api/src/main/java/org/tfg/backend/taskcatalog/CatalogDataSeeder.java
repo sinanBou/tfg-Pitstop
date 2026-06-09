@@ -9,6 +9,10 @@ import org.tfg.backend.workshop.WorkshopRepository;
 
 import java.util.List;
 
+/**
+ * Componente ejecutor de inicio (CommandLineRunner) encargado de asegurar que todos los talleres
+ * existentes en la base de datos cuenten con su catálogo base de tareas y de repuestos inicializado.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j

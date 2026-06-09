@@ -186,4 +186,80 @@ class WorkshopAdminServiceTest {
         verify(storageService, times(1)).deleteFile("http://s3/logo.png");
         verify(workshopRepository, times(1)).save(mockWorkshop);
     }
+
+    @Test
+    void saveWorkshop_ShouldThrowExceptionWhenCloseTimeBeforeOpenTime() {
+        WorkshopRequest request = new WorkshopRequest();
+        request.setCif("B12345678");
+        request.setOwnerId(mockOwner.getId());
+        request.setOpenTime(LocalTime.of(18, 0));
+        request.setCloseTime(LocalTime.of(8, 0));
+
+        when(workshopRepository.existsByCif("B12345678")).thenReturn(false);
+        when(employeeRepository.findById(mockOwner.getId())).thenReturn(Optional.of(mockOwner));
+
+        assertThrows(RuntimeException.class, () -> workshopAdminService.saveWorkshop(request));
+    }
+
+    @Test
+    void saveWorkshop_ShouldThrowExceptionWhenSlotDurationZeroOrLess() {
+        WorkshopRequest request = new WorkshopRequest();
+        request.setCif("B12345678");
+        request.setOwnerId(mockOwner.getId());
+        request.setOpenTime(LocalTime.of(8, 0));
+        request.setCloseTime(LocalTime.of(18, 0));
+        request.setSlotDurationMinutes(0);
+
+        when(workshopRepository.existsByCif("B12345678")).thenReturn(false);
+        when(employeeRepository.findById(mockOwner.getId())).thenReturn(Optional.of(mockOwner));
+
+        assertThrows(RuntimeException.class, () -> workshopAdminService.saveWorkshop(request));
+    }
+
+    @Test
+    void saveWorkshop_ShouldThrowExceptionWhenHourlyRateNegative() {
+        WorkshopRequest request = new WorkshopRequest();
+        request.setCif("B12345678");
+        request.setOwnerId(mockOwner.getId());
+        request.setOpenTime(LocalTime.of(8, 0));
+        request.setCloseTime(LocalTime.of(18, 0));
+        request.setSlotDurationMinutes(60);
+        request.setHourlyRate(-10.0);
+
+        when(workshopRepository.existsByCif("B12345678")).thenReturn(false);
+        when(employeeRepository.findById(mockOwner.getId())).thenReturn(Optional.of(mockOwner));
+
+        assertThrows(RuntimeException.class, () -> workshopAdminService.saveWorkshop(request));
+    }
+
+    @Test
+    void updateWorkshopSettings_ShouldThrowExceptionWhenCloseTimeBeforeOpenTime() {
+        WorkshopRequest request = new WorkshopRequest();
+        request.setOpenTime(LocalTime.of(18, 0));
+        request.setCloseTime(LocalTime.of(8, 0));
+
+        when(workshopRepository.findById(mockWorkshop.getId())).thenReturn(Optional.of(mockWorkshop));
+
+        assertThrows(RuntimeException.class, () -> workshopAdminService.updateWorkshopSettings(mockWorkshop.getId(), request));
+    }
+
+    @Test
+    void updateWorkshopSettings_ShouldThrowExceptionWhenSlotDurationZeroOrLess() {
+        WorkshopRequest request = new WorkshopRequest();
+        request.setSlotDurationMinutes(0);
+
+        when(workshopRepository.findById(mockWorkshop.getId())).thenReturn(Optional.of(mockWorkshop));
+
+        assertThrows(RuntimeException.class, () -> workshopAdminService.updateWorkshopSettings(mockWorkshop.getId(), request));
+    }
+
+    @Test
+    void updateWorkshopSettings_ShouldThrowExceptionWhenHourlyRateNegative() {
+        WorkshopRequest request = new WorkshopRequest();
+        request.setHourlyRate(-5.0);
+
+        when(workshopRepository.findById(mockWorkshop.getId())).thenReturn(Optional.of(mockWorkshop));
+
+        assertThrows(RuntimeException.class, () -> workshopAdminService.updateWorkshopSettings(mockWorkshop.getId(), request));
+    }
 }

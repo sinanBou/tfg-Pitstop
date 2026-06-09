@@ -10,6 +10,11 @@ import org.tfg.backend.user.UserRepository;
 
 import java.io.IOException;
 
+/**
+ * Servicio encargado de la gestión del perfil personal de los empleados en Pitstop.
+ * Permite a los mecánicos y gestores visualizar sus perfiles, actualizar datos personales
+ * y cargar/eliminar su fotografía de perfil.
+ */
 @Service
 @RequiredArgsConstructor
 public class EmployeeProfileService {
@@ -18,6 +23,12 @@ public class EmployeeProfileService {
     private final StorageService storageService;
     private final EmployeeMapper employeeMapper;
 
+    /**
+     * Recupera el perfil consolidado del empleado a partir de su dirección de correo electrónico.
+     *
+     * @param email Correo electrónico del usuario/empleado.
+     * @return DTO del perfil del empleado.
+     */
     @Transactional(readOnly = true)
     public EmployeeDTO getEmployeeProfile(String email) {
         User user = userRepository.findByEmail(email)
@@ -31,6 +42,13 @@ public class EmployeeProfileService {
         return employeeMapper.mapToDTO(employee);
     }
 
+    /**
+     * Actualiza los datos de perfil personales y de contacto del empleado logueado.
+     *
+     * @param email Correo electrónico del usuario/empleado.
+     * @param request Datos del perfil a actualizar.
+     * @return DTO del empleado actualizado.
+     */
     @Transactional
     public EmployeeDTO updateProfile(String email, UpdateProfileRequest request) {
         User user = userRepository.findByEmail(email)
@@ -64,6 +82,14 @@ public class EmployeeProfileService {
         return employeeMapper.mapToDTO(employee);
     }
 
+    /**
+     * Sube y asocia una foto de perfil del empleado en el servicio de almacenamiento persistente S3.
+     *
+     * @param email Correo electrónico del usuario/empleado.
+     * @param file Archivo multipart correspondiente a la imagen.
+     * @return DTO del empleado con la nueva dirección URL de la foto de perfil.
+     * @throws IOException Si ocurre un error al cargar el archivo.
+     */
     @Transactional
     public EmployeeDTO uploadProfilePicture(String email, MultipartFile file) throws IOException {
         User user = userRepository.findByEmail(email)
@@ -80,6 +106,12 @@ public class EmployeeProfileService {
         return employeeMapper.mapToDTO(user.getEmployee());
     }
 
+    /**
+     * Elimina físicamente del storage S3 la foto de perfil del empleado y borra su referencia en base de datos.
+     *
+     * @param email Correo electrónico del usuario/empleado.
+     * @return DTO del empleado actualizado.
+     */
     @Transactional
     public EmployeeDTO deleteProfilePicture(String email) {
         User user = userRepository.findByEmail(email)

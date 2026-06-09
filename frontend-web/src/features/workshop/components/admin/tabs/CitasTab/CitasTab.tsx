@@ -7,17 +7,34 @@ import { DateNavigator } from '@/components/common/DateNavigator/DateNavigator';
 import { PendingAppointmentsList } from './PendingAppointmentsList';
 import { ConfirmedAppointmentsList } from './ConfirmedAppointmentsList';
 
+/**
+ * Propiedades del componente CitasTab.
+ */
 interface CitasTabProps {
+  /** Colección de citas confirmadas o activas para el día seleccionado. */
   appointments: any[];
+  /** Colección de solicitudes de citas que aún están en estado PENDING. */
   pendingAppointments: any[];
+  /** Fecha activa seleccionada en el navegador diario. */
   selectedDate: Date;
+  /** Callback para cambiar la fecha activa en el estado del contenedor. */
   setSelectedDate: (date: Date) => void;
+  /** Callback para navegar automáticamente a la fecha del siguiente aviso/cita pendiente. */
   goToNextPendingDate: () => void;
+  /** Callback asíncrono para actualizar el estado de una cita (ej: confirmar, rechazar). */
   updateAppointmentStatus: (id: string, status: string) => Promise<boolean | void>;
+  /** Callback asíncrono para eliminar/cancelar una cita. */
   handleDeleteAppointment: (id: string) => Promise<boolean | void>;
+  /** Callback opcional para recepcionar físicamente un vehículo en el taller, registrando kilómetros y notas de entrada. */
   checkInVehicle?: (id: string, kilometers: number, notes: string) => Promise<boolean>;
 }
 
+/**
+ * Pestaña de Citas en el panel de Administración de Taller.
+ * Gestiona la recepción de solicitudes pendientes (confirmar o rechazar) y el listado de citas confirmadas del día.
+ * Proporciona un buscador de citas, navegación de fecha diaria y la funcionalidad para
+ * registrar ("Check-In") un coche cuando entra físicamente al taller.
+ */
 export const CitasTab: React.FC<CitasTabProps> = ({
   appointments,
   pendingAppointments,

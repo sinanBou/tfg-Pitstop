@@ -16,6 +16,13 @@ import java.util.UUID;
 public class WorkshopTaskController {
     private final WorkshopTaskService taskService;
 
+    /**
+    * Obtiene la lista de tareas programadas para un taller en un día específico.
+    *
+    * @param workshopId Identificador único del taller.
+    * @param date Fecha para filtrar las tareas.
+    * @return Lista de tareas programadas (tanto asignadas a mecánicos como pendientes).
+    */
     @GetMapping("/workshop/{workshopId}")
     public List<WorkshopTaskDTO> getWorkshopTasks(
             @PathVariable UUID workshopId,
@@ -23,6 +30,25 @@ public class WorkshopTaskController {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(23, 59, 59);
         return taskService.getTasksByWorkshopAndDate(workshopId, start, end);
+    /**
+    * Actualiza el progreso, duración estimada o la asignación de mecánico de una tarea existente.
+    *
+    * @param id Identificador único de la tarea.
+    * @param dto DTO con los campos actualizados.
+    * @return El DTO de la tarea modificada.
+    */
+    }
+
+    @GetMapping("/workshop/{workshopId}/delayed")
+    public List<WorkshopTaskDTO> getDelayedTasks(@PathVariable UUID workshopId) {
+        return taskService.getDelayedTasksByWorkshop(workshopId);
+    /**
+    * Elimina o cancela una tarea según las reglas de negocio (dependiendo de si la cita
+    * origen está dividida en varias tareas o no).
+    *
+    * @param id Identificador único de la tarea a eliminar.
+    * @return Respuesta HTTP vacía indicando éxito.
+    */
     }
 
     @GetMapping("/workshop/{workshopId}/delayed")

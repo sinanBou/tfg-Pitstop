@@ -10,6 +10,11 @@ import type {
   WorkshopMinDTO 
 } from '../types/client.types';
 
+/**
+ * Hook de control para el cuadro de mando del Cliente (Client Dashboard).
+ * Expone la lógica para ver el historial de citas, citas activas,
+ * registrar y consultar vehículos propios, y reservar nuevas citas.
+ */
 export const useClientDashboard = () => {
   const navigate = useNavigate();
   
@@ -23,6 +28,10 @@ export const useClientDashboard = () => {
   const [history, setHistory] = useState<HistoryDTO[]>([]);
 
   // Carga de datos principales del dashboard
+  /**
+   * Carga todo el conjunto de datos iniciales del panel del cliente:
+   * perfil de usuario, información extendida de cliente, vehículos propios, talleres y citas activas/historial.
+   */
   const loadDashboardData = useCallback(async () => {
     const token = localStorage.getItem('jwt_token');
     const role = localStorage.getItem('role');
@@ -109,6 +118,11 @@ export const useClientDashboard = () => {
     navigate('/login');
   }, [navigate]);
 
+  /**
+   * Registra un vehículo del cliente en el taller asociado.
+   * 
+   * @param vehicleData Estructura del vehículo a registrar (marca, modelo, matrícula, bastidor, año, color).
+   */
   const registerVehicle = useCallback(async (vehicleData: {
     brand: string; model: string; licensePlate: string; vin: string; year: number; color: string;
   }) => {
@@ -125,6 +139,9 @@ export const useClientDashboard = () => {
     }
   }, [loadDashboardData]);
 
+  /**
+   * Registra una nueva cita para un vehículo propio en el taller y horario deseados.
+   */
   const createAppointment = useCallback(async (appointmentData: AppointmentRequest) => {
     try {
       return await clientService.createAppointment(appointmentData);
@@ -134,6 +151,13 @@ export const useClientDashboard = () => {
     }
   }, []);
 
+  /**
+   * Obtiene la lista de franjas horarias disponibles para reservar cita en una fecha concreta.
+   * 
+   * @param workshopId ID del taller.
+   * @param date Fecha a consultar en formato ISO (YYYY-MM-DD).
+   * @returns Lista de horas libres disponibles formateadas como HH:MM.
+   */
   const getAvailableSlots = useCallback(async (workshopId: string, date: string): Promise<string[]> => {
     try {
       return await clientService.getAvailableSlots(workshopId, date);
@@ -189,6 +213,9 @@ export const useClientDashboard = () => {
     }
   }, []);
 
+  /**
+   * Actualiza la información del perfil del cliente (nombre, apellidos, dirección y teléfono).
+   */
   const handleProfileUpdate = useCallback(async (profileData: { firstname: string; lastname: string; address: string; phoneNumber?: string }) => {
     try {
       const updated = await clientService.updateProfile(profileData);

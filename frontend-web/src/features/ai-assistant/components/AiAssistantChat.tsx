@@ -3,6 +3,15 @@ import { useAiChat } from '../hooks/useAiChat';
 import type { AiAssistantChatProps } from '../types/aiAssistant';
 import { MessageSquare, Trash, X, BookOpen, Settings, Send } from '@/assets/icons';
 
+/**
+ * Componente de Chat flotante del Asistente de Inteligencia Artificial (AiAssistantChat).
+ * 
+ * Permite al usuario interactuar en tiempo real con la IA de Pitstop. Ofrece dos modos:
+ * 1. **Manual de Uso**: Resuelve dudas acerca de las funcionalidades y uso de la aplicación según el rol.
+ * 2. **Asistente Mecánico**: Responde a consultas técnicas, diagnósticos y fallos mecánicos de vehículos.
+ * 
+ * Cuenta con un indicador LED de salud de la conexión y un renderizador interno seguro y liviano de Markdown.
+ */
 export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) => {
   const {
     isOpen,

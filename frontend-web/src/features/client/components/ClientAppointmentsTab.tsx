@@ -2,12 +2,22 @@ import { ClientAppointmentCard } from '@/components/common/Card/ClientAppointmen
 import { Button } from '@/components/common/Button/Button';
 import { Calendar } from '@/assets/icons';
 
+/**
+ * Propiedades del componente ClientAppointmentsTab.
+ */
 interface ClientAppointmentsTabProps {
+  /** Colección de citas activas asociadas al cliente. */
   appointments: any[];
+  /** Callback para abrir el modal de reserva de citas. */
   onAddAppointment: () => void;
+  /** Callback para cancelar o eliminar una cita existente. */
   deleteAppointment: (id: string) => void;
 }
 
+/**
+ * Pestaña de listado y solicitud de citas del Cliente.
+ * Renderiza tarjetas de citas del cliente con soporte de cancelación directa.
+ */
 export function ClientAppointmentsTab({ appointments, onAddAppointment, deleteAppointment }: ClientAppointmentsTabProps) {
   return (
     <div>

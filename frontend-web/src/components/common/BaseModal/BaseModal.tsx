@@ -2,6 +2,12 @@ import { createPortal } from 'react-dom';
 import type { BaseModalProps } from './BaseModal.types';
 import { X } from '@/assets/icons';
 
+/**
+ * Componente modal estructurado de forma horizontal para PitStop.
+ * Integra un portal de React para renderizarse sobre el árbol principal del DOM,
+ * con desenfoque de fondo (glassmorphism), glows decorativos, barra de progreso superior
+ * y control de cierre mediante click fuera o botón dedicado.
+ */
 export const BaseModal = ({
   isOpen,
   onClose,

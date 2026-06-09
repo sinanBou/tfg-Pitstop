@@ -1,5 +1,9 @@
 import React from 'react';
 
+/**
+ * Componente del pie de página (Footer) para la landing page.
+ * Muestra el logotipo de la marca PitStop y el aviso de copyright corporativo.
+ */
 export const Footer: React.FC = () => {
   return (
     <footer className="w-full border-t border-neutral-900 bg-black/60 backdrop-blur-md py-12 px-6 relative z-10 mt-20">

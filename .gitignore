@@ -1,5 +1,7 @@
 # Pitstop Project Git Ignore
 principios_solid.txt
+despliegue.md
+despliegue_tfg.md
 
 # Seguridad
 .env

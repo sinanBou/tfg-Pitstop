@@ -4,6 +4,10 @@ import * as authService from '../services/authService';
 import type { ClientRegistrationFormData } from '../types/auth.types';
 import { useToast } from '@/hooks/useToast';
 
+/**
+ * Hook personalizado para controlar el formulario y proceso de registro de nuevos Clientes (Conductores).
+ * Envía los datos personales, NIF, teléfono y dirección al backend y redirige al login tras tener éxito.
+ */
 export function useClientRegistration() {
   const toast = useToast();
   const navigate = useNavigate();

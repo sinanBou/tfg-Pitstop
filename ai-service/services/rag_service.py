@@ -1,22 +1,36 @@
+"""
+Módulo del servicio RAG (Generación Aumentada por Recuperación).
+Se encarga de la vectorización de manuales con SentenceTransformers,
+el almacenamiento en ChromaDB y la recuperación semántica basada en roles.
+"""
+
 import os
 import chromadb
 from sentence_transformers import SentenceTransformer
 from config import settings
 
 class RAGService:
+    """
+    Servicio de base de datos vectorial y embeddings para gestionar los manuales de usuario.
+    Permite ingestar documentos Markdown y realizar búsquedas de similitud.
+    """
+
     def __init__(self):
-        # Directorio de persistencia
+        """
+        Inicializa el cliente persistente de ChromaDB y carga el modelo de embeddings SentenceTransformer.
+        """
+        # Crea el directorio de persistencia si no existe
         os.makedirs(settings.CHROMA_PERSIST_DIR, exist_ok=True)
         
-        # Inicializar cliente de ChromaDB
+        # Inicializa el cliente local persistente de ChromaDB
         self.chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
         
-        # Cargar modelo local de embeddings
+        # Carga el modelo local para generar embeddings vectoriales en CPU
         print("Cargando modelo local de embeddings semánticos (all-MiniLM-L6-v2)...")
         self.model = SentenceTransformer('all-MiniLM-L6-v2')
         print("Modelo cargado con éxito.")
         
-        # Obtener o crear colecciones segregadas
+        # Obtiene o crea las colecciones segregadas para clientes y personal del taller (seguridad de datos)
         self.client_col = self.chroma_client.get_or_create_collection(
             name="client_manual",
             metadata={"hnsw:space": "cosine"}
@@ -28,8 +42,11 @@ class RAGService:
 
     def ingest_manual(self, file_path: str, collection_type: str):
         """
-        Lee un manual en Markdown, lo divide en fragmentos lógicos
-        y los almacena vectorizados en ChromaDB.
+        Lee un archivo Markdown de manual, lo fragmenta de manera inteligente y lo vectoriza en ChromaDB.
+
+        Args:
+            file_path (str): Ruta absoluta al archivo Markdown (.md).
+            collection_type (str): Tipo de colección ('client' o 'staff').
         """
         if not os.path.exists(file_path):
             print(f"Error en ingesta: El archivo {file_path} no existe.")
@@ -38,18 +55,18 @@ class RAGService:
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Dividimos el manual en fragmentos utilizando encabezados y párrafos
+        # Divide el manual en fragmentos utilizando los encabezados de segundo nivel '##'
         sections = content.split("\n## ")
         chunks = []
         
-        # El primer elemento puede contener el título principal
+        # Agrega la primera sección si contiene texto (generalmente el título principal)
         first_sec = sections[0].strip()
         if first_sec:
             chunks.append(first_sec)
             
         for sec in sections[1:]:
             sec_text = "## " + sec.strip()
-            # Si la sección es demasiado grande, la dividimos por párrafos
+            # Si el fragmento de la sección supera los 1000 caracteres, se subdivide por párrafos
             if len(sec_text) > 1000:
                 paragraphs = sec_text.split("\n\n")
                 current_chunk = ""
@@ -65,13 +82,13 @@ class RAGService:
             else:
                 chunks.append(sec_text)
 
-        # Filtrar fragmentos vacíos
+        # Filtra fragmentos vacíos o que solo contengan espacios en blanco
         chunks = [c for c in chunks if c.strip()]
 
-        # Seleccionar colección
+        # Selecciona la colección destino adecuada según el tipo solicitado
         collection = self.client_col if collection_type == "client" else self.staff_col
         
-        # Limpiar datos previos para evitar duplicados en re-ingesta
+        # Limpia datos previos de esa colección para evitar duplicados en re-ingestas
         try:
             existing = collection.get()
             if existing and existing["ids"]:
@@ -79,7 +96,7 @@ class RAGService:
         except Exception as e:
             print(f"Aviso al limpiar colección: {e}")
             
-        # Insertar nuevos fragmentos
+        # Inserta los nuevos fragmentos y sus correspondientes embeddings vectoriales
         ids = [f"doc_{collection_type}_{i}" for i in range(len(chunks))]
         embeddings = [self.model.encode(c).tolist() for c in chunks]
         metadatas = [{"source": os.path.basename(file_path), "index": i} for i in range(len(chunks))]
@@ -94,21 +111,28 @@ class RAGService:
 
     def query_manual(self, query: str, user_role: str, k: int = 3) -> str:
         """
-        Realiza una búsqueda semántica de los k fragmentos más parecidos
-        en la colección correspondiente al rol del usuario.
+        Realiza una consulta semántica para recuperar los fragmentos más relevantes del manual.
+
+        Args:
+            query (str): Término o pregunta de búsqueda semántica.
+            user_role (str): Rol del usuario que realiza la consulta para determinar la colección a usar.
+            k (int, optional): Número máximo de fragmentos relevantes a recuperar. Por defecto es 3.
+
+        Returns:
+            str: Fragmentos recuperados concatenados o un mensaje de error/advertencia.
         """
         collection_type = "client" if user_role.upper() == "CLIENT" else "staff"
         collection = self.client_col if collection_type == "client" else self.staff_col
 
-        # Verificar si hay documentos cargados
+        # Comprueba si la colección tiene documentos indexados
         count = collection.count()
         if count == 0:
             return "El manual operativo no ha sido indexado en la base de datos de vectores."
 
-        # Vectorizar consulta
+        # Vectoriza la consulta del usuario
         query_embedding = self.model.encode(query).tolist()
         
-        # Consulta semántica
+        # Realiza la consulta por similitud de coseno
         results = collection.query(
             query_embeddings=[query_embedding],
             n_results=min(k, count)
@@ -118,6 +142,8 @@ class RAGService:
         if not documents:
             return "No se ha encontrado información específica en el manual de usuario."
             
+        # Devuelve los fragmentos más relevantes separados por líneas divisoras
         return "\n\n---\n\n".join(documents)
 
+# Instancia global para ser utilizada en el microservicio de IA
 rag_service = RAGService()

@@ -4,11 +4,19 @@ import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useVehicleForm } from '../hooks/useVehicleForm';
 
 // 1. Definimos una interfaz clara para las props del Modal
+/**
+ * Propiedades del componente VehicleModal.
+ */
 interface VehicleModalProps {
+  /** Indica si la modal de registro de vehículo está visible/abierta. */
   isOpen: boolean;
+  /** Callback ejecutado al cancelar o cerrar la modal. */
   onClose: () => void;
+  /** Callback para guardar el vehículo registrado en el servidor. Devuelve true si la creación es exitosa. */
   onSubmit: (data: VehicleRequest) => Promise<boolean>;
+  /** Callback para cargar las marcas del catálogo general. */
   fetchMakes: () => Promise<string[]>;
+  /** Callback para filtrar los modelos asociados a la marca seleccionada. */
   fetchModels: (make: string) => Promise<string[]>;
 }
 
@@ -18,6 +26,11 @@ const POPULAR_BRANDS = [
   "SEAT", "TOYOTA", "VOLKSWAGEN"
 ];
 
+/**
+ * Modal interactiva para el registro de vehículos nuevos.
+ * Permite buscar marcas y modelos del catálogo mediante selectores con autocompletado y
+ * registrar metadatos del coche como matrícula, número de bastidor (VIN), año de fabricación y color.
+ */
 export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModels }: VehicleModalProps) => {
   const {
     loading,
