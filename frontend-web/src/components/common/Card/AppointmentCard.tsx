@@ -52,7 +52,7 @@ export const AppointmentCard: React.FC<AppointmentCardProps> = ({
       padding="none" 
       onClick={onClick}
       rounded="2xl"
-      className={`w-full h-full hover:border-red-500/40 group relative overflow-hidden flex flex-col justify-start ${isCompact ? 'p-4 pt-5' : 'p-6 justify-center'}`}
+      className={`w-full h-full hover:border-red-500/40 group relative overflow-hidden flex flex-col justify-start ${isCompact ? 'px-3 pt-1 pb-1.5' : 'p-6 justify-center'}`}
     >
       <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none">
         <Calendar className="w-16 h-16" strokeWidth={1} />

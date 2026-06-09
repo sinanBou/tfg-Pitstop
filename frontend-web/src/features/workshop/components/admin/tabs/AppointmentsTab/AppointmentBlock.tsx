@@ -219,7 +219,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
         draggable={!isResizing && !readOnly}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        className={`absolute hover:z-50 transition-all origin-center group ${readOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
+        className={`absolute hover:z-50 transition-all origin-center ${readOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}`}
         style={{
             top: `${topPosition}px`,
             height: `${duration * minuteHeight}px`,
@@ -230,115 +230,115 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
     >
         <div className="w-full h-full relative p-[2px]">
 
-           {/* Visual Card con overlay de botones dentro */}
-           <div className={`w-full h-full overflow-hidden relative ${isResizing ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''} rounded-2xl`}>
+           {/* Visual Card - actúa como el contenedor del grupo de hover */}
+           <div className={`w-full h-full relative ${isResizing ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''} rounded-2xl hover:[&_.actions-bar]:opacity-100 hover:[&_.actions-bar]:pointer-events-auto hover:[&_.resize-handle]:opacity-100`}>
 
-               {/* Botones de acción — overlay dentro de la tarjeta, esquina superior derecha */}
-               <div className="absolute top-1.5 right-1.5 z-30 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
+             {/* Botones de acción — flotando centrados encima de la tarjeta */}
+             <div className={`actions-bar absolute ${topPosition < 40 ? 'top-2' : '-top-9'} left-1/2 -translate-x-1/2 z-30 flex gap-2 bg-black/95 backdrop-blur-md border border-white/10 rounded-full px-2 py-1 shadow-2xl opacity-0 transition-all duration-200 pointer-events-none whitespace-nowrap`}>
 
-                 {/* Gestionar */}
+               {/* Gestionar */}
+               <button
+                 onClick={(e) => {
+                   e.stopPropagation();
+                   if (!isVehicleReceived) return;
+                   onManage ? onManage(appointment) : toast.info(`Gestionar: ${appointment.vehicleDisplay}`);
+                 }}
+                 disabled={!isVehicleReceived}
+                 className={`w-8 h-8 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
+                   isVehicleReceived
+                     ? 'bg-white/5 border-white/10 text-white/70 hover:bg-white hover:text-black cursor-pointer'
+                     : 'bg-amber-950/20 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
+                 }`}
+                 title={isVehicleReceived ? 'Gestionar Cita' : 'Recepciona el vehículo primero'}
+               >
+                 {isVehicleReceived ? (
+                   <Edit className="w-4 h-4" />
+                 ) : (
+                   <Lock className="w-4 h-4" />
+                 )}
+               </button>
+
+               {/* Checklist */}
+               {appointment.isTask && appointment.serviceType && (
                  <button
                    onClick={(e) => {
                      e.stopPropagation();
                      if (!isVehicleReceived) return;
-                     onManage ? onManage(appointment) : toast.info(`Gestionar: ${appointment.vehicleDisplay}`);
+                     onViewChecklist ? onViewChecklist(appointment) : undefined;
                    }}
                    disabled={!isVehicleReceived}
-                   className={`w-6 h-6 backdrop-blur-md border rounded-full transition-all shadow-lg flex items-center justify-center active:scale-95 ${
+                   className={`w-8 h-8 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
                      isVehicleReceived
-                       ? 'bg-black/80 border-white/20 text-white/70 hover:bg-white hover:text-black cursor-pointer'
-                       : 'bg-amber-950/80 border-amber-500/30 text-amber-500/60 cursor-not-allowed'
+                       ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer'
+                       : 'bg-amber-950/20 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
                    }`}
-                   title={isVehicleReceived ? 'Gestionar Cita' : 'Recepciona el vehículo primero'}
+                   title={isVehicleReceived ? 'Ver checklist de tareas' : 'Recepciona el vehículo primero'}
                  >
-                   {isVehicleReceived ? (
-                     <Edit className="w-3 h-3" />
-                   ) : (
-                     <Lock className="w-3 h-3" />
-                   )}
+                   <FileText className="w-4 h-4" />
                  </button>
+               )}
 
-                 {/* Checklist */}
-                 {appointment.isTask && appointment.serviceType && (
-                   <button
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       if (!isVehicleReceived) return;
-                       onViewChecklist ? onViewChecklist(appointment) : undefined;
-                     }}
-                     disabled={!isVehicleReceived}
-                     className={`w-6 h-6 backdrop-blur-md border rounded-full transition-all shadow-lg flex items-center justify-center active:scale-95 ${
-                       isVehicleReceived
-                         ? 'bg-black/80 border-blue-500/40 text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer'
-                         : 'bg-amber-950/80 border-amber-500/30 text-amber-500/60 cursor-not-allowed'
-                     }`}
-                     title={isVehicleReceived ? 'Ver checklist de tareas' : 'Recepciona el vehículo primero'}
-                   >
-                     <FileText className="w-3 h-3" />
-                   </button>
-                 )}
+               {/* Retrasar */}
+               {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+                 <button
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     setConfirmModal({
+                       isOpen: true,
+                       type: 'delay',
+                       title: 'Retrasar Cita/Tarea',
+                       description: '¿Seguro que deseas marcar esta cita/tarea como retrasada?',
+                       confirmText: 'Sí, Marcar',
+                       theme: 'amber'
+                     });
+                   }}
+                   className="w-8 h-8 border border-amber-500/30 bg-amber-500/10 text-amber-400 rounded-full transition-all hover:bg-amber-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
+                   title="Marcar como Retrasada"
+                 >
+                   <Clock className="w-4 h-4" strokeWidth={2.5} />
+                 </button>
+               )}
 
-                 {/* Retrasar */}
-                 {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
-                   <button
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       setConfirmModal({
-                         isOpen: true,
-                         type: 'delay',
-                         title: 'Retrasar Cita/Tarea',
-                         description: '¿Seguro que deseas marcar esta cita/tarea como retrasada?',
-                         confirmText: 'Sí, Marcar',
-                         theme: 'amber'
-                       });
-                     }}
-                     className="w-6 h-6 bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-400 rounded-full transition-all hover:bg-amber-500 hover:text-white shadow-lg flex items-center justify-center active:scale-95 cursor-pointer"
-                     title="Marcar como Retrasada"
-                   >
-                     <Clock className="w-3 h-3" strokeWidth={2.5} />
-                   </button>
-                 )}
-
-                 {/* Cancelar / Eliminar */}
-                 {!readOnly && onUpdateStatus && (
-                   <button
-                     onClick={handleCancel}
-                     className="w-6 h-6 bg-black/80 backdrop-blur-md border border-red-500/40 text-red-400 rounded-full transition-all hover:bg-red-500 hover:text-white shadow-lg flex items-center justify-center active:scale-95 cursor-pointer"
-                     title="Cancelar Cita"
-                   >
-                     <X className="w-3 h-3" strokeWidth={2.5} />
-                   </button>
-                 )}
-               </div>
-
-               {/* Contenido de la tarjeta — ligeramente bajado para dejar espacio visual */}
-               <div className="w-full h-full pt-2">
-                 <AppointmentCard
-                   type={appointment.isTask ? "TAREA" : "CITA"}
-                   dateTime={appointment.dateTime}
-                   description={appointment.description}
-                   status={appointment.status}
-                   variant={columnId === null ? "blue" : "red"}
-                   vehicleDisplay={appointment.vehicleDisplay}
-                   clientName={appointment.clientFullName}
-                   isCompact={true}
-                   serviceType={appointment.serviceType}
-                   completedTasks={appointment.completedTasks}
-                   estimatedDuration={appointment.estimatedDuration}
-                   vehicleReceived={appointment.vehicleReceived}
-                 />
-               </div>
-           </div>
-
-           {/* Resize handle (Bottom) */}
-           {!readOnly && (
-             <div
-               onPointerDown={handlePointerDown}
-               className="absolute bottom-0 left-0 right-0 h-4 flex items-end justify-center cursor-ns-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 pb-1"
-             >
-               <div className="w-12 h-1.5 bg-white/40 hover:bg-white/70 rounded-full transition-colors mix-blend-screen" />
+               {/* Cancelar / Eliminar */}
+               {!readOnly && onUpdateStatus && (
+                 <button
+                   onClick={handleCancel}
+                   className="w-8 h-8 border border-red-500/30 bg-red-500/10 text-red-400 rounded-full transition-all hover:bg-red-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
+                   title="Cancelar Cita"
+                 >
+                   <X className="w-4 h-4" strokeWidth={2.5} />
+                 </button>
+               )}
              </div>
-           )}
+
+             {/* Contenido de la tarjeta */}
+             <div className="w-full h-full">
+               <AppointmentCard
+                 type={appointment.isTask ? "TAREA" : "CITA"}
+                 dateTime={appointment.dateTime}
+                 description={appointment.description}
+                 status={appointment.status}
+                 variant={columnId === null ? "blue" : "red"}
+                 vehicleDisplay={appointment.vehicleDisplay}
+                 clientName={appointment.clientFullName}
+                 isCompact={true}
+                 serviceType={appointment.serviceType}
+                 completedTasks={appointment.completedTasks}
+                 estimatedDuration={appointment.estimatedDuration}
+                 vehicleReceived={appointment.vehicleReceived}
+               />
+             </div>
+
+             {/* Resize handle (Bottom) */}
+             {!readOnly && (
+               <div
+                 onPointerDown={handlePointerDown}
+                 className="resize-handle absolute bottom-0 left-0 right-0 h-4 flex items-end justify-center cursor-ns-resize opacity-0 transition-opacity z-20 pb-1"
+               >
+                 <div className="w-12 h-1.5 bg-white/40 hover:bg-white/70 rounded-full transition-colors mix-blend-screen" />
+               </div>
+             )}
+           </div>
         </div>
         {confirmModal && (
            <ConfirmCardModal
