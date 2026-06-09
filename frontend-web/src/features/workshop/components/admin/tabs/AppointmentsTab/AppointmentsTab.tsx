@@ -19,7 +19,7 @@ interface AppointmentsTabProps {
   /** Callback para cambiar de fecha/hora/mecánico una tarea. */
   onRescheduleTask?: (appointmentId: string, employeeId: string | null, newDateTime: Date, newDuration?: number) => Promise<void>;
   /** Callback para actualizar el estado de una cita/tarea. */
-  onUpdateStatus?: (id: string, status: string) => Promise<boolean | void>;
+  onUpdateStatus?: (id: string, status: string, isTask?: boolean) => Promise<boolean | void>;
   /** Callback para eliminar permanentemente una cita de cliente. */
   onDeleteAppointment?: (id: string) => Promise<boolean | void>;
   /** Callback para borrar una tarea de taller. */
