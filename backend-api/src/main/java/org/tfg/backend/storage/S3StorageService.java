@@ -24,6 +24,14 @@ public class S3StorageService implements StorageService {
     private final String bucketName;
     private final String region;
 
+    /**
+    * Constructor que inyecta las dependencias necesarias de AWS S3.
+    *
+    * @param s3Client Cliente para operaciones estÃ¡ndar en S3.
+    * @param s3Presigner Firmador para generar URLs temporales.
+    * @param bucketName Nombre del bucket S3 configurado.
+    * @param region RegiÃ³n de AWS donde se aloja el bucket.
+    */
     public S3StorageService(S3Client s3Client,
                             S3Presigner s3Presigner,
                             @Value("${aws.s3.bucket}") String bucketName,

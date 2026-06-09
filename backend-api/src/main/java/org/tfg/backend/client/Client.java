@@ -32,6 +32,9 @@ public class Client {
     @Column(unique = true)
     private String nif;
 
+    /**
+    * TelÃ©fono mÃ³vil o fijo de contacto del cliente.
+    */
     private String phoneNumber;
     private String address;
 

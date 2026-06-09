@@ -17,6 +17,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Servicio administrativo para la gestión de recursos humanos de los talleres.
+ * Permite listar empleados vinculados a talleres, dar de alta nuevos empleados,
+ * eliminarlos del sistema, ascender/degradar roles y gestionar permisos de secciones.
+ */
 @Service
 @RequiredArgsConstructor
 public class EmployeeAdminService {
@@ -28,6 +33,13 @@ public class EmployeeAdminService {
     private final AppointmentRepository appointmentRepository;
     private final EmployeeMapper employeeMapper;
 
+    /**
+     * Obtiene todos los empleados registrados para un taller específico, incluyendo lógica
+     * de auto-curación para asegurar que el propietario del taller aparezca en los resultados.
+     *
+     * @param workshopId Identificador único del taller.
+     * @return Listado de DTOs correspondientes a los empleados.
+     */
     @Transactional
     public List<EmployeeDTO> getEmployeesByWorkshopId(UUID workshopId) {
         Workshop workshop = workshopRepository.findById(workshopId).orElse(null);
@@ -52,6 +64,13 @@ public class EmployeeAdminService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Registra un nuevo empleado y lo vincula a un taller determinado.
+     * Crea un usuario de seguridad con el rol especificado.
+     *
+     * @param workshopId Identificador del taller destino.
+     * @param request Datos del nuevo empleado.
+     */
     @Transactional
     public void addEmployeeToWorkshop(UUID workshopId, AddEmployeeRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -79,12 +98,17 @@ public class EmployeeAdminService {
         employeeRepository.save(employee);
     }
 
+    /**
+     * Elimina físicamente a un empleado y a su cuenta de usuario asociada, desvinculándolo
+     * previamente de cualquier cita asignada.
+     *
+     * @param employeeId Identificador del empleado.
+     */
     @Transactional
     public void deleteEmployee(UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
-        // Preparamos citas asociadas para evitar el DataIntegrityViolation
         List<Appointment> asigAppointments = appointmentRepository.findByAssignedEmployeeId(employeeId);
         if (!asigAppointments.isEmpty()) {
             for (Appointment app : asigAppointments) {
@@ -95,13 +119,17 @@ public class EmployeeAdminService {
 
         User user = employee.getUser();
         
-        // Eliminamos al empleado y al usuario asociado (Limpieza total)
         employeeRepository.delete(employee);
         if (user != null) {
             userRepository.delete(user);
         }
     }
 
+    /**
+     * Promociona el rol de un empleado a WORKSHOP_MANAGER (gestor).
+     *
+     * @param employeeId Identificador del empleado.
+     */
     @Transactional
     public void promoteToManager(UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -114,6 +142,11 @@ public class EmployeeAdminService {
         }
     }
 
+    /**
+     * Degrada el rol de un empleado a WORKSHOP_STAFF (mecánico).
+     *
+     * @param employeeId Identificador del empleado.
+     */
     @Transactional
     public void demoteToStaff(UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -126,6 +159,12 @@ public class EmployeeAdminService {
         }
     }
 
+    /**
+     * Actualiza la lista de secciones a las que el empleado tiene permitido el acceso en el frontend.
+     *
+     * @param employeeId Identificador del empleado.
+     * @param allowedSections Cadena serializada con las secciones habilitadas.
+     */
     @Transactional
     public void updateAllowedSections(UUID employeeId, String allowedSections) {
         Employee employee = employeeRepository.findById(employeeId)

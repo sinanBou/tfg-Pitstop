@@ -3,9 +3,18 @@ package org.tfg.backend.part;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
+/**
+ * Componente observador que escucha eventos de bajo stock en el inventario.
+ * Registra alertas en el sistema cuando las existencias caen por debajo del umbral mínimo de seguridad.
+ */
 @Component
 public class InventoryStockObserver {
 
+    /**
+     * Maneja el evento de bajo stock imprimiendo una alerta en consola/logs.
+     *
+     * @param event El evento que contiene detalles del repuesto con bajo stock.
+     */
     @EventListener
     public void handleLowStock(LowStockEvent event) {
         System.out.printf("[ALERTA DE ALMACÉN] El repuesto %s (ID: %s) ha caído por debajo de su umbral de aviso. Stock actual: %d, Umbral límite: %d%n",

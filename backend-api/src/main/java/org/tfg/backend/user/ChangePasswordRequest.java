@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChangePasswordRequest {
 
+    /** Contraseña actual del usuario (puede ser nula si la cuenta se registró con Google). */
     @NotBlank(message = "La contraseña actual es obligatoria")
     private String currentPassword;
 

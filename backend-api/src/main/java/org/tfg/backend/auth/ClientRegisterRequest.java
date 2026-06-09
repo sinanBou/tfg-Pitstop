@@ -24,6 +24,9 @@ public class ClientRegisterRequest {
     @Email(message = "El formato del email es incorrecto")
     private String email;
 
+    /**
+    * Contraseña elegida por el cliente para el inicio de sesión. Mínimo de 6 caracteres.
+    */
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
@@ -31,8 +34,14 @@ public class ClientRegisterRequest {
     @NotBlank(message = "El NIF es obligatorio")
     private String nif;
 
+    /**
+    * Teléfono móvil o fijo de contacto del cliente. Obligatorio.
+    */
     @NotBlank(message = "El teléfono es obligatorio")
     private String phoneNumber;
 
+    /**
+    * DirecciÃ³n postal o residencial del cliente (opcional).
+    */
     private String address;
 }

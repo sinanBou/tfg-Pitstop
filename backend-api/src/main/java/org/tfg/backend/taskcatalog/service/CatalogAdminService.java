@@ -123,6 +123,12 @@ public class CatalogAdminService {
         return prefix + "." + nextSuffix;
     }
 
+    /**
+    * Helper que extrae el prefijo numÃ©rico inicial de un nombre de categorÃ­a.
+    *
+    * @param categoryName Nombre tÃ©cnico de la categorÃ­a.
+    * @return El prefijo numÃ©rico como cadena o un hash ligero si no posee nÃºmeros.
+    */
     private String extractNumericPrefix(String categoryName) {
         if (categoryName.contains("_")) {
             String firstPart = categoryName.split("_")[0];
