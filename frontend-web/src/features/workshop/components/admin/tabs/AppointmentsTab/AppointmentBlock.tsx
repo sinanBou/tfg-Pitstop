@@ -229,92 +229,99 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
         }}
     >
         <div className="w-full h-full relative p-[2px]">
- 
-           {/* Barra de acciones — flota ENCIMA de la tarjeta, solo visible en hover */}
-            <div className="absolute bottom-2 right-2 z-50 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
-              {/* Gestionar — Abre modal de planificación (requiere recepción) */}
-              <button
-                onClick={(e) => { 
-                  e.stopPropagation();
-                  if (!isVehicleReceived) return;
-                  onManage ? onManage(appointment) : toast.info(`Gestionar: ${appointment.vehicleDisplay}`);
-                }}
-                disabled={!isVehicleReceived}
-                className={`w-7 h-7 backdrop-blur-sm border rounded-full transition-all shadow-xl flex items-center justify-center active:scale-95 ${
-                  isVehicleReceived
-                    ? 'bg-black/90 border-white/15 text-white/70 hover:bg-white hover:text-black cursor-pointer'
-                    : 'bg-amber-950/80 border-amber-500/30 text-amber-500/60 cursor-not-allowed'
-                }`}
-                title={isVehicleReceived ? 'Gestionar Cita' : 'Recepciona el vehículo primero'}
-              >
-                {isVehicleReceived ? (
-                  <Edit className="w-3.5 h-3.5" />
-                ) : (
-                  <Lock className="w-3.5 h-3.5" />
-                )}
-              </button>
 
-              {/* Checklist — Ver sub-tareas del vehículo (solo para tareas, requiere recepción) */}
-              {appointment.isTask && appointment.serviceType && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (!isVehicleReceived) return;
-                    onViewChecklist ? onViewChecklist(appointment) : undefined;
-                  }}
-                  disabled={!isVehicleReceived}
-                  className={`w-7 h-7 backdrop-blur-sm border rounded-full transition-all shadow-xl flex items-center justify-center active:scale-95 ${
-                    isVehicleReceived
-                      ? 'bg-black/90 border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer'
-                      : 'bg-amber-950/80 border-amber-500/30 text-amber-500/60 cursor-not-allowed'
-                  }`}
-                  title={isVehicleReceived ? 'Ver checklist de tareas' : 'Recepciona el vehículo primero'}
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                </button>
-              )}
+           {/* Visual Card con overlay de botones dentro */}
+           <div className={`w-full h-full overflow-hidden relative ${isResizing ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''} rounded-2xl`}>
 
-              {/* Retrasar */}
-              {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setConfirmModal({
-                      isOpen: true,
-                      type: 'delay',
-                      title: 'Retrasar Cita/Tarea',
-                      description: '¿Seguro que deseas marcar esta cita/tarea como retrasada?',
-                      confirmText: 'Sí, Marcar',
-                      theme: 'amber'
-                    });
-                  }}
-                  className="w-7 h-7 bg-black/90 backdrop-blur-sm border border-amber-500/30 text-amber-500 rounded-full transition-all hover:bg-amber-500 hover:text-white shadow-xl flex items-center justify-center active:scale-95 cursor-pointer"
-                  title="Marcar como Retrasada"
-                >
-                  <Clock className="w-3.5 h-3.5" strokeWidth={2.5} />
-                </button>
-              )}
+               {/* Gradiente superior — visible en hover para dar contraste a los botones */}
+               <div className="absolute top-0 inset-x-0 h-10 bg-gradient-to-b from-black/70 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-t-2xl pointer-events-none" />
 
-             {/* Eliminar */}
-             {!readOnly && onUpdateStatus && (
-                <button
-                  onClick={handleCancel}
-                  className="w-7 h-7 bg-black/90 backdrop-blur-sm border border-red-500/30 text-red-400 rounded-full transition-all hover:bg-red-500 hover:text-white shadow-xl flex items-center justify-center active:scale-95 cursor-pointer"
-                  title="Cancelar Cita"
-                >
-                  <X className="w-3.5 h-3.5" strokeWidth={2.5} />
-                </button>
-             )}
-           </div>
+               {/* Botones de acción — overlay dentro de la tarjeta, esquina superior derecha */}
+               <div className="absolute top-1.5 right-1.5 z-30 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
 
-           {/* Visual Card */}
-           <div className={`w-full h-full overflow-hidden ${isResizing ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''} rounded-2xl`}>
-               <AppointmentCard 
-                   type={appointment.isTask ? "TAREA" : "CITA"} 
-                   dateTime={appointment.dateTime} 
-                   description={appointment.description} 
-                   status={appointment.status} 
-                   variant={columnId === null ? "blue" : "red"} 
+                 {/* Gestionar */}
+                 <button
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     if (!isVehicleReceived) return;
+                     onManage ? onManage(appointment) : toast.info(`Gestionar: ${appointment.vehicleDisplay}`);
+                   }}
+                   disabled={!isVehicleReceived}
+                   className={`w-6 h-6 backdrop-blur-md border rounded-full transition-all shadow-lg flex items-center justify-center active:scale-95 ${
+                     isVehicleReceived
+                       ? 'bg-black/80 border-white/20 text-white/70 hover:bg-white hover:text-black cursor-pointer'
+                       : 'bg-amber-950/80 border-amber-500/30 text-amber-500/60 cursor-not-allowed'
+                   }`}
+                   title={isVehicleReceived ? 'Gestionar Cita' : 'Recepciona el vehículo primero'}
+                 >
+                   {isVehicleReceived ? (
+                     <Edit className="w-3 h-3" />
+                   ) : (
+                     <Lock className="w-3 h-3" />
+                   )}
+                 </button>
+
+                 {/* Checklist */}
+                 {appointment.isTask && appointment.serviceType && (
+                   <button
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       if (!isVehicleReceived) return;
+                       onViewChecklist ? onViewChecklist(appointment) : undefined;
+                     }}
+                     disabled={!isVehicleReceived}
+                     className={`w-6 h-6 backdrop-blur-md border rounded-full transition-all shadow-lg flex items-center justify-center active:scale-95 ${
+                       isVehicleReceived
+                         ? 'bg-black/80 border-blue-500/40 text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer'
+                         : 'bg-amber-950/80 border-amber-500/30 text-amber-500/60 cursor-not-allowed'
+                     }`}
+                     title={isVehicleReceived ? 'Ver checklist de tareas' : 'Recepciona el vehículo primero'}
+                   >
+                     <FileText className="w-3 h-3" />
+                   </button>
+                 )}
+
+                 {/* Retrasar */}
+                 {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+                   <button
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setConfirmModal({
+                         isOpen: true,
+                         type: 'delay',
+                         title: 'Retrasar Cita/Tarea',
+                         description: '¿Seguro que deseas marcar esta cita/tarea como retrasada?',
+                         confirmText: 'Sí, Marcar',
+                         theme: 'amber'
+                       });
+                     }}
+                     className="w-6 h-6 bg-black/80 backdrop-blur-md border border-amber-500/40 text-amber-400 rounded-full transition-all hover:bg-amber-500 hover:text-white shadow-lg flex items-center justify-center active:scale-95 cursor-pointer"
+                     title="Marcar como Retrasada"
+                   >
+                     <Clock className="w-3 h-3" strokeWidth={2.5} />
+                   </button>
+                 )}
+
+                 {/* Cancelar / Eliminar */}
+                 {!readOnly && onUpdateStatus && (
+                   <button
+                     onClick={handleCancel}
+                     className="w-6 h-6 bg-black/80 backdrop-blur-md border border-red-500/40 text-red-400 rounded-full transition-all hover:bg-red-500 hover:text-white shadow-lg flex items-center justify-center active:scale-95 cursor-pointer"
+                     title="Cancelar Cita"
+                   >
+                     <X className="w-3 h-3" strokeWidth={2.5} />
+                   </button>
+                 )}
+               </div>
+
+               {/* Contenido de la tarjeta — ligeramente bajado para dejar espacio visual */}
+               <div className="w-full h-full pt-2">
+                 <AppointmentCard
+                   type={appointment.isTask ? "TAREA" : "CITA"}
+                   dateTime={appointment.dateTime}
+                   description={appointment.description}
+                   status={appointment.status}
+                   variant={columnId === null ? "blue" : "red"}
                    vehicleDisplay={appointment.vehicleDisplay}
                    clientName={appointment.clientFullName}
                    isCompact={true}
@@ -322,17 +329,18 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                    completedTasks={appointment.completedTasks}
                    estimatedDuration={appointment.estimatedDuration}
                    vehicleReceived={appointment.vehicleReceived}
-               />
+                 />
+               </div>
            </div>
 
-           {/* Resize handle (Bottom) - Only if not readOnly */}
+           {/* Resize handle (Bottom) */}
            {!readOnly && (
-            <div 
-                onPointerDown={handlePointerDown}
-                className="absolute bottom-0 left-0 right-0 h-4 flex items-end justify-center cursor-ns-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 pb-1"
-            >
-                <div className="w-12 h-1.5 bg-white/40 hover:bg-white/70 rounded-full transition-colors mix-blend-screen" />
-            </div>
+             <div
+               onPointerDown={handlePointerDown}
+               className="absolute bottom-0 left-0 right-0 h-4 flex items-end justify-center cursor-ns-resize opacity-0 group-hover:opacity-100 transition-opacity z-20 pb-1"
+             >
+               <div className="w-12 h-1.5 bg-white/40 hover:bg-white/70 rounded-full transition-colors mix-blend-screen" />
+             </div>
            )}
         </div>
         {confirmModal && (
