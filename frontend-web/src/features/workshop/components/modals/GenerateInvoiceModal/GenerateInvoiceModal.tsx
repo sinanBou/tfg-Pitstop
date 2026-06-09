@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { Plus, AlertTriangle, Trash, Check } from '@/assets/icons';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { Plus, AlertTriangle, Trash, Check, Box } from '@/assets/icons';
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/useToast';
  * Representa una pieza de repuesto agregada manualmente o importada para la facturación.
  */
 interface PartItem {
+  /** Identificador único de la pieza en catálogo (opcional). */
+  partId?: string;
   /** Nombre descriptivo del repuesto. */
   name: string;
   /** Precio de venta asignado a la pieza, o null si está pendiente de cotización. */
@@ -58,8 +60,13 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   const [catalogMap, setCatalogMap] = useState<Map<string, { name: string; hours: number }>>(new Map());
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [parts, setParts] = useState<PartItem[]>([]);
-  const [newPartName, setNewPartName] = useState('');
-  const [newPartPrice, setNewPartPrice] = useState('');
+  const [inventory, setInventory] = useState<any[]>([]);
+  const [selectedInvId, setSelectedInvId] = useState('');
+  const [partQuery, setPartQuery] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [quantityToUse, setQuantityToUse] = useState(1);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [addingPart, setAddingPart] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const toast = useToast();
 
@@ -86,22 +93,50 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
       .finally(() => setLoadingCatalog(false));
   }, [isOpen, job?.workshopId]);
 
-  // Cargar piezas desde el campo parts (relacional) de la cita (servidor)
-  useEffect(() => {
-    if (isOpen && job?.id) {
-      if (job.parts) {
-        setParts(job.parts.map((p: any) => ({
-          name: p.name,
+  // Cargar inventario del taller
+  const loadInventory = useCallback(() => {
+    if (!job?.workshopId) return;
+    const token = localStorage.getItem('jwt_token');
+    fetch(`${API_BASE_URL}/parts/workshop/${job.workshopId}/inventory`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then((data: any[]) => {
+        setInventory(data || []);
+      })
+      .catch(err => console.error("Error loading inventory for invoice:", err));
+  }, [job?.workshopId]);
+
+  // Cargar repuestos asignados a la cita
+  const loadAssignedParts = useCallback(() => {
+    if (!job?.id) return;
+    const token = localStorage.getItem('jwt_token');
+    fetch(`${API_BASE_URL}/parts/appointments/${job.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then((data: any[]) => {
+        setParts((data || []).map(p => ({
+          partId: p.part.id,
+          name: p.part.name,
           price: p.appliedPrice,
           quantityUsed: p.quantityUsed
         })));
-      } else {
-        setParts([]);
-      }
-      setNewPartName('');
-      setNewPartPrice('');
+      })
+      .catch(() => setParts([]));
+  }, [job?.id]);
+
+  // Efecto de inicialización al abrir la modal
+  useEffect(() => {
+    if (isOpen && job?.id) {
+      loadInventory();
+      loadAssignedParts();
+      setPartQuery('');
+      setSelectedInvId('');
+      setQuantityToUse(1);
+      setDiscountPercent(0);
     }
-  }, [isOpen, job?.id, job?.parts]);
+  }, [isOpen, job?.id, job?.workshopId, loadInventory, loadAssignedParts]);
 
   // Traducir los códigos del servicio de la cita
   const resolvedTasks = useMemo<ResolvedTask[]>(() => {
@@ -119,6 +154,16 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
         };
       });
   }, [job?.serviceType, catalogMap]);
+
+  // Filtrado de inventario en tiempo real
+  const filteredInventory = useMemo(() => {
+    if (!partQuery.trim()) return inventory;
+    const q = partQuery.toLowerCase();
+    return inventory.filter(inv => 
+      inv.part.name.toLowerCase().includes(q) || 
+      (inv.part.oemReference && inv.part.oemReference.toLowerCase().includes(q))
+    );
+  }, [inventory, partQuery]);
 
   // Cálculos en tiempo real
   const totalLaborHours = useMemo(() => {
@@ -138,55 +183,96 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
     return parts.some(p => p.price === null || p.price === undefined || p.price <= 0);
   }, [parts]);
 
-  /** Persist parts to the backend */
-  const persistPartsToApi = async (updatedParts: PartItem[]) => {
-    if (!job?.id) return;
-    try {
-      const token = localStorage.getItem('jwt_token');
-      await fetch(`${API_BASE_URL}/appointments/${job.id}/parts`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ partsJson: JSON.stringify(updatedParts) }),
-      });
-    } catch {
-      // Silent
-    }
-  };
-
-  // Editar precio de una pieza inline
-  const handleUpdatePartPrice = (index: number, value: string) => {
-    const price = value.trim() !== '' ? parseFloat(value) : null;
-    const updated = parts.map((p, i) => i === index ? { ...p, price } : p);
-    setParts(updated);
-    persistPartsToApi(updated);
-  };
-
   const finalTotal = useMemo(() => {
     return totalLaborCost + totalPartsCost;
   }, [totalLaborCost, totalPartsCost]);
 
-  // Agregar pieza
-  const handleAddPart = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newPartName.trim()) return;
-    const price = parseFloat(newPartPrice) || 0;
-    if (price < 0) return;
-
-    const updated = [...parts, { name: newPartName.trim(), price }];
+  // Editar precio de una pieza inline (solo actualiza el estado local para el envío de factura)
+  const handleUpdatePartPrice = (index: number, value: string) => {
+    const price = value.trim() !== '' ? parseFloat(value) : null;
+    const updated = parts.map((p, i) => i === index ? { ...p, price } : p);
     setParts(updated);
-    persistPartsToApi(updated);
-    setNewPartName('');
-    setNewPartPrice('');
   };
 
-  // Eliminar pieza
-  const handleRemovePart = (index: number) => {
-    const updated = parts.filter((_, i) => i !== index);
-    setParts(updated);
-    persistPartsToApi(updated);
+  // Agregar pieza usando los endpoints reales
+  const handleAddPart = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!job?.id || !partQuery.trim()) return;
+
+    const matchedInv = inventory.find(
+      i => i.id === selectedInvId || i.part.name.toLowerCase() === partQuery.trim().toLowerCase()
+    );
+
+    if (quantityToUse <= 0) return;
+
+    let payload: any = { quantity: quantityToUse };
+    if (discountPercent > 0) {
+      payload.discount = discountPercent / 100;
+    }
+    if (matchedInv) {
+      if (matchedInv.stockQuantity < quantityToUse) {
+        toast.warning(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
+        return;
+      }
+      payload.partId = matchedInv.part.id;
+    } else {
+      payload.customName = partQuery.trim();
+    }
+
+    setAddingPart(true);
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const res = await fetch(`${API_BASE_URL}/parts/appointments/${job.id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errMsg = await res.text();
+        throw new Error(errMsg || 'Error al asignar repuesto');
+      }
+
+      loadInventory();
+      loadAssignedParts();
+      setSelectedInvId('');
+      setPartQuery('');
+      setQuantityToUse(1);
+      setDiscountPercent(0);
+      setShowDropdown(false);
+      toast.success('Repuesto agregado con éxito.');
+    } catch (err: any) {
+      toast.error(err.message || 'Error al guardar repuesto.');
+    } finally {
+      setAddingPart(false);
+    }
+  };
+
+  // Eliminar pieza usando los endpoints reales
+  const handleRemovePart = async (partId?: string) => {
+    if (!job?.id || !partId) return;
+    try {
+      const token = localStorage.getItem('jwt_token');
+      const res = await fetch(`${API_BASE_URL}/parts/appointments/${job.id}/parts/${partId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (res.ok) {
+        loadInventory();
+        loadAssignedParts();
+        toast.success('Repuesto eliminado con éxito.');
+      } else {
+        const errMsg = await res.text();
+        throw new Error(errMsg || 'Error al eliminar repuesto');
+      }
+    } catch (err: any) {
+      toast.error(err.message || 'Error al eliminar repuesto.');
+    }
   };
 
   // Enviar factura a la API
@@ -238,7 +324,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
       subtitle="Liquidación de Servicio"
       theme="green"
     >
-      <div className="space-y-6 flex-1 flex flex-col">
+      <div className="space-y-6 flex-1 flex flex-col animate-none">
         {/* Info Cita */}
         <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-5 space-y-3 shrink-0">
           <div className="flex justify-between items-center text-xs">
@@ -291,28 +377,96 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
           <div className="w-full md:w-1/2 space-y-4 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl p-5">
             <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">Piezas y Repuestos</h4>
             
-            {/* Formulario Agregar Pieza */}
-            <form onSubmit={handleAddPart} className="flex gap-2">
-              <input 
-                type="text"
-                required
-                value={newPartName}
-                onChange={e => setNewPartName(e.target.value)}
-                placeholder="Repuesto (ej: Filtro de aceite)"
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2.5 text-white text-xs placeholder-neutral-600 focus:outline-none focus:border-blue-500 transition-all flex-1 min-w-0"
-              />
+            {/* Formulario rápido con buscador de autocompletado */}
+            <form onSubmit={handleAddPart} className="flex gap-2 shrink-0 relative">
+              <div className="relative flex-1 min-w-0">
+                <input 
+                  type="text"
+                  required
+                  value={partQuery}
+                  onChange={e => {
+                    setPartQuery(e.target.value);
+                    setShowDropdown(true);
+                    if (selectedInvId !== 'custom') setSelectedInvId('');
+                  }}
+                  onFocus={() => setShowDropdown(true)}
+                  placeholder="Buscar o escribir repuesto..."
+                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all font-semibold text-white animate-none"
+                />
+                
+                {showDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
+                    <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 divide-y divide-neutral-900 custom-scrollbar">
+                      {filteredInventory.map(inv => (
+                        <button
+                          key={inv.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedInvId(inv.id);
+                            setPartQuery(inv.part.name);
+                            setShowDropdown(false);
+                          }}
+                          disabled={inv.stockQuantity === 0}
+                          className="w-full text-left px-3 py-2.5 text-xs hover:bg-neutral-900 flex justify-between items-center transition-all disabled:opacity-50"
+                        >
+                          <span className="text-white font-semibold">{inv.part.name}</span>
+                          <span className="text-[10px] text-neutral-400 font-mono">
+                            {inv.stockQuantity} uds. - {inv.retailPrice.toFixed(2)}€
+                          </span>
+                        </button>
+                      ))}
+                      
+                      {partQuery.trim().length > 0 && (
+                        <button
+                          key="custom-part-btn"
+                          type="button"
+                          onClick={() => {
+                            setSelectedInvId('custom');
+                            setShowDropdown(false);
+                          }}
+                          className="w-full text-left px-3 py-2.5 text-xs bg-green-950/20 hover:bg-green-900/20 text-green-400 font-bold flex items-center gap-1.5 transition-all"
+                        >
+                          <span>Usar repuesto personalizado:</span>
+                          <span className="text-white italic font-normal">"{partQuery.trim()}"</span>
+                        </button>
+                      )}
+                      
+                      {filteredInventory.length === 0 && partQuery.trim().length === 0 && (
+                        <div className="px-3 py-3 text-center text-xs text-neutral-500 font-medium">
+                          Escribe para buscar o añadir personalizado
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+
               <input 
                 type="number"
-                step="0.01"
                 required
-                value={newPartPrice}
-                onChange={e => setNewPartPrice(e.target.value)}
-                placeholder="Precio (€)"
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-white text-xs placeholder-neutral-600 focus:outline-none focus:border-blue-500 transition-all w-24 shrink-0 font-mono"
+                min="1"
+                value={quantityToUse}
+                onChange={e => setQuantityToUse(parseInt(e.target.value) || 1)}
+                placeholder="Cant."
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
               />
+              
+              <input 
+                type="number"
+                min="0"
+                max="100"
+                value={discountPercent || ''}
+                onChange={e => setDiscountPercent(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
+                placeholder="Desc. %"
+                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-white"
+                title="Descuento opcional en porcentaje (0-100)"
+              />
+
               <button
                 type="submit"
-                className="px-3 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-extrabold text-xs transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,197,94,0.3)]"
+                disabled={addingPart || !partQuery.trim()}
+                className="px-3 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-white font-extrabold text-xs transition-all flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(34,197,94,0.3)] active:scale-95 disabled:opacity-50"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -320,8 +474,9 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
 
             {/* Listado de Piezas */}
             {parts.length === 0 ? (
-              <div className="text-center py-6 text-neutral-600 text-xs border border-dashed border-neutral-900 rounded-xl">
-                Ninguno añadido aún.
+              <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center border border-dashed border-neutral-900 rounded-xl">
+                <Box className="w-8 h-8 text-neutral-800 mb-1" strokeWidth={1.5} />
+                <p className="text-[10px] font-bold uppercase tracking-wider">Ninguno añadido aún.</p>
               </div>
             ) : (
               <div className="border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 max-h-[200px] overflow-y-auto custom-scrollbar">
@@ -368,7 +523,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                       )}
                       <button
                         type="button"
-                        onClick={() => handleRemovePart(idx)}
+                        onClick={() => handleRemovePart(p.partId)}
                         className="text-neutral-500 hover:text-red-400 transition-all"
                       >
                         <Trash className="w-4 h-4" />
