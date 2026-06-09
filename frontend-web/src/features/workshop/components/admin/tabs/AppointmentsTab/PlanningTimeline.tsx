@@ -102,8 +102,18 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   const mechanicColumns = columns.filter(c => c.employeeId !== null);
   const unassignedApps = filteredAppointments.filter(a => a.assignedEmployeeId === null || a.assignedEmployeeId === undefined);
 
-  const workStart = parseInt(openTime.split(':')[0], 10) || 9;
-  const workEnd = parseInt(closeTime.split(':')[0], 10) || 18;
+  const openTimeSafe = openTime || '09:00';
+  const closeTimeSafe = closeTime || '18:00';
+
+  const startHourParsed = parseInt(openTimeSafe.split(':')[0], 10);
+  const workStart = isNaN(startHourParsed) ? 9 : startHourParsed;
+
+  const endHourParsed = parseInt(closeTimeSafe.split(':')[0], 10);
+  let workEnd = isNaN(endHourParsed) ? 18 : endHourParsed;
+  if (workEnd === 0 && workStart > 0) {
+    workEnd = 24;
+  }
+
   const startDisplay = Math.max(0, workStart - 1);
   const endDisplay = Math.min(24, workEnd + 1);
 

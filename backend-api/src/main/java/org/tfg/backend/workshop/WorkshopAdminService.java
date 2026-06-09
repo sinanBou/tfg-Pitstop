@@ -45,16 +45,32 @@ public class WorkshopAdminService {
         Employee owner = employeeRepository.findById(request.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("No se encontró el empleado con ID: " + request.getOwnerId()));
 
+        java.time.LocalTime open = request.getOpenTime() != null ? request.getOpenTime() : java.time.LocalTime.of(9, 0);
+        java.time.LocalTime close = request.getCloseTime() != null ? request.getCloseTime() : java.time.LocalTime.of(18, 0);
+        if (!close.isAfter(open)) {
+            throw new RuntimeException("La hora de cierre debe ser posterior a la hora de apertura.");
+        }
+
+        int slotMins = request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60;
+        if (slotMins <= 0) {
+            throw new RuntimeException("La duración de la cita debe ser mayor a 0 minutos.");
+        }
+
+        double rate = request.getHourlyRate() != null ? request.getHourlyRate() : 50.0;
+        if (rate < 0) {
+            throw new RuntimeException("El precio de la mano de obra no puede ser negativo.");
+        }
+
         Workshop workshop = Workshop.builder()
                 .cif(request.getCif())
                 .companyName(request.getCompanyName())
                 .address(request.getAddress())
                 .owner(owner)
-                .openTime(request.getOpenTime())
-                .closeTime(request.getCloseTime())
-                .slotDurationMinutes(request.getSlotDurationMinutes() != null ? request.getSlotDurationMinutes() : 60)
+                .openTime(open)
+                .closeTime(close)
+                .slotDurationMinutes(slotMins)
                 .workingDays(request.getWorkingDays())
-                .hourlyRate(request.getHourlyRate() != null ? request.getHourlyRate() : 50.0)
+                .hourlyRate(rate)
                 .includeOwnerInPlanning(request.getIncludeOwnerInPlanning() != null ? request.getIncludeOwnerInPlanning() : false)
                 .build();
 
@@ -78,14 +94,31 @@ public class WorkshopAdminService {
         Workshop workshop = workshopRepository.findById(workshopId)
                 .orElseThrow(() -> new RuntimeException("Taller no encontrado"));
 
+        java.time.LocalTime newOpen = request.getOpenTime() != null ? request.getOpenTime() : workshop.getOpenTime();
+        java.time.LocalTime newClose = request.getCloseTime() != null ? request.getCloseTime() : workshop.getCloseTime();
+        
+        if (newOpen != null && newClose != null) {
+            if (!newClose.isAfter(newOpen)) {
+                throw new RuntimeException("La hora de cierre debe ser posterior a la hora de apertura.");
+            }
+        }
+
         if (request.getOpenTime() != null) workshop.setOpenTime(request.getOpenTime());
         if (request.getCloseTime() != null) workshop.setCloseTime(request.getCloseTime());
         if (request.getSlotDurationMinutes() != null) {
+            if (request.getSlotDurationMinutes() <= 0) {
+                throw new RuntimeException("La duración de la cita debe ser mayor a 0 minutos.");
+            }
             workshop.setSlotDurationMinutes(request.getSlotDurationMinutes());
+        }
+        if (request.getHourlyRate() != null) {
+            if (request.getHourlyRate() < 0) {
+                throw new RuntimeException("El precio de la mano de obra no puede ser negativo.");
+            }
+            workshop.setHourlyRate(request.getHourlyRate());
         }
         if (request.getAddress() != null) workshop.setAddress(request.getAddress());
         if (request.getWorkingDays() != null) workshop.setWorkingDays(request.getWorkingDays());
-        if (request.getHourlyRate() != null) workshop.setHourlyRate(request.getHourlyRate());
         if (request.getIncludeOwnerInPlanning() != null) workshop.setIncludeOwnerInPlanning(request.getIncludeOwnerInPlanning());
 
         return workshopMapper.mapToDTO(workshopRepository.save(workshop));

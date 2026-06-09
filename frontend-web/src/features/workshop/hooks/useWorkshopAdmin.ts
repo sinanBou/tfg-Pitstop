@@ -129,13 +129,41 @@ export function useWorkshopAdmin() {
   const handleSettingsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!id) return;
+
+    if (!settingsForm.openTime || !settingsForm.closeTime) {
+      toast.warning("Las horas de apertura y cierre son obligatorias.");
+      return;
+    }
+
+    const [openH, openM] = settingsForm.openTime.split(':').map(Number);
+    const [closeH, closeM] = settingsForm.closeTime.split(':').map(Number);
+    const openInMinutes = openH * 60 + openM;
+    const closeInMinutes = closeH * 60 + closeM;
+
+    if (closeInMinutes <= openInMinutes) {
+      toast.warning("La hora de cierre debe ser posterior a la hora de apertura.");
+      return;
+    }
+
+    const slotMins = parseInt(settingsForm.slotDurationMinutes) || 0;
+    if (slotMins <= 0) {
+      toast.warning("La duración de la cita debe ser mayor a 0 minutos.");
+      return;
+    }
+
+    const rate = parseFloat(settingsForm.hourlyRate) || 0;
+    if (rate < 0) {
+      toast.warning("El precio de la mano de obra no puede ser negativo.");
+      return;
+    }
+
     try {
       const payload = {
         openTime: settingsForm.openTime,
         closeTime: settingsForm.closeTime,
-        slotDurationMinutes: parseInt(settingsForm.slotDurationMinutes) || 30,
+        slotDurationMinutes: slotMins,
         workingDays: settingsForm.workingDays.join(', '),
-        hourlyRate: parseFloat(settingsForm.hourlyRate) || 50.0,
+        hourlyRate: rate,
         includeOwnerInPlanning: settingsForm.includeOwnerInPlanning
       };
       await workshopService.updateWorkshopSettings(id, payload);

@@ -29,6 +29,8 @@ function App() {
     }
   }, [location]);
 
+  const isPublicRoute = ['/', '/login', '/registration', '/forgot-password', '/reset-password'].includes(location.pathname);
+
   return (
     <ToastProvider>
       <div className="h-full bg-black text-white flex flex-col relative">
@@ -49,8 +51,8 @@ function App() {
           </Routes>
         </main>
 
-        {/* ASISTENTE DE IA FLOTANTE (Solo si está logueado) */}
-        {userRole && <AiAssistantChat userRole={userRole} />}
+        {/* ASISTENTE DE IA FLOTANTE (Solo si está logueado y no está en una ruta pública) */}
+        {userRole && !isPublicRoute && <AiAssistantChat userRole={userRole} />}
       </div>
     </ToastProvider>
   );

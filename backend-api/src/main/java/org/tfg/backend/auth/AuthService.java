@@ -24,6 +24,10 @@ import org.tfg.backend.workshop.WorkshopRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Servicio encargado de gestionar los procesos de autenticación y registro en el sistema.
+ * Valida contraseñas encriptadas, gestiona roles, genera tokens JWT y despacha correos de verificación.
+ */
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -38,13 +42,13 @@ public class AuthService {
     private final EmailService emailService;
 
     /**
-    * Realiza el proceso de login. Verifica la existencia de usuario, validad el estado de verificaciÃ³n
-    * de cuenta, autentica las credenciales y genera un token JWT de sesiÃ³n.
-    *
-    * @param request Datos con el email y contraseÃ±a provistos.
-    * @return {@link AuthResponse} con el token JWT y el rol del usuario.
-    * @throws ResponseStatusException si el usuario/contraseÃ±a son invÃ¡lidos (UNAUTHORIZED) o la cuenta no estÃ¡ verificada (FORBIDDEN).
-    */
+     * Realiza el proceso de login. Verifica la existencia de usuario, valida el estado de verificación
+     * de cuenta, autentica las credenciales y genera un token JWT de sesión.
+     *
+     * @param request Datos con el email y contraseña provistos.
+     * @return {@link AuthResponse} con el token JWT y el rol del usuario.
+     * @throws ResponseStatusException si el usuario/contraseña son inválidos (UNAUTHORIZED) o la cuenta no está verificada (FORBIDDEN).
+     */
     public AuthResponse login(LoginRequest request) {
         String cleanEmail = request.getEmail().trim().toLowerCase();
         var user = userRepository.findByEmail(cleanEmail)
@@ -58,14 +62,6 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(
                         cleanEmail,
                         request.getPassword()
-                /**
-                * Realiza el proceso de login. Verifica la existencia de usuario, validad el estado de verificación
-                * de cuenta, autentica las credenciales y genera un token JWT de sesión.
-                *
-                * @param request Datos con el email y contraseña provistos.
-                * @return {@link AuthResponse} con el token JWT y el rol del usuario.
-                * @throws ResponseStatusException si el usuario/contraseña son inválidos (UNAUTHORIZED) o la cuenta no está verificada (FORBIDDEN).
-                */
                 )
         );
 
@@ -77,6 +73,14 @@ public class AuthService {
                 .build();
     }
 
+    /**
+     * Registra un nuevo cliente (Client) en el sistema.
+     * Genera un token de verificación de cuenta y envía un correo electrónico al destinatario.
+     *
+     * @param request Datos del registro de cliente.
+     * @return Mensaje de confirmación del registro.
+     * @throws ResponseStatusException si el email o NIF ya se encuentran en uso.
+     */
     @Transactional
     public String registerClient(ClientRegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail().trim().toLowerCase())) {
@@ -114,6 +118,14 @@ public class AuthService {
         return "Cliente registrado. Por favor, verifica tu cuenta en el correo electrónico enviado.";
     }
 
+    /**
+     * Registra un nuevo propietario de taller (Workshop Owner) en el sistema.
+     * Genera un token de verificación y despacha el correo electrónico de confirmación.
+     *
+     * @param request Datos del registro del dueño.
+     * @return Mensaje de confirmación del registro.
+     * @throws ResponseStatusException si el email ya se encuentra en uso.
+     */
     @Transactional
     public String registerWorkshop(OwnerRegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail().trim().toLowerCase())) {
