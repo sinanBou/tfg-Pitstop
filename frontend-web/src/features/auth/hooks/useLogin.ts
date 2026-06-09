@@ -4,6 +4,14 @@ import * as authService from '../services/authService';
 import type { LoginFormData } from '../types/auth.types';
 import { useToast } from '@/hooks/useToast';
 
+/**
+ * Hook personalizado para gestionar el proceso de inicio de sesión de usuarios.
+ * Soporta autenticación mediante formulario tradicional (Email/Contraseña) y mediante Google OAuth.
+ * Almacena el token JWT y el rol en `localStorage` y redirige al panel correspondiente:
+ * - CLIENT -> `/client-dashboard`
+ * - WORKSHOP_OWNER -> `/owner-dashboard`
+ * - WORKSHOP_MANAGER / WORKSHOP_STAFF -> `/worker-dashboard`
+ */
 export function useLogin() {
   const toast = useToast();
   const navigate = useNavigate();

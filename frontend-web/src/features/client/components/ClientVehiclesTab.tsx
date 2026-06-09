@@ -5,12 +5,23 @@ import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Plus, Building } from '@/assets/icons';
 
+/**
+ * Propiedades del componente ClientVehiclesTab.
+ */
 interface ClientVehiclesTabProps {
+  /** Listado de vehículos registrados del cliente. */
   vehicles: any[];
+  /** Callback para abrir el formulario de añadir nuevo vehículo. */
   onAddVehicle: () => void;
+  /** Callback para borrar un vehículo por su identificador único. */
   onDeleteVehicle: (id: string) => void;
 }
 
+/**
+ * Pestaña de gestión del Garaje del cliente.
+ * Lista todos los vehículos de su propiedad y proporciona el botón para añadir nuevos,
+ * junto con la confirmación de eliminación segura por medio de un modal premium.
+ */
 export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: ClientVehiclesTabProps) {
   // Estados para controlar el modal de confirmación premium
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);

@@ -5,6 +5,11 @@ import { StreetInputField } from './StreetInputField';
 import { FloorInputField } from './FloorInputField';
 import type { AddressAutocompleteProps } from './AddressAutocomplete.types';
 
+/**
+ * Componente interactivo de autocompletado de direcciones postales.
+ * Consume la API de geocodificación de OpenStreetMap (Nominatim) de manera asíncrona
+ * e integra la lógica de calle, portal, número y piso en un único valor consolidado.
+ */
 export default function AddressAutocomplete({ label, value, onChange, error, placeholder }: AddressAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);

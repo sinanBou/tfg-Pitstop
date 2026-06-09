@@ -37,6 +37,25 @@ const diasSemana = [
   { value: 'DOMINGO', label: 'Domingo' },
 ];
 
+/**
+ * Panel de Administración y Control Operativo del Taller (WorkshopAdminDashboard).
+ * 
+ * Centraliza toda la lógica de gestión para Propietarios (Owners) y Gestores (Managers).
+ * Actúa como orquestador de las pestañas principales del Dashboard del taller:
+ * - Resumen general (OverviewTab)
+ * - Alertas y avisos de almacén/retrasos (AvisosTab)
+ * - Recepción y control de citas de clientes (CitasTab)
+ * - Planificador temporal interactivo (AppointmentsTab / PlanningTimeline)
+ * - Liquidación y facturación (CompletedJobsTab / GenerateInvoiceModal)
+ * - Agenda individual por mecánico
+ * - Gestión de catálogo de tareas (TasksTab)
+ * - Control de stock de almacén (PartsTab)
+ * - Informes analíticos y de rendimiento (ReportsTab)
+ * - Alta y control de plantilla (TeamTab)
+ * 
+ * Integra los modales para planificar servicios, listas de verificación, check-in
+ * y actualización de los perfiles del empleado y de taller.
+ */
 export default function WorkshopAdminDashboard() {
   const [invoicingJob, setInvoicingJob] = useState<any | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);

@@ -3,22 +3,43 @@ import { Card } from '@/components/common/Card/Card';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { Calendar, Lock, Check } from '@/assets/icons';
 
+/**
+ * Propiedades del componente AppointmentCard.
+ */
 interface AppointmentCardProps {
+  /** Tipo de servicio o cita (ej. "Revisión", "Cambio Filtro"). */
   type: string;
+  /** Fecha y hora de programación de la cita. */
   dateTime: string;
+  /** Comentarios descriptivos o nota del cliente (opcional). */
   description?: string;
+  /** Estado de progreso o confirmación (ej. "PENDING", "CONFIRMED") (opcional). */
   status?: string;
+  /** Tema cromático del borde y acento del botón. Por defecto 'red'. */
   variant?: 'red' | 'blue';
+  /** Información del vehículo (ej. "Audi A3 Blanco") (opcional). */
   vehicleDisplay?: string;
+  /** Nombre completo del cliente (opcional). */
   clientName?: string;
+  /** Callback opcional que se ejecuta al presionar la tarjeta. */
   onClick?: () => void;
+  /** Compacta los textos y reduce el padding para cuadrículas ajustadas. Por defecto false. */
   isCompact?: boolean;
+  /** Listado de tareas solicitadas separadas por comas (opcional). */
   serviceType?: string;
+  /** Listado de tareas ya completadas separadas por comas (opcional). */
   completedTasks?: string;
+  /** Duración estimada del servicio en minutos (opcional). */
   estimatedDuration?: number;
+  /** Estado de recepción del vehículo en el taller físico (opcional). */
   vehicleReceived?: boolean;
 }
 
+/**
+ * Tarjeta interactiva para la representación de Citas.
+ * Soporta renderización normal (historiales) y compacta (planning/timelines),
+ * además de mostrar logotipos de marcas de automoción, contadores de subtareas y etiquetas de recepción.
+ */
 export const AppointmentCard: React.FC<AppointmentCardProps> = ({ 
   type, dateTime, description, status, variant = 'red', vehicleDisplay, clientName, onClick, isCompact = false,
   serviceType, completedTasks, estimatedDuration, vehicleReceived

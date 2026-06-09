@@ -5,35 +5,67 @@ import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePr
 import { useToast } from '@/hooks/useToast';
 import { ChevronLeft, ChevronRight, Calendar, Clock, User } from '@/assets/icons';
 
+/**
+ * Interfaz que define una columna del planning (mecánico o columna "Sin Asignar").
+ */
 interface Column {
+  /** Identificador único de la columna (típicamente el id de empleado o 'unassigned'). */
   id: string;
+  /** Título/nombre mostrado en la cabecera. */
   title: string;
+  /** ID del empleado asociado, o null si corresponde a citas/tareas sin asignar. */
   employeeId: string | null;
+  /** Rol profesional del empleado para mostrar debajo del nombre (opcional). */
   role?: string;
+  /** Flag indicador de si es una columna sin asignar (opcional). */
   isUnassigned?: boolean;
+  /** URL de la foto de perfil en S3 del empleado (opcional). */
   profilePictureUrl?: string;
 }
 
+/**
+ * Propiedades del componente PlanningTimeline.
+ */
 interface PlanningTimelineProps {
+  /** Columnas de mecánicos/unassigned a renderizar. */
   columns: Column[];
+  /** Colección completa de citas y tareas del día. */
   appointments: any[];
+  /** Fecha actualmente seleccionada en el calendario superior. */
   selectedDate: Date;
+  /** Hora de inicio de jornada (ej: "09:00"). */
   openTime?: string;
+  /** Hora de finalización de jornada (ej: "18:00"). */
   closeTime?: string;
+  /** Callback para cambiar de hora/empleado una tarea/cita mediante drag & drop. */
   onRescheduleTask?: (id: string, employeeId: string | null, newDateTime: Date, newDuration?: number, isTask?: boolean) => Promise<void>;
+  /** Callback para actualizar el estado de una cita o tarea (ej: de CONFIRMED a IN_PROGRESS). */
   onUpdateStatus?: (id: string, status: string, isTask?: boolean) => Promise<boolean | void>;
+  /** Callback para borrar una tarea del taller. */
   onDeleteTask?: (id: string) => Promise<boolean | void>;
+  /** Callback para eliminar/cancelar una cita de cliente. */
   onDeleteAppointment?: (id: string) => Promise<boolean | void>;
+  /** Ancho de cada columna de mecánico en el timeline (opcional). Por defecto '260px'. */
   columnWidth?: string;
+  /** Deshabilita la edición y arrastre (drag & drop) en el planning. */
   readOnly?: boolean;
+  /** Ajusta el timeline al 100% del contenedor padre sin scroll horizontal. */
   fillContainer?: boolean;
+  /** Callback para abrir el panel de control del vehículo/cita. */
   onManage?: (app: any) => void;
+  /** Callback para visualizar la lista de verificación (checklist) de la tarea. */
   onViewChecklist?: (app: any) => void;
 }
 
 const ROW_HEIGHT = 80;
 const MINUTE_HEIGHT = ROW_HEIGHT / 30;
 
+/**
+ * Planning/Línea temporal diaria interactiva para el taller (Gantt/Kanban).
+ * Organiza las citas de clientes y tareas asignadas por columnas de mecánicos y horas de trabajo.
+ * Soporta arrastrar y soltar (drag & drop) para re-planificación en tiempo real, detección
+ * de colisiones de horarios, y agrupamiento de tareas solapadas en carriles internos.
+ */
 export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   columns,
   appointments,

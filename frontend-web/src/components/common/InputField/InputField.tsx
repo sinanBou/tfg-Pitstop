@@ -1,6 +1,11 @@
 import React from 'react';
 import type { InputFieldProps } from './InputField.types';
 
+/**
+ * Componente unificado de entrada de datos (formulario) para PitStop.
+ * Soporta inputs convencionales y cuadros de texto multilínea (textarea),
+ * con visualización integrada de errores y estrellas de campo obligatorio.
+ */
 export const InputField: React.FC<InputFieldProps> = ({
   label,
   multiline = false,

@@ -7,9 +7,15 @@ import { DeleteAccountSection } from '@/components/common/DeleteAccountSection';
 import { useToast } from '@/hooks/useToast';
 import { API_BASE_URL } from '@/config/api';
 
+/**
+ * Propiedades del componente MiPerfil (Taller/Personal).
+ */
 interface MiPerfilProps {
+  /** Determina si la modal está visible o no. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
+  /** Perfil del empleado/propietario actual. */
   employeeProfile: {
     id?: string;
     employeeId?: string;
@@ -17,6 +23,7 @@ interface MiPerfilProps {
     firstname: string;
     lastname: string;
   };
+  /** Estructura de datos del formulario con campos modificables. */
   profileForm: {
     firstname: string;
     lastname: string;
@@ -24,16 +31,23 @@ interface MiPerfilProps {
     nif: string;
     phoneNumber: string;
   };
+  /** Callback para actualizar el estado del formulario en la vista contenedora. */
   setProfileForm: (form: { firstname: string; lastname: string; address: string; nif: string; phoneNumber: string }) => void;
+  /** Callback asíncrono que se ejecuta al guardar los datos del perfil en el servidor. */
   onSubmit: (form: { firstname: string; lastname: string; address: string; nif: string; phoneNumber: string }) => Promise<void>;
+  /** Callback asíncrono para subir la foto de perfil en S3. */
   onUploadAvatar: (file: File) => Promise<boolean | void>;
+  /** Callback asíncrono para borrar la foto de perfil. */
   onDeleteAvatar: () => Promise<boolean | void>;
+  /** Callback para previsualizar la imagen del perfil en tamaño completo. */
   onPreviewImage: () => void;
 }
 
 /**
- * Modal de perfil personal reutilizable.
- * Se renderiza mediante portal para garantizar z-index y evitar conflictos de stacking context.
+ * Modal de perfil personal para los trabajadores y encargados de taller.
+ * Renderizada en portal para evitar solapamientos visuales.
+ * Permite cambiar nombre, datos personales, subir/borrar foto de perfil,
+ * cambiar clave secreta de acceso y realizar la solicitud de baja/eliminación.
  */
 export const MiPerfil: React.FC<MiPerfilProps> = ({
   isOpen,

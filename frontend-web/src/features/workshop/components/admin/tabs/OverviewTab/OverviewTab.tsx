@@ -5,14 +5,28 @@ import { WelcomeHeader } from './WelcomeHeader';
 import { WorkshopProfileCard } from './WorkshopProfileCard';
 import { WorkingDaysSelector } from './WorkingDaysSelector';
 
+/**
+ * Propiedades del componente OverviewTab.
+ */
 interface OverviewTabProps {
+  /** Objeto de datos con la información global del taller (nombre, dirección, horario, contador de vehículos). */
   workshopData: any;
+  /** Mapeo de valores de días de la semana legibles. */
   diasSemana: Array<{value: string, label: string}>;
+  /** Perfil del empleado actualmente autenticado (opcional). */
   employeeProfile?: any;
+  /** Rol del usuario logueado en la aplicación (opcional). */
   userRole?: string;
 }
 
+/**
+ * Pestaña Resumen/Vista General del panel de Administración del taller.
+ * Presenta el saludo inicial personalizado, información básica del taller,
+ * recuento de vehículos actualmente estacionados/reparándose en las instalaciones,
+ * tamaño de la plantilla contratada, y horario con días de apertura.
+ */
 export const OverviewTab: React.FC<OverviewTabProps> = ({ 
+
   workshopData, 
   diasSemana,
   employeeProfile,

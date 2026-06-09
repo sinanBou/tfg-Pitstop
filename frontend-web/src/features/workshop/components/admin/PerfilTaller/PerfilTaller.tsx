@@ -4,9 +4,15 @@ import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { X, Building2, Camera } from '@/assets/icons';
 
+/**
+ * Propiedades del componente PerfilTaller.
+ */
 interface PerfilTallerProps {
+  /** Determina si la modal del perfil del taller está visible o no. */
   isOpen: boolean;
+  /** Callback para cerrar la modal. */
   onClose: () => void;
+  /** Estructura de datos del formulario con campos operativos del taller. */
   settingsForm: {
     openTime: string;
     closeTime: string;
@@ -15,11 +21,17 @@ interface PerfilTallerProps {
     workingDays: string[];
     includeOwnerInPlanning: boolean;
   };
+  /** Callback para actualizar el estado del formulario en la vista contenedora. */
   setSettingsForm: (form: any) => void;
+  /** Callback para enviar los cambios de configuración al servidor. */
   onSubmit: (e: React.FormEvent) => void;
+  /** URL de la imagen del logotipo actual del taller (opcional). */
   workshopLogoUrl?: string;
+  /** Callback asíncrono para subir un archivo como logotipo (opcional). */
   onUploadLogo?: (file: File) => Promise<boolean | void>;
+  /** Callback asíncrono para borrar el logotipo actual (opcional). */
   onDeleteLogo?: () => Promise<boolean | void>;
+  /** Callback para previsualizar el logotipo a tamaño completo (opcional). */
   onPreviewLogo?: () => void;
 }
 
@@ -34,8 +46,9 @@ const diasSemana = [
 ];
 
 /**
- * Modal de configuración del taller reutilizable.
- * Se renderiza mediante portal para garantizar z-index correcto.
+ * Modal de configuración operativa del taller (PerfilTaller).
+ * Presenta opciones para definir horas de apertura/cierre, precio mano de obra,
+ * días laborables semanales y subida del logo corporativo de la marca.
  */
 export const PerfilTaller: React.FC<PerfilTallerProps> = ({
   isOpen,

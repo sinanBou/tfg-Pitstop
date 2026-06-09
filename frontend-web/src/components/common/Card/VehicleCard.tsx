@@ -3,15 +3,29 @@ import { Card } from '@/components/common/Card/Card';
 import { BRAND_LOGOS, getBrandLogo } from '@/assets/BrandLogos';
 import { Car, Trash } from '@/assets/icons';
 
+/**
+ * Propiedades del componente VehicleCard.
+ */
 interface VehicleCardProps {
+  /** Marca y modelo del vehículo (ej. "Audi A4"). */
   brand: string;
+  /** Matrícula del vehículo (ej. "1234-BBB"). */
   plate: string;
+  /** Variante cromática del estilo de tarjeta. Por defecto 'blue'. */
   variant?: 'blue' | 'red';
+  /** Callback opcional que se ejecuta al pulsar sobre la tarjeta. */
   onClick?: () => void;
+  /** Callback opcional para gestionar la acción de eliminación del vehículo. */
   onDelete?: () => void;
+  /** Índice para calcular el retardo en la animación de entrada (fade/slide). Por defecto 0. */
   index?: number;
 }
 
+/**
+ * Tarjeta interactiva de representación visual de Vehículos.
+ * Dibuja un gran logotipo de fondo translúcido correspondiente a la marca del coche,
+ * e incluye el panel de matrícula y un botón de eliminación.
+ */
 export const VehicleCard: React.FC<VehicleCardProps> = ({ 
   brand, plate, variant = 'blue', onClick, onDelete, index = 0 
 }) => {

@@ -1,6 +1,10 @@
 import React from 'react';
 import type { ButtonProps } from './Button.types';
 
+/**
+ * Componente de botón de interacción común del sistema.
+ * Implementa la estética premium industrial de PitStop, con transiciones y micro-interacciones hover.
+ */
 export const Button: React.FC<ButtonProps> = ({
   children,
   variant = 'primary',

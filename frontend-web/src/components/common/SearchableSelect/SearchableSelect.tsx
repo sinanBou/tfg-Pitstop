@@ -3,6 +3,11 @@ import type { SearchableSelectProps } from './SearchableSelect.types';
 import { useSearchableSelect } from './useSearchableSelect';
 import { ChevronDown } from '@/assets/icons';
 
+/**
+ * Componente de menú desplegable de selección con buscador integrado.
+ * Especialmente útil para catálogos largos (como marcas de coches), soportando
+ * división de opciones populares vs generales y logotipos visuales si corresponde.
+ */
 export const SearchableSelect = ({ 
   label, 
   placeholder, 

@@ -3,6 +3,15 @@ import { useToast } from '@/hooks/useToast';
 import type { ClientSearchDTO, VehicleSearchDTO, VehicleRequest } from '@/features/client';
 import * as service from '../services/staffAppointmentService';
 
+/**
+ * Hook personalizado para gestionar el flujo secuencial de creación de citas por parte del personal del taller (staff/manager).
+ * Coordina la búsqueda/registro manual de clientes, selección/registro de vehículos y asignación horaria/empleados.
+ * 
+ * @param workshopId Identificador único del taller donde se crea la cita.
+ * @param onSuccess Función callback que se ejecuta tras registrar exitosamente la cita en el sistema.
+ * @param isOpen Estado de apertura del modal que envuelve este flujo (reinicia o activa efectos).
+ * @returns Estado del flujo, variables de formulario, catálogo de vehículos y funciones controladoras de cada paso.
+ */
 export function useStaffAppointment(workshopId: string, onSuccess: () => void, isOpen: boolean) {
   const toast = useToast();
   const [step, setStep] = useState(1);
@@ -104,6 +113,13 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     }
   }, [vehicleForm.brand]);
 
+  /**
+   * Realiza una búsqueda paginada de clientes e intenta autocompletar vehículos por matrícula.
+   * Si la búsqueda de vehículos devuelve exactamente un resultado, lo selecciona automáticamente.
+   * 
+   * @param pageIdx Índice de página para la paginación de clientes (comienza en 0).
+   * @param isNewSearch Indica si es una nueva búsqueda o si se están cargando más resultados (paginación).
+   */
   const handleSearch = async (pageIdx = 0, isNewSearch = true) => {
     if (!searchQuery.trim()) return;
     setLoading(true);
@@ -134,6 +150,12 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     }
   };
 
+  /**
+   * Manejador para seleccionar un cliente existente. Limpia la búsqueda actual,
+   * solicita los vehículos de dicho cliente y avanza al paso de selección de vehículo (Paso 2).
+   * 
+   * @param client Objeto con los datos del cliente seleccionado.
+   */
   const handleSelectClient = async (client: ClientSearchDTO) => {
     setSelectedClient(client);
     setSearchQuery('');
@@ -150,11 +172,21 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     setStep(2);
   };
 
+  /**
+   * Manejador para la selección de un vehículo. Asigna el vehículo seleccionado
+   * y avanza al paso de configuración de la cita (Paso 3).
+   * 
+   * @param vehicle Objeto con los datos del vehículo seleccionado.
+   */
   const handleSelectVehicle = (vehicle: VehicleSearchDTO) => {
     setSelectedVehicle(vehicle);
     setStep(3);
   };
 
+  /**
+   * Registra manualmente un nuevo cliente en el sistema a partir de los datos del formulario `clientForm`.
+   * Tras la creación exitosa, selecciona al cliente y avanza al paso 2.
+   */
   const handleCreateClient = async () => {
     setLoading(true);
     try {
@@ -169,6 +201,10 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     }
   };
 
+  /**
+   * Registra un nuevo vehículo para el cliente seleccionado a partir de los datos del formulario `vehicleForm`.
+   * Vincula el vehículo al cliente en la base de datos y avanza al paso 3 tras finalizar con éxito.
+   */
   const handleCreateVehicle = async () => {
     if (!selectedClient) return;
     setLoading(true);
@@ -184,6 +220,12 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     }
   };
 
+  /**
+   * Consulta las franjas horarias disponibles para el taller y fecha seleccionados.
+   * Filtra las franjas que están ocupadas y guarda las horas libres formateadas (HH:MM).
+   * 
+   * @param date Fecha seleccionada en formato ISO (YYYY-MM-DD).
+   */
   const fetchSlots = async (date: string) => {
     try {
       const data = await service.fetchAvailabilitySlots(workshopId, date);
@@ -193,6 +235,12 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     }
   };
 
+  /**
+   * Finaliza la creación de la cita enviando toda la información recopilada al backend.
+   * Realiza el formateo del payload, la asignación de mecánico y gestiona los estados de carga.
+   * 
+   * @returns `true` si la cita se creó exitosamente, de lo contrario `false`.
+   */
   const handleFinish = async () => {
     if (!selectedVehicle || !appointmentForm.date || !appointmentForm.time) return false;
     setLoading(true);
@@ -224,6 +272,10 @@ export function useStaffAppointment(workshopId: string, onSuccess: () => void, i
     }
   };
 
+  /**
+   * Restablece todos los estados internos, formularios y selecciones del hook
+   * a sus valores iniciales por defecto.
+   */
   const reset = () => {
     setStep(1);
     setSelectedClient(null);

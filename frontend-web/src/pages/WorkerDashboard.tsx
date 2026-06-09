@@ -34,6 +34,21 @@ const diasSemana = [
   { value: 'DOMINGO', label: 'Domingo' },
 ];
 
+/**
+ * Panel Operativo para Empleados y Mecánicos (WorkerDashboard).
+ * 
+ * Permite a los mecánicos realizar el seguimiento de su agenda personal (tareas asignadas)
+ * y acceder de forma dinámica a otras secciones administrativas adicionales según
+ * sus permisos asignados por el propietario (controlado a través de `employeeProfile.allowedSections`).
+ * 
+ * Secciones que se pueden habilitar dinámicamente:
+ * - Planificación (Timeline global del taller)
+ * - Avisos (Alertas de stock/citas retrasadas)
+ * - Citas (Recepción/Check-in de vehículos)
+ * - Catálogo de Tareas y Almacén de Piezas
+ * - Liquidación y Facturación de trabajos listos
+ * - Informes de rendimiento
+ */
 export default function WorkerDashboard() {
   const navigate = useNavigate();
   const { 

@@ -2,7 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { askMechanic, askManual, checkAiHealth } from '../services/aiApi';
 import type { ChatMessage } from '../types/aiAssistant';
 
-// Función helper pura para decodificar de forma segura el JWT token desde el cliente
+/**
+ * Decodifica de forma segura la carga útil (payload) de un token JWT.
+ * @param token Token JWT codificado en Base64.
+ * @returns Objeto JSON parseado del payload o null si ocurre un fallo.
+ */
 const decodeToken = (token: string | null) => {
   if (!token) return null;
   try {
@@ -20,6 +24,12 @@ const decodeToken = (token: string | null) => {
   }
 };
 
+/**
+ * Hook personalizado para manejar el ciclo de vida, estados y la interacción del chat del Asistente IA.
+ * Proporciona persistencia de mensajes por sesión de usuario, encuestas de estado de salud del backend
+ * e integración directa con las APIs del Asistente Técnico y el Asistente del Manual.
+ * @param userRole Rol del usuario actual para ajustar el manual del asistente de IA.
+ */
 export function useAiChat(userRole: string) {
   const [isOpen, setIsOpen] = useState(false);
   

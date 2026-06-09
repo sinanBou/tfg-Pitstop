@@ -1,12 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Car, Lock, FileText, Clock } from '@/assets/icons';
 
+/**
+ * Propiedades del componente MechanicLiveTask.
+ */
 interface MechanicLiveTaskProps {
+  /** Objeto de la cita o tarea asignada al mecánico. */
   appointment: any;
+  /** Callback para actualizar el estado del trabajo (ej: iniciar, pausar, finalizar). */
   onUpdateStatus: (id: string, status: string) => Promise<boolean>;
+  /** Callback opcional para abrir la modal de lista de verificación (checklist) y repuestos asociados. */
   onViewChecklist?: (item: any) => void;
 }
 
+/**
+ * Tarjeta interactiva de Tarea en Vivo (Live Task) para mecánicos.
+ * Permite realizar el seguimiento de tiempos de reparación en tiempo real (cronómetro activo),
+ * transicionar estados de trabajo (Confirmar -> Iniciar -> Finalizar / Retrasar) y
+ * bloquear operaciones de edición si el vehículo no ha sido recepcionado en el taller.
+ */
 export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment, onUpdateStatus, onViewChecklist }) => {
   const isVehicleReceived = appointment.vehicleReceived === true;
   const [isUpdating, setIsUpdating] = useState(false);

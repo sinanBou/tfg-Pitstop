@@ -11,10 +11,20 @@ import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Search, X } from '@/assets/icons';
 
+/**
+ * Propiedades del componente PartsTab.
+ */
 interface PartsTabProps {
+  /** Identificador del taller para consultar y actualizar el catálogo de repuestos e inventario. */
   workshopId: string;
 }
 
+/**
+ * Pestaña de Almacén/Repuestos en el panel de Administración de Taller.
+ * Gestiona el inventario de partes mecánicas agrupado por carpetas/categorías.
+ * Soporta la creación de categorías, el filtrado/búsqueda en tiempo real (OEM, fabricante, nombre),
+ * la inserción en línea de repuestos y su posterior modificación (stock, precio coste, precio venta, umbral de alerta).
+ */
 export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
   const toast = useToast();
   const [categories, setCategories] = useState<PartCategory[]>([]);

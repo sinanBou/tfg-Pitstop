@@ -3,12 +3,24 @@ import { WorkshopVehicleCard } from '@/components/common/Card/WorkshopVehicleCar
 import { Card } from '@/components/common/Card/Card';
 import { Mail, Car, Calendar } from '@/assets/icons';
 
+/**
+ * Propiedades del componente ClientOverviewTab.
+ */
 interface ClientOverviewTabProps {
+  /** Listado de vehículos del cliente. */
   vehicles: any[];
+  /** Listado de citas de reparación del cliente. */
   appointments: any[];
+  /** Perfil del usuario autenticado (opcional). */
   userProfile?: UserDTO | null;
 }
 
+/**
+ * Pestaña resumen/vista general para el panel del Cliente.
+ * Muestra el saludo personalizado, KPIs de vehículos/citas,
+ * y un listado de coches que están actualmente en reparación en el taller físico
+ * con sus correspondientes estados de servicio actualizados en tiempo real.
+ */
 export function ClientOverviewTab({ vehicles, appointments, userProfile }: ClientOverviewTabProps) {
   // Override status dynamically to follow strict business rules:
   // - If a vehicle has an active appointment in status 'COMPLETED', it's 'COMPLETED' ("Listo para Recoger").

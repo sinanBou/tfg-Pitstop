@@ -4,6 +4,10 @@ import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../services/workshopService';
 import type { EmployeeProfile, Workshop } from '../types/workshop.types';
 
+/**
+ * Hook de control para el cuadro de mando de operarios y mecánicos (Worker/Staff Dashboard).
+ * Facilita el acceso a tareas asignadas, listas de comprobación, y control de estados de reparación.
+ */
 export function useWorkerDashboard() {
   const navigate = useNavigate();
   const toast = useToast();
@@ -20,6 +24,10 @@ export function useWorkerDashboard() {
     return d;
   });
 
+  /**
+   * Obtiene la información del operario autenticado y carga las citas,
+   * tareas diarias del taller, lista de operarios y citas listas para entrega.
+   */
   const fetchWorkerData = useCallback(async () => {
     try {
       const data = await workshopService.getEmployeeMe();
@@ -85,6 +93,12 @@ export function useWorkerDashboard() {
     return false;
   };
 
+  /**
+   * Actualiza el estado de progreso de una tarea asignada del taller.
+   * 
+   * @param id Identificador de la tarea.
+   * @param newStatus Nuevo estado a asignar (ej. IN_PROGRESS, COMPLETED).
+   */
   const updateTaskStatus = async (id: string, newStatus: string) => {
     try {
       await workshopService.updateTaskStatus(id, newStatus);
@@ -113,6 +127,12 @@ export function useWorkerDashboard() {
   };
 
   /** Mark a job as fully completed — client sees it as ready to pick up */
+  /**
+   * Marca un servicio/cita de reparación como completamente completado ('COMPLETED').
+   * En este punto, el vehículo está listo para que el cliente lo recoja.
+   * 
+   * @param appointmentId Identificador de la cita.
+   */
   const completeJob = async (appointmentId: string) => {
     try {
       await workshopService.updateAppointmentStatus(appointmentId, 'COMPLETED');
@@ -137,6 +157,13 @@ export function useWorkerDashboard() {
   };
 
   /** Check-in vehicle (register kilometers and notes) */
+  /**
+   * Registra los kilómetros y notas del cliente al ingresar el vehículo en el taller.
+   * 
+   * @param appointmentId Identificador de la cita asociada.
+   * @param kilometers Kilometraje actual del vehículo al entrar.
+   * @param notes Notas del estado de entrada o necesidades particulares del cliente.
+   */
   const checkInVehicle = async (appointmentId: string, kilometers: number, notes: string) => {
     try {
       await workshopService.checkInVehicle(appointmentId, kilometers, notes);

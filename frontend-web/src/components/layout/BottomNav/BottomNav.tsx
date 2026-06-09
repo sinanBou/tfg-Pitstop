@@ -1,6 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
 import type { BottomNavProps } from './BottomNav.types';
 
+/**
+ * Componente de navegación inferior persistente (Bottom Navigation Bar).
+ * Presenta un diseño flotante con desenfoque de fondo (backdrop-blur) y un indicador animado
+ * deslizante que resalta la pestaña de control activa.
+ */
 export function BottomNav({ tabs, activeTab, onTabChange, theme }: BottomNavProps) {
   const isClient = theme === 'client';
   

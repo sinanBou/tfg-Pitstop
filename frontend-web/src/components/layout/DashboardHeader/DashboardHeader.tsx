@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import type { DashboardHeaderProps } from './DashboardHeader.types';
 import { User, Settings, LogOut } from '@/assets/icons';
 
+/**
+ * Cabecera superior para los paneles de mando (Dashboards).
+ * Proporciona el título del sistema, visualización de roles (Mecánico, Encargado, Conductor),
+ * accesos directos al perfil/ajustes y la funcionalidad centralizada de cierre de sesión.
+ */
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({ 
   type, 
   profilePictureUrl, 

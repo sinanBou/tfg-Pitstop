@@ -11,6 +11,17 @@ import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePr
 
 const SECCIONES = ['TALLERES', 'REPORTES'];
 
+/**
+ * Panel de Control Multitaller para Propietarios (OwnerDashboard).
+ * 
+ * Ofrece una vista consolidada a nivel corporativo para usuarios que poseen uno o más talleres.
+ * Permite realizar las siguientes operaciones globales:
+ * - Listar y gestionar todas las sucursales/talleres activos propiedad de la cuenta (WorkshopManagementTab).
+ * - Crear y dar de alta nuevos talleres asignando el nombre comercial, CIF y propietario (WorkshopCreationModal).
+ * - Eliminar talleres existentes de forma definitiva.
+ * - Acceder a reportes agregados y estadísticas de rendimiento comercial multitaller (WorkshopReportsTab).
+ * - Editar datos del perfil del propietario (MiPerfil).
+ */
 export default function OwnerDashboard() {
   const { 
     loading, 
