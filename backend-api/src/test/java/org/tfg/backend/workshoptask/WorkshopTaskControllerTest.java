@@ -85,4 +85,17 @@ class WorkshopTaskControllerTest {
 
         verify(taskService, times(1)).deleteTask(taskId);
     }
+
+    @Test
+    void getDelayedTasks_ShouldReturnList() throws Exception {
+        UUID workshopId = UUID.randomUUID();
+        when(taskService.getDelayedTasksByWorkshop(eq(workshopId))).thenReturn(List.of(mockDTO));
+
+        mockMvc.perform(get("/api/workshop-tasks/workshop/{workshopId}/delayed", workshopId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].description", is("Cambio de aceite")));
+
+        verify(taskService, times(1)).getDelayedTasksByWorkshop(eq(workshopId));
+    }
 }
