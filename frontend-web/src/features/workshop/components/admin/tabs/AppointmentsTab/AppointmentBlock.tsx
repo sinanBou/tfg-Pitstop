@@ -231,7 +231,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
         <div className="w-full h-full relative p-[2px]">
  
            {/* Barra de acciones — flota ENCIMA de la tarjeta, solo visible en hover */}
-            <div className="absolute top-2 right-2 z-50 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
+            <div className="absolute bottom-2 right-2 z-50 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
               {/* Gestionar — Abre modal de planificación (requiere recepción) */}
               <button
                 onClick={(e) => { 
