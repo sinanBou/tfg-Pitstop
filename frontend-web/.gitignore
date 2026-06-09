@@ -23,10 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 
-ninx.conf
+nginx.conf
 
 *.env
 *.env.local
 
-explicacion.txt
-patrones.txt    
