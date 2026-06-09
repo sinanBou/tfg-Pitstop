@@ -25,6 +25,9 @@ public class CatalogTask {
     @Column(nullable = false, length = 1024)
     private String name;
 
+    /**
+    * DuraciÃ³n en horas asignada por defecto a la tarea.
+    */
     private Double hours;
 
     @Column(name = "hours_4_cil")

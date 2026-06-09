@@ -14,6 +14,13 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+    * Obtiene y retorna los datos del usuario autenticado que realiza la solicitud.
+    * Retorna campos extendidos (como IDs de perfiles vinculados).
+    *
+    * @param userDetails Detalles del usuario autenticado en el contexto de seguridad.
+    * @return Respuesta HTTP con el DTO del perfil del usuario.
+    */
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMe(@AuthenticationPrincipal UserDetails userDetails) {
 
@@ -33,6 +40,13 @@ public class UserController {
         return ResponseEntity.ok(finalDto);
     }
 
+    /**
+    * Cambia la contraseña del usuario logueado tras validar la contraseña actual.
+    *
+    * @param request Datos de la petición con la contraseña actual y la nueva contraseña.
+    * @param userDetails Detalles del usuario autenticado.
+    * @return Respuesta HTTP con un mensaje de éxito.
+    */
     @PostMapping("/change-password")
     public ResponseEntity<String> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,

@@ -11,11 +11,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ClientDTO {
+    /**
+    * Identificador Ãºnico del cliente.
+    */
     private UUID id;
     private String firstname;
     private String lastname;
     private String email;
     private String nif;
+    /**
+    * TelÃ©fono de contacto.
+    */
     private String phoneNumber;
     private String address;
     private String profilePictureUrl;

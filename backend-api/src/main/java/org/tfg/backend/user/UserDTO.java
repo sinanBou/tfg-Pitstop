@@ -16,6 +16,7 @@ public class UserDTO {
     private String lastname;
     private String email;
     private String role;
+    /** Identificador del perfil de cliente asociado, si aplica. */
     private UUID clientId;    // ID de perfil de cliente si existe
     private UUID employeeId;  // ID de perfil de empleado si existe
     private UUID workshopId;  // ID del taller si es dueño/empleado

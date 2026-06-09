@@ -1,20 +1,45 @@
+"""
+Módulo del servicio de interacción con el modelo de lenguaje de Groq.
+Proporciona métodos para chatear sobre mecánica y con soporte contextual (RAG).
+"""
+
 import os
 from groq import Groq
 from config import settings
 
 class GroqService:
+    """
+    Clase de servicio que envuelve la integración con el cliente oficial de Groq Cloud API.
+    Permite consultas de mecánica especializada y respuestas basadas en contextos de manuales.
+    """
+
     def __init__(self):
+        """
+        Inicializa el cliente de Groq utilizando la API Key configurada.
+        """
         api_key = settings.GROQ_API_KEY or os.environ.get("GROQ_API_KEY", "")
         self.client = Groq(api_key=api_key) if api_key else None
         self.model = "llama-3.1-8b-instant"
 
-
     def is_configured(self) -> bool:
+        """
+        Verifica si la API Key de Groq ha sido configurada correctamente.
+
+        Returns:
+            bool: True si el cliente de Groq está inicializado, False en caso contrario.
+        """
         return self.client is not None
 
     def chat_mechanics(self, query: str, history: list = None) -> str:
         """
-        Calls Groq with a highly restrictive system prompt to keep responses 100% focused on mechanics.
+        Envía una consulta al modelo de lenguaje restringiéndolo al ámbito de la mecánica automotriz.
+
+        Args:
+            query (str): Pregunta o consulta del usuario.
+            history (list, optional): Historial previo de la conversación para mantener el contexto.
+
+        Returns:
+            str: Respuesta generada por el LLM o mensaje de error.
         """
         if not self.is_configured():
             return "Error: La API Key de Groq no está configurada en el servidor de IA."
@@ -31,7 +56,7 @@ class GroqService:
 
         messages = [{"role": "system", "content": system_prompt}]
         
-        # Inyectar historial si existe
+        # Inyecta el historial si existe para mantener el hilo conversacional
         if history:
             for msg in history:
                 messages.append({"role": msg.get("role", "user"), "content": msg.get("content", "")})
@@ -51,7 +76,15 @@ class GroqService:
 
     def chat_with_context(self, query: str, context: str, user_role: str) -> str:
         """
-        Generates a context-aware answer from the user manual retrieved context.
+        Genera una respuesta contextualizada (RAG) combinando la pregunta con fragmentos del manual de usuario.
+
+        Args:
+            query (str): Pregunta del usuario sobre el uso de la aplicación.
+            context (str): Fragmentos recuperados del manual de usuario.
+            user_role (str): Rol del usuario (por ejemplo, CLIENT o WORKSHOP_STAFF).
+
+        Returns:
+            str: Respuesta adaptada y estructurada basada exclusivamente en el contexto provisto.
         """
         if not self.is_configured():
             return "Error: La API Key de Groq no está configurada en el servidor de IA."
@@ -72,7 +105,6 @@ class GroqService:
             "Solo si la funcionalidad realmente no guarda ninguna relación con el contexto provisto, dile amablemente "
             "que no tienes registro de esa funcionalidad en el manual de su rol."
         )
-
 
         user_content = (
             f"CONTEXTO DEL MANUAL DE USUARIO:\n"
@@ -99,4 +131,5 @@ class GroqService:
         except Exception as e:
             return f"Error al generar respuesta RAG con Groq: {str(e)}"
 
+# Instancia del servicio lista para ser consumida por otros componentes
 groq_service = GroqService()

@@ -68,6 +68,12 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+    * Mapea un objeto {@link Vehicle} a su versión {@link VehicleDTO}.
+    *
+    * @param vehicle Entidad del vehículo.
+    * @return DTO correspondiente.
+    */
     private VehicleDTO mapToDTO(Vehicle vehicle) {
         return VehicleDTO.builder()
                 .id(vehicle.getId())
@@ -98,6 +104,12 @@ public class VehicleService {
                 .collect(Collectors.toList());
     }
 
+    /**
+    * Mapea un objeto {@link Vehicle} a su versión simplificada {@link VehicleSearchDTO}.
+    *
+    * @param vehicle Entidad de vehículo.
+    * @return DTO simplificado resultante.
+    */
     private VehicleSearchDTO mapToSearchDTO(Vehicle vehicle) {
         return VehicleSearchDTO.builder()
                 .id(vehicle.getId())

@@ -9,6 +9,10 @@ import org.tfg.backend.part.*;
 
 import java.util.UUID;
 
+/**
+ * Servicio encargado de la administración y configuración de repuestos,
+ * la inicialización del catálogo por defecto para talleres y la gestión del inventario.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,6 +26,13 @@ public class PartAdminService {
     private final org.tfg.backend.workshop.WorkshopRepository workshopRepository;
     private final com.fasterxml.jackson.databind.ObjectMapper objectMapper;
 
+    /**
+     * Busca una categoría en un taller o la crea si no existe, generando un 'slug' de nombre único.
+     *
+     * @param displayName Nombre visible de la categoría.
+     * @param workshop Taller de referencia.
+     * @return La categoría encontrada o creada.
+     */
     public PartCategory findOrCreateCategory(String displayName, org.tfg.backend.workshop.Workshop workshop) {
         String slug = displayName.toLowerCase().trim()
                 .replace(" ", "_")
@@ -41,6 +52,11 @@ public class PartAdminService {
                 });
     }
 
+    /**
+     * Carga e inicializa el inventario por defecto para un nuevo taller a partir del archivo JSON de repuestos.
+     *
+     * @param workshop El taller para el cual se inicializará el catálogo de repuestos.
+     */
     @Transactional
     public void initializeInventoryForWorkshop(org.tfg.backend.workshop.Workshop workshop) {
         findOrCreateCategory("Recambios personalizados", workshop);
@@ -86,6 +102,9 @@ public class PartAdminService {
         }
     }
 
+    /**
+     * Crea un repuesto en el catálogo global si no existe y lo vincula al inventario del taller.
+     */
     private void createPartInInventory(String oemRef, String name, String manufacturer, String specs, PartCategory category,
                                        double costPrice, double retailPrice, int stock, int avisoThreshold, org.tfg.backend.workshop.Workshop workshop) {
         PartCatalog part = partCatalogRepository.findByOemReferenceAndCategoryWorkshopId(oemRef, workshop.getId())
@@ -113,6 +132,21 @@ public class PartAdminService {
         }
     }
 
+    /**
+     * Añade un nuevo repuesto al inventario del taller. Si el repuesto no existe en el catálogo, lo crea.
+     *
+     * @param oemReference Referencia OEM del repuesto.
+     * @param name Nombre del repuesto.
+     * @param manufacturer Fabricante del repuesto.
+     * @param technicalSpecs Especificaciones técnicas.
+     * @param categoryId Identificador de la categoría.
+     * @param costPrice Precio de coste.
+     * @param retailPrice Precio de venta sugerido.
+     * @param stockQuantity Cantidad a añadir al stock.
+     * @param avisoThreshold Umbral para alerta de bajo stock.
+     * @param workshopId Identificador del taller.
+     * @return El registro de inventario creado o actualizado.
+     */
     @Transactional
     public WorkshopInventory addPartToInventory(String oemReference, String name, String manufacturer, String technicalSpecs, UUID categoryId,
                                                 double costPrice, double retailPrice, int stockQuantity, int avisoThreshold, UUID workshopId) {
@@ -159,6 +193,21 @@ public class PartAdminService {
         return workshopInventoryRepository.save(inventory);
     }
 
+    /**
+     * Actualiza los datos de un artículo del inventario y de su repuesto asociado en catálogo.
+     *
+     * @param inventoryId Identificador único del inventario.
+     * @param oemReference Referencia OEM del repuesto.
+     * @param name Nombre del repuesto.
+     * @param manufacturer Fabricante del repuesto.
+     * @param technicalSpecs Especificaciones técnicas.
+     * @param categoryId Identificador de la categoría.
+     * @param costPrice Precio de coste.
+     * @param retailPrice Precio de venta sugerido.
+     * @param stockQuantity Cantidad de stock disponible.
+     * @param avisoThreshold Umbral para alerta de bajo stock.
+     * @return El registro de inventario actualizado.
+     */
     @Transactional
     public WorkshopInventory updateInventoryItem(UUID inventoryId, String oemReference, String name, String manufacturer, String technicalSpecs, UUID categoryId,
                                                  double costPrice, double retailPrice, int stockQuantity, int avisoThreshold) {
@@ -195,6 +244,12 @@ public class PartAdminService {
         return workshopInventoryRepository.save(inventory);
     }
 
+    /**
+     * Elimina un artículo del inventario del taller y su repuesto asociado en el catálogo,
+     * eliminando previamente todas las asignaciones a citas que tuviera.
+     *
+     * @param inventoryId Identificador único del inventario a eliminar.
+     */
     @Transactional
     public void deleteInventoryItem(UUID inventoryId) {
         WorkshopInventory inventory = workshopInventoryRepository.findById(inventoryId)
@@ -207,6 +262,13 @@ public class PartAdminService {
         partCatalogRepository.delete(inventory.getPart());
     }
 
+    /**
+     * Crea una nueva categoría lógica de repuestos para el taller especificado.
+     *
+     * @param displayName Nombre visible de la categoría.
+     * @param workshopId Identificador único del taller.
+     * @return La categoría creada.
+     */
     @Transactional
     public PartCategory createCategory(String displayName, UUID workshopId) {
         org.tfg.backend.workshop.Workshop workshop = workshopRepository.findById(workshopId)
@@ -230,6 +292,11 @@ public class PartAdminService {
         return partCategoryRepository.save(newCat);
     }
 
+    /**
+     * Elimina una categoría del taller, siempre y cuando no sea protegida y no contenga piezas asociadas.
+     *
+     * @param categoryId Identificador único de la categoría.
+     */
     @Transactional
     public void deleteCategory(UUID categoryId) {
         PartCategory category = partCategoryRepository.findById(categoryId)

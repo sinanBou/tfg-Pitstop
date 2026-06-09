@@ -65,6 +65,13 @@ public class InvoiceService {
                 .orElse(null); // Return null instead of throwing to be graceful in frontend
     }
 
+    /**
+    * Mapea de manera privada una entidad {@link Invoice} a su {@link InvoiceDTO},
+    * rellenando los datos de la cita y tolerando eliminaciones fÃ­sicas previas.
+    *
+    * @param invoice Entidad de la factura.
+    * @return DTO de la factura listo para el frontend.
+    */
     private InvoiceDTO mapToDTO(Invoice invoice) {
         InvoiceDTO dto = InvoiceDTO.builder()
                 .id(invoice.getId())

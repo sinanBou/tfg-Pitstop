@@ -9,6 +9,11 @@ import org.tfg.backend.employee.Employee;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Representa una cita en el taller de Pitstop.
+ * Almacena información sobre la fecha y hora de la cita, estado, duración estimada y real,
+ * comentarios del mecánico, cliente, vehículo y taller asociado, además del empleado asignado.
+ */
 @Entity
 @Data
 @Builder

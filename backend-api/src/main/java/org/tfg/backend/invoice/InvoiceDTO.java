@@ -12,17 +12,26 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 public class InvoiceDTO {
+    /**
+    * Identificador Ãºnico de la factura.
+    */
     private UUID id;
     private UUID appointmentId;
     private UUID workshopId;
     private Double laborRate;
     private Double totalLabor;
+    /**
+    * Detalle JSON con la lista de repuestos.
+    */
     private String partsJson;
     private Double totalParts;
     private Double totalPrice;
     private LocalDateTime createdAt;
 
     // Campos extendidos de la Cita original para consumo ágil en Frontend
+    /**
+    * Nombre completo del cliente que solicitÃ³ el servicio.
+    */
     private String clientFullName;
     private String vehicleDisplay;
     private String serviceType;

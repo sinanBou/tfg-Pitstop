@@ -43,9 +43,21 @@ public class WorkshopController {
         return ResponseEntity.ok(workshopService.getWorkshopById(id));
     }
 
+    /**
+    * Recupera todos los talleres pertenecientes a un propietario concreto.
+    *
+    * @param ownerId Identificador único del empleado propietario.
+    * @return Lista de talleres asociados a ese dueño.
+    */
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<WorkshopDTO>> getWorkshopsByOwner(@PathVariable UUID ownerId) {
         return ResponseEntity.ok(workshopService.getWorkshopsByOwnerId(ownerId));
+    /**
+    * Obtiene los detalles de un taller específico a partir de su identificador único.
+    *
+    * @param id Identificador único (UUID) del taller.
+    * @return El DTO con los detalles del taller.
+    */
     }
 
     // En backend/workshop/WorkshopController.java
@@ -60,6 +72,13 @@ public class WorkshopController {
             @PathVariable UUID id,
             @RequestBody WorkshopRequest request) {
         return ResponseEntity.ok(workshopService.updateWorkshopSettings(id, request));
+    /**
+    * Actualiza la configuración de horario, días laborables y duración de citas de un taller.
+    *
+    * @param id Identificador único del taller a modificar.
+    * @param request Datos con el nuevo horario, tarifa y duración del slot.
+    * @return El DTO con la configuración modificada.
+    */
     }
 
     @GetMapping("/search")
@@ -68,6 +87,13 @@ public class WorkshopController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(workshopService.searchWorkshops(query, page, size));
+    /**
+    * Sube un archivo de imagen para el logotipo del taller.
+    *
+    * @param id Identificador único del taller.
+    * @param file Archivo de imagen multiparte.
+    * @return El taller actualizado con la URL del logotipo.
+    */
     }
 
     /**
@@ -81,6 +107,12 @@ public class WorkshopController {
             return ResponseEntity.ok(workshopService.uploadLogo(id, file));
         } catch (Exception e) {
             throw new RuntimeException("Error al subir el logo del taller: " + e.getMessage(), e);
+        /**
+        * Elimina el logotipo de taller actual tanto del almacenamiento como de la base de datos.
+        *
+        * @param id Identificador único del taller.
+        * @return El taller con el campo del logotipo restaurado a nulo.
+        */
         }
     }
 

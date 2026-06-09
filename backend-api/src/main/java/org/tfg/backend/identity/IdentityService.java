@@ -15,6 +15,11 @@ import org.tfg.backend.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Servicio encargado de gestionar los procesos de identidad de los usuarios.
+ * Esto incluye la verificación de cuentas, inicio de sesión federado con Google,
+ * y los flujos de recuperación/restablecimiento de contraseñas.
+ */
 @Service
 @RequiredArgsConstructor
 public class IdentityService {
@@ -25,6 +30,13 @@ public class IdentityService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Verifica la cuenta de un usuario mediante el token recibido por correo electrónico.
+     *
+     * @param token Token único de verificación.
+     * @return Mensaje indicando que la cuenta ha sido verificada.
+     * @throws ResponseStatusException si el token no es válido o ha expirado.
+     */
     @Transactional
     public String verifyAccount(String token) {
         User user = userRepository.findByVerificationToken(token)
@@ -37,6 +49,13 @@ public class IdentityService {
         return "Cuenta verificada con éxito. Ya puedes iniciar sesión.";
     }
 
+    /**
+     * Inicia sesión o vincula una cuenta existente a través del token ID de Google.
+     *
+     * @param request Datos de la petición con el token de Google.
+     * @return Respuesta con el token JWT de acceso y el rol asignado.
+     * @throws ResponseStatusException si el token de Google no es válido o el usuario no existe/no está verificado.
+     */
     @Transactional
     public AuthResponse loginWithGoogle(GoogleLoginRequest request) {
         OAuth2GoogleService.GoogleUserInfo googleUser = googleService.validateToken(request.getIdToken());
@@ -51,10 +70,9 @@ public class IdentityService {
                     "La cuenta no está verificada. Por favor, verifica tu cuenta a través del enlace de correo antes de iniciar sesión.");
         }
 
-        // Vinculación híbrida automática
         user.setGoogleId(googleUser.getGoogleId());
         user.setAuthProvider(AuthProvider.GOOGLE);
-        user.setVerified(true); // Verificado automáticamente por Google
+        user.setVerified(true);
         userRepository.save(user);
 
         String jwtToken = jwtService.generarToken(user.getUsername());
@@ -65,6 +83,13 @@ public class IdentityService {
                 .build();
     }
 
+    /**
+     * Genera un token único de recuperación de contraseña y lo envía por correo electrónico.
+     *
+     * @param request Datos del usuario incluyendo el correo electrónico.
+     * @return Mensaje confirmando el envío del correo de recuperación.
+     * @throws ResponseStatusException si el correo no existe o si la cuenta está vinculada a Google.
+     */
     @Transactional
     public String forgotPassword(ForgotPasswordRequest request) {
         User user = userRepository.findByEmail(request.getEmail().trim().toLowerCase())
@@ -85,6 +110,13 @@ public class IdentityService {
         return "Enlace de recuperación enviado. Revisa tu correo electrónico.";
     }
 
+    /**
+     * Restablece la contraseña del usuario a partir del token de seguridad recibido.
+     *
+     * @param request Petición con el token y la nueva contraseña elegida.
+     * @return Mensaje confirmando la actualización de la contraseña.
+     * @throws ResponseStatusException si el token no es válido o ha expirado.
+     */
     @Transactional
     public String resetPassword(ResetPasswordRequest request) {
         User user = userRepository.findByPasswordResetToken(request.getToken())

@@ -10,6 +10,12 @@ import java.util.UUID;
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, UUID> {
 
+    /**
+    * Obtiene todos los vehículos de un cliente en base a su identificador de perfil.
+    *
+    * @param clientId Identificador único del cliente.
+    * @return Lista de vehículos del cliente.
+    */
     List<Vehicle> findByClientId(UUID clientId);
 
     Optional<Vehicle> findByLicensePlate(String licensePlate);

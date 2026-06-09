@@ -98,6 +98,12 @@ public class ClientService {
                 .map(this::mapToSearchDTO);
     }
 
+    /**
+    * MÃ©todo auxiliar para transformar un cliente en DTO de bÃºsqueda rÃ¡pida.
+    *
+    * @param client Entidad cliente.
+    * @return DTO simplificado.
+    */
     private ClientSearchDTO mapToSearchDTO(Client client) {
         return ClientSearchDTO.builder()
                 .id(client.getId())

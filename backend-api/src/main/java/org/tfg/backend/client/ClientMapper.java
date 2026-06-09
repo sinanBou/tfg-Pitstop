@@ -5,6 +5,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientMapper {
 
+    /**
+    * Transforma una entidad {@link Client} a un DTO de informaciÃ³n completa {@link ClientDTO}.
+    *
+    * @param client Entidad cliente de origen.
+    * @return DTO completo del cliente o null si la entidad es nula.
+    */
     public ClientDTO mapToDTO(Client client) {
         if (client == null) return null;
         return ClientDTO.builder()
@@ -18,6 +24,12 @@ public class ClientMapper {
                 .build();
     }
 
+    /**
+    * Transforma una entidad {@link Client} a un DTO simplificado para listados y bÃºsquedas rÃ¡pidas {@link ClientSearchDTO}.
+    *
+    * @param client Entidad cliente de origen.
+    * @return DTO de bÃºsqueda rÃ¡pida o null si la entidad es nula.
+    */
     public ClientSearchDTO mapToSearchDTO(Client client) {
         if (client == null) return null;
         return ClientSearchDTO.builder()

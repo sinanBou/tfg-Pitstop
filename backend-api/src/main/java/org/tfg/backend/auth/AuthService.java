@@ -37,6 +37,14 @@ public class AuthService {
     private final JwtService jwtService;
     private final EmailService emailService;
 
+    /**
+    * Realiza el proceso de login. Verifica la existencia de usuario, validad el estado de verificaciÃ³n
+    * de cuenta, autentica las credenciales y genera un token JWT de sesiÃ³n.
+    *
+    * @param request Datos con el email y contraseÃ±a provistos.
+    * @return {@link AuthResponse} con el token JWT y el rol del usuario.
+    * @throws ResponseStatusException si el usuario/contraseÃ±a son invÃ¡lidos (UNAUTHORIZED) o la cuenta no estÃ¡ verificada (FORBIDDEN).
+    */
     public AuthResponse login(LoginRequest request) {
         String cleanEmail = request.getEmail().trim().toLowerCase();
         var user = userRepository.findByEmail(cleanEmail)
@@ -50,6 +58,14 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(
                         cleanEmail,
                         request.getPassword()
+                /**
+                * Realiza el proceso de login. Verifica la existencia de usuario, validad el estado de verificación
+                * de cuenta, autentica las credenciales y genera un token JWT de sesión.
+                *
+                * @param request Datos con el email y contraseña provistos.
+                * @return {@link AuthResponse} con el token JWT y el rol del usuario.
+                * @throws ResponseStatusException si el usuario/contraseña son inválidos (UNAUTHORIZED) o la cuenta no está verificada (FORBIDDEN).
+                */
                 )
         );
 

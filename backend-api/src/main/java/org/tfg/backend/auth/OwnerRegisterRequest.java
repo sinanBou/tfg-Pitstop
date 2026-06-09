@@ -24,6 +24,9 @@ public class OwnerRegisterRequest {
     @Email(message = "El formato del email es incorrecto")
     private String email;
 
+    /**
+    * Contraseña elegida por el propietario para acceder a la aplicación. Mínimo de 6 caracteres.
+    */
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
@@ -31,8 +34,14 @@ public class OwnerRegisterRequest {
     @NotBlank(message = "El NIF es obligatorio")
     private String nif;
 
+    /**
+    * Teléfono móvil o fijo del propietario. Obligatorio.
+    */
     @NotBlank(message = "El teléfono es obligatorio")
     private String phoneNumber;
 
+    /**
+    * DirecciÃ³n de contacto o comercial del propietario (opcional).
+    */
     private String address;
 }

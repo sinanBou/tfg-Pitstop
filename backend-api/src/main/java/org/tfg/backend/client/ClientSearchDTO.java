@@ -11,10 +11,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientSearchDTO {
+    /**
+    * Identificador Ãºnico del cliente.
+    */
     private UUID id;
     private String firstname;
     private String lastname;
     private String email;
     private String nif;
+    /**
+    * TelÃ©fono de contacto.
+    */
     private String phoneNumber;
 }

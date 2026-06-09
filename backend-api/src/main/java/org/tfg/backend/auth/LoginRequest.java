@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class LoginRequest {
+    /**
+    * Correo electrÃ³nico del usuario que actÃºa como identificador Ãºnico de inicio de sesiÃ³n.
+    */
     private String email;
     private String password;
 }

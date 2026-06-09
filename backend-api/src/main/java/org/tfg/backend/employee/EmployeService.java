@@ -15,6 +15,11 @@ import org.tfg.backend.workshop.Workshop;
 import org.tfg.backend.appointment.Appointment;
 import org.tfg.backend.appointment.AppointmentRepository;
 
+/**
+ * Servicio encargado de la lógica de negocio para la gestión de empleados (EmployeService) en Pitstop.
+ * Administra los perfiles individuales de empleados, carga y borrado de imágenes de perfil en S3,
+ * adición de nuevos empleados a talleres, promociones/demociones de roles y asignación de permisos de secciones.
+ */
 @Service
 @RequiredArgsConstructor
 public class EmployeService {
@@ -130,6 +135,13 @@ public class EmployeService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Registra un nuevo empleado y lo vincula a un taller determinado.
+     * Crea un usuario de seguridad con el rol especificado.
+     *
+     * @param workshopId Identificador del taller destino.
+     * @param request Datos del nuevo empleado.
+     */
     @Transactional
     public void addEmployeeToWorkshop(java.util.UUID workshopId, AddEmployeeRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -157,12 +169,17 @@ public class EmployeService {
         employeeRepository.save(employee);
     }
 
+    /**
+     * Elimina físicamente a un empleado y a su cuenta de usuario asociada, desvinculándolo
+     * previamente de cualquier cita asignada.
+     *
+     * @param employeeId Identificador del empleado.
+     */
     @Transactional
     public void deleteEmployee(java.util.UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new RuntimeException("Empleado no encontrado"));
 
-        // Preparamos citas asociadas para evitar el DataIntegrityViolation
         List<Appointment> asigAppointments = appointmentRepository.findByAssignedEmployeeId(employeeId);
         if (!asigAppointments.isEmpty()) {
             for (Appointment app : asigAppointments) {
@@ -173,13 +190,17 @@ public class EmployeService {
 
         User user = employee.getUser();
         
-        // Eliminamos al empleado y al usuario asociado (Limpieza total)
         employeeRepository.delete(employee);
         if (user != null) {
             userRepository.delete(user);
         }
     }
 
+    /**
+     * Promociona el rol de un empleado a WORKSHOP_MANAGER (gestor).
+     *
+     * @param employeeId Identificador del empleado.
+     */
     @Transactional
     public void promoteToManager(java.util.UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -192,6 +213,11 @@ public class EmployeService {
         }
     }
 
+    /**
+     * Degrada el rol de un empleado a WORKSHOP_STAFF (mecánico).
+     *
+     * @param employeeId Identificador del empleado.
+     */
     @Transactional
     public void demoteToStaff(java.util.UUID employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -204,6 +230,12 @@ public class EmployeService {
         }
     }
 
+    /**
+     * Actualiza la lista de secciones a las que el empleado tiene permitido el acceso en el frontend.
+     *
+     * @param employeeId Identificador del empleado.
+     * @param allowedSections Cadena serializada con las secciones habilitadas.
+     */
     @Transactional
     public void updateAllowedSections(java.util.UUID employeeId, String allowedSections) {
         Employee employee = employeeRepository.findById(employeeId)
@@ -212,6 +244,12 @@ public class EmployeService {
         employeeRepository.save(employee);
     }
 
+    /**
+     * Mapea una entidad {@link Employee} a su correspondiente {@link EmployeeDTO}.
+     *
+     * @param employee Entidad del empleado.
+     * @return DTO del empleado con la información mapeada.
+     */
     public EmployeeDTO mapToDTO(Employee employee) {
         return EmployeeDTO.builder()
                 .id(employee.getId())

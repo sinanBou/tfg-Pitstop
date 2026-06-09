@@ -12,6 +12,11 @@ import org.tfg.backend.user.UserRepository;
 
 import java.util.UUID;
 
+/**
+ * Servicio administrativo para la gestión de clientes en Pitstop.
+ * Permite realizar búsquedas paginadas de clientes y registrar clientes de manera manual
+ * por el personal del taller.
+ */
 @Service
 @RequiredArgsConstructor
 public class ClientAdminService {
@@ -21,12 +26,27 @@ public class ClientAdminService {
     private final PasswordEncoder passwordEncoder;
     private final ClientMapper clientMapper;
 
+    /**
+     * Busca clientes de manera paginada filtrando por nombre, apellidos, NIF o email.
+     *
+     * @param query Término de búsqueda.
+     * @param page Número de página.
+     * @param size Tamaño de la página.
+     * @return Página de resultados mapeada a DTOs de búsqueda.
+     */
     @Transactional(readOnly = true)
     public Page<ClientSearchDTO> searchClientsPaginated(String query, int page, int size) {
         return clientRepository.searchClients(query, PageRequest.of(page, size))
                 .map(clientMapper::mapToSearchDTO);
     }
 
+    /**
+     * Registra un cliente de forma manual en el sistema. Genera un usuario base con una contraseña
+     * temporal y asocia los datos del cliente y su NIF.
+     *
+     * @param request Datos del cliente a registrar.
+     * @return DTO del cliente recién registrado.
+     */
     @Transactional
     public ClientSearchDTO registerManualClient(ClientSearchDTO request) {
         // Validaciones básicas

@@ -7,6 +7,12 @@ import org.tfg.backend.user.UserDTO;
 @Component
 public class UserMapper {
 
+    /**
+    * Convierte una entidad {@link User} en un DTO {@link UserDTO}.
+    *
+    * @param user Entidad del usuario a mapear. Puede ser nula.
+    * @return El DTO con los detalles mapeados, o null si la entidad es nula.
+    */
     public UserDTO mapToDTO(User user) {
         if (user == null) return null;
 

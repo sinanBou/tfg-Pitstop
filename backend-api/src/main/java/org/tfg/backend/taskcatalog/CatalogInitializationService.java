@@ -71,6 +71,14 @@ public class CatalogInitializationService {
         }
     }
 
+    /**
+    * Helper que procesa una secciÃ³n de tareas de un archivo JSON, crea la categorÃ­a
+    * correspondiente si es necesario y guarda todas sus tareas asociadas.
+    *
+    * @param categoryKey Identificador Ãºnico clave de la categorÃ­a.
+    * @param tasksArray Nodo JSON array que contiene las tareas de la categorÃ­a.
+    * @param workshop Taller asociado.
+    */
     private void createCategoryAndTasks(String categoryKey, JsonNode tasksArray, Workshop workshop) {
         String displayName = CATEGORY_DISPLAY_NAMES.getOrDefault(categoryKey, categoryKey);
         

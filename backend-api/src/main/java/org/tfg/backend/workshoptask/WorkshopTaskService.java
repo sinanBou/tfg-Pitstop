@@ -15,6 +15,15 @@ public class WorkshopTaskService {
     private final org.tfg.backend.employee.EmployeeRepository employeeRepository;
     private final org.tfg.backend.appointment.AppointmentRepository appointmentRepository;
 
+    /**
+    * Recupera las tareas planificadas en un taller para un rango horario de un día.
+    * Añade automáticamente aquellas tareas que no tienen mecánico asignado para que no se pierdan.
+    *
+    * @param workshopId Identificador único del taller.
+    * @param start Fecha y hora inicial del día.
+    * @param end Fecha y hora límite del día.
+    * @return Lista de DTOs de las tareas del taller.
+    */
     public List<WorkshopTaskDTO> getTasksByWorkshopAndDate(UUID workshopId, LocalDateTime start, LocalDateTime end) {
         List<WorkshopTask> list = new java.util.ArrayList<>(taskRepository.findByWorkshopIdAndDateTimeBetween(workshopId, start, end));
         List<WorkshopTask> allTasks = taskRepository.findByWorkshopId(workshopId);
@@ -44,6 +53,14 @@ public class WorkshopTaskService {
                 .collect(Collectors.toList());
     }
 
+    /**
+    * Recupera todas las tareas asignadas a un mecánico específico en un rango de fechas.
+    *
+    * @param employeeId Identificador del empleado/mecánico.
+    * @param start Rango inicial.
+    * @param end Rango final.
+    * @return Lista de tareas asignadas.
+    */
     public List<WorkshopTaskDTO> getTasksByEmployeeAndDate(UUID employeeId, LocalDateTime start, LocalDateTime end) {
         return taskRepository.findByAssignedEmployeeIdAndDateTimeBetween(employeeId, start, end)
                 .stream()
@@ -107,6 +124,13 @@ public class WorkshopTaskService {
         }
     }
 
+    /**
+    * Convierte una entidad {@link WorkshopTask} a su objeto de transferencia {@link WorkshopTaskDTO},
+    * enriqueciendo el resultado con detalles del vehículo, cliente y taller.
+    *
+    * @param task Entidad de la tarea a convertir.
+    * @return El DTO de la tarea.
+    */
     public WorkshopTaskDTO convertToDTO(WorkshopTask task) {
         return WorkshopTaskDTO.builder()
                 .id(task.getId())

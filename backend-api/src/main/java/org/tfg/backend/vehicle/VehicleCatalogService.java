@@ -35,6 +35,11 @@ public class VehicleCatalogService {
         catalog = objectMapper.readValue(inputStream, new TypeReference<List<CatalogEntry>>() {});
     }
 
+    /**
+    * Obtiene el listado de marcas únicas presentes en el catálogo, ordenadas alfabéticamente.
+    *
+    * @return Lista de nombres de marcas.
+    */
     public List<String> getMakes() {
         return catalog.stream()
                 .map(CatalogEntry::getMake)
@@ -43,6 +48,12 @@ public class VehicleCatalogService {
                 .collect(Collectors.toList());
     }
 
+    /**
+    * Obtiene la lista de modelos de vehículos para una marca en particular, ordenados alfabéticamente.
+    *
+    * @param make Nombre de la marca.
+    * @return Lista de nombres de modelos para esa marca.
+    */
     public List<String> getModels(String make) {
         if (make == null || make.isEmpty()) return Collections.emptyList();
         String upperMake = make.toUpperCase();

@@ -10,6 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequest {
+    /**
+    * Nombre de pila del usuario.
+    */
     private String firstname;
     private String lastname;
     private String email;
