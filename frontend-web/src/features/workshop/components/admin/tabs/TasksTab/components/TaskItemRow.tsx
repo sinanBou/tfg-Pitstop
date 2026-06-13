@@ -36,7 +36,7 @@ export const TaskItemRow: React.FC<TaskItemRowProps> = ({
         {/* Edit Action Button */}
         <button
           onClick={onStartEdit}
-          className="p-2 text-neutral-500 hover:text-blue-400 hover:bg-neutral-800/40 rounded-xl transition-all cursor-pointer"
+          className="p-2 text-neutral-500 hover:text-red-400 hover:bg-neutral-800/40 rounded-xl transition-all cursor-pointer"
           title="Editar Tarea"
         >
           <Edit className="w-4 h-4" />

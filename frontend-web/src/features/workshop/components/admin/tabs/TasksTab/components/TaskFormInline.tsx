@@ -42,7 +42,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
 }) => {
   return (
     <form onSubmit={onSubmit} className="p-5 bg-neutral-950 border border-neutral-800/40 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-300">
-      <p className="text-xs font-black text-blue-400 uppercase tracking-widest">{title}</p>
+      <p className="text-xs font-black text-red-500 uppercase tracking-widest">{title}</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField
@@ -57,7 +57,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
           <select
             value={calcType}
             onChange={e => setCalcType(e.target.value as any)}
-            className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-blue-500/50 transition-all font-semibold cursor-pointer"
+            className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-red-500/50 transition-all font-semibold cursor-pointer"
           >
             <option value="fixed">Fijo (Tiempo determinado)</option>
             <option value="cylinder">Por Cilindros (Coches/Motores)</option>
@@ -128,7 +128,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
         <button
           type="submit"
           disabled={submitting}
-          className="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-black uppercase tracking-wider text-white transition-all disabled:opacity-50 cursor-pointer"
+          className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-wider text-white transition-all disabled:opacity-50 cursor-pointer"
         >
           {submitting ? 'Procesando...' : submitLabel}
         </button>

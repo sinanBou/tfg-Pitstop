@@ -8,7 +8,7 @@ import { TaskItemRow } from './components/TaskItemRow';
 import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
-import { Search, X, Wrench } from '@/assets/icons';
+import { Search, X, Box } from '@/assets/icons';
 
 export interface CatalogTask {
   id: string;
@@ -327,7 +327,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-neutral-500 gap-4">
-        <div className="w-12 h-12 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-2 border-neutral-800 border-t-red-600 rounded-full animate-spin" />
         <p className="text-xs uppercase tracking-widest font-black">Cargando catálogo del taller...</p>
       </div>
     );
@@ -341,7 +341,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
         subtitle="Controla y personaliza las tareas mecánicas de tu taller"
         actionLabel="Nueva Categoría"
         onActionClick={() => setShowAddCat(!showAddCat)}
-        colorVariant="blue"
+        colorVariant="red"
       />
 
       {/* Search Input Bar */}
@@ -354,7 +354,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           placeholder="Buscar servicios por descripción o código (ej: alternador, 1.10, frenos)..."
-          className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-12 pr-12 py-3.5 text-white text-xs focus:outline-none focus:border-blue-500/50 focus:bg-black/40 transition-all placeholder-neutral-500 font-semibold"
+          className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-12 pr-12 py-3.5 text-white text-xs focus:outline-none focus:border-red-500/50 focus:bg-black/40 transition-all placeholder-neutral-500 font-semibold"
         />
         {searchTerm && (
           <button
@@ -377,7 +377,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
           onSubmit={handleCreateCategory}
           onCancel={() => setShowAddCat(false)}
           submitting={addingCat}
-          colorVariant="blue"
+          colorVariant="red"
         />
       )}
 
@@ -417,8 +417,8 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                   itemLabelSingle="Tarea"
                   itemLabelPlural="Tareas"
                   gender="f"
-                  icon={Wrench}
-                  colorVariant="blue"
+                  icon={Box}
+                  colorVariant="red"
                 />
 
                 {/* Add Task Form Inline */}
