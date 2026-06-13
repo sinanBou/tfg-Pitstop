@@ -243,7 +243,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                 </Button>
               )}
 
-              {selectedEmp.role !== 'WORKSHOP_OWNER' && (
+              {userRole === 'WORKSHOP_OWNER' && selectedEmp.role !== 'WORKSHOP_OWNER' && (
                 <Button 
                   onClick={() => {
                     setConfirmModal({
