@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import type { WorkshopInventory, PartCategory } from '@/features/workshop';
-import { CategoryHeader } from './components/CategoryHeader';
+import { CategoryHeader } from '../shared/CategoryHeader';
 import { AddCategoryForm } from '../shared/AddCategoryForm';
 import { TabHeader } from '../shared/TabHeader';
 import { PartFormInline } from './components/PartFormInline';

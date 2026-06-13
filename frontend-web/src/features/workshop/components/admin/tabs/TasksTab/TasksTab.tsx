@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { TabHeader } from '../shared/TabHeader';
 import { AddCategoryForm } from '../shared/AddCategoryForm';
-import { CategoryHeader } from '../PartsTab/components/CategoryHeader';
+import { CategoryHeader } from '../shared/CategoryHeader';
 import { TaskFormInline } from './components/TaskFormInline';
 import { TaskItemRow } from './components/TaskItemRow';
 import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
-import { Search, X } from '@/assets/icons';
+import { Search, X, Wrench } from '@/assets/icons';
 
 export interface CatalogTask {
   id: string;
@@ -413,6 +413,12 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                   onToggle={() => toggleCategory(cat.id)}
                   onToggleAddPart={() => setAddingTaskCatId(isAddingTaskHere ? null : cat.id)}
                   onDelete={(e) => handleDeleteCategory(e, cat.id)}
+                  addLabel="Añadir Tarea"
+                  itemLabelSingle="Tarea"
+                  itemLabelPlural="Tareas"
+                  gender="f"
+                  icon={Wrench}
+                  colorVariant="blue"
                 />
 
                 {/* Add Task Form Inline */}
