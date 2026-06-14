@@ -13,7 +13,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WorkshopController {
 
-    private final WorkshopService workshopService;
+    private final WorkshopLookupService workshopLookupService;
+    private final WorkshopAdminService workshopAdminService;
 
     /**
      * Crea un nuevo taller.
@@ -22,7 +23,7 @@ public class WorkshopController {
      */
     @PostMapping
     public ResponseEntity<WorkshopDTO> createWorkshop(@RequestBody WorkshopRequest request) {
-        return ResponseEntity.ok(workshopService.saveWorkshop(request));
+        return ResponseEntity.ok(workshopAdminService.saveWorkshop(request));
     }
 
     /**
@@ -31,7 +32,7 @@ public class WorkshopController {
      */
     @GetMapping
     public ResponseEntity<List<WorkshopDTO>> getAllWorkshops() {
-        return ResponseEntity.ok(workshopService.getAllWorkshops());
+        return ResponseEntity.ok(workshopLookupService.getAllWorkshops());
     }
 
     /**
@@ -40,7 +41,7 @@ public class WorkshopController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<WorkshopDTO> getWorkshopById(@PathVariable UUID id) {
-        return ResponseEntity.ok(workshopService.getWorkshopById(id));
+        return ResponseEntity.ok(workshopLookupService.getWorkshopById(id));
     }
 
     /**
@@ -51,16 +52,8 @@ public class WorkshopController {
     */
     @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<WorkshopDTO>> getWorkshopsByOwner(@PathVariable UUID ownerId) {
-        return ResponseEntity.ok(workshopService.getWorkshopsByOwnerId(ownerId));
-    /**
-    * Obtiene los detalles de un taller específico a partir de su identificador único.
-    *
-    * @param id Identificador único (UUID) del taller.
-    * @return El DTO con los detalles del taller.
-    */
+        return ResponseEntity.ok(workshopLookupService.getWorkshopsByOwnerId(ownerId));
     }
-
-    // En backend/workshop/WorkshopController.java
 
     /**
      * Actualiza la configuración de horario y duración de citas de un taller.
@@ -71,14 +64,7 @@ public class WorkshopController {
     public ResponseEntity<WorkshopDTO> updateSettings(
             @PathVariable UUID id,
             @RequestBody WorkshopRequest request) {
-        return ResponseEntity.ok(workshopService.updateWorkshopSettings(id, request));
-    /**
-    * Actualiza la configuración de horario, días laborables y duración de citas de un taller.
-    *
-    * @param id Identificador único del taller a modificar.
-    * @param request Datos con el nuevo horario, tarifa y duración del slot.
-    * @return El DTO con la configuración modificada.
-    */
+        return ResponseEntity.ok(workshopAdminService.updateWorkshopSettings(id, request));
     }
 
     @GetMapping("/search")
@@ -86,14 +72,7 @@ public class WorkshopController {
             @RequestParam(defaultValue = "") String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(workshopService.searchWorkshops(query, page, size));
-    /**
-    * Sube un archivo de imagen para el logotipo del taller.
-    *
-    * @param id Identificador único del taller.
-    * @param file Archivo de imagen multiparte.
-    * @return El taller actualizado con la URL del logotipo.
-    */
+        return ResponseEntity.ok(workshopLookupService.searchWorkshops(query, page, size));
     }
 
     /**
@@ -104,15 +83,9 @@ public class WorkshopController {
             @PathVariable UUID id,
             @RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
         try {
-            return ResponseEntity.ok(workshopService.uploadLogo(id, file));
+            return ResponseEntity.ok(workshopAdminService.uploadLogo(id, file));
         } catch (Exception e) {
             throw new RuntimeException("Error al subir el logo del taller: " + e.getMessage(), e);
-        /**
-        * Elimina el logotipo de taller actual tanto del almacenamiento como de la base de datos.
-        *
-        * @param id Identificador único del taller.
-        * @return El taller con el campo del logotipo restaurado a nulo.
-        */
         }
     }
 
@@ -121,7 +94,7 @@ public class WorkshopController {
      */
     @DeleteMapping("/{id}/logo")
     public ResponseEntity<WorkshopDTO> deleteLogo(@PathVariable UUID id) {
-        return ResponseEntity.ok(workshopService.deleteLogo(id));
+        return ResponseEntity.ok(workshopAdminService.deleteLogo(id));
     }
 
     /**
@@ -129,7 +102,7 @@ public class WorkshopController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteWorkshop(@PathVariable UUID id) {
-        workshopService.deleteWorkshop(id);
+        workshopAdminService.deleteWorkshop(id);
         return ResponseEntity.noContent().build();
     }
 }

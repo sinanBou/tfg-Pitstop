@@ -30,7 +30,10 @@ class UserControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private UserService userService;
+    private org.tfg.backend.user.service.UserLookupService userLookupService;
+
+    @Mock
+    private org.tfg.backend.user.service.UserAdminService userAdminService;
 
     @InjectMocks
     private UserController userController;
@@ -56,7 +59,7 @@ class UserControllerTest {
 
                     @Override
                     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                                  NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+                                                   NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
                         return org.springframework.security.core.userdetails.User.withUsername("john@example.com")
                                 .password("password")
                                 .roles("CLIENT")
@@ -68,7 +71,7 @@ class UserControllerTest {
 
     @Test
     void getMe_ShouldReturnUserDetails() throws Exception {
-        when(userService.getUserDetails("john@example.com")).thenReturn(mockDTO);
+        when(userLookupService.getUserDetails("john@example.com")).thenReturn(mockDTO);
 
         mockMvc.perform(get("/api/users/me"))
                 .andExpect(status().isOk())
@@ -76,6 +79,6 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.firstname", is("John")))
                 .andExpect(jsonPath("$.role", is("CLIENT")));
 
-        verify(userService, times(1)).getUserDetails("john@example.com");
+        verify(userLookupService, times(1)).getUserDetails("john@example.com");
     }
 }

@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.tfg.backend.user.service.UserAdminService;
+import org.tfg.backend.user.service.UserLookupService;
 
 /**
  * Controlador REST que gestiona las operaciones del perfil del usuario actualmente autenticado,
@@ -16,7 +18,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserLookupService userLookupService;
+    private final UserAdminService userAdminService;
 
     /**
     * Obtiene y retorna los datos del usuario autenticado que realiza la solicitud.
@@ -28,7 +31,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getMe(@AuthenticationPrincipal UserDetails userDetails) {
 
-        UserDTO userDto = userService.getUserDetails(userDetails.getUsername());
+        UserDTO userDto = userLookupService.getUserDetails(userDetails.getUsername());
 
         UserDTO finalDto = UserDTO.builder()
                 .id(userDto.getId())
@@ -55,7 +58,7 @@ public class UserController {
     public ResponseEntity<String> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
-        userService.changePassword(userDetails.getUsername(), request);
+        userAdminService.changePassword(userDetails.getUsername(), request);
         return ResponseEntity.ok("Contraseña cambiada correctamente.");
     }
 
@@ -68,7 +71,7 @@ public class UserController {
      */
     @DeleteMapping("/me")
     public ResponseEntity<String> deleteMe(@AuthenticationPrincipal UserDetails userDetails) {
-        userService.deleteUser(userDetails.getUsername());
+        userAdminService.deleteUser(userDetails.getUsername());
         return ResponseEntity.ok("Usuario eliminado correctamente.");
     }
 }

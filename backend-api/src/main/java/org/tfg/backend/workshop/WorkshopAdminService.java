@@ -167,4 +167,12 @@ public class WorkshopAdminService {
 
         return workshopMapper.mapToDTO(workshop);
     }
+
+    @Transactional
+    public void deleteWorkshop(UUID id) {
+        if (!workshopRepository.existsById(id)) {
+            throw new RuntimeException("Taller no encontrado");
+        }
+        workshopRepository.deleteById(id);
+    }
 }

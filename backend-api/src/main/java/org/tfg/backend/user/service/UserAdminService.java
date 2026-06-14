@@ -1,4 +1,4 @@
-package org.tfg.backend.user;
+package org.tfg.backend.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,12 +16,17 @@ import org.tfg.backend.workshoptask.WorkshopTaskRepository;
 import org.tfg.backend.workshoptask.WorkshopTask;
 import org.tfg.backend.workshop.Workshop;
 import org.tfg.backend.workshop.WorkshopRepository;
+import org.tfg.backend.user.*;
 
 import java.util.List;
 
+/**
+ * Servicio administrativo encargado de las operaciones de modificación del perfil de usuario,
+ * como cambiar contraseña y dar de baja cuentas de usuario de manera segura.
+ */
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserAdminService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,16 +35,6 @@ public class UserService {
     private final AppointmentRepository appointmentRepository;
     private final WorkshopTaskRepository workshopTaskRepository;
     private final WorkshopRepository workshopRepository;
-
-    /**
-     * Busca un usuario por su email y devuelve su DTO seguro.
-     */
-    @Transactional(readOnly = true)
-    public UserDTO getUserDetails(String email) {
-        User user = userRepository.findByEmail(email.trim().toLowerCase())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        return mapToDTO(user);
-    }
 
     /**
      * Cambia la contraseña de un usuario autenticado tras validar la contraseña actual.
@@ -122,22 +117,5 @@ public class UserService {
 
         // 4. Eliminar el usuario
         userRepository.delete(user);
-    }
-
-    /**
-     * Mapea la entidad User a UserDTO de forma segura.
-     */
-    public UserDTO mapToDTO(User user) {
-        return UserDTO.builder()
-                .id(user.getId())
-                .firstname(user.getFirstname())
-                .lastname(user.getLastname())
-                .email(user.getEmail())
-                .role(user.getRole().name())
-                // Navegamos a las relaciones inversas para obtener los IDs de perfil
-                .clientId(user.getClient() != null ? user.getClient().getId() : null)
-                .employeeId(user.getEmployee() != null ? user.getEmployee().getId() : null)
-                .workshopId(user.getEmployee() != null && user.getEmployee().getWorkshop() != null ? user.getEmployee().getWorkshop().getId() : null)
-                .build();
     }
 }

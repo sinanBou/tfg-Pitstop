@@ -5,9 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.tfg.backend.vehicle.VehicleDTO;
-import org.tfg.backend.vehicle.VehicleRequest;
-import org.tfg.backend.vehicle.VehicleService;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +15,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VehicleController {
 
-    private final VehicleService vehicleService;
+    private final VehicleAdminService vehicleAdminService;
+    private final VehicleProfileService vehicleProfileService;
     private final VehicleCatalogService catalogService;
 
     /**
@@ -54,7 +52,7 @@ public class VehicleController {
     @PostMapping("/register")
     public ResponseEntity<VehicleDTO> register(@RequestBody VehicleRequest request,
                                                @AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(vehicleService.registerVehicle(request, userDetails.getUsername()));
+        return ResponseEntity.ok(vehicleProfileService.registerVehicle(request, userDetails.getUsername()));
     }
 
     // Devuelve una lista de DTOs
@@ -66,7 +64,7 @@ public class VehicleController {
     */
     @GetMapping("/my-vehicles")
     public ResponseEntity<List<VehicleDTO>> getMyVehicles(@AuthenticationPrincipal UserDetails userDetails) {
-        return ResponseEntity.ok(vehicleService.getVehiclesByClient(userDetails.getUsername()));
+        return ResponseEntity.ok(vehicleProfileService.getVehiclesByClient(userDetails.getUsername()));
     }
 
     /**
@@ -77,7 +75,7 @@ public class VehicleController {
     */
     @GetMapping("/search")
     public ResponseEntity<List<VehicleSearchDTO>> search(@RequestParam String licensePlate) {
-        return ResponseEntity.ok(vehicleService.searchVehicles(licensePlate));
+        return ResponseEntity.ok(vehicleAdminService.searchVehicles(licensePlate));
     }
 
     /**
@@ -88,7 +86,7 @@ public class VehicleController {
     */
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<VehicleSearchDTO>> getVehiclesByClientId(@PathVariable UUID clientId) {
-        return ResponseEntity.ok(vehicleService.getVehiclesByClientId(clientId));
+        return ResponseEntity.ok(vehicleAdminService.getVehiclesByClientId(clientId));
     }
 
     /**
@@ -100,7 +98,7 @@ public class VehicleController {
     */
     @PostMapping("/register-for-client/{clientId}")
     public ResponseEntity<VehicleSearchDTO> registerForClient(@PathVariable UUID clientId, @RequestBody VehicleRequest request) {
-        return ResponseEntity.ok(vehicleService.registerVehicleForClient(clientId, request));
+        return ResponseEntity.ok(vehicleAdminService.registerVehicleForClient(clientId, request));
     }
 
     /**
@@ -113,7 +111,7 @@ public class VehicleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteVehicle(@PathVariable UUID id,
                                               @AuthenticationPrincipal UserDetails userDetails) {
-        vehicleService.deleteVehicle(id, userDetails.getUsername());
+        vehicleProfileService.deleteVehicle(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }
 }

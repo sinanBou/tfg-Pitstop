@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.tfg.backend.workshoptask.service.WorkshopTaskAdminService;
+import org.tfg.backend.workshoptask.service.WorkshopTaskLookupService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,7 +21,8 @@ import java.util.UUID;
 @RequestMapping("/api/workshop-tasks")
 @RequiredArgsConstructor
 public class WorkshopTaskController {
-    private final WorkshopTaskService taskService;
+    private final WorkshopTaskLookupService taskLookupService;
+    private final WorkshopTaskAdminService taskAdminService;
 
     /**
      * Obtiene la lista de tareas programadas para un taller en un día específico.
@@ -34,7 +37,7 @@ public class WorkshopTaskController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         LocalDateTime start = date.atStartOfDay();
         LocalDateTime end = date.atTime(23, 59, 59);
-        return taskService.getTasksByWorkshopAndDate(workshopId, start, end);
+        return taskLookupService.getTasksByWorkshopAndDate(workshopId, start, end);
     }
 
     /**
@@ -45,7 +48,7 @@ public class WorkshopTaskController {
      */
     @GetMapping("/workshop/{workshopId}/delayed")
     public List<WorkshopTaskDTO> getDelayedTasks(@PathVariable UUID workshopId) {
-        return taskService.getDelayedTasksByWorkshop(workshopId);
+        return taskLookupService.getDelayedTasksByWorkshop(workshopId);
     }
 
     /**
@@ -57,7 +60,7 @@ public class WorkshopTaskController {
      */
     @PatchMapping("/{id}")
     public ResponseEntity<WorkshopTaskDTO> updateTask(@PathVariable UUID id, @RequestBody WorkshopTaskDTO dto) {
-        return ResponseEntity.ok(taskService.updateTask(id, dto));
+        return ResponseEntity.ok(taskAdminService.updateTask(id, dto));
     }
 
     /**
@@ -69,7 +72,7 @@ public class WorkshopTaskController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID id) {
-        taskService.deleteTask(id);
+        taskAdminService.deleteTask(id);
         return ResponseEntity.ok().build();
     }
 }

@@ -35,7 +35,10 @@ class EmployeeControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private EmployeService employeService;
+    private EmployeeProfileService employeeProfileService;
+
+    @Mock
+    private EmployeeAdminService employeeAdminService;
 
     @InjectMocks
     private EmployeeController employeeController;
@@ -69,7 +72,7 @@ class EmployeeControllerTest {
 
             @Override
             public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                          NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+                                           NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
                 return mockAuthUser;
             }
         };
@@ -81,19 +84,19 @@ class EmployeeControllerTest {
 
     @Test
     void getMe_ShouldReturnProfile() throws Exception {
-        when(employeService.getEmployeeProfile("john.doe@pitstop.com")).thenReturn(mockDTO);
+        when(employeeProfileService.getEmployeeProfile("john.doe@pitstop.com")).thenReturn(mockDTO);
 
         mockMvc.perform(get("/api/employees/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("john.doe@pitstop.com")))
                 .andExpect(jsonPath("$.firstname", is("John")));
 
-        verify(employeService, times(1)).getEmployeeProfile("john.doe@pitstop.com");
+        verify(employeeProfileService, times(1)).getEmployeeProfile("john.doe@pitstop.com");
     }
 
     @Test
     void updateMe_ShouldReturnUpdatedProfile() throws Exception {
-        when(employeService.updateProfile(eq("john.doe@pitstop.com"), any(UpdateProfileRequest.class)))
+        when(employeeProfileService.updateProfile(eq("john.doe@pitstop.com"), any(UpdateProfileRequest.class)))
                 .thenReturn(mockDTO);
 
         String payload = "{\"firstname\":\"Jane\",\"lastname\":\"Smith\"}";
@@ -104,36 +107,36 @@ class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("john.doe@pitstop.com")));
 
-        verify(employeService, times(1)).updateProfile(eq("john.doe@pitstop.com"), any(UpdateProfileRequest.class));
+        verify(employeeProfileService, times(1)).updateProfile(eq("john.doe@pitstop.com"), any(UpdateProfileRequest.class));
     }
 
     @Test
     void deleteAvatar_ShouldReturnClearedProfile() throws Exception {
-        when(employeService.deleteProfilePicture("john.doe@pitstop.com")).thenReturn(mockDTO);
+        when(employeeProfileService.deleteProfilePicture("john.doe@pitstop.com")).thenReturn(mockDTO);
 
         mockMvc.perform(delete("/api/employees/me/avatar"))
                 .andExpect(status().isOk());
 
-        verify(employeService, times(1)).deleteProfilePicture("john.doe@pitstop.com");
+        verify(employeeProfileService, times(1)).deleteProfilePicture("john.doe@pitstop.com");
     }
 
     @Test
     void getEmployeesByWorkshop_ShouldReturnList() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(employeService.getEmployeesByWorkshopId(workshopId)).thenReturn(List.of(mockDTO));
+        when(employeeAdminService.getEmployeesByWorkshopId(workshopId)).thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/employees/workshop/{workshopId}", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].email", is("john.doe@pitstop.com")));
 
-        verify(employeService, times(1)).getEmployeesByWorkshopId(workshopId);
+        verify(employeeAdminService, times(1)).getEmployeesByWorkshopId(workshopId);
     }
 
     @Test
     void addEmployeeToWorkshop_ShouldReturnOk() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        doNothing().when(employeService).addEmployeeToWorkshop(eq(workshopId), any(AddEmployeeRequest.class));
+        doNothing().when(employeeAdminService).addEmployeeToWorkshop(eq(workshopId), any(AddEmployeeRequest.class));
 
         String payload = "{\"firstname\":\"Jane\",\"lastname\":\"Smith\",\"email\":\"jane.smith@pitstop.com\",\"password\":\"12345\",\"role\":\"WORKSHOP_STAFF\"}";
 
@@ -143,55 +146,55 @@ class EmployeeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string("Empleado añadido con éxito"));
 
-        verify(employeService, times(1)).addEmployeeToWorkshop(eq(workshopId), any(AddEmployeeRequest.class));
+        verify(employeeAdminService, times(1)).addEmployeeToWorkshop(eq(workshopId), any(AddEmployeeRequest.class));
     }
 
     @Test
     void deleteEmployee_ShouldReturnOk() throws Exception {
         UUID id = UUID.randomUUID();
-        doNothing().when(employeService).deleteEmployee(id);
+        doNothing().when(employeeAdminService).deleteEmployee(id);
 
         mockMvc.perform(delete("/api/employees/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Empleado eliminado con éxito"));
 
-        verify(employeService, times(1)).deleteEmployee(id);
+        verify(employeeAdminService, times(1)).deleteEmployee(id);
     }
 
     @Test
     void promoteToManager_ShouldReturnOk() throws Exception {
         UUID id = UUID.randomUUID();
-        doNothing().when(employeService).promoteToManager(id);
+        doNothing().when(employeeAdminService).promoteToManager(id);
 
         mockMvc.perform(put("/api/employees/{id}/promote", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Empleado ascendido a Gerente"));
 
-        verify(employeService, times(1)).promoteToManager(id);
+        verify(employeeAdminService, times(1)).promoteToManager(id);
     }
 
     @Test
     void demoteToStaff_ShouldReturnOk() throws Exception {
         UUID id = UUID.randomUUID();
-        doNothing().when(employeService).demoteToStaff(id);
+        doNothing().when(employeeAdminService).demoteToStaff(id);
 
         mockMvc.perform(put("/api/employees/{id}/demote", id))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Empleado degradado a Mecánico"));
 
-        verify(employeService, times(1)).demoteToStaff(id);
+        verify(employeeAdminService, times(1)).demoteToStaff(id);
     }
 
     @Test
     void updateAllowedSections_ShouldReturnOk() throws Exception {
         UUID id = UUID.randomUUID();
-        doNothing().when(employeService).updateAllowedSections(id, "PLANNING,TASKS");
+        doNothing().when(employeeAdminService).updateAllowedSections(id, "PLANNING,TASKS");
 
         mockMvc.perform(put("/api/employees/{id}/allowed-sections", id)
                         .param("allowedSections", "PLANNING,TASKS"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Permisos actualizados con éxito"));
 
-        verify(employeService, times(1)).updateAllowedSections(id, "PLANNING,TASKS");
+        verify(employeeAdminService, times(1)).updateAllowedSections(id, "PLANNING,TASKS");
     }
 }

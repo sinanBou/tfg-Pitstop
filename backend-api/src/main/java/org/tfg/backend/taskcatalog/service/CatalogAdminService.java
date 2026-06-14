@@ -131,6 +131,16 @@ public class CatalogAdminService {
         taskRepository.deleteById(taskId);
     }
 
+    @Transactional
+    public void deleteCategory(UUID categoryId) {
+        TaskCategory category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+        if (!category.getTasks().isEmpty()) {
+            throw new RuntimeException("No se puede eliminar la categoría porque contiene tareas");
+        }
+        categoryRepository.delete(category);
+    }
+
     private String generateNextCode(TaskCategory category) {
         List<CatalogTask> tasks = category.getTasks();
         if (tasks == null || tasks.isEmpty()) {

@@ -3,6 +3,8 @@ package org.tfg.backend.taskcatalog;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.tfg.backend.taskcatalog.service.CatalogAdminService;
+import org.tfg.backend.taskcatalog.service.CatalogLookupService;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +19,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CatalogController {
 
-    private final CatalogService catalogService;
+    private final CatalogLookupService catalogLookupService;
+    private final CatalogAdminService catalogAdminService;
 
     /**
      * Obtiene el listado de categorías y tareas del catálogo de un taller específico.
@@ -27,7 +30,7 @@ public class CatalogController {
      */
     @GetMapping("/workshop/{workshopId}")
     public ResponseEntity<List<TaskCategory>> getCatalog(@PathVariable UUID workshopId) {
-        return ResponseEntity.ok(catalogService.getCatalog(workshopId));
+        return ResponseEntity.ok(catalogLookupService.getCatalog(workshopId));
     }
 
     /**
@@ -45,7 +48,7 @@ public class CatalogController {
         if (displayName == null || displayName.trim().isEmpty()) {
             throw new RuntimeException("El nombre legible de la categoría es obligatorio");
         }
-        return ResponseEntity.ok(catalogService.createCategory(workshopId, displayName));
+        return ResponseEntity.ok(catalogAdminService.createCategory(workshopId, displayName));
     }
 
     /**
@@ -61,7 +64,7 @@ public class CatalogController {
             @PathVariable UUID workshopId,
             @PathVariable UUID categoryId,
             @RequestBody CatalogTask taskDto) {
-        return ResponseEntity.ok(catalogService.createTask(workshopId, categoryId, taskDto));
+        return ResponseEntity.ok(catalogAdminService.createTask(workshopId, categoryId, taskDto));
     }
 
     /**
@@ -75,7 +78,7 @@ public class CatalogController {
     public ResponseEntity<CatalogTask> updateTask(
             @PathVariable UUID taskId,
             @RequestBody CatalogTask taskDto) {
-        return ResponseEntity.ok(catalogService.updateTask(taskId, taskDto));
+        return ResponseEntity.ok(catalogAdminService.updateTask(taskId, taskDto));
     }
 
     /**
@@ -86,7 +89,7 @@ public class CatalogController {
      */
     @DeleteMapping("/tasks/{taskId}")
     public ResponseEntity<Void> deleteTask(@PathVariable UUID taskId) {
-        catalogService.deleteTask(taskId);
+        catalogAdminService.deleteTask(taskId);
         return ResponseEntity.ok().build();
     }
 
@@ -98,7 +101,7 @@ public class CatalogController {
      */
     @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID categoryId) {
-        catalogService.deleteCategory(categoryId);
+        catalogAdminService.deleteCategory(categoryId);
         return ResponseEntity.ok().build();
     }
 }

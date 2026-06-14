@@ -34,7 +34,10 @@ class VehicleControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private VehicleService vehicleService;
+    private VehicleProfileService vehicleProfileService;
+
+    @Mock
+    private VehicleAdminService vehicleAdminService;
 
     @Mock
     private VehicleCatalogService catalogService;
@@ -79,7 +82,7 @@ class VehicleControllerTest {
 
             @Override
             public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                          NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+                                           NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
                 return mockUserDetails;
             }
         };
@@ -115,7 +118,7 @@ class VehicleControllerTest {
 
     @Test
     void register_ShouldReturnDTO() throws Exception {
-        when(vehicleService.registerVehicle(any(VehicleRequest.class), eq("john@pitstop.com")))
+        when(vehicleProfileService.registerVehicle(any(VehicleRequest.class), eq("john@pitstop.com")))
                 .thenReturn(mockDTO);
 
         String payload = "{\"brand\":\"BMW\",\"model\":\"M3\",\"licensePlate\":\"1234BBB\",\"year\":2022,\"vin\":\"VIN123456789\"}";
@@ -126,24 +129,24 @@ class VehicleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.brand", is("BMW")));
 
-        verify(vehicleService, times(1)).registerVehicle(any(VehicleRequest.class), eq("john@pitstop.com"));
+        verify(vehicleProfileService, times(1)).registerVehicle(any(VehicleRequest.class), eq("john@pitstop.com"));
     }
 
     @Test
     void getMyVehicles_ShouldReturnList() throws Exception {
-        when(vehicleService.getVehiclesByClient("john@pitstop.com")).thenReturn(List.of(mockDTO));
+        when(vehicleProfileService.getVehiclesByClient("john@pitstop.com")).thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/vehicles/my-vehicles"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].brand", is("BMW")));
 
-        verify(vehicleService, times(1)).getVehiclesByClient("john@pitstop.com");
+        verify(vehicleProfileService, times(1)).getVehiclesByClient("john@pitstop.com");
     }
 
     @Test
     void search_ShouldReturnList() throws Exception {
-        when(vehicleService.searchVehicles("1234BBB")).thenReturn(List.of(mockSearchDTO));
+        when(vehicleAdminService.searchVehicles("1234BBB")).thenReturn(List.of(mockSearchDTO));
 
         mockMvc.perform(get("/api/vehicles/search")
                         .param("licensePlate", "1234BBB"))
@@ -151,26 +154,26 @@ class VehicleControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].brand", is("BMW")));
 
-        verify(vehicleService, times(1)).searchVehicles("1234BBB");
+        verify(vehicleAdminService, times(1)).searchVehicles("1234BBB");
     }
 
     @Test
     void getVehiclesByClientId_ShouldReturnList() throws Exception {
         UUID clientId = mockSearchDTO.getClientId();
-        when(vehicleService.getVehiclesByClientId(clientId)).thenReturn(List.of(mockSearchDTO));
+        when(vehicleAdminService.getVehiclesByClientId(clientId)).thenReturn(List.of(mockSearchDTO));
 
         mockMvc.perform(get("/api/vehicles/client/{clientId}", clientId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].brand", is("BMW")));
 
-        verify(vehicleService, times(1)).getVehiclesByClientId(clientId);
+        verify(vehicleAdminService, times(1)).getVehiclesByClientId(clientId);
     }
 
     @Test
     void registerForClient_ShouldReturnSearchDTO() throws Exception {
         UUID clientId = mockSearchDTO.getClientId();
-        when(vehicleService.registerVehicleForClient(eq(clientId), any(VehicleRequest.class)))
+        when(vehicleAdminService.registerVehicleForClient(eq(clientId), any(VehicleRequest.class)))
                 .thenReturn(mockSearchDTO);
 
         String payload = "{\"brand\":\"BMW\",\"model\":\"M3\",\"licensePlate\":\"1234BBB\",\"year\":2022,\"vin\":\"VIN123456789\"}";
@@ -181,17 +184,17 @@ class VehicleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.brand", is("BMW")));
 
-        verify(vehicleService, times(1)).registerVehicleForClient(eq(clientId), any(VehicleRequest.class));
+        verify(vehicleAdminService, times(1)).registerVehicleForClient(eq(clientId), any(VehicleRequest.class));
     }
 
     @Test
     void deleteVehicle_ShouldReturnNoContent() throws Exception {
         UUID vehicleId = mockDTO.getId();
-        doNothing().when(vehicleService).deleteVehicle(vehicleId, "john@pitstop.com");
+        doNothing().when(vehicleProfileService).deleteVehicle(vehicleId, "john@pitstop.com");
 
         mockMvc.perform(delete("/api/vehicles/{id}", vehicleId))
                 .andExpect(status().isNoContent());
 
-        verify(vehicleService, times(1)).deleteVehicle(vehicleId, "john@pitstop.com");
+        verify(vehicleProfileService, times(1)).deleteVehicle(vehicleId, "john@pitstop.com");
     }
 }

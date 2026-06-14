@@ -27,7 +27,10 @@ class WorkshopTaskControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private WorkshopTaskService taskService;
+    private org.tfg.backend.workshoptask.service.WorkshopTaskLookupService taskLookupService;
+
+    @Mock
+    private org.tfg.backend.workshoptask.service.WorkshopTaskAdminService taskAdminService;
 
     @InjectMocks
     private WorkshopTaskController workshopTaskController;
@@ -48,7 +51,7 @@ class WorkshopTaskControllerTest {
     @Test
     void getWorkshopTasks_ShouldReturnList() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(taskService.getTasksByWorkshopAndDate(eq(workshopId), any(), any()))
+        when(taskLookupService.getTasksByWorkshopAndDate(eq(workshopId), any(), any()))
                 .thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/workshop-tasks/workshop/{workshopId}", workshopId)
@@ -57,13 +60,13 @@ class WorkshopTaskControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].description", is("Cambio de aceite")));
 
-        verify(taskService, times(1)).getTasksByWorkshopAndDate(eq(workshopId), any(), any());
+        verify(taskLookupService, times(1)).getTasksByWorkshopAndDate(eq(workshopId), any(), any());
     }
 
     @Test
     void updateTask_ShouldReturnUpdatedDTO() throws Exception {
         UUID taskId = mockDTO.getId();
-        when(taskService.updateTask(eq(taskId), any(WorkshopTaskDTO.class))).thenReturn(mockDTO);
+        when(taskAdminService.updateTask(eq(taskId), any(WorkshopTaskDTO.class))).thenReturn(mockDTO);
 
         String payload = "{\"status\":\"IN_PROGRESS\"}";
 
@@ -73,7 +76,7 @@ class WorkshopTaskControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is("Cambio de aceite")));
 
-        verify(taskService, times(1)).updateTask(eq(taskId), any(WorkshopTaskDTO.class));
+        verify(taskAdminService, times(1)).updateTask(eq(taskId), any(WorkshopTaskDTO.class));
     }
 
     @Test
@@ -83,19 +86,19 @@ class WorkshopTaskControllerTest {
         mockMvc.perform(delete("/api/workshop-tasks/{id}", taskId))
                 .andExpect(status().isOk());
 
-        verify(taskService, times(1)).deleteTask(taskId);
+        verify(taskAdminService, times(1)).deleteTask(taskId);
     }
 
     @Test
     void getDelayedTasks_ShouldReturnList() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(taskService.getDelayedTasksByWorkshop(eq(workshopId))).thenReturn(List.of(mockDTO));
+        when(taskLookupService.getDelayedTasksByWorkshop(eq(workshopId))).thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/workshop-tasks/workshop/{workshopId}/delayed", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].description", is("Cambio de aceite")));
 
-        verify(taskService, times(1)).getDelayedTasksByWorkshop(eq(workshopId));
+        verify(taskLookupService, times(1)).getDelayedTasksByWorkshop(eq(workshopId));
     }
 }

@@ -50,4 +50,12 @@ public class WorkshopTaskLookupService {
                 .map(taskMapper::convertToDTO)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<WorkshopTaskDTO> getDelayedTasksByWorkshop(UUID workshopId) {
+        return taskRepository.findByWorkshopIdAndStatus(workshopId, WorkshopTaskStatus.DELAYED)
+                .stream()
+                .map(taskMapper::convertToDTO)
+                .collect(Collectors.toList());
+    }
 }

@@ -27,7 +27,10 @@ class CatalogControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private CatalogService catalogService;
+    private org.tfg.backend.taskcatalog.service.CatalogLookupService catalogLookupService;
+
+    @Mock
+    private org.tfg.backend.taskcatalog.service.CatalogAdminService catalogAdminService;
 
     @InjectMocks
     private CatalogController catalogController;
@@ -56,20 +59,20 @@ class CatalogControllerTest {
     @Test
     void getCatalog_ShouldReturnList() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(catalogService.getCatalog(workshopId)).thenReturn(List.of(mockCategory));
+        when(catalogLookupService.getCatalog(workshopId)).thenReturn(List.of(mockCategory));
 
         mockMvc.perform(get("/api/catalog/workshop/{workshopId}", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].displayName", is("Consumibles")));
 
-        verify(catalogService, times(1)).getCatalog(workshopId);
+        verify(catalogLookupService, times(1)).getCatalog(workshopId);
     }
 
     @Test
     void createCategory_ShouldReturnCreated() throws Exception {
         UUID workshopId = UUID.randomUUID();
-        when(catalogService.createCategory(workshopId, "Consumibles")).thenReturn(mockCategory);
+        when(catalogAdminService.createCategory(workshopId, "Consumibles")).thenReturn(mockCategory);
 
         String payload = "{\"displayName\":\"Consumibles\"}";
 
@@ -79,14 +82,14 @@ class CatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.displayName", is("Consumibles")));
 
-        verify(catalogService, times(1)).createCategory(workshopId, "Consumibles");
+        verify(catalogAdminService, times(1)).createCategory(workshopId, "Consumibles");
     }
 
     @Test
     void createTask_ShouldReturnTask() throws Exception {
         UUID workshopId = UUID.randomUUID();
         UUID categoryId = mockCategory.getId();
-        when(catalogService.createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class))).thenReturn(mockTask);
+        when(catalogAdminService.createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class))).thenReturn(mockTask);
 
         String payload = "{\"name\":\"Cambio de aceite\",\"hours\":0.5}";
 
@@ -96,13 +99,13 @@ class CatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Cambio de aceite")));
 
-        verify(catalogService, times(1)).createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class));
+        verify(catalogAdminService, times(1)).createTask(eq(workshopId), eq(categoryId), any(CatalogTask.class));
     }
 
     @Test
     void updateTask_ShouldReturnUpdatedTask() throws Exception {
         UUID taskId = mockTask.getId();
-        when(catalogService.updateTask(eq(taskId), any(CatalogTask.class))).thenReturn(mockTask);
+        when(catalogAdminService.updateTask(eq(taskId), any(CatalogTask.class))).thenReturn(mockTask);
 
         String payload = "{\"name\":\"Cambio de aceite Pro\",\"hours\":0.8}";
 
@@ -112,7 +115,7 @@ class CatalogControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name", is("Cambio de aceite"))); // returns mockTask
 
-        verify(catalogService, times(1)).updateTask(eq(taskId), any(CatalogTask.class));
+        verify(catalogAdminService, times(1)).updateTask(eq(taskId), any(CatalogTask.class));
     }
 
     @Test
@@ -122,6 +125,6 @@ class CatalogControllerTest {
         mockMvc.perform(delete("/api/catalog/tasks/{taskId}", taskId))
                 .andExpect(status().isOk());
 
-        verify(catalogService, times(1)).deleteTask(taskId);
+        verify(catalogAdminService, times(1)).deleteTask(taskId);
     }
 }

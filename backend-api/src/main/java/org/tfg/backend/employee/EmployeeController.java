@@ -19,7 +19,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EmployeeController {
 
-    private final EmployeService employeService;
+    private final EmployeeProfileService employeeProfileService;
+    private final EmployeeAdminService employeeAdminService;
 
     /**
      * Devuelve el perfil del empleado que ha iniciado sesión.
@@ -29,7 +30,7 @@ public class EmployeeController {
      */
     @GetMapping("/me")
     public ResponseEntity<EmployeeDTO> getMe(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(employeService.getEmployeeProfile(user.getEmail()));
+        return ResponseEntity.ok(employeeProfileService.getEmployeeProfile(user.getEmail()));
     }
 
     /**
@@ -43,7 +44,7 @@ public class EmployeeController {
     public ResponseEntity<EmployeeDTO> updateMe(
             @AuthenticationPrincipal User user,
             @RequestBody UpdateProfileRequest request) {
-        return ResponseEntity.ok(employeService.updateProfile(user.getEmail(), request));
+        return ResponseEntity.ok(employeeProfileService.updateProfile(user.getEmail(), request));
     }
 
     /**
@@ -58,7 +59,7 @@ public class EmployeeController {
             @AuthenticationPrincipal User user,
             @RequestParam("file") MultipartFile file) {
         try {
-            return ResponseEntity.ok(employeService.uploadProfilePicture(user.getEmail(), file));
+            return ResponseEntity.ok(employeeProfileService.uploadProfilePicture(user.getEmail(), file));
         } catch (Exception e) {
             throw new RuntimeException("Error al subir la imagen de perfil: " + e.getMessage(), e);
         }
@@ -72,7 +73,7 @@ public class EmployeeController {
      */
     @DeleteMapping("/me/avatar")
     public ResponseEntity<EmployeeDTO> deleteAvatar(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(employeService.deleteProfilePicture(user.getEmail()));
+        return ResponseEntity.ok(employeeProfileService.deleteProfilePicture(user.getEmail()));
     }
 
     /**
@@ -83,7 +84,7 @@ public class EmployeeController {
      */
     @GetMapping("/workshop/{workshopId}")
     public ResponseEntity<List<EmployeeDTO>> getEmployeesByWorkshop(@PathVariable UUID workshopId) {
-        return ResponseEntity.ok(employeService.getEmployeesByWorkshopId(workshopId));
+        return ResponseEntity.ok(employeeAdminService.getEmployeesByWorkshopId(workshopId));
     }
 
     /**
@@ -98,7 +99,7 @@ public class EmployeeController {
             @PathVariable UUID workshopId,
             @RequestBody AddEmployeeRequest request) {
         try {
-            employeService.addEmployeeToWorkshop(workshopId, request);
+            employeeAdminService.addEmployeeToWorkshop(workshopId, request);
             return ResponseEntity.ok("Empleado añadido con éxito");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -114,7 +115,7 @@ public class EmployeeController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEmployee(@PathVariable UUID id) {
         try {
-            employeService.deleteEmployee(id);
+            employeeAdminService.deleteEmployee(id);
             return ResponseEntity.ok("Empleado eliminado con éxito");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -130,7 +131,7 @@ public class EmployeeController {
     @PutMapping("/{id}/promote")
     public ResponseEntity<String> promoteToManager(@PathVariable UUID id) {
         try {
-            employeService.promoteToManager(id);
+            employeeAdminService.promoteToManager(id);
             return ResponseEntity.ok("Empleado ascendido a Gerente");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -146,7 +147,7 @@ public class EmployeeController {
     @PutMapping("/{id}/demote")
     public ResponseEntity<String> demoteToStaff(@PathVariable UUID id) {
         try {
-            employeService.demoteToStaff(id);
+            employeeAdminService.demoteToStaff(id);
             return ResponseEntity.ok("Empleado degradado a Mecánico");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -165,7 +166,7 @@ public class EmployeeController {
             @PathVariable UUID id,
             @RequestParam String allowedSections) {
         try {
-            employeService.updateAllowedSections(id, allowedSections);
+            employeeAdminService.updateAllowedSections(id, allowedSections);
             return ResponseEntity.ok("Permisos actualizados con éxito");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

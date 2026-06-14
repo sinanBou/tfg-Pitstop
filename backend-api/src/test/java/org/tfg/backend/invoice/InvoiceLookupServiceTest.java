@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -64,19 +65,24 @@ class InvoiceLookupServiceTest {
 
         assertNotNull(result);
         assertEquals(mockInvoice.getId(), result.getId());
+
         verify(invoiceRepository, times(1)).findByAppointmentId(appointmentId);
         verify(invoiceMapper, times(1)).mapToDTO(mockInvoice);
     }
 
     @Test
-    void getInvoiceByAppointment_ShouldReturnNullWhenNotFound() {
-        UUID randomId = UUID.randomUUID();
-        when(invoiceRepository.findByAppointmentId(randomId)).thenReturn(Optional.empty());
+    void getInvoicesByWorkshop_ShouldReturnList() {
+        UUID workshopId = mockInvoice.getWorkshopId();
+        when(invoiceRepository.findByWorkshopIdOrderByCreatedAtDesc(workshopId)).thenReturn(List.of(mockInvoice));
+        when(invoiceMapper.mapToDTO(mockInvoice)).thenReturn(mockDTO);
 
-        InvoiceDTO result = invoiceLookupService.getInvoiceByAppointment(randomId);
+        List<InvoiceDTO> result = invoiceLookupService.getInvoicesByWorkshop(workshopId);
 
-        assertNull(result);
-        verify(invoiceRepository, times(1)).findByAppointmentId(randomId);
-        verify(invoiceMapper, never()).mapToDTO(any());
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(mockInvoice.getId(), result.get(0).getId());
+
+        verify(invoiceRepository, times(1)).findByWorkshopIdOrderByCreatedAtDesc(workshopId);
+        verify(invoiceMapper, times(1)).mapToDTO(mockInvoice);
     }
 }

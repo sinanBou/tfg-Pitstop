@@ -51,12 +51,4 @@ public class InvoiceAdminService {
         // 3. Devolver el DTO con campos mapeados
         return invoiceMapper.mapToDTO(saved, appointment);
     }
-
-    @Transactional(readOnly = true)
-    public List<InvoiceDTO> getInvoicesByWorkshop(UUID workshopId) {
-        return invoiceRepository.findByWorkshopIdOrderByCreatedAtDesc(workshopId)
-                .stream()
-                .map(invoiceMapper::mapToDTO)
-                .collect(Collectors.toList());
-    }
 }

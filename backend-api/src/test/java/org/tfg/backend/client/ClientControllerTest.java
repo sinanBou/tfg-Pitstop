@@ -37,7 +37,10 @@ class ClientControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private ClientService clientService;
+    private ClientProfileService clientProfileService;
+
+    @Mock
+    private ClientAdminService clientAdminService;
 
     @InjectMocks
     private ClientController clientController;
@@ -82,7 +85,7 @@ class ClientControllerTest {
 
             @Override
             public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
-                                          NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
+                                           NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
                 return mockAuthUser;
             }
         };
@@ -94,19 +97,19 @@ class ClientControllerTest {
 
     @Test
     void getMe_ShouldReturnProfile() throws Exception {
-        when(clientService.getClientProfile("sinan@pitstop.com")).thenReturn(mockDTO);
+        when(clientProfileService.getClientProfile("sinan@pitstop.com")).thenReturn(mockDTO);
 
         mockMvc.perform(get("/api/clients/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("sinan@pitstop.com")))
                 .andExpect(jsonPath("$.nif", is("12345678A")));
 
-        verify(clientService, times(1)).getClientProfile("sinan@pitstop.com");
+        verify(clientProfileService, times(1)).getClientProfile("sinan@pitstop.com");
     }
 
     @Test
     void updateMe_ShouldReturnUpdatedProfile() throws Exception {
-        when(clientService.updateProfile(eq("sinan@pitstop.com"), any(ClientDTO.class)))
+        when(clientProfileService.updateProfile(eq("sinan@pitstop.com"), any(ClientDTO.class)))
                 .thenReturn(mockDTO);
 
         String payload = "{\"firstname\":\"Sinan Refactored\",\"phoneNumber\":\"999888777\"}";
@@ -117,13 +120,13 @@ class ClientControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("sinan@pitstop.com")));
 
-        verify(clientService, times(1)).updateProfile(eq("sinan@pitstop.com"), any(ClientDTO.class));
+        verify(clientProfileService, times(1)).updateProfile(eq("sinan@pitstop.com"), any(ClientDTO.class));
     }
 
     @Test
     void search_ShouldReturnPaginatedClients() throws Exception {
         Page<ClientSearchDTO> pagedResult = new PageImpl<>(List.of(mockSearchDTO), org.springframework.data.domain.PageRequest.of(0, 10), 1);
-        when(clientService.searchClientsPaginated("Sinan", 0, 10)).thenReturn(pagedResult);
+        when(clientAdminService.searchClientsPaginated("Sinan", 0, 10)).thenReturn(pagedResult);
 
         mockMvc.perform(get("/api/clients/search")
                         .param("query", "Sinan")
@@ -133,12 +136,12 @@ class ClientControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].email", is("sinan@pitstop.com")));
 
-        verify(clientService, times(1)).searchClientsPaginated("Sinan", 0, 10);
+        verify(clientAdminService, times(1)).searchClientsPaginated("Sinan", 0, 10);
     }
 
     @Test
     void manualRegister_ShouldReturnRegisteredClient() throws Exception {
-        when(clientService.registerManualClient(any(ClientSearchDTO.class))).thenReturn(mockSearchDTO);
+        when(clientAdminService.registerManualClient(any(ClientSearchDTO.class))).thenReturn(mockSearchDTO);
 
         String payload = "{\"firstname\":\"Sinan\",\"lastname\":\"Bou\",\"email\":\"sinan@pitstop.com\",\"nif\":\"12345678A\"}";
 
@@ -148,6 +151,6 @@ class ClientControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email", is("sinan@pitstop.com")));
 
-        verify(clientService, times(1)).registerManualClient(any(ClientSearchDTO.class));
+        verify(clientAdminService, times(1)).registerManualClient(any(ClientSearchDTO.class));
     }
 }

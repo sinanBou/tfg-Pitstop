@@ -122,20 +122,4 @@ class InvoiceAdminServiceTest {
         assertThrows(RuntimeException.class, () -> invoiceAdminService.createInvoice(inputDTO));
         verify(invoiceRepository, never()).save(any(Invoice.class));
     }
-
-    @Test
-    void getInvoicesByWorkshop_ShouldReturnList() {
-        UUID workshopId = UUID.randomUUID();
-        when(invoiceRepository.findByWorkshopIdOrderByCreatedAtDesc(workshopId)).thenReturn(List.of(mockInvoice));
-        when(invoiceMapper.mapToDTO(mockInvoice)).thenReturn(mockDTO);
-
-        List<InvoiceDTO> result = invoiceAdminService.getInvoicesByWorkshop(workshopId);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(mockInvoice.getId(), result.get(0).getId());
-
-        verify(invoiceRepository, times(1)).findByWorkshopIdOrderByCreatedAtDesc(workshopId);
-        verify(invoiceMapper, times(1)).mapToDTO(mockInvoice);
-    }
 }

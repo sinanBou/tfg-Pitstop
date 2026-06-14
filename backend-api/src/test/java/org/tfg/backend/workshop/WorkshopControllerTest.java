@@ -31,7 +31,10 @@ class WorkshopControllerTest {
     private MockMvc mockMvc;
 
     @Mock
-    private WorkshopService workshopService;
+    private WorkshopLookupService workshopLookupService;
+
+    @Mock
+    private WorkshopAdminService workshopAdminService;
 
     @InjectMocks
     private WorkshopController workshopController;
@@ -58,7 +61,7 @@ class WorkshopControllerTest {
 
     @Test
     void createWorkshop_ShouldReturnDTO() throws Exception {
-        when(workshopService.saveWorkshop(any(WorkshopRequest.class))).thenReturn(mockDTO);
+        when(workshopAdminService.saveWorkshop(any(WorkshopRequest.class))).thenReturn(mockDTO);
 
         String payload = "{\"cif\":\"B12345678\",\"companyName\":\"PitStop Central\",\"address\":\"Calle Falsa 123\",\"ownerId\":\"" + UUID.randomUUID() + "\"}";
 
@@ -69,50 +72,50 @@ class WorkshopControllerTest {
                 .andExpect(jsonPath("$.companyName", is("PitStop Central")))
                 .andExpect(jsonPath("$.cif", is("B12345678")));
 
-        verify(workshopService, times(1)).saveWorkshop(any(WorkshopRequest.class));
+        verify(workshopAdminService, times(1)).saveWorkshop(any(WorkshopRequest.class));
     }
 
     @Test
     void getAllWorkshops_ShouldReturnList() throws Exception {
-        when(workshopService.getAllWorkshops()).thenReturn(List.of(mockDTO));
+        when(workshopLookupService.getAllWorkshops()).thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/workshops"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).getAllWorkshops();
+        verify(workshopLookupService, times(1)).getAllWorkshops();
     }
 
     @Test
     void getWorkshopById_ShouldReturnDTO() throws Exception {
         UUID workshopId = mockDTO.getId();
-        when(workshopService.getWorkshopById(workshopId)).thenReturn(mockDTO);
+        when(workshopLookupService.getWorkshopById(workshopId)).thenReturn(mockDTO);
 
         mockMvc.perform(get("/api/workshops/{id}", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).getWorkshopById(workshopId);
+        verify(workshopLookupService, times(1)).getWorkshopById(workshopId);
     }
 
     @Test
     void getWorkshopsByOwner_ShouldReturnList() throws Exception {
         UUID ownerId = UUID.randomUUID();
-        when(workshopService.getWorkshopsByOwnerId(ownerId)).thenReturn(List.of(mockDTO));
+        when(workshopLookupService.getWorkshopsByOwnerId(ownerId)).thenReturn(List.of(mockDTO));
 
         mockMvc.perform(get("/api/workshops/owner/{ownerId}", ownerId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).getWorkshopsByOwnerId(ownerId);
+        verify(workshopLookupService, times(1)).getWorkshopsByOwnerId(ownerId);
     }
 
     @Test
     void updateSettings_ShouldReturnDTO() throws Exception {
         UUID workshopId = mockDTO.getId();
-        when(workshopService.updateWorkshopSettings(eq(workshopId), any(WorkshopRequest.class))).thenReturn(mockDTO);
+        when(workshopAdminService.updateWorkshopSettings(eq(workshopId), any(WorkshopRequest.class))).thenReturn(mockDTO);
 
         String payload = "{\"openTime\":\"09:00\",\"closeTime\":\"19:00\",\"slotDurationMinutes\":30}";
 
@@ -122,12 +125,12 @@ class WorkshopControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).updateWorkshopSettings(eq(workshopId), any(WorkshopRequest.class));
+        verify(workshopAdminService, times(1)).updateWorkshopSettings(eq(workshopId), any(WorkshopRequest.class));
     }
 
     @Test
     void searchWorkshops_ShouldReturnPage() throws Exception {
-        when(workshopService.searchWorkshops(eq("PitStop"), eq(0), eq(10)))
+        when(workshopLookupService.searchWorkshops(eq("PitStop"), eq(0), eq(10)))
                 .thenReturn(new PageImpl<>(List.of(mockDTO), PageRequest.of(0, 10), 1));
 
         mockMvc.perform(get("/api/workshops/search")
@@ -138,32 +141,32 @@ class WorkshopControllerTest {
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).searchWorkshops(eq("PitStop"), eq(0), eq(10));
+        verify(workshopLookupService, times(1)).searchWorkshops(eq("PitStop"), eq(0), eq(10));
     }
 
     @Test
     void uploadLogo_ShouldReturnDTO() throws Exception {
         UUID workshopId = mockDTO.getId();
         MockMultipartFile file = new MockMultipartFile("file", "logo.png", "image/png", "some-bytes".getBytes());
-        when(workshopService.uploadLogo(eq(workshopId), any())).thenReturn(mockDTO);
+        when(workshopAdminService.uploadLogo(eq(workshopId), any())).thenReturn(mockDTO);
 
         mockMvc.perform(multipart("/api/workshops/{id}/logo", workshopId)
                         .file(file))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).uploadLogo(eq(workshopId), any());
+        verify(workshopAdminService, times(1)).uploadLogo(eq(workshopId), any());
     }
 
     @Test
     void deleteLogo_ShouldReturnDTO() throws Exception {
         UUID workshopId = mockDTO.getId();
-        when(workshopService.deleteLogo(workshopId)).thenReturn(mockDTO);
+        when(workshopAdminService.deleteLogo(workshopId)).thenReturn(mockDTO);
 
         mockMvc.perform(delete("/api/workshops/{id}/logo", workshopId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.companyName", is("PitStop Central")));
 
-        verify(workshopService, times(1)).deleteLogo(workshopId);
+        verify(workshopAdminService, times(1)).deleteLogo(workshopId);
     }
 }

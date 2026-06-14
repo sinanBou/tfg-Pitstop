@@ -14,41 +14,42 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClientController {
 
-    private final ClientService clientService;
+    private final ClientProfileService clientProfileService;
+    private final ClientAdminService clientAdminService;
 
     /**
      * Devuelve el perfil del cliente que ha iniciado sesión.
      */
     @GetMapping("/me")
     public ResponseEntity<ClientDTO> getMe(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(clientService.getClientProfile(user.getEmail()));
+        return ResponseEntity.ok(clientProfileService.getClientProfile(user.getEmail()));
     }
 
     /**
-    * Endpoint de bÃºsqueda general y paginada de clientes.
+    * Endpoint de búsqueda general y paginada de clientes.
     *
-    * @param query Texto o tÃ©rmino por el cual filtrar (NIF, nombre, email).
-    * @param page NÃºmero de pÃ¡gina (comienza en 0).
-    * @param size Cantidad de elementos por pÃ¡gina.
-    * @return ResponseEntity con la pÃ¡gina de resultados {@link ClientSearchDTO}.
+    * @param query Texto o término por el cual filtrar (NIF, nombre, email).
+    * @param page Número de página (comienza en 0).
+    * @param size Cantidad de elementos por página.
+    * @return ResponseEntity con la página de resultados {@link ClientSearchDTO}.
     */
     @GetMapping("/search")
     public ResponseEntity<Page<ClientSearchDTO>> search(
             @RequestParam(defaultValue = "") String query,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        return ResponseEntity.ok(clientService.searchClientsPaginated(query, page, size));
+        return ResponseEntity.ok(clientAdminService.searchClientsPaginated(query, page, size));
     }
 
     /**
-    * Registra manualmente un cliente en el sistema sin requerir proceso de registro pÃºblico.
+    * Registra manualmente un cliente en el sistema sin requerir proceso de registro público.
     *
-    * @param request Datos bÃ¡sicos del cliente a registrar.
+    * @param request Datos básicos del cliente a registrar.
     * @return ResponseEntity con el DTO simplificado del cliente registrado.
     */
     @PostMapping("/manual-register")
     public ResponseEntity<ClientSearchDTO> manualRegister(@RequestBody ClientSearchDTO request) {
-        return ResponseEntity.ok(clientService.registerManualClient(request));
+        return ResponseEntity.ok(clientAdminService.registerManualClient(request));
     }
 
     /**
@@ -61,6 +62,6 @@ public class ClientController {
     public ResponseEntity<ClientDTO> updateMe(
             @AuthenticationPrincipal User user,
             @RequestBody ClientDTO request) {
-        return ResponseEntity.ok(clientService.updateProfile(user.getEmail(), request));
+        return ResponseEntity.ok(clientProfileService.updateProfile(user.getEmail(), request));
     }
 }
