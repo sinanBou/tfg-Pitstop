@@ -26,8 +26,8 @@ class RAGService:
         self.chroma_client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
         
         # Carga el modelo local para generar embeddings vectoriales en CPU
-        print("Cargando modelo local de embeddings semánticos (all-MiniLM-L6-v2)...")
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        print("Cargando modelo local de embeddings semánticos (paraphrase-multilingual-MiniLM-L12-v2)...")
+        self.model = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
         print("Modelo cargado con éxito.")
         
         # Obtiene o crea las colecciones segregadas para clientes y personal del taller (seguridad de datos)
