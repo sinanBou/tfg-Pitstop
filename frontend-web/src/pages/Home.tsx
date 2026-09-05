@@ -2,17 +2,13 @@ import { useNavigate } from "react-router-dom";
 import { HeroSection } from "@/features/home/components/HeroSection";
 import { Footer } from "@/features/home/components/FooterSection";
 import { Button } from "@/components/common/Button/Button";
+import { useTranslation } from "@/i18n";
+import { LanguageSelector } from "@/components/common/LanguageSelector/LanguageSelector";
 
-/**
- * Página de Bienvenida y Landing Page de PitStop (Home).
- * 
- * Es el punto de entrada público para usuarios no autenticados.
- * Integra la barra de navegación superior (Navbar) con accesos directos,
- * la sección Hero de presentación del producto (HeroSection) y el pie de página (Footer).
- * Implementa animaciones suaves de entrada y un fondo visual futurista con luces y texturas de carbono.
- */
 export default function Home() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   return (
     <div className="w-full flex flex-col bg-zinc-950 font-sans selection:bg-red-600/30 selection:text-white relative overflow-hidden">
       
@@ -25,13 +21,14 @@ export default function Home() {
       <nav className="w-full fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-6 animate-fade-in-up">
          <div className="w-full max-w-6xl bg-neutral-900/50 backdrop-blur-xl border border-neutral-800 rounded-2xl px-6 py-4 flex justify-between items-center shadow-lg">
             <h1 className="text-2xl font-black italic tracking-tighter text-white uppercase">PitStop</h1>
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-3 items-center">
+               <LanguageSelector />
                <Button 
                  onClick={() => navigate('/login')} 
                  variant="ghost"
                  className="!px-4 !py-2.5 !text-[10px] md:!text-xs border-transparent hover:border-neutral-800"
                >
-                 Iniciar Sesión
+                 {t('common.login')}
                </Button>
                <Button 
                  onClick={() => navigate('/registration')} 
@@ -39,7 +36,7 @@ export default function Home() {
                  className="!px-5 !py-2.5 !text-[10px] md:!text-xs !bg-white !text-black hover:!bg-neutral-200 shadow-[0_0_20px_rgba(255,255,255,0.2)] border-transparent"
                  glow={false}
                >
-                 Registrarse
+                 {t('common.register')}
                </Button>
             </div>
          </div>

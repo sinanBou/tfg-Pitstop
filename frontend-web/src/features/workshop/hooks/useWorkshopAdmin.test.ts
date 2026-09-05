@@ -67,6 +67,7 @@ vi.mock('../services/workshopService', () => ({
   getTasksByWorkshopAndDate: vi.fn(() => Promise.resolve(mockTasks)),
   getEmployeesByWorkshop: vi.fn(() => Promise.resolve(mockEmployees)),
   getAppointmentsReadyForCompletion: vi.fn(() => Promise.resolve([])),
+  getDelayedTasksByWorkshop: vi.fn(() => Promise.resolve([])),
   updateWorkshopSettings: vi.fn(() => Promise.resolve()),
   registerEmployee: vi.fn(() => Promise.resolve()),
   deleteEmployee: vi.fn(() => Promise.resolve()),

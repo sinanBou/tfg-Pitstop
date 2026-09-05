@@ -1,27 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button/Button';
 import { Building, User, FileText } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
-/**
- * Componente de la sección principal (HeroSection) para la página de bienvenida (Landing Page).
- * 
- * Presenta la propuesta de valor de Pitstop, proporcionando accesos directos e intuitivos
- * para el registro e inicio de sesión de usuarios. Destaca las tres principales
- * vertientes del sistema: panel de taller, portal del cliente y el control de inventario/facturación.
- */
 export const HeroSection: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <section className="relative z-10 w-full min-h-screen flex flex-col justify-center items-center text-center px-4 pt-32 pb-20">
       
       <h1 className="text-white text-5xl md:text-[6rem] font-black mb-8 max-w-5xl leading-[0.9] tracking-tighter uppercase animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-        Revoluciona la <br className="hidden md:block"/>
-        <span>experiencia de taller</span>
+        {t('home.heroTitle')}
       </h1>
       
       <p className="text-neutral-400 text-lg md:text-xl mb-12 max-w-2xl mx-auto font-medium leading-relaxed animate-fade-in-up" style={{ animationDelay: '200ms' }}>
-        La única plataforma híbrida que ofrece control absoluto para los <span className="text-red-400 font-bold">Talleres</span> y transparencia total en tiempo real para los <span className="text-blue-400 font-bold">Conductores</span>.
+        {t('home.heroSubtitle')}
       </p>
 
       <div className="flex flex-col sm:flex-row justify-center gap-6 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
@@ -32,8 +26,8 @@ export const HeroSection: React.FC = () => {
           glow={false}
         >
           <span className="relative z-10 flex items-center gap-3">
-            Registrarse
-            </span>
+            {t('common.register')}
+          </span>
         </Button>
         <Button 
           onClick={() => navigate('/login')} 
@@ -41,8 +35,8 @@ export const HeroSection: React.FC = () => {
           className="border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white transition-all duration-300 scale-105 active:scale-95 px-10 py-4"
         >
           <span className="relative z-10 flex items-center gap-3">
-            Iniciar Sesión
-           </span>
+            {t('common.login')}
+          </span>
         </Button>
       </div>
 
@@ -52,24 +46,24 @@ export const HeroSection: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-red-600/10 border border-red-500/20 flex items-center justify-center mb-6">
               <Building className="w-6 h-6 text-red-500" strokeWidth={2} />
             </div>
-            <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">Panel del Taller</h4>
-            <p className="text-neutral-400 text-sm leading-relaxed font-medium">Control absoluto sobre citas, asignación en directo de mecánicos, kilometraje y recepción de vehículos.</p>
+            <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">{t('home.workshopCardTitle')}</h4>
+            <p className="text-neutral-400 text-sm leading-relaxed font-medium">{t('home.workshopCardDesc')}</p>
           </div>
 
           <div className="bg-neutral-900/40 border border-neutral-800/80 p-8 rounded-[2rem] text-left relative overflow-hidden group hover:border-blue-500/30 transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center mb-6">
               <User className="w-6 h-6 text-blue-500" strokeWidth={2} />
             </div>
-            <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">Área de Clientes</h4>
-            <p className="text-neutral-400 text-sm leading-relaxed font-medium">Garaje virtual con estado en tiempo real, notificaciones automáticas y descarga de facturas en PDF.</p>
+            <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">{t('home.driverCardTitle')}</h4>
+            <p className="text-neutral-400 text-sm leading-relaxed font-medium">{t('home.driverCardDesc')}</p>
           </div>
 
           <div className="bg-neutral-900/40 border border-neutral-800/80 p-8 rounded-[2rem] text-left relative overflow-hidden group hover:border-yellow-500/30 transition-all duration-300">
             <div className="w-12 h-12 rounded-2xl bg-yellow-600/10 border border-yellow-500/20 flex items-center justify-center mb-6">
               <FileText className="w-6 h-6 text-yellow-500" strokeWidth={2} />
             </div>
-            <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">Inventario y Facturación</h4>
-            <p className="text-neutral-400 text-sm leading-relaxed font-medium">Gestión inteligente de repuestos, stock del taller y generación de presupuestos / facturas simplificadas.</p>
+            <h4 className="text-white text-lg font-black uppercase tracking-wider mb-2">{t('home.feature3Title')}</h4>
+            <p className="text-neutral-400 text-sm leading-relaxed font-medium">{t('home.feature3Desc')}</p>
           </div>
         </div>
       </div>

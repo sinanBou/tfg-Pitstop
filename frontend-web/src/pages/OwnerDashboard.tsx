@@ -8,21 +8,10 @@ import { WorkshopReportsTab } from '@/features/workshop/components/owner/Worksho
 import { WorkshopCreationModal } from '@/features/workshop/components/modals/WorkshopCreationModal';
 import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
+import { useTranslation } from '@/i18n';
 
-const SECCIONES = ['TALLERES', 'REPORTES'];
-
-/**
- * Panel de Control Multitaller para Propietarios (OwnerDashboard).
- * 
- * Ofrece una vista consolidada a nivel corporativo para usuarios que poseen uno o más talleres.
- * Permite realizar las siguientes operaciones globales:
- * - Listar y gestionar todas las sucursales/talleres activos propiedad de la cuenta (WorkshopManagementTab).
- * - Crear y dar de alta nuevos talleres asignando el nombre comercial, CIF y propietario (WorkshopCreationModal).
- * - Eliminar talleres existentes de forma definitiva.
- * - Acceder a reportes agregados y estadísticas de rendimiento comercial multitaller (WorkshopReportsTab).
- * - Editar datos del perfil del propietario (MiPerfil).
- */
 export default function OwnerDashboard() {
+  const { t } = useTranslation();
   const { 
     loading, 
     workshops, 
@@ -36,6 +25,7 @@ export default function OwnerDashboard() {
   } = useOwnerDashboard();
 
   const [activeTab, setActiveTab] = useState(0);
+  const SECCIONES = [t('common.workshop'), t('nav.reports')];
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -55,7 +45,7 @@ export default function OwnerDashboard() {
   }, [employeeProfile]);
 
   if (loading) {
-    return <LoadingScreen message="Sincronizando taller..." theme="workshop" />;
+    return <LoadingScreen message={t('common.loading')} theme="workshop" />;
   }
 
   return (

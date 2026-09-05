@@ -1,0 +1,59 @@
+===============================================================================
+🏁 PITSTOP - REGISTRO DE PATRONES DE DISEÑO Y ARQUITECTURA
+===============================================================================
+
+Este documento describe la aplicación de Patrones de Software (GoF y Enterprise Patterns)
+en la arquitectura modular de Pitstop para garantizar Clean Code, mantenibilidad y seguridad.
+
+-------------------------------------------------------------------------------
+1. STATE PATTERN (Patrón Estado)
+-------------------------------------------------------------------------------
+Ubicación: `backend-api/src/main/java/org/tfg/backend/appointment/state/`
+- Interfaz: `AppointmentState`
+- Implementaciones: `PendingState`, `ConfirmedState`, `InProgressState`, `DelayedState`, `CompletedState`, `CancelledState`, `PickedUpState`.
+- Descripción: Encapsula los comportamientos y las reglas de transición válidas de una cita (Appointment) según su estado actual. Previene lógica condicional compleja en el dominio.
+
+-------------------------------------------------------------------------------
+2. FACTORY PATTERN (Patrón Fábrica)
+-------------------------------------------------------------------------------
+Ubicación: `backend-api/src/main/java/org/tfg/backend/appointment/state/AppointmentStateFactory.java`
+- Clase: `AppointmentStateFactory`
+- Descripción: Encargada de instanciar el estado correspondiente a partir del enum `AppointmentStatus`. Desacopla la creación del objeto estado de su uso.
+
+-------------------------------------------------------------------------------
+3. STRATEGY PATTERN (Patrón Estrategia)
+-------------------------------------------------------------------------------
+Ubicación: `backend-api/src/main/java/org/tfg/backend/part/strategy/`
+- Descripción: Utilizado en el cálculo de precios y descuentos de piezas de recambio (StandardPricingStrategy vs DiscountPricingStrategy), permitiendo aplicar dinámicamente diferentes políticas comerciales según la categoría o promoción del cliente/taller.
+
+-------------------------------------------------------------------------------
+4. OBSERVER PATTERN (Patrón Observador)
+-------------------------------------------------------------------------------
+Ubicación: `backend-api/src/main/java/org/tfg/backend/*/Event.java` y listeners
+- Descripción: Utilizado en la gestión de inventario. Cuando el stock de un repuesto cae por debajo del nivel mínimo crítico, el evento de stock desencadena alertas en tiempo real en la UI del taller (AvisosTab) y notificaciones por correo.
+
+-------------------------------------------------------------------------------
+5. REPOSITORY PATTERN (Patrón Repositorio)
+-------------------------------------------------------------------------------
+Ubicación: `backend-api/src/main/java/org/tfg/backend/*/Repository.java`
+- Clases: `AppointmentRepository`, `ClientRepository`, `EmployeeRepository`, `VehicleRepository`, `WorkshopRepository`, `PartRepository`, etc.
+- Descripción: Abstracción de la capa de acceso a datos utilizando Spring Data JPA para desacoplar las consultas a la base de datos de la lógica de negocio.
+
+-------------------------------------------------------------------------------
+6. DTO & MAPPER PATTERN (Data Transfer Object)
+-------------------------------------------------------------------------------
+Ubicación: `backend-api/src/main/java/org/tfg/backend/*/*Mapper.java` y `*DTO.java`
+- Herramienta: MapStruct & Lombok.
+- Descripción: Aísla la capa de presentación (API REST) del modelo de dominio/entidades JPA, garantizando que solo los campos requeridos y saneados viajen por la red.
+
+-------------------------------------------------------------------------------
+7. RETRIEVAL-AUGMENTED GENERATION (RAG) PATTERN
+-------------------------------------------------------------------------------
+Ubicación: `ai-service/services/rag_service.py`
+- Descripción: Integra la recuperación de contexto semántico desde ChromaDB (utilizando embeddings de SentenceTransformers) con el modelo LLM de Groq para responder consultas técnicas y operativas según el rol del usuario (Cliente vs Mecánico/Manager).
+
+-------------------------------------------------------------------------------
+8. DEPENDENCY INJECTION & SINGLETON PATTERN
+-------------------------------------------------------------------------------
+Ubicación: Spring Framework (`@Service`, `@Component`, `@Repository`, `@RestController`) y Python Services (`groq_service`, `rag_service`).
+- Descripción: Garantiza instancias únicas e inyectables de servicios sin acoplamiento directo en la instanciación.

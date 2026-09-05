@@ -1,57 +1,59 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from '@/i18n';
+import { LanguageSelector } from '@/components/common/LanguageSelector/LanguageSelector';
 
 export function HomeHeader() {
   const location = useLocation();
   const navigate = useNavigate();
-  // Determinamos si ocultar los botones de acción según la ruta actual
-  const homeBar = location.pathname === '/' ? true : false;
-  const authBar = location.pathname === '/login' || location.pathname === '/registration' ? true : false;
+  const { t } = useTranslation();
+
+  const homeBar = location.pathname === '/';
+  const authBar = location.pathname === '/login' || location.pathname === '/registration';
 
   const handleLogout = () => {
-    // 1. Borramos los datos del almacenamiento local
-    localStorage.removeItem('jwt_token'); 
-    localStorage.removeItem('role');
-    
     localStorage.clear(); 
     sessionStorage.clear();
-
     navigate('/');
   };
 
   return (
-    <nav className="bg-zinc-950 backdrop-blur-md h-12 w-full px-5 py-8 flex items-center justify-between text-white border-b border-white/10">
+    <nav className="bg-zinc-950 backdrop-blur-md h-16 w-full px-5 py-3 flex items-center justify-between text-white border-b border-white/10 z-50 relative">
       <div className="text-xl p-1">
-        <Link to="/" className="font-bold text-5xl">
+        <Link to="/" className="font-bold text-3xl sm:text-4xl italic tracking-tighter">
           PitStop
         </Link>
       </div>
 
-      {homeBar && (
-        <div className="flex gap-4 text-md font-bold">
-          <Link 
-            to="/login" 
-            className="border border-white rounded px-2 p-1 hover:bg-white/20 transition-colors"
-          >
-            Iniciar Sesión
-          </Link>
-          <Link 
-            to="/registration" 
-            className="bg-red-600 text-white rounded px-2 p-1 hover:bg-red-700 transition-colors"
-          >
-            Registrarse
-          </Link>
-        </div>
-      )}
-      {!homeBar && !authBar && (
-        <div className="flex gap-4 text-xl font-bold">
-          <button 
-            onClick={handleLogout}
-            className="bg-red-600 text-white rounded px-4 py-1 hover:bg-red-700 transition-colors"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-      )}
+      <div className="flex items-center gap-3">
+        <LanguageSelector />
+
+        {homeBar && (
+          <div className="flex gap-2 sm:gap-4 text-sm font-bold">
+            <Link 
+              to="/login" 
+              className="border border-white/30 rounded-xl px-3 py-2 hover:bg-white/10 transition-colors flex items-center"
+            >
+              {t('common.login')}
+            </Link>
+            <Link 
+              to="/registration" 
+              className="bg-red-600 text-white rounded-xl px-3 py-2 hover:bg-red-700 transition-colors flex items-center shadow-lg shadow-red-900/30"
+            >
+              {t('common.register')}
+            </Link>
+          </div>
+        )}
+        {!homeBar && !authBar && (
+          <div className="flex gap-4 text-sm font-bold">
+            <button 
+              onClick={handleLogout}
+              className="bg-red-600 text-white rounded-xl px-4 py-2 hover:bg-red-700 transition-colors"
+            >
+              {t('common.logout')}
+            </button>
+          </div>
+        )}
+      </div>
     </nav>
   );
 }

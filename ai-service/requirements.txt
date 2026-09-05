@@ -1,7 +1,7 @@
-fastapi
-uvicorn
-chromadb
-groq
-sentence-transformers
-pydantic
-pydantic-settings
+fastapi>=0.110.0,<1.0.0
+uvicorn[standard]>=0.28.0,<1.0.0
+chromadb>=0.4.24,<0.6.0
+groq>=0.4.2,<1.0.0
+sentence-transformers>=2.5.1,<4.0.0
+pydantic>=2.6.0,<3.0.0
+pydantic-settings>=2.2.0,<3.0.0

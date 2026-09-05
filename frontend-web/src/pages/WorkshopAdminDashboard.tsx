@@ -26,6 +26,7 @@ import { TaskChecklistModal } from '@/features/workshop/components/modals/TaskCh
 import { MechanicTaskModal } from '@/features/workshop/components/modals/MechanicTaskModal/index';
 import { PerfilTaller } from '@/features/workshop/components/admin/PerfilTaller/PerfilTaller';
 import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil';
+import { useTranslation } from '@/i18n';
 
 const diasSemana = [
   { value: 'LUNES', label: 'Lunes' },
@@ -37,26 +38,8 @@ const diasSemana = [
   { value: 'DOMINGO', label: 'Domingo' },
 ];
 
-/**
- * Panel de Administración y Control Operativo del Taller (WorkshopAdminDashboard).
- * 
- * Centraliza toda la lógica de gestión para Propietarios (Owners) y Gestores (Managers).
- * Actúa como orquestador de las pestañas principales del Dashboard del taller:
- * - Resumen general (OverviewTab)
- * - Alertas y avisos de almacén/retrasos (AvisosTab)
- * - Recepción y control de citas de clientes (CitasTab)
- * - Planificador temporal interactivo (AppointmentsTab / PlanningTimeline)
- * - Liquidación y facturación (CompletedJobsTab / GenerateInvoiceModal)
- * - Agenda individual por mecánico
- * - Gestión de catálogo de tareas (TasksTab)
- * - Control de stock de almacén (PartsTab)
- * - Informes analíticos y de rendimiento (ReportsTab)
- * - Alta y control de plantilla (TeamTab)
- * 
- * Integra los modales para planificar servicios, listas de verificación, check-in
- * y actualización de los perfiles del empleado y de taller.
- */
 export default function WorkshopAdminDashboard() {
+  const { t } = useTranslation();
   const [invoicingJob, setInvoicingJob] = useState<any | null>(null);
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [checklistItem, setChecklistItem] = useState<any>(null);
@@ -108,8 +91,6 @@ export default function WorkshopAdminDashboard() {
     userRole
   } = useWorkshopAdmin();
 
-
-
   useEffect(() => {
     if (employeeProfile?.id && !selectedAgendaEmployeeId) {
       setSelectedAgendaEmployeeId(employeeProfile.id);
@@ -135,7 +116,18 @@ export default function WorkshopAdminDashboard() {
   );
 
   const isOwner = userRole === 'WORKSHOP_OWNER';
-  const SECCIONES = ['RESUMEN', 'AVISOS', 'CITAS', 'PLANIFICACIÓN', 'FINALIZADOS', 'AGENDA', 'TAREAS', 'ALMACÉN', 'INFORMES', 'EQUIPO'];
+  const SECCIONES = [
+    t('nav.overview'), 
+    t('workshopDashboard.alertsTab'), 
+    t('workshopDashboard.appointmentsTab'), 
+    t('workshopDashboard.timelineTab'), 
+    t('common.status'), 
+    t('common.mechanic'), 
+    t('workshopDashboard.tasksTab'), 
+    t('workshopDashboard.partsTab'), 
+    t('nav.reports'), 
+    t('workshopDashboard.teamTab')
+  ];
 
   const isSameDate = (isoString: string) => {
       const appDate = new Date(isoString);

@@ -4,6 +4,7 @@ Define la API REST con FastAPI, los endpoints para consultas generales y RAG,
 e inicializa la ingesta de los manuales de usuario al arrancar.
 """
 
+from contextlib import asynccontextmanager
 import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,41 +15,11 @@ from config import settings
 from services.groq_service import groq_service
 from services.rag_service import rag_service
 
-# Inicialización de la aplicación FastAPI y metadatos descriptivos
-app = FastAPI(
-    title="Pitstop AI Assistant Service",
-    description="Microservicio de IA independiente para soporte mecánico e interactivo RAG de Pitstop.",
-    version="1.0.0"
-)
-
-# Configuración de CORS para permitir solicitudes del Frontend en desarrollo/producción
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-class MechanicsChatRequest(BaseModel):
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     """
-    Modelo de datos para la solicitud de consulta mecánica.
-    """
-    query: str
-    history: Optional[List[dict]] = None
-
-class ManualChatRequest(BaseModel):
-    """
-    Modelo de datos para la solicitud de consulta sobre los manuales de usuario (RAG).
-    """
-    query: str
-    role: str  # Los roles permitidos son: CLIENT, WORKSHOP_STAFF, WORKSHOP_MANAGER, WORKSHOP_OWNER
-
-@app.on_event("startup")
-def startup_event():
-    """
-    Evento que se ejecuta automáticamente al arrancar la aplicación.
-    Realiza la lectura e ingesta inicial de los manuales Markdown en la base de datos vectorial ChromaDB.
+    Gestor del ciclo de vida de la aplicación FastAPI.
+    Inicia e ingesta los manuales Markdown en la base vectorial ChromaDB al arrancar.
     """
     print("🤖 Iniciando Microservicio de IA...")
     base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -63,6 +34,27 @@ def startup_event():
     rag_service.ingest_manual(manual_taller_path, "staff")
     
     print("🤖 ¡Microservicio de IA listo para recibir peticiones!")
+    yield
+    print("🛑 Apagando Microservicio de IA...")
+
+# Inicialización de la aplicación FastAPI y metadatos descriptivos
+app = FastAPI(
+    title="Pitstop AI Assistant Service",
+    description="Microservicio de IA independiente para soporte mecánico e interactivo RAG de Pitstop.",
+    version="1.0.0",
+    lifespan=lifespan
+)
+
+# Configuración de CORS permitiendo orígenes configurables o desarrollo local
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=allowed_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/api/ai/health")
 def health_check():

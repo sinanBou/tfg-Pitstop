@@ -6,9 +6,12 @@ import { RoleSelector } from '@/features/auth/components/RoleSelector';
 import { AuthFormFields } from '@/features/auth/components/AuthFormFields';
 import { useToast } from '@/hooks/useToast';
 import { ArrowLeft } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
+import { LanguageSelector } from '@/components/common/LanguageSelector/LanguageSelector';
 
 export default function Registration() {
   const toast = useToast();
+  const { t } = useTranslation();
   const [role, setRole] = useState<'workshop' | 'client' | null>(null);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
@@ -68,6 +71,11 @@ export default function Registration() {
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 relative bg-zinc-950 font-sans selection:bg-red-500/30 selection:text-white overflow-hidden">
       
+      {/* Selector de idioma flotante superior derecha */}
+      <div className="absolute top-6 right-6 z-50">
+        <LanguageSelector />
+      </div>
+
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen z-0"></div>
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none z-0"></div>
 
@@ -82,14 +90,14 @@ export default function Registration() {
 
             <button onClick={() => setRole(null)} className="flex items-center gap-2 text-neutral-500 hover:text-white mb-8 text-[10px] font-black uppercase tracking-widest transition-colors cursor-pointer">
               <ArrowLeft className="w-4 h-4" />
-              Cambiar Perfil
+              {t('common.back')}
             </button>
 
             <div className={`bg-neutral-950/60 backdrop-blur-xl p-10 sm:p-12 rounded-[2.5rem] border shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group ${role === 'workshop' ? 'border-red-900/30' : 'border-blue-900/30'}`}>
 
               <div className="mb-10 text-center">
-                <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">Registro <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? 'Dueño' : 'Cliente'}</span></h2>
-                <p className="text-neutral-500 text-sm font-medium tracking-wide">Configura tus credenciales y datos de acceso</p>
+                <h2 className="text-3xl font-black text-white uppercase tracking-tighter mb-2">{t('auth.registerTitle')} <span className={role === 'workshop' ? 'text-red-500' : 'text-blue-400'}>{role === 'workshop' ? t('common.owner') : t('common.driver')}</span></h2>
+                <p className="text-neutral-500 text-sm font-medium tracking-wide">{t('auth.registerSubtitle')}</p>
               </div>
 
               <form onSubmit={handleRegistrationSubmit} className="flex flex-col gap-6">
@@ -114,7 +122,7 @@ export default function Registration() {
                   }`}
                 >
                   {!isLoading && <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%,100%_100%] bg-no-repeat group-hover:animate-[shimmer_2s_infinite_linear]" />}
-                  <span className="relative z-10">{isLoading ? 'Procesando...' : 'Crear Cuenta'}</span>
+                  <span className="relative z-10">{isLoading ? t('common.loading') : t('auth.registerTitle')}</span>
                 </button>
 
               </form>
@@ -122,7 +130,7 @@ export default function Registration() {
             
              <div className="mt-8 text-center">
                <Link to="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
-                  Volver al Inicio
+                  {t('common.back')} {t('nav.home')}
                </Link>
              </div>
           </div>

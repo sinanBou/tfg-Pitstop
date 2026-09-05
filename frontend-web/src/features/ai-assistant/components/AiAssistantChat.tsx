@@ -2,17 +2,10 @@ import React from 'react';
 import { useAiChat } from '../hooks/useAiChat';
 import type { AiAssistantChatProps } from '../types/aiAssistant';
 import { MessageSquare, Trash, X, BookOpen, Settings, Send } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
-/**
- * Componente de Chat flotante del Asistente de Inteligencia Artificial (AiAssistantChat).
- * 
- * Permite al usuario interactuar en tiempo real con la IA de Pitstop. Ofrece dos modos:
- * 1. **Manual de Uso**: Resuelve dudas acerca de las funcionalidades y uso de la aplicación según el rol.
- * 2. **Asistente Mecánico**: Responde a consultas técnicas, diagnósticos y fallos mecánicos de vehículos.
- * 
- * Cuenta con un indicador LED de salud de la conexión y un renderizador interno seguro y liviano de Markdown.
- */
 export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) => {
+  const { t } = useTranslation();
   const {
     isOpen,
     setIsOpen,
@@ -28,31 +21,19 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
     clearChat
   } = useAiChat(userRole);
 
-  // Parseador de Markdown extremadamente liviano, rápido y seguro de cero dependencias
   const renderMessageContent = (text: string) => {
-    // Escapar HTML básico para prevenir XSS
     let html = text
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
 
-    // Convertir títulos ### o ## o #
     html = html.replace(/^### (.*?)$/gm, '<h3 class="text-sm font-bold mt-2.5 mb-1 text-slate-100 uppercase tracking-wider">$1</h3>');
     html = html.replace(/^## (.*?)$/gm, '<h3 class="text-sm font-bold mt-2.5 mb-1 text-slate-100 uppercase tracking-wider">$1</h3>');
     html = html.replace(/^# (.*?)$/gm, '<h3 class="text-sm font-bold mt-2.5 mb-1 text-slate-100 uppercase tracking-wider">$1</h3>');
-
-    // Convertir negrita **texto**
     html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-slate-100">$1</strong>');
-
-    // Convertir cursiva *texto*
     html = html.replace(/\*(.*?)\*/g, '<em class="italic text-slate-300">$1</em>');
-
-    // Convertir listas con viñetas "- item" o "* item"
     html = html.replace(/^\s*[\-\*]\s+(.*?)$/gm, '<li class="mb-0.5 list-disc ml-4 text-slate-300">$1</li>');
-    // Envolver elementos li adyacentes en ul
     html = html.replace(/(<li class="mb-0.5 list-disc ml-4 text-slate-300">.*?<\/li>)+/g, '<ul class="my-2">$&</ul>');
-
-    // Convertir saltos de línea a <br /> si no están en una lista o etiqueta de bloque
     html = html.replace(/\n/g, '<br />');
 
     return <div dangerouslySetInnerHTML={{ __html: html }} className="text-[13.5px] leading-relaxed text-slate-300" />;
@@ -60,31 +41,27 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
 
   return (
     <>
-      {/* Burbuja flotante de Chat (Diseño limpio y plano con simple hover) */}
       <div 
         className="fixed bottom-6 right-6 w-[56px] h-[56px] rounded-full bg-zinc-800 border border-white/10 shadow-lg flex justify-center items-center cursor-pointer z-[9999] transition-colors duration-200 hover:bg-red-600 hover:border-red-500/20 group"
         onClick={() => setIsOpen(!isOpen)}
-        title="Asistente de Inteligencia Artificial Pitstop"
+        title={t('aiAssistant.title')}
       >
         <MessageSquare className="w-6 h-6 text-slate-100 transition-transform duration-200 group-hover:scale-105" />
         
-        {/* Indicador visual de estado del servidor en caliente */}
         <span className={`absolute top-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-zinc-800 ${
           isServerUp ? 'bg-green-500' : 'bg-red-500'
         }`} />
       </div>
 
-      {/* Ventana de Conversación del Asistente (Instante, sin animaciones complejas) */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-[400px] h-[600px] rounded-2xl bg-zinc-900/95 backdrop-blur-[12px] border border-white/5 shadow-2xl flex flex-col overflow-hidden z-[9998]">
-          {/* Cabecera */}
           <div className="px-5 py-4 bg-zinc-900 border-b border-white/5 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-red-600 flex justify-center items-center shadow-md">
                 <span className="font-bold text-[15px] text-white">P</span>
               </div>
               <div className="flex flex-col">
-                <h3 className="text-sm font-semibold text-white tracking-wide font-sans m-0">Asistente Pitstop</h3>
+                <h3 className="text-sm font-semibold text-white tracking-wide font-sans m-0">{t('aiAssistant.title')}</h3>
                 <span className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5 uppercase tracking-widest font-medium">
                   <span className={`w-1.5 h-1.5 rounded-full inline-block ${isServerUp ? 'bg-green-500' : 'bg-red-500'}`} />
                   {isServerUp ? 'Conectado (Groq AI)' : 'Desconectado'}
@@ -96,21 +73,20 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
               <button 
                 onClick={clearChat} 
                 className="bg-transparent border-none text-slate-400 hover:text-white hover:bg-white/5 p-1.5 rounded-lg cursor-pointer transition-colors duration-200 flex justify-center items-center"
-                title="Limpiar Conversación"
+                title="Limpiar"
               >
                 <Trash className="w-4 h-4" />
               </button>
               <button 
                 onClick={() => setIsOpen(false)} 
                 className="bg-transparent border-none text-slate-400 hover:text-white hover:bg-white/5 p-1.5 rounded-lg cursor-pointer transition-colors duration-200 flex justify-center items-center"
-                title="Cerrar Chat"
+                title={t('common.close')}
               >
                 <X className="w-[18px] h-[18px]" />
               </button>
             </div>
           </div>
 
-          {/* Selector de Modo */}
           <div className="flex p-2 bg-zinc-900 border-b border-white/5 gap-2">
             <button
               onClick={() => setMode('manual')}
@@ -121,7 +97,7 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
               }`}
             >
               <BookOpen className="w-3.5 h-3.5" />
-              Manual de Uso
+              {t('aiAssistant.manualTab')}
             </button>
             <button
               onClick={() => setMode('mechanics')}
@@ -132,11 +108,10 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
               }`}
             >
               <Settings className="w-3.5 h-3.5" />
-              Asistente Mecánico
+              {t('aiAssistant.mechanicTab')}
             </button>
           </div>
 
-          {/* Listado de Mensajes */}
           <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4 scroll-smooth scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-zinc-900/40">
             {messages.map((msg: any, index: number) => (
               <div 
@@ -153,7 +128,6 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
               </div>
             ))}
             
-            {/* Pensando... */}
             {isLoading && (
               <div className="flex w-full justify-start animate-pulse">
                 <div className="max-w-[80%] px-4 py-3 rounded-2xl text-[13.5px] leading-relaxed shadow-sm font-sans bg-zinc-800 text-slate-200 rounded-bl-none border border-white/5">
@@ -169,20 +143,13 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Formulario de Entrada */}
           <div className="p-4 bg-zinc-900 border-t border-white/5">
             <form onSubmit={handleSendMessage} className="flex gap-2.5 items-center">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  !isServerUp 
-                    ? "El asistente IA no está disponible" 
-                    : mode === 'manual' 
-                      ? "Preguntar sobre el uso de la app..." 
-                      : "Describir consulta o fallo mecánico..."
-                }
+                placeholder={t('aiAssistant.placeholder')}
                 className="flex-1 bg-zinc-850 border border-white/5 rounded-xl px-4 py-3 text-white text-[13.5px] font-sans placeholder-slate-500 focus:outline-none focus:border-red-500/50 transition-colors duration-200 disabled:bg-zinc-950 disabled:text-slate-700 disabled:border-white/5"
                 disabled={isLoading || !isServerUp}
                 autoFocus

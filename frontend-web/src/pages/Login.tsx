@@ -3,13 +3,21 @@ import { useLogin } from '@/features/auth/hooks/useLogin';
 import InputGroup from '@/components/common/InputGroup/InputGroup'; 
 import GoogleSignInButton from '@/features/auth/components/GoogleSignInButton';
 import { ArrowLeft } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
+import { LanguageSelector } from '@/components/common/LanguageSelector/LanguageSelector';
 
 function Login() {
   const { formData, errors, isLoading, handleChange, handleLogin, handleGoogleLogin } = useLogin();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen w-full flex flex-col justify-center items-center p-6 relative bg-zinc-950 font-sans selection:bg-blue-500/30 selection:text-white overflow-hidden">
       
+      {/* Selector de idioma flotante superior derecha */}
+      <div className="absolute top-6 right-6 z-50">
+        <LanguageSelector />
+      </div>
+
       {/* Fondo Glow estático */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[150px] pointer-events-none mix-blend-screen"></div>
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-[0.02] pointer-events-none z-0"></div>
@@ -20,13 +28,13 @@ function Login() {
         <div className="bg-neutral-950/60 backdrop-blur-xl p-10 sm:p-12 rounded-[2.5rem] border border-neutral-800/60 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group">
 
           <div className="mb-10 text-center">
-            <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">Iniciar Sesión</h2>
-            <p className="text-neutral-500 text-sm font-medium tracking-wide">Bienvenido de nuevo a <span className="text-white font-bold">PitStop</span></p>
+            <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">{t('auth.loginTitle')}</h2>
+            <p className="text-neutral-500 text-sm font-medium tracking-wide">{t('auth.loginSubtitle')}</p>
           </div>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-5">
             <InputGroup 
-              label="Correo Electrónico" 
+              label={t('auth.emailLabel')} 
               name="email" 
               type="email" 
               value={formData.email} 
@@ -35,7 +43,7 @@ function Login() {
               placeholder="tu@email.com" 
             />
             <InputGroup 
-              label="Contraseña" 
+              label={t('auth.passwordLabel')} 
               name="password" 
               type="password" 
               value={formData.password} 
@@ -46,7 +54,7 @@ function Login() {
 
             <div className="flex justify-end -mt-2">
               <Link to="/forgot-password" className="text-xs text-neutral-500 hover:text-white transition-colors">
-                ¿Olvidaste tu contraseña?
+                {t('auth.forgotPassword')}
               </Link>
             </div>
 
@@ -66,14 +74,14 @@ function Login() {
               }`}
             >
               {!isLoading && <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:250%_250%,100%_100%] bg-no-repeat group-hover:animate-[shimmer_2s_infinite_linear]" />}
-              <span className="relative z-10">{isLoading ? 'Conectando...' : 'Acceder'}</span>
+              <span className="relative z-10">{isLoading ? t('common.loading') : t('common.login')}</span>
             </button>
           </form>
 
           {/* Separador Visual Premium */}
           <div className="flex items-center my-6">
             <div className="flex-1 h-[1px] bg-neutral-800/80"></div>
-            <span className="px-4 text-[10px] font-black uppercase tracking-widest text-neutral-600">o continuar con</span>
+            <span className="px-4 text-[10px] font-black uppercase tracking-widest text-neutral-600">{t('auth.orLoginWith')}</span>
             <div className="flex-1 h-[1px] bg-neutral-800/80"></div>
           </div>
 
@@ -82,9 +90,9 @@ function Login() {
 
           <div className="mt-8 text-center">
             <p className="text-neutral-500 text-sm">
-              ¿No tienes cuenta?{' '}
+              {t('auth.noAccount')}{' '}
               <Link to="/registration" className="text-blue-400 font-bold hover:text-blue-300 transition-colors">
-                Regístrate ahora
+                {t('auth.registerHere')}
               </Link>
             </p>
           </div>
@@ -94,7 +102,7 @@ function Login() {
         <div className="mt-8 text-center">
            <Link to="/" className="inline-flex items-center gap-2 text-neutral-600 hover:text-white transition-colors text-[10px] font-black uppercase tracking-widest">
               <ArrowLeft className="w-4 h-4" />
-              Volver al Inicio
+              {t('common.back')} {t('nav.home')}
            </Link>
         </div>
       </div>
