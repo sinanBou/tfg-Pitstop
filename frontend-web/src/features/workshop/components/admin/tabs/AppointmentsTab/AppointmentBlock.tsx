@@ -3,6 +3,7 @@ import { AppointmentCard } from '@/components/common/Card/AppointmentCard';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Edit, Lock, FileText, Clock, X } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface AppointmentBlockProps {
   appointment: any;
@@ -36,6 +37,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
   totalLanes = 1,
   readOnly = false
 }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const isVehicleReceived = appointment.vehicleReceived === true;
   const [isResizing, setIsResizing] = useState(false);
@@ -110,7 +112,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
 
     ghost.innerHTML = `
       <span style="width:6px;height:6px;border-radius:50%;background:${appointment.isTask ? '#3b82f6' : '#ef4444'};flex-shrink:0"></span>
-      <span style="font-size:12px;font-weight:900;letter-spacing:0.5px;text-transform:uppercase">${appointment.vehicleDisplay || 'Cita'}</span>
+      <span style="font-size:12px;font-weight:900;letter-spacing:0.5px;text-transform:uppercase">${appointment.vehicleDisplay || t('appointmentsTab.appointmentLabel')}</span>
       ${durationStr ? `<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);font-family:monospace;padding:2px 6px;background:rgba(255,255,255,0.06);border-radius:6px;border:1px solid rgba(255,255,255,0.08)">${durationStr}</span>` : ''}
       ${appointment.clientFullName ? `<span style="font-size:10px;color:rgba(255,255,255,0.4);border-left:1px solid rgba(255,255,255,0.1);padding-left:8px">${appointment.clientFullName}</span>` : ''}
     `;
@@ -189,18 +191,18 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
       setConfirmModal({
         isOpen: true,
         type: 'cancel',
-        title: 'Eliminar Tarea',
-        description: '¿Estás seguro de que deseas ELIMINAR esta tarea de forma permanente?',
-        confirmText: 'Sí, Eliminar',
+        title: t('appointmentsTab.deleteTaskTitle'),
+        description: t('appointmentsTab.deleteTaskDesc'),
+        confirmText: t('appointmentsTab.confirmDelete'),
         theme: 'red'
       });
     } else {
       setConfirmModal({
         isOpen: true,
         type: 'cancel',
-        title: 'Cancelar Cita',
-        description: '¿Deseas cancelar esta cita? El cliente verá el aviso de cancelación en su panel de notificaciones.',
-        confirmText: 'Sí, Cancelar',
+        title: t('appointmentsTab.deleteAppointmentTitle'),
+        description: t('appointmentsTab.deleteAppointmentDesc'),
+        confirmText: t('appointmentsTab.confirmCancel'),
         theme: 'red'
       });
     }
@@ -241,7 +243,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                  onClick={(e) => {
                    e.stopPropagation();
                    if (!isVehicleReceived) return;
-                   onManage ? onManage(appointment) : toast.info(`Gestionar: ${appointment.vehicleDisplay}`);
+                   onManage ? onManage(appointment) : toast.info(`${t('appointmentsTab.manage')}: ${appointment.vehicleDisplay}`);
                  }}
                  disabled={!isVehicleReceived}
                  className={`w-8 h-8 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
@@ -249,7 +251,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                      ? 'bg-white/5 border-white/10 text-white/70 hover:bg-white hover:text-black cursor-pointer'
                      : 'bg-amber-950/20 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
                  }`}
-                 title={isVehicleReceived ? 'Gestionar Cita' : 'Recepciona el vehículo primero'}
+                 title={isVehicleReceived ? t('appointmentsTab.manageTooltip') : t('appointmentsTab.receptionTooltip')}
                >
                  {isVehicleReceived ? (
                    <Edit className="w-4 h-4" />
@@ -272,7 +274,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                        ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer'
                        : 'bg-amber-950/20 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
                    }`}
-                   title={isVehicleReceived ? 'Ver checklist de tareas' : 'Recepciona el vehículo primero'}
+                   title={isVehicleReceived ? t('appointmentsTab.viewChecklistTooltip') : t('appointmentsTab.receptionTooltip')}
                  >
                    <FileText className="w-4 h-4" />
                  </button>
@@ -286,14 +288,14 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                      setConfirmModal({
                        isOpen: true,
                        type: 'delay',
-                       title: 'Retrasar Cita/Tarea',
-                       description: '¿Seguro que deseas marcar esta cita/tarea como retrasada?',
-                       confirmText: 'Sí, Marcar',
+                       title: t('appointmentsTab.delayTitle'),
+                       description: t('appointmentsTab.delayDesc'),
+                       confirmText: t('appointmentsTab.confirmDelay'),
                        theme: 'amber'
                      });
                    }}
                    className="w-8 h-8 border border-amber-500/30 bg-amber-500/10 text-amber-400 rounded-full transition-all hover:bg-amber-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
-                   title="Marcar como Retrasada"
+                   title={t('appointmentsTab.markDelayedTooltip')}
                  >
                    <Clock className="w-4 h-4" strokeWidth={2.5} />
                  </button>
@@ -304,7 +306,7 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
                  <button
                    onClick={handleCancel}
                    className="w-8 h-8 border border-red-500/30 bg-red-500/10 text-red-400 rounded-full transition-all hover:bg-red-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
-                   title="Cancelar Cita"
+                   title={t('appointmentsTab.cancelAppointmentTooltip')}
                  >
                    <X className="w-4 h-4" strokeWidth={2.5} />
                  </button>

@@ -3,7 +3,7 @@ import { Plus, AlertTriangle, Trash, Check, Box } from '@/assets/icons';
 import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
-
+import { useTranslation } from '@/i18n';
 
 /**
  * Representa una pieza de repuesto agregada manualmente o importada para la facturación.
@@ -57,6 +57,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   job,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [catalogMap, setCatalogMap] = useState<Map<string, { name: string; hours: number }>>(new Map());
   const [loadingCatalog, setLoadingCatalog] = useState(true);
   const [parts, setParts] = useState<PartItem[]>([]);
@@ -211,7 +212,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
     }
     if (matchedInv) {
       if (matchedInv.stockQuantity < quantityToUse) {
-        toast.warning(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
+        toast.warning(t('invoiceModal.insufficientStock', { count: matchedInv.stockQuantity }));
         return;
       }
       payload.partId = matchedInv.part.id;
@@ -233,7 +234,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
 
       if (!res.ok) {
         const errMsg = await res.text();
-        throw new Error(errMsg || 'Error al asignar repuesto');
+        throw new Error(errMsg || t('common.error'));
       }
 
       loadInventory();
@@ -243,9 +244,9 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
       setQuantityToUse(1);
       setDiscountPercent(0);
       setShowDropdown(false);
-      toast.success('Repuesto agregado con éxito.');
+      toast.success(t('invoiceModal.partAddedSuccess'));
     } catch (err: any) {
-      toast.error(err.message || 'Error al guardar repuesto.');
+      toast.error(err.message || t('common.error'));
     } finally {
       setAddingPart(false);
     }
@@ -265,13 +266,13 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
       if (res.ok) {
         loadInventory();
         loadAssignedParts();
-        toast.success('Repuesto eliminado con éxito.');
+        toast.success(t('invoiceModal.partDeleteSuccess'));
       } else {
         const errMsg = await res.text();
-        throw new Error(errMsg || 'Error al eliminar repuesto');
+        throw new Error(errMsg || t('common.error'));
       }
     } catch (err: any) {
-      toast.error(err.message || 'Error al eliminar repuesto.');
+      toast.error(err.message || t('common.error'));
     }
   };
 
@@ -279,7 +280,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
   const handleConfirmInvoice = async () => {
     // Validación: todos los repuestos deben tener precio
     if (hasMissingPrices) {
-      toast.error('Hay repuestos sin precio asignado. Por favor, completa todos los precios antes de confirmar.');
+      toast.error(t('invoiceModal.missingPricesError'));
       return;
     }
 
@@ -303,12 +304,12 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
         }),
       });
 
-      if (!res.ok) throw new Error('Error al registrar la factura');
+      if (!res.ok) throw new Error(t('common.error'));
       
       onSuccess();
       onClose();
     } catch (err: any) {
-      toast.error(err.message || 'Error al completar el trabajo');
+      toast.error(err.message || t('common.error'));
     } finally {
       setSubmitting(false);
     }
@@ -320,53 +321,53 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Resumen de Facturación"
-      subtitle="Liquidación de Servicio"
+      title={t('invoiceModal.title')}
+      subtitle={t('invoiceModal.subtitle')}
       theme="green"
     >
       <div className="space-y-6 flex-1 flex flex-col animate-none">
         {/* Info Cita */}
         <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-5 space-y-3 shrink-0">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider">Vehículo</span>
+            <span className="text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.vehicle')}</span>
             <span className="text-white font-extrabold">{job?.vehicleDisplay}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider">Cliente</span>
+            <span className="text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.client')}</span>
             <span className="text-white font-extrabold">{job?.clientFullName}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider">Tarifa de Mano de Obra</span>
-            <span className="text-green-400 font-extrabold">{laborRate.toFixed(2)}€ / hora</span>
+            <span className="text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.laborRate')}</span>
+            <span className="text-green-400 font-extrabold">{laborRate.toFixed(2)}€ / h</span>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 items-start flex-1">
           {/* Mano de Obra (Izquierda) */}
           <div className="w-full md:w-1/2 space-y-3 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl p-5">
-            <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">Mano de Obra</h4>
+            <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">{t('invoiceModal.laborTitle')}</h4>
             
             {loadingCatalog ? (
               <div className="text-center py-6 text-neutral-500 text-xs font-bold uppercase tracking-wider animate-pulse">
-                Cargando tiempos del catálogo...
+                {t('invoiceModal.loadingCatalogTimes')}
               </div>
             ) : resolvedTasks.length === 0 ? (
               <div className="text-center py-6 text-neutral-500 text-xs border border-dashed border-neutral-800 rounded-xl">
-                No hay tareas específicas mapeadas. Se aplicará mano de obra base.
+                {t('invoiceModal.noMappedTasks')}
               </div>
             ) : (
               <div className="border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900">
-                {resolvedTasks.map((t, idx) => (
+                {resolvedTasks.map((tItem, idx) => (
                   <div key={idx} className="bg-neutral-900/10 px-4 py-3 flex justify-between items-center text-sm">
                     <div>
-                      <p className="text-white font-bold text-xs">{t.name}</p>
-                      <p className="text-[9px] text-neutral-500 font-mono mt-0.5">CÓDIGO: {t.code}</p>
+                      <p className="text-white font-bold text-xs">{tItem.name}</p>
+                      <p className="text-[9px] text-neutral-500 font-mono mt-0.5">{t('invoiceModal.taskCode')} {tItem.code}</p>
                     </div>
-                    <span className="text-neutral-400 font-mono text-xs">{t.hours.toFixed(2)}h</span>
+                    <span className="text-neutral-400 font-mono text-xs">{tItem.hours.toFixed(2)}h</span>
                   </div>
                 ))}
                 <div className="bg-neutral-900/40 px-4 py-3 flex justify-between items-center text-xs font-black uppercase tracking-widest text-neutral-300">
-                  <span>Total Horas</span>
+                  <span>{t('invoiceModal.totalHours')}</span>
                   <span className="text-white font-mono">{totalLaborHours.toFixed(2)}h ({totalLaborCost.toFixed(2)}€)</span>
                 </div>
               </div>
@@ -375,7 +376,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
 
           {/* Repuestos / Piezas Compradas (Derecha) */}
           <div className="w-full md:w-1/2 space-y-4 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl p-5">
-            <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">Piezas y Repuestos</h4>
+            <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">{t('invoiceModal.partsTitle')}</h4>
             
             {/* Formulario rápido con buscador de autocompletado */}
             <form onSubmit={handleAddPart} className="flex gap-2 shrink-0 relative">
@@ -390,7 +391,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                     if (selectedInvId !== 'custom') setSelectedInvId('');
                   }}
                   onFocus={() => setShowDropdown(true)}
-                  placeholder="Buscar o escribir repuesto..."
+                  placeholder={t('invoiceModal.searchPartPlaceholder')}
                   className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all font-semibold text-white animate-none"
                 />
                 
@@ -427,14 +428,14 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                           }}
                           className="w-full text-left px-3 py-2.5 text-xs bg-green-950/20 hover:bg-green-900/20 text-green-400 font-bold flex items-center gap-1.5 transition-all"
                         >
-                          <span>Usar repuesto personalizado:</span>
+                          <span>{t('invoiceModal.customPartLabel')}</span>
                           <span className="text-white italic font-normal">"{partQuery.trim()}"</span>
                         </button>
                       )}
                       
                       {filteredInventory.length === 0 && partQuery.trim().length === 0 && (
                         <div className="px-3 py-3 text-center text-xs text-neutral-500 font-medium">
-                          Escribe para buscar o añadir personalizado
+                          {t('invoiceModal.typeToSearchCustom')}
                         </div>
                       )}
                     </div>
@@ -448,7 +449,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                 min="1"
                 value={quantityToUse}
                 onChange={e => setQuantityToUse(parseInt(e.target.value) || 1)}
-                placeholder="Cant."
+                placeholder={t('invoiceModal.quantityPlaceholder')}
                 className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
               />
               
@@ -458,7 +459,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                 max="100"
                 value={discountPercent || ''}
                 onChange={e => setDiscountPercent(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
-                placeholder="Desc. %"
+                placeholder={t('invoiceModal.discountPlaceholder')}
                 className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-white"
                 title="Descuento opcional en porcentaje (0-100)"
               />
@@ -476,14 +477,14 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
             {parts.length === 0 ? (
               <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center border border-dashed border-neutral-900 rounded-xl">
                 <Box className="w-8 h-8 text-neutral-800 mb-1" strokeWidth={1.5} />
-                <p className="text-[10px] font-bold uppercase tracking-wider">Ninguno añadido aún.</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider">{t('invoiceModal.noPartsAdded')}</p>
               </div>
             ) : (
               <div className="border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 max-h-[200px] overflow-y-auto custom-scrollbar">
                 {hasMissingPrices && (
                   <div className="bg-yellow-600/10 border-b border-yellow-500/20 px-4 py-2 flex items-center gap-2 text-[10px] text-yellow-400 font-bold uppercase tracking-wider">
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                    Hay repuestos sin precio — Introduce el importe para poder confirmar
+                    {t('invoiceModal.missingPricesWarning')}
                   </div>
                 )}
                 {parts.map((p, idx) => (
@@ -532,7 +533,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                   </div>
                 ))}
                 <div className="bg-neutral-900/40 px-4 py-3 flex justify-between items-center text-xs font-black uppercase tracking-widest text-neutral-300">
-                  <span>Total Repuestos</span>
+                  <span>{t('invoiceModal.totalParts')}</span>
                   <span className="text-white font-mono">{totalPartsCost.toFixed(2)}€</span>
                 </div>
               </div>
@@ -543,11 +544,11 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
         {/* Resumen Total */}
         <div className="bg-green-500/5 border border-green-500/20 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shrink-0">
           <div className="flex gap-6 text-xs text-neutral-400 font-bold uppercase tracking-wider">
-            <div>Mano de Obra: <span className="font-mono text-white ml-1">{totalLaborCost.toFixed(2)}€</span></div>
-            <div>Repuestos: <span className="font-mono text-white ml-1">{totalPartsCost.toFixed(2)}€</span></div>
+            <div>{t('invoiceModal.laborTitle')}: <span className="font-mono text-white ml-1">{totalLaborCost.toFixed(2)}€</span></div>
+            <div>{t('invoiceModal.totalParts')}: <span className="font-mono text-white ml-1">{totalPartsCost.toFixed(2)}€</span></div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-neutral-400 text-xs font-bold uppercase tracking-wider">Total (PVP):</span>
+            <span className="text-neutral-400 text-xs font-bold uppercase tracking-wider">{t('invoiceModal.totalPVP')}</span>
             <span className="text-green-400 text-2xl font-mono font-black">{finalTotal.toFixed(2)}€</span>
           </div>
         </div>
@@ -559,7 +560,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
             onClick={onClose}
             className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button
             type="button"
@@ -576,7 +577,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
             ) : (
               <>
                 <Check className="w-4 h-4" />
-                Confirmar y Avisar al Cliente
+                {t('invoiceModal.confirmAndNotify')}
               </>
             )}
           </button>

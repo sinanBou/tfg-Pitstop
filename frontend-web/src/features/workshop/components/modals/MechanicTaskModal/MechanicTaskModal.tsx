@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { X, Check, AlertTriangle, FileText, Calendar } from '@/assets/icons';
 import { API_BASE_URL } from '@/config/api';
+import { useTranslation } from '@/i18n';
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Types
@@ -120,6 +121,7 @@ function calcHoursForTask(task: CatalogTask, cylinders: number, wheels: number =
 export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
   isOpen, onClose, appointment, onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [cylinders, setCylinders] = useState<number>(0);
   const [wheels, setWheels] = useState<number>(0);
   const [selectedTasks, setSelectedTasks] = useState<SelectedTask[]>([]);
@@ -291,7 +293,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
       });
       if (!res.ok) {
         const msg = await res.text();
-        throw new Error(msg || 'Error al gestionar la cita');
+        throw new Error(msg || t('common.error'));
       }
       onSuccess();
       onClose();
@@ -299,7 +301,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
       setCylinders(0);
       setWheels(0);
     } catch (err: any) {
-      setError(err.message ?? 'Error de conexión');
+      setError(err.message ?? t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -328,7 +330,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
         {/* Header */}
         <div className="p-8 pb-5 border-b border-neutral-800/50 bg-neutral-950/20 flex justify-between items-start shrink-0">
           <div>
-            <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest mb-1">Gestión de Cita</p>
+            <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest mb-1">{t('mechanicTaskModal.title')}</p>
             <h2 className="text-2xl font-black uppercase tracking-[0.08em] text-white">
               {appointment?.vehicleDisplay}
             </h2>
@@ -347,12 +349,12 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
 
             {/* Search bar only */}
             <div className="p-5 border-b border-neutral-800/40 shrink-0">
-              <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500 block mb-1">Buscar tarea</label>
+              <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500 block mb-1">{t('mechanicTaskModal.searchTaskLabel')}</label>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Ej: filtro, rueda, turbo..."
+                placeholder={t('mechanicTaskModal.searchTaskPlaceholder')}
                 className="w-full bg-neutral-800/60 border border-neutral-700 rounded-xl px-4 py-2 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-blue-500/60"
               />
             </div>
@@ -361,7 +363,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
             <div className="flex overflow-x-auto gap-1 px-4 py-3 shrink-0 border-b border-neutral-800/40 custom-scrollbar">
               {searchQuery.trim() && (
                 <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider whitespace-nowrap bg-blue-600/20 text-blue-400 border border-blue-500/30 shrink-0">
-                  🔍 Búsqueda global
+                  {t('mechanicTaskModal.globalSearch')}
                 </span>
               )}
               {sections.map(s => (
@@ -386,17 +388,17 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
               {loadingCatalog ? (
                 <div className="text-center py-20 text-neutral-500 flex flex-col items-center justify-center gap-3">
                   <div className="w-8 h-8 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
-                  <p className="text-xs uppercase tracking-widest font-black">Cargando catálogo dinámico...</p>
+                  <p className="text-xs uppercase tracking-widest font-black">{t('mechanicTaskModal.loadingCatalog')}</p>
                 </div>
               ) : (
                 <>
                   {searchQuery.trim() && (
                     <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest pb-1">
-                      {filteredTasks.length} resultado{filteredTasks.length !== 1 ? 's' : ''} en todo el catálogo
+                      {t(filteredTasks.length === 1 ? 'mechanicTaskModal.resultsCount' : 'mechanicTaskModal.resultsCount_plural', { count: filteredTasks.length })}
                     </p>
                   )}
                   {filteredTasks.length === 0 && (
-                    <p className="text-neutral-600 text-center py-12 text-sm">No se encontraron tareas</p>
+                    <p className="text-neutral-600 text-center py-12 text-sm">{t('mechanicTaskModal.noTasksFound')}</p>
                   )}
                   {(filteredTasks as any[]).map((task: any) => {
                     const hours = calcHoursForTask(task, cylinders, wheels);
@@ -438,7 +440,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                                 <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
                                   selected ? 'bg-blue-600/30 text-blue-300' : 'bg-blue-900/30 text-blue-600'
                                 }`}>
-                                  ×{wheels} rueda{wheels !== 1 ? 's' : ''}
+                                  ×{wheels} {t('mechanicTaskModal.wheels').toLowerCase()}
                                 </span>
                               )}
                               {/* Category badge during global search */}
@@ -465,7 +467,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
           {/* Right: Summary panel */}
           <div className="w-[35%] flex flex-col overflow-hidden">
             <div className="p-5 border-b border-neutral-800/40 shrink-0">
-              <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-3">Resumen de Trabajo</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-3">{t('mechanicTaskModal.workSummary')}</p>
 
               {/* Hours summary */}
               <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 mb-4">
@@ -474,14 +476,14 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                     <div className="text-4xl font-black text-white mb-1">
                       {totalHours.toFixed(1)}<span className="text-lg text-neutral-500 ml-1">h</span>
                     </div>
-                    <p className="text-[10px] text-neutral-500 uppercase tracking-widest">{totalMinutes} minutos estimados</p>
+                    <p className="text-[10px] text-neutral-500 uppercase tracking-widest">{t('mechanicTaskModal.estimatedMinutes', { count: totalMinutes })}</p>
                   </div>
                   <div className="text-right">
                     <div className="text-3xl font-black text-blue-400 mb-1">
                       {(totalHours * (appointment?.workshopHourlyRate ?? 50.0)).toFixed(2)}<span className="text-xs text-neutral-500 ml-1">€</span>
                     </div>
                     <p className="text-[9px] text-neutral-500 uppercase tracking-widest">
-                      Mano de Obra ({(appointment?.workshopHourlyRate ?? 50.0).toFixed(2)}€/h)
+                      {t('mechanicTaskModal.laborRateLabel', { rate: (appointment?.workshopHourlyRate ?? 50.0).toFixed(2) })}
                     </p>
                   </div>
                 </div>
@@ -489,7 +491,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                   <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
                     <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
                     <p className="text-amber-400 text-[10px] font-black uppercase tracking-wider">
-                      Se distribuirá en varios días
+                      {t('mechanicTaskModal.multiDayWarning')}
                     </p>
                   </div>
                 )}
@@ -500,8 +502,8 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                 {showCylinderCounter && (
                   <div className="flex items-center justify-between p-3 bg-neutral-800/20 border border-neutral-700/20 rounded-2xl">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest">Motor</span>
-                      <span className="text-xs text-white font-bold">Cilindros</span>
+                      <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest">{t('mechanicTaskModal.engine')}</span>
+                      <span className="text-xs text-white font-bold">{t('mechanicTaskModal.cylinders')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -520,8 +522,8 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                 {showWheelCounter && (
                   <div className="flex items-center justify-between p-3 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest">Ruedas</span>
-                      <span className="text-xs text-blue-400 font-bold">Sustitución</span>
+                      <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest">{t('mechanicTaskModal.wheels')}</span>
+                      <span className="text-xs text-blue-400 font-bold">{t('mechanicTaskModal.replacement')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
@@ -544,7 +546,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
               {selectedTasks.length === 0 ? (
                 <div className="text-center py-12">
                   <FileText className="w-10 h-10 text-neutral-700 mx-auto mb-3" strokeWidth={1.5} />
-                  <p className="text-neutral-600 text-xs">Selecciona tareas del catálogo</p>
+                  <p className="text-neutral-600 text-xs">{t('mechanicTaskModal.selectTasksHint')}</p>
                 </div>
               ) : (
                 selectedTasks.map(({ task }) => (
@@ -582,7 +584,7 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                 ) : (
                   <>
                     <Calendar className="w-4 h-4" />
-                    Planificar {totalHours.toFixed(1)}h
+                    {t('mechanicTaskModal.planHours', { hours: totalHours.toFixed(1) })}
                   </>
                 )}
               </button>

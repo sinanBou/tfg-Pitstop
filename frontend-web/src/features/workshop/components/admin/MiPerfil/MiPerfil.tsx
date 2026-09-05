@@ -426,7 +426,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                     required
                     value={newPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
-                    placeholder="Mín. 6 caracteres"
+                    placeholder="••••••••"
                     className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
                   />
                 </div>

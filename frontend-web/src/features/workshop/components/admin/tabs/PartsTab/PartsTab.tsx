@@ -10,6 +10,7 @@ import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Search, X } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente PartsTab.
@@ -26,6 +27,7 @@ interface PartsTabProps {
  * la inserción en línea de repuestos y su posterior modificación (stock, precio coste, precio venta, umbral de alerta).
  */
 export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [categories, setCategories] = useState<PartCategory[]>([]);
   const [inventory, setInventory] = useState<WorkshopInventory[]>([]);
@@ -335,9 +337,9 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       isOpen: true,
       type: 'part',
       id,
-      title: 'Eliminar Repuesto',
-      description: '¿Seguro que deseas eliminar este repuesto del almacén? Se desvinculará de cualquier orden histórica.',
-      confirmText: 'Sí, Eliminar',
+      title: t('partsTab.deletePartTitle'),
+      description: t('partsTab.deletePartDesc'),
+      confirmText: t('common.confirm'),
       theme: 'red'
     });
   };
@@ -349,9 +351,9 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       isOpen: true,
       type: 'category',
       id: categoryId,
-      title: 'Eliminar Categoría',
-      description: '¿Seguro que deseas eliminar esta categoría? Debe estar vacía.',
-      confirmText: 'Sí, Eliminar',
+      title: t('partsTab.deleteCatTitle'),
+      description: t('partsTab.deleteCatDesc'),
+      confirmText: t('common.confirm'),
       theme: 'red'
     });
   };
@@ -360,7 +362,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-neutral-500 gap-4">
         <div className="w-12 h-12 border-2 border-neutral-800 border-t-red-600 rounded-full animate-spin" />
-        <p className="text-xs uppercase tracking-widest font-black">Cargando inventario de almacén...</p>
+        <p className="text-xs uppercase tracking-widest font-black">{t('partsTab.loadingInventory')}</p>
       </div>
     );
   }
@@ -369,9 +371,9 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
     <div className="space-y-6 text-white animate-fade-in-up select-none">
       {/* Title Block */}
       <TabHeader
-        title="Inventario de Almacén"
-        subtitle="Administra las categorías de repuestos y las existencias físicas"
-        actionLabel="Nueva Categoría"
+        title={t('partsTab.title')}
+        subtitle={t('partsTab.subtitle')}
+        actionLabel={t('partsTab.newCategoryBtn')}
         onActionClick={() => setShowAddCategory(!showAddCategory)}
         colorVariant="red"
       />
@@ -385,7 +387,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
           type="text"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          placeholder="Buscar repuestos por descripción, OEM, marca o categoría (ej: Brembo, REF-1020, Pastillas)..."
+          placeholder={t('partsTab.searchPlaceholder')}
           className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-12 pr-12 py-3.5 text-white text-xs focus:outline-none focus:border-red-500/50 focus:bg-black/40 transition-all placeholder-neutral-500 font-semibold"
         />
         {searchTerm && (
@@ -401,9 +403,9 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       {/* Add Category Form Panel */}
       {showAddCategory && (
         <AddCategoryForm
-          title="Crear Nueva Categoría de Repuestos"
-          label="Nombre de la Categoría"
-          placeholder="Ej: Transmisión, Suspensión, Embragues..."
+          title={t('partsTab.createCategoryTitle')}
+          label={t('partsTab.categoryNameLabel')}
+          placeholder={t('partsTab.categoryNamePlaceholder')}
           value={newCategoryName}
           onChange={setNewCategoryName}
           onSubmit={handleCreateCategory}
@@ -417,11 +419,11 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       <div className="space-y-4">
         {categories.length === 0 ? (
           <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-neutral-900/80 border-neutral-800/40 shadow-sm">
-            <p className="text-neutral-400 text-sm font-semibold uppercase tracking-wider">No hay categorías registradas en el almacén.</p>
+            <p className="text-neutral-400 text-sm font-semibold uppercase tracking-wider">{t('partsTab.noCategories')}</p>
           </Card>
         ) : Object.keys(groupedInventory).length === 0 ? (
           <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-neutral-900/80 border-neutral-800/40 shadow-sm">
-            <p className="text-neutral-400 text-sm font-semibold">No se encontraron categorías o repuestos con la búsqueda "{searchTerm}".</p>
+            <p className="text-neutral-400 text-sm font-semibold">{t('partsTab.noSearchHits', { search: searchTerm })}</p>
           </Card>
         ) : (
           categories.map(cat => {
@@ -454,8 +456,8 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
                 {isAddingPartHere && (
                   <div className="mx-6 mb-6">
                     <PartFormInline
-                      title={`Añadir Repuesto a ${cat.displayName}`}
-                      submitLabel="Añadir al Almacén"
+                      title={t('partsTab.addPartTitle', { catName: cat.displayName })}
+                      submitLabel={t('partsTab.addPartSubmit')}
                       oemRef={newOemRef}
                       setOemRef={setNewOemRef}
                       name={newName}
@@ -483,7 +485,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
                 {isExpanded && (
                   <div className="px-6 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     {items.length === 0 ? (
-                      <p className="text-xs text-neutral-500 italic py-2 text-center">No hay piezas añadidas en esta categoría.</p>
+                      <p className="text-xs text-neutral-500 italic py-2 text-center">{t('partsTab.noPartsInCat')}</p>
                     ) : (
                       items.map(item => {
                         const isEditingThis = editingItem?.id === item.id;
@@ -492,8 +494,8 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
                           return (
                             <PartFormInline
                               key={item.id}
-                              title={`Modificar repuesto ${item.part.name}`}
-                              submitLabel="Guardar Cambios"
+                              title={t('partsTab.modifyPartTitle', { name: item.part.name })}
+                              submitLabel={t('common.saveChanges')}
                               oemRef={editOemRef}
                               setOemRef={setEditOemRef}
                               name={editName}

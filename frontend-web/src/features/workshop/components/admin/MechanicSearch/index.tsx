@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { User } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface Mechanic {
   id: string;
@@ -14,6 +15,7 @@ interface MechanicSearchProps {
 }
 
 export const MechanicSearch: React.FC<MechanicSearchProps> = ({ mechanics, onSelectMechanic }) => {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -60,7 +62,7 @@ export const MechanicSearch: React.FC<MechanicSearchProps> = ({ mechanics, onSel
           value={query}
           onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
           onFocus={() => setIsOpen(true)}
-          placeholder="Buscar mecánico..."
+          placeholder={t('mechanicSearch.placeholder')}
           className="bg-white/5 border border-white/10 hover:border-white/20 focus:border-blue-500/50 focus:bg-white/10 text-white pl-12 pr-6 h-[54px] rounded-xl text-xs font-bold w-48 md:w-60 outline-none transition-all placeholder:text-neutral-600 shadow-2xl"
         />
       </div>
@@ -79,7 +81,7 @@ export const MechanicSearch: React.FC<MechanicSearchProps> = ({ mechanics, onSel
                 </div>
                 <div className="flex-1 min-w-0">
                    <div className="text-white font-black uppercase text-[10px] truncate">{m.firstname} {m.lastname}</div>
-                   <div className="text-[8px] text-neutral-500 font-bold uppercase">{m.role === 'WORKSHOP_MANAGER' ? 'Encargado' : 'Mecánico'}</div>
+                   <div className="text-[8px] text-neutral-500 font-bold uppercase">{m.role === 'WORKSHOP_MANAGER' ? t('mechanicSearch.manager') : t('mechanicSearch.mechanic')}</div>
                 </div>
               </button>
             ))}

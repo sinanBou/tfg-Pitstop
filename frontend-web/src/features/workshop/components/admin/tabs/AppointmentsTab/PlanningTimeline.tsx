@@ -3,6 +3,7 @@ import { AppointmentBlock } from './AppointmentBlock';
 import { UnassignedColumn } from './UnassignedColumn';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
 import { useToast } from '@/hooks/useToast';
+import { useTranslation } from '@/i18n';
 import { ChevronLeft, ChevronRight, Calendar, Clock, User } from '@/assets/icons';
 
 /**
@@ -82,6 +83,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
   onManage,
   onViewChecklist,
 }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [activePreview, setActivePreview] = useState<{ url: string; title: string } | null>(null);
 
@@ -191,7 +193,7 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
 
       if (collision) {
         const colTime = new Date(collision.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-        toast.warning(`No se puede colocar aquí: ya existe "${collision.vehicleDisplay || 'una cita'}" a las ${colTime} en esta columna.`);
+        toast.warning(t('appointmentsTab.collisionWarning', { vehicle: collision.vehicleDisplay || t('appointmentsTab.appointmentLabel'), time: colTime }));
         return;
       }
     }
@@ -215,14 +217,14 @@ export const PlanningTimeline: React.FC<PlanningTimelineProps> = ({
           <button
             onClick={() => scroll('left')}
             className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-neutral-400 hover:text-white transition-all"
-            title="Desplazar izquierda"
+            title={t('appointmentsTab.scrollLeftTitle')}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => scroll('right')}
             className="w-9 h-9 flex items-center justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 rounded-xl text-neutral-400 hover:text-white transition-all"
-            title="Desplazar derecha"
+            title={t('appointmentsTab.scrollRightTitle')}
           >
             <ChevronRight className="w-4 h-4" />
           </button>

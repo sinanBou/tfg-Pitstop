@@ -29,13 +29,13 @@ import { MiPerfil } from '@/features/workshop/components/admin/MiPerfil/MiPerfil
 import { useTranslation } from '@/i18n';
 
 const diasSemana = [
-  { value: 'LUNES', label: 'Lunes' },
-  { value: 'MARTES', label: 'Martes' },
-  { value: 'MIERCOLES', label: 'Miércoles' },
-  { value: 'JUEVES', label: 'Jueves' },
-  { value: 'VIERNES', label: 'Viernes' },
-  { value: 'SABADO', label: 'Sábado' },
-  { value: 'DOMINGO', label: 'Domingo' },
+  { value: 'LUNES', label: 'days.monday' },
+  { value: 'MARTES', label: 'days.tuesday' },
+  { value: 'MIERCOLES', label: 'days.wednesday' },
+  { value: 'JUEVES', label: 'days.thursday' },
+  { value: 'VIERNES', label: 'days.friday' },
+  { value: 'SABADO', label: 'days.saturday' },
+  { value: 'DOMINGO', label: 'days.sunday' },
 ];
 
 export default function WorkshopAdminDashboard() {
@@ -192,7 +192,7 @@ export default function WorkshopAdminDashboard() {
                         className="flex items-center gap-2 text-neutral-500 hover:text-white mb-2 text-[10px] font-black uppercase tracking-widest transition-all group w-fit"
                       >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-                        Volver a Mis Talleres
+                        {t('workshopAdminDashboard.backToMyWorkshops')}
                       </Link>
                     )}
                     <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
@@ -207,7 +207,7 @@ export default function WorkshopAdminDashboard() {
                       className="!px-6 !py-4"
                     >
                       <Plus className="w-4 h-4 text-red-500" />
-                      Nueva Cita
+                      {t('workshopAdminDashboard.newAppointment')}
                     </Button>
                   </div>
                </div>
@@ -222,7 +222,7 @@ export default function WorkshopAdminDashboard() {
                 <div className="animate-fade-in-up">
                   <OverviewTab 
                     workshopData={workshopData} 
-                    diasSemana={diasSemana} 
+                    diasSemana={diasSemana.map(d => ({ value: d.value, label: t(d.label as any) }))} 
                     employeeProfile={employeeProfile}
                     userRole={userRole || undefined}
                   />
@@ -281,7 +281,7 @@ export default function WorkshopAdminDashboard() {
                       className="!px-5 !py-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 border border-blue-600/20 hover:border-blue-500/40 group/btn"
                     >
                       <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                      Sin Asignar
+                      {t('workshopAdminDashboard.unassigned')}
                     </Button>
                     <div className="ml-auto">
                       <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="red" />
@@ -333,17 +333,19 @@ export default function WorkshopAdminDashboard() {
                   <div className="flex flex-col md:flex-row md:items-center justify-between p-5 border-b border-neutral-800/60 gap-4">
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
-                        <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">Mi Agenda</span>
+                        <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">{t('workshopAdminDashboard.mySchedule')}</span>
                       </div>
                       
                       <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-1.5">
-                        <span className="text-[10px] text-neutral-500 font-black uppercase tracking-widest">Ver Agenda de:</span>
+                        <span className="text-[10px] text-neutral-500 font-black uppercase tracking-widest">{t('workshopAdminDashboard.viewScheduleOf')}</span>
                         <select
                           value={selectedAgendaEmployeeId || ''}
                           onChange={(e) => setSelectedAgendaEmployeeId(e.target.value || null)}
                           className="bg-transparent text-white text-xs font-black uppercase tracking-wider focus:outline-none cursor-pointer border-none p-0 pr-6"
                         >
-                          <option value={employeeProfile?.id || ''} className="bg-neutral-950 text-white">Mía ({employeeProfile?.firstname || 'Yo'})</option>
+                          <option value={employeeProfile?.id || ''} className="bg-neutral-950 text-white">
+                            {t('workshopAdminDashboard.mine', { name: employeeProfile?.firstname || t('workshopAdminDashboard.me') })}
+                          </option>
                           {employees
                             .filter(e => e.id !== employeeProfile?.id)
                             .filter(e => {
@@ -353,7 +355,7 @@ export default function WorkshopAdminDashboard() {
                             })
                             .map((emp: any) => (
                               <option key={emp.id} value={emp.id} className="bg-neutral-950 text-white">
-                                {emp.firstname} {emp.lastname} ({emp.role === 'WORKSHOP_MANAGER' ? 'Gerente' : emp.role === 'WORKSHOP_OWNER' ? 'Propietario' : 'Mecánico'})
+                                {emp.firstname} {emp.lastname} ({emp.role === 'WORKSHOP_MANAGER' ? t('roles.manager') : emp.role === 'WORKSHOP_OWNER' ? t('roles.owner') : t('roles.staff')})
                               </option>
                             ))
                           }
@@ -367,9 +369,9 @@ export default function WorkshopAdminDashboard() {
                     <PlanningTimeline
                       columns={[{ 
                         id: selectedAgendaEmployeeId || '', 
-                        title: selectedEmpObj ? `${selectedEmpObj.firstname} ${selectedEmpObj.lastname}` : 'Sin Asignar', 
+                        title: selectedEmpObj ? `${selectedEmpObj.firstname} ${selectedEmpObj.lastname}` : t('workshopAdminDashboard.unassigned'), 
                         employeeId: selectedAgendaEmployeeId,
-                        role: selectedEmpObj ? (selectedEmpObj.role === 'WORKSHOP_OWNER' ? 'Dueño' : selectedEmpObj.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico') : undefined,
+                        role: selectedEmpObj ? (selectedEmpObj.role === 'WORKSHOP_OWNER' ? t('roles.owner') : selectedEmpObj.role === 'WORKSHOP_MANAGER' ? t('roles.manager') : t('roles.staff')) : undefined,
                         profilePictureUrl: selectedEmpObj?.profilePictureUrl
                       }]}
                       appointments={agendaItems}

@@ -6,6 +6,7 @@ import { AppointmentSearch } from '@/features/workshop/components/admin/Appointm
 import { DateNavigator } from '@/components/common/DateNavigator/DateNavigator';
 import { PendingAppointmentsList } from './PendingAppointmentsList';
 import { ConfirmedAppointmentsList } from './ConfirmedAppointmentsList';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente CitasTab.
@@ -45,6 +46,8 @@ export const CitasTab: React.FC<CitasTabProps> = ({
   handleDeleteAppointment,
   checkInVehicle
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-12 animate-fade-in-up">
       <Card
@@ -62,7 +65,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
             className="!px-5 !py-3 bg-yellow-600/10 hover:bg-yellow-600/20 text-yellow-500 border border-yellow-600/20 hover:border-yellow-500/40 group/btn"
           >
             <ChevronsRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-            Pendientes
+            {t('citasTab.pendingBtn')}
           </Button>
           <div className="ml-auto">
             <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="red" />
@@ -77,7 +80,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
         
         {pendingAppointments.length > 0 && (
           <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-6 text-center">
-            Las citas confirmadas se moverán a la pestaña "Planificación" para ser asignadas.
+            {t('citasTab.confirmedMoveInfo')}
           </p>
         )}
         
@@ -91,3 +94,4 @@ export const CitasTab: React.FC<CitasTabProps> = ({
     </div>
   );
 };
+

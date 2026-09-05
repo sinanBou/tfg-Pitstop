@@ -3,6 +3,7 @@ import { Card } from '@/components/common/Card/Card';
 import { Check } from '@/assets/icons';
 import { Button } from '@/components/common/Button/Button';
 import { getBrandLogo } from '@/assets/BrandLogos';
+import { useTranslation } from '@/i18n';
 
 interface PendingAppointmentsListProps {
   appointments: any[];
@@ -18,10 +19,12 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
   onConfirmAppointment,
   onRejectAppointment
 }) => {
+  const { t, language } = useTranslation();
+
   return (
     <div className="space-y-6">
       <h3 className="text-white font-black uppercase tracking-widest text-sm mb-6 flex items-center gap-3">
-        Pendientes de Confirmar
+        {t('citasTab.pendingConfirmationTitle')}
         <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">
           {appointments.length}
         </span>
@@ -54,12 +57,12 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
 
                 {app.clientFullName && (
                   <div className="text-neutral-400 text-xs font-bold mt-1">
-                    Cliente: <span className="text-neutral-200">{app.clientFullName}</span>
+                    {t('avisosTab.clientLabel')}: <span className="text-neutral-200">{app.clientFullName}</span>
                   </div>
                 )}
 
                 <div className="text-neutral-400 text-xs font-mono mt-3 mb-4">
-                  {new Date(app.dateTime).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}{' '}
+                  {new Date(app.dateTime).toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', { day: '2-digit', month: '2-digit' })}{' '}
                   {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}{' '}
                   h
                 </div>
@@ -71,7 +74,7 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
                   className="flex-1 !py-3 bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 group/btn !px-2 text-xs"
                 >
                   <Check className="w-3.5 h-3.5 mr-1 shrink-0" strokeWidth={2.5} />
-                  Confirmar
+                  {t('citasTab.confirmBtn')}
                 </Button>
                 
                 {onRejectAppointment && (
@@ -80,9 +83,9 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
                     variant="danger"
                     glow={false}
                     className="!py-3 border border-red-500/20 hover:border-red-500/40 flex items-center justify-center font-bold text-xs !px-3 shrink-0"
-                    title="Rechazar Cita"
+                    title={t('citasTab.rejectTitle')}
                   >
-                    Rechazar
+                    {t('citasTab.rejectBtn')}
                   </Button>
                 )}
               </div>
@@ -90,10 +93,11 @@ export const PendingAppointmentsList: React.FC<PendingAppointmentsListProps> = (
           ))
         ) : (
           <div className="col-span-full py-8 text-center text-neutral-500 text-xs uppercase tracking-widest font-bold">
-            Todo al día. No hay citas por confirmar.
+            {t('citasTab.noPendingAppointments')}
           </div>
         )}
       </div>
     </div>
   );
 };
+

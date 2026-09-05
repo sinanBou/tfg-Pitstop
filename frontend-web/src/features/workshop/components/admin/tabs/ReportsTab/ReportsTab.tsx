@@ -7,6 +7,7 @@ import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { PartsStatsWidget } from '@/components/common/PartsStatsWidget/PartsStatsWidget';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
 import { useToast } from '@/hooks/useToast';
+import { useTranslation } from '@/i18n';
 import { Search, FileText, ChevronDown, Download } from '@/assets/icons';
 
 interface PartItem {
@@ -35,6 +36,7 @@ interface ReportsTabProps {
 }
 
 export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
+  const { t, language } = useTranslation();
   const toast = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
@@ -124,7 +126,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
         <div className="w-8 h-8 border-4 border-neutral-800 border-t-red-500 rounded-full animate-spin" />
         <p className="text-neutral-500 text-sm font-black uppercase tracking-widest animate-pulse">
-          Cargando Historial de Informes...
+          {t('reportsTab.loadingHistory')}
         </p>
       </div>
     );
@@ -135,8 +137,8 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
       {/* Cabecera y Selector de Mes */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-900 pb-4">
         <div>
-          <span className="text-xs font-black uppercase tracking-widest text-neutral-500">Panel de Control de Informes</span>
-          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">Análisis General</h2>
+          <span className="text-xs font-black uppercase tracking-widest text-neutral-500">{t('reportsTab.dashboardTitle')}</span>
+          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">{t('reportsTab.generalAnalysis')}</h2>
         </div>
         <MonthSelector selectedMonth={selectedMonth} onChange={setSelectedMonth} />
       </div>
@@ -144,19 +146,19 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
       {/* ── SECCIÓN DE ANALÍTICAS Y METRICAS DEL TALLER (KPIs) ── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <MetricCard 
-          label="Facturación Total" 
+          label={t('reportsTab.totalRevenue')} 
           value={formatCurrency(analytics.totalRevenue)} 
         />
         <MetricCard 
-          label="Precio Medio" 
+          label={t('reportsTab.avgPrice')} 
           value={formatCurrency(analytics.avgInvoice)} 
         />
         <MetricCard 
-          label="Citas Facturadas" 
+          label={t('reportsTab.invoicedAppointments')} 
           value={filteredInvoicesByMonth.length} 
         />
         <MetricCard 
-          label="Mano de Obra / Piezas" 
+          label={t('reportsTab.laborPartsRatio')} 
           value={`${analytics.laborPercentage.toFixed(0)}% / ${analytics.partsPercentage.toFixed(0)}%`} 
         />
       </div>
@@ -171,18 +173,18 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
         <div className="bg-neutral-900/80 rounded-2xl p-6 md:p-8 space-y-6 border border-neutral-800/40">
           <div className="flex items-center justify-between border-b border-neutral-800/40 pb-4">
             <h3 className="text-sm font-black uppercase tracking-wider text-white">
-              Ingresos por Categoría
+              {t('reportsTab.revenueByCategory')}
             </h3>
           </div>
 
           <div className="space-y-6 py-2">
             <ProgressBar
-              label="Total Mano de Obra"
+              label={t('reportsTab.totalLabor')}
               valueText={formatCurrency(analytics.totalLabor)}
               percentage={analytics.laborPercentage}
             />
             <ProgressBar
-              label="Total Repuestos y Materiales"
+              label={t('reportsTab.totalParts')}
               valueText={formatCurrency(analytics.totalParts)}
               percentage={analytics.partsPercentage}
             />
@@ -196,9 +198,9 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
       <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
         <div>
           <h3 className="text-xs font-black uppercase tracking-widest text-neutral-400">
-            {invoices.length} {invoices.length === 1 ? 'informe registrado' : 'informes registrados'}
+            {t(invoices.length === 1 ? 'reportsTab.registeredReportsCount' : 'reportsTab.registeredReportsCount_plural', { count: invoices.length })}
           </h3>
-          <p className="text-neutral-500 text-xs mt-0.5">Consulta de facturas y descargas de PDFs oficiales.</p>
+          <p className="text-neutral-500 text-xs mt-0.5">{t('reportsTab.reportsSubtitle')}</p>
         </div>
 
         {/* Buscador */}
@@ -207,7 +209,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            placeholder="Buscar por cliente, matrícula o tarea..."
+            placeholder={t('reportsTab.searchPlaceholder')}
             className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-11 pr-10 py-3 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-red-500/50 transition-all shadow-inner"
           />
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500">
@@ -229,7 +231,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
         <div className="flex flex-col items-center justify-center py-20 opacity-40 border border-dashed border-neutral-850 rounded-2xl">
           <FileText className="w-12 h-12 text-neutral-600 mb-3" strokeWidth={1.5} />
           <p className="text-neutral-500 text-sm font-black uppercase tracking-widest">
-            No se han encontrado informes
+            {t('reportsTab.noReportsFound')}
           </p>
         </div>
       ) : (
@@ -237,7 +239,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
           {filteredInvoices.map(inv => {
             const isExpanded = expandedInvoiceId === inv.id;
             const dateObj = new Date(inv.createdAt);
-            const formattedDate = dateObj.toLocaleDateString('es-ES', {
+            const formattedDate = dateObj.toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', {
               day: '2-digit',
               month: 'short',
               year: 'numeric'
@@ -269,7 +271,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                   {/* Lado Derecho: Totales y Acciones */}
                   <div className="flex items-center gap-4 self-end md:self-center">
                     <div className="text-right">
-                      <p className="text-xs font-black uppercase tracking-widest text-neutral-500">Total Liquidado</p>
+                      <p className="text-xs font-black uppercase tracking-widest text-neutral-500">{t('reportsTab.settledTotal')}</p>
                       <p className="text-lg font-black font-mono text-green-400 mt-0.5">{formatCurrency(inv.totalPrice)}</p>
                     </div>
 
@@ -278,7 +280,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                       <button
                         onClick={() => setExpandedInvoiceId(isExpanded ? null : inv.id)}
                         className="w-10 h-10 rounded-xl bg-neutral-900/60 hover:bg-neutral-800 border border-neutral-850 flex items-center justify-center text-neutral-400 hover:text-white transition-all active:scale-95 cursor-pointer"
-                        title={isExpanded ? "Ocultar detalle" : "Ver detalle"}
+                        title={isExpanded ? t('reportsTab.hideDetails') : t('reportsTab.showDetails')}
                       >
                         <ChevronDown 
                           className={`w-4 h-4 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} 
@@ -305,17 +307,17 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                       
                       {/* Mano de Obra */}
                       <div className="bg-neutral-950/40 border border-neutral-800/40 rounded-2xl p-5 space-y-2">
-                        <span className="text-xs font-black uppercase tracking-widest text-neutral-500 block mb-1">Cálculo Mano de Obra</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-neutral-500 block mb-1">{t('reportsTab.laborCalculation')}</span>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="text-neutral-400">Tarifa por hora:</span>
+                          <span className="text-neutral-400">{t('reportsTab.hourlyRate')}</span>
                           <span className="text-white font-mono">{formatCurrency(inv.laborRate)}/h</span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="text-neutral-400">Total Mano de Obra:</span>
+                          <span className="text-neutral-400">{t('reportsTab.totalLabor')}:</span>
                           <span className="text-white font-mono font-bold">{formatCurrency(inv.totalLabor)}</span>
                         </div>
                         <div className="flex justify-between items-center text-xs">
-                          <span className="text-neutral-400">Servicios:</span>
+                          <span className="text-neutral-400">{t('reportsTab.services')}</span>
                           <span className="text-neutral-300 text-xs font-mono truncate max-w-[60%]" title={inv.serviceType}>
                             {inv.serviceType}
                           </span>
@@ -324,9 +326,9 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
 
                       {/* Repuestos */}
                       <div className="bg-neutral-950/40 border border-neutral-800/40 rounded-2xl p-5 space-y-2">
-                        <span className="text-xs font-black uppercase tracking-widest text-neutral-500 block mb-1">Repuestos Utilizados ({partsList.length})</span>
+                        <span className="text-xs font-black uppercase tracking-widest text-neutral-500 block mb-1">{t('reportsTab.usedParts', { count: partsList.length })}</span>
                         {partsList.length === 0 ? (
-                          <p className="text-neutral-600 text-xs italic">Ningún repuesto imputado en este trabajo.</p>
+                          <p className="text-neutral-600 text-xs italic">{t('reportsTab.noPartsImputed')}</p>
                         ) : (
                           <div className="space-y-1.5 max-h-24 overflow-y-auto custom-scrollbar">
                             {partsList.map((p, idx) => (
@@ -339,7 +341,7 @@ export const ReportsTab: React.FC<ReportsTabProps> = ({ workshopId }) => {
                         )}
                         {partsList.length > 0 && (
                           <div className="flex justify-between items-center text-xs pt-1.5 border-t border-neutral-900/60 font-bold">
-                            <span className="text-neutral-400">Total Materiales:</span>
+                            <span className="text-neutral-400">{t('reportsTab.totalMaterials')}</span>
                             <span className="text-white font-mono">{formatCurrency(inv.totalParts)}</span>
                           </div>
                         )}

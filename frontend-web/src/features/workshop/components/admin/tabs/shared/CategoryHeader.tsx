@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Plus, Trash, ChevronDown } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface CategoryHeaderProps {
   displayName: string;
@@ -26,13 +27,23 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
   onToggle,
   onToggleAddPart,
   onDelete,
-  addLabel = 'Añadir Repuesto',
-  itemLabelSingle = 'Repuesto',
-  itemLabelPlural = 'Repuestos',
+  addLabel,
+  itemLabelSingle,
+  itemLabelPlural,
   gender = 'm',
   icon: Icon = Box,
   colorVariant = 'red'
 }) => {
+  const { t } = useTranslation();
+
+  const finalAddLabel = addLabel || t('shared.addPart');
+  const finalItemSingle = itemLabelSingle || t('shared.partSingle');
+  const finalItemPlural = itemLabelPlural || t('shared.partPlural');
+
+  const registeredStatus = gender === 'm'
+    ? (itemCount !== 1 ? t('shared.registeredMPlural') : t('shared.registeredM'))
+    : (itemCount !== 1 ? t('shared.registeredFPlural') : t('shared.registeredF'));
+
   return (
     <div
       onClick={onToggle}
@@ -45,7 +56,7 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
         <div>
           <h3 className="font-bold text-white tracking-tight uppercase text-sm tracking-wider">{displayName}</h3>
           <span className="text-xs font-mono text-neutral-400 tracking-widest uppercase block mt-0.5">
-            {itemCount} {itemCount === 1 ? itemLabelSingle : itemLabelPlural} {gender === 'm' ? (itemCount !== 1 ? 'registrados' : 'registrado') : (itemCount !== 1 ? 'registradas' : 'registrada')}
+            {itemCount} {itemCount === 1 ? finalItemSingle : finalItemPlural} {registeredStatus}
           </span>
         </div>
       </div>
@@ -61,13 +72,13 @@ export const CategoryHeader: React.FC<CategoryHeaderProps> = ({
           }`}
         >
           <Plus className={`w-3.5 h-3.5 ${colorVariant === 'red' ? 'text-red-500' : 'text-blue-500'} transition-transform duration-300 ${isAddingPart ? 'rotate-45' : ''}`} strokeWidth={2.5} />
-          {isAddingPart ? 'Cancelar' : addLabel}
+          {isAddingPart ? t('shared.cancel') : finalAddLabel}
         </button>
         {itemCount === 0 && onDelete && (
           <button
             onClick={onDelete}
             className={`p-2 text-neutral-500 ${colorVariant === 'red' ? 'hover:text-red-500' : 'hover:text-blue-500'} hover:bg-neutral-800/40 rounded-xl transition-all cursor-pointer`}
-            title="Eliminar Categoría Vacía"
+            title={t('shared.deleteEmptyCategory')}
           >
             <Trash className="w-4 h-4" />
           </button>

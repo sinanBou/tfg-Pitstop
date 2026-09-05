@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { X, Building2, Camera } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente PerfilTaller.
@@ -36,13 +37,13 @@ interface PerfilTallerProps {
 }
 
 const diasSemana = [
-  { value: 'LUNES', label: 'Lunes' },
-  { value: 'MARTES', label: 'Martes' },
-  { value: 'MIERCOLES', label: 'Miércoles' },
-  { value: 'JUEVES', label: 'Jueves' },
-  { value: 'VIERNES', label: 'Viernes' },
-  { value: 'SABADO', label: 'Sábado' },
-  { value: 'DOMINGO', label: 'Domingo' }
+  { value: 'LUNES', labelKey: 'days.monday' },
+  { value: 'MARTES', labelKey: 'days.tuesday' },
+  { value: 'MIERCOLES', labelKey: 'days.wednesday' },
+  { value: 'JUEVES', labelKey: 'days.thursday' },
+  { value: 'VIERNES', labelKey: 'days.friday' },
+  { value: 'SABADO', labelKey: 'days.saturday' },
+  { value: 'DOMINGO', labelKey: 'days.sunday' }
 ];
 
 /**
@@ -61,6 +62,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
   onDeleteLogo,
   onPreviewLogo,
 }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -108,10 +110,10 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
           <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
             <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-              Operativa del Negocio
+              {t('common.workshopSettings')}
             </p>
             <h3 className="text-3xl font-black uppercase tracking-widest text-white">
-              Perfil del Taller
+              {t('profile.title')}
             </h3>
           </header>
 
@@ -161,7 +163,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                       disabled={uploadingLogo}
                       className="px-3 py-1.5 text-[9px] h-fit"
                     >
-                      {workshopLogoUrl ? 'Cambiar Imagen' : 'Añadir Imagen'}
+                      {workshopLogoUrl ? t('profile.changeImage') : t('profile.addImage')}
                     </Button>
                     {workshopLogoUrl && (
                       <Button
@@ -169,7 +171,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                         onClick={onPreviewLogo}
                         className="px-3 py-1.5 text-[9px] h-fit"
                       >
-                        Ver Foto
+                        {t('profile.viewPhoto')}
                       </Button>
                     )}
                     {workshopLogoUrl && (
@@ -179,17 +181,17 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                         disabled={uploadingLogo}
                         className="px-3 py-1.5 text-[9px] h-fit"
                       >
-                        Eliminar
+                        {t('profile.deletePhoto')}
                       </Button>
                     )}
                   </div>
-                  <p className="text-[10px] text-neutral-500 font-medium">PNG, JPG de hasta 5MB. Almacenamiento seguro en la nube.</p>
+                  <p className="text-[10px] text-neutral-500 font-medium">{t('profile.photoRestrictions')}</p>
                 </div>
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Hora Apertura</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopCreationModal.openTime')}</label>
                 <input
                   type="time"
                   value={settingsForm.openTime}
@@ -199,7 +201,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Hora Cierre</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopCreationModal.closeTime')}</label>
                 <input
                   type="time"
                   value={settingsForm.closeTime}
@@ -209,7 +211,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Duración Cita (Min)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('appointmentModal.scheduledDate')}</label>
                 <input
                   type="number"
                   value={settingsForm.slotDurationMinutes}
@@ -218,7 +220,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Precio Mano de Obra (€/h)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopDashboard.hourlyRate')}</label>
                 <input
                   type="number"
                   step="0.01"
@@ -230,7 +232,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
             </div>
 
             <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">Días Laborables</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopCreationModal.operatingDays')}</label>
               <div className="flex flex-wrap gap-2">
                 {diasSemana.map(dia => (
                   <button
@@ -248,7 +250,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                         : 'bg-neutral-950/60 border-neutral-800/80 text-neutral-400 hover:text-white hover:border-neutral-700'
                     }`}
                   >
-                    {dia.label}
+                    {t(dia.labelKey as any)}
                   </button>
                 ))}
               </div>
@@ -258,7 +260,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
               <div className="space-y-1 text-left">
                 <h4 className="text-white text-xs font-black uppercase tracking-wider flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
-                  Añadir Dueño a la Planificación
+                  {t('workshopAdminDashboard.unassigned')}
                 </h4>
                 <p className="text-neutral-500 text-[10px] font-medium leading-relaxed">
                   Si se activa esta opción, el propietario del taller se incorporará a la agenda de planificación general y se le podrán asignar citas y tareas.
@@ -285,7 +287,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                 variant="primary"
                 glow={true}
               >
-                Guardar Ajustes
+                {t('common.saveChanges')}
               </Button>
             </div>
           </form>
@@ -296,9 +298,9 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
           isOpen={isConfirmDeleteOpen}
           onClose={() => setIsConfirmDeleteOpen(false)}
           onConfirm={handleConfirmDelete}
-          title="Eliminar Logo del Taller"
-          description="¿Estás seguro de que deseas eliminar la foto de perfil del taller? Esta acción es instantánea."
-          confirmText="Sí, Eliminar"
+          title={t('profile.deletePhotoTitle')}
+          description={t('profile.deletePhotoDesc')}
+          confirmText={t('common.confirm')}
           theme="red"
         />
       )}
@@ -306,3 +308,4 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
     document.body
   );
 };
+

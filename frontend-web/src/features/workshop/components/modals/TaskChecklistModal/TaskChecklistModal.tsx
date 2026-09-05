@@ -3,6 +3,7 @@ import { API_BASE_URL } from '@/config/api';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
 import type { WorkshopInventory } from '@/features/workshop';
+import { useTranslation } from '@/i18n';
 import { Check, Plus, Trash, Box } from '@/assets/icons';
 
 /* ─────────────────────────────────────────────
@@ -87,6 +88,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
   onUpdateStatus,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
   const [loadingCatalog, setLoadingCatalog] = useState(true);
@@ -260,7 +262,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     }
     if (matchedInv) {
       if (matchedInv.stockQuantity < quantityToUse) {
-      toast.warning(`Stock insuficiente en almacén. Unidades disponibles: ${matchedInv.stockQuantity}`);
+      toast.warning(t('invoiceModal.insufficientStock', { count: matchedInv.stockQuantity }));
         return;
       }
       payload.partId = matchedInv.part.id;
@@ -282,7 +284,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
 
       if (!res.ok) {
         const errMsg = await res.text();
-        throw new Error(errMsg || 'Error al asignar repuesto');
+        throw new Error(errMsg || t('common.error'));
       }
 
       loadInventory();
@@ -294,7 +296,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
       setShowDropdown(false);
       onSuccess?.();
     } catch (err: any) {
-      toast.error(err.message || 'Error al guardar repuesto.');
+      toast.error(err.message || t('common.error'));
     } finally {
       setAddingPart(false);
     }
@@ -326,7 +328,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title={item.isTask ? 'Gestión de Tarea' : 'Gestión de Cita'}
+      title={item.isTask ? t('taskChecklistModal.taskManagement') : t('taskChecklistModal.appointmentManagement')}
       subtitle={item.vehicleDisplay}
       theme={item.isTask ? 'blue' : 'red'}
       progressBarWidth={`${progress}%`}
@@ -335,11 +337,11 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         {/* Info cabecera rápida */}
         <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-4 flex justify-between items-center text-xs shrink-0">
           <div className="flex gap-4">
-            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">Cliente:</span> <span className="text-white font-extrabold">{item.clientFullName}</span></div>
-            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">Duración:</span> <span className="text-white font-extrabold font-mono">{item.estimatedDuration || '--'} min</span></div>
+            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">{t('taskChecklistModal.client')}</span> <span className="text-white font-extrabold">{item.clientFullName}</span></div>
+            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">{t('taskChecklistModal.duration')}</span> <span className="text-white font-extrabold font-mono">{item.estimatedDuration || '--'} min</span></div>
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg">
-            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">Progreso:</span>
+            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">{t('taskChecklistModal.progress')}</span>
             <span className="text-white text-xs font-black">{completedCount}/{totalCount}</span>
           </div>
         </div>
@@ -349,18 +351,18 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
           {/* TAREAS (Izquierda) */}
           <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
-              Operaciones del Servicio
+              {t('taskChecklistModal.serviceOperations')}
             </h4>
             
             <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-2">
               {loadingCatalog ? (
                 <div className="text-center py-12 text-neutral-500 flex flex-col items-center justify-center gap-2">
                   <div className="w-6 h-6 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
-                  <p className="text-[9px] uppercase tracking-widest font-black">Mapeando tareas del catálogo...</p>
+                  <p className="text-[9px] uppercase tracking-widest font-black">{t('taskChecklistModal.mappingTasks')}</p>
                 </div>
               ) : checklist.length === 0 ? (
                 <div className="text-center py-12 bg-neutral-900/10 border border-neutral-800/40 rounded-2xl p-4">
-                  <p className="text-neutral-500 text-xs">No hay operaciones asignadas.</p>
+                  <p className="text-neutral-500 text-xs">{t('taskChecklistModal.noAssignedOperations')}</p>
                 </div>
               ) : (
                 checklist.map((ci) => (
@@ -406,10 +408,8 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
           {/* PIEZAS Y REPUESTOS (Derecha) */}
           <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
-              Materiales y Repuestos Requeridos
+              {t('taskChecklistModal.materialsAndParts')}
             </h4>
-
-
 
             {/* Formulario rápido con buscador de autocompletado */}
             <form onSubmit={handleAddPart} className="flex gap-2 shrink-0 relative">
@@ -424,7 +424,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                     if (selectedInvId !== 'custom') setSelectedInvId('');
                   }}
                   onFocus={() => setShowDropdown(true)}
-                  placeholder="Buscar o escribir repuesto..."
+                  placeholder={t('invoiceModal.searchPartPlaceholder')}
                   className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all font-semibold text-white"
                 />
                 
@@ -461,14 +461,14 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                           }}
                           className="w-full text-left px-3 py-2.5 text-xs bg-red-950/20 hover:bg-red-900/20 text-red-400 font-bold flex items-center gap-1.5 transition-all"
                         >
-                          <span>Usar repuesto personalizado:</span>
+                          <span>{t('invoiceModal.customPartLabel')}</span>
                           <span className="text-white italic font-normal">"{partQuery.trim()}"</span>
                         </button>
                       )}
                       
                       {filteredInventory.length === 0 && partQuery.trim().length === 0 && (
                         <div className="px-3 py-3 text-center text-xs text-neutral-500 font-medium">
-                          Escribe para buscar o añadir personalizado
+                          {t('invoiceModal.typeToSearchCustom')}
                         </div>
                       )}
                     </div>
@@ -482,7 +482,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                 min="1"
                 value={quantityToUse}
                 onChange={e => setQuantityToUse(parseInt(e.target.value) || 1)}
-                placeholder="Cant."
+                placeholder={t('invoiceModal.quantityPlaceholder')}
                 className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
               />
               
@@ -492,7 +492,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                 max="100"
                 value={discountPercent || ''}
                 onChange={e => setDiscountPercent(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
-                placeholder="Desc. %"
+                placeholder={t('invoiceModal.discountPlaceholder')}
                 className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-white"
                 title="Descuento opcional en porcentaje (0-100)"
               />
@@ -511,7 +511,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
               {parts.length === 0 ? (
                 <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center p-4">
                   <Box className="w-8 h-8 text-neutral-800 mb-1" strokeWidth={1.5} />
-                  <p className="text-[10px] font-bold uppercase tracking-wider">No se han registrado piezas</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider">{t('taskChecklistModal.noPartsRegistered')}</p>
                 </div>
               ) : (
                 parts.map((p, idx) => (
@@ -522,7 +522,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       {p.price <= 0 ? (
-                        <span className="text-amber-500 font-black uppercase tracking-wider text-[9px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">Precio Pendiente</span>
+                        <span className="text-amber-500 font-black uppercase tracking-wider text-[9px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">{t('taskChecklistModal.pendingPrice')}</span>
                       ) : (
                         <span className="text-neutral-400 font-mono">{(p.price * p.quantityUsed).toFixed(2)}€</span>
                       )}
@@ -548,7 +548,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
             onClick={onClose}
             className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
           >
-            Cerrar
+            {t('taskChecklistModal.close')}
           </button>
           <button
             onClick={handleCompleteAll}
@@ -564,7 +564,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
             ) : (
               <>
                 <Check className="w-4 h-4" strokeWidth={2.5} />
-                Marcar como Completado
+                {t('taskChecklistModal.markAsCompleted')}
               </>
             )}
           </button>

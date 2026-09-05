@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Car, Lock, FileText, Clock } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente MechanicLiveTask.
@@ -20,6 +21,7 @@ interface MechanicLiveTaskProps {
  * bloquear operaciones de edición si el vehículo no ha sido recepcionado en el taller.
  */
 export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment, onUpdateStatus, onViewChecklist }) => {
+  const { t, language } = useTranslation();
   const isVehicleReceived = appointment.vehicleReceived === true;
   const [isUpdating, setIsUpdating] = useState(false);
   const [elapsed, setElapsed] = useState<string>('00:00');
@@ -46,11 +48,11 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
 
   const getStatusConfig = (status: string) => {
     switch (status) {
-      case 'PENDING': return { label: 'Pendiente', color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20' };
-      case 'CONFIRMED': return { label: 'Confirmada', color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' };
-      case 'IN_PROGRESS': return { label: 'En Curso', color: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/20' };
-      case 'DELAYED': return { label: 'Retrasada', color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' };
-      case 'COMPLETED': return { label: 'Finalizada', color: 'text-neutral-400', bg: 'bg-neutral-400/10', border: 'border-neutral-400/20' };
+      case 'PENDING': return { label: t('mechanicLiveTask.pending'), color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/20' };
+      case 'CONFIRMED': return { label: t('mechanicLiveTask.confirmed'), color: 'text-blue-400', bg: 'bg-blue-400/10', border: 'border-blue-400/20' };
+      case 'IN_PROGRESS': return { label: t('mechanicLiveTask.inProgress'), color: 'text-green-400', bg: 'bg-green-400/10', border: 'border-green-400/20' };
+      case 'DELAYED': return { label: t('mechanicLiveTask.delayed'), color: 'text-red-500', bg: 'bg-red-500/10', border: 'border-red-500/20' };
+      case 'COMPLETED': return { label: t('mechanicLiveTask.completed'), color: 'text-neutral-400', bg: 'bg-neutral-400/10', border: 'border-neutral-400/20' };
       default: return { label: status, color: 'text-white', bg: 'bg-white/10', border: 'border-white/20' };
     }
   };
@@ -95,7 +97,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
                 {new Date(appointment.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h
               </span>
               <span className="text-neutral-500 text-[10px] font-black uppercase tracking-[0.2em]">
-                | {new Date(appointment.dateTime).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }).replace('.', '')} | {appointment.clientFullName}
+                | {new Date(appointment.dateTime).toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', { day: '2-digit', month: 'short' }).replace('.', '')} | {appointment.clientFullName}
               </span>
             </div>
           </div>
@@ -106,13 +108,13 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
           <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 flex items-center gap-3">
             <Lock className="w-5 h-5 text-amber-400 shrink-0" />
             <div>
-              <p className="text-amber-400 font-black text-[10px] uppercase tracking-widest">Pendiente de Recepción</p>
-              <p className="text-amber-500/60 text-[10px] mt-0.5">Recepciona el vehículo desde la pestaña de Citas para poder gestionar.</p>
+              <p className="text-amber-400 font-black text-[10px] uppercase tracking-widest">{t('mechanicLiveTask.pendingReceptionTitle')}</p>
+              <p className="text-amber-500/60 text-[10px] mt-0.5">{t('mechanicLiveTask.pendingReceptionDesc')}</p>
             </div>
           </div>
         )}
         <div className="bg-black/20 rounded-2xl p-4 border border-white/5">
-          <p className="text-red-500 font-black text-[10px] uppercase tracking-tighter mb-1">Servicio</p>
+          <p className="text-red-500 font-black text-[10px] uppercase tracking-tighter mb-1">{t('mechanicLiveTask.serviceLabel')}</p>
           <p className="text-white font-bold text-sm mb-2">{appointment.serviceType}</p>
           <p className="text-neutral-400 text-xs line-clamp-2">{appointment.description}</p>
         </div>
@@ -120,11 +122,11 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
         {/* Control de Tiempo */}
         <div className="grid grid-cols-2 gap-4">
           <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-            <span className="text-[9px] text-neutral-500 uppercase font-black block mb-1">Estimado</span>
+            <span className="text-[9px] text-neutral-500 uppercase font-black block mb-1">{t('mechanicLiveTask.estimated')}</span>
             <span className="text-white font-mono text-sm">{appointment.estimatedDuration || '--'} min</span>
           </div>
           <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-            <span className="text-[9px] text-neutral-500 uppercase font-black block mb-1">Transcurrido</span>
+            <span className="text-[9px] text-neutral-500 uppercase font-black block mb-1">{t('mechanicLiveTask.elapsed')}</span>
             <span className={`font-mono text-sm ${appointment.status === 'IN_PROGRESS' ? 'text-green-400 animate-pulse' : 'text-neutral-600'}`}>
               {appointment.status === 'IN_PROGRESS' ? elapsed : '--:--'}
             </span>
@@ -142,14 +144,14 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
                 isUpdating ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 
                 'bg-white text-black hover:bg-red-600 hover:text-white shadow-[0_10px_20px_rgba(0,0,0,0.2)]'
               }`}
-              title={!isVehicleReceived ? 'Recepciona el vehículo primero' : undefined}
+              title={!isVehicleReceived ? t('appointmentsTab.receptionTooltip') : undefined}
             >
-              {!isVehicleReceived ? 'Recepción Pendiente' :
-               isUpdating ? 'Procesando...' : 
-               appointment.status === 'PENDING' ? 'Confirmar' :
-               appointment.status === 'CONFIRMED' ? 'Iniciar Trabajo' :
-               appointment.status === 'IN_PROGRESS' ? 'Finalizar' :
-               'Reanudar'}
+              {!isVehicleReceived ? t('mechanicLiveTask.pendingReceptionBtn') :
+               isUpdating ? t('mechanicLiveTask.processingBtn') : 
+               appointment.status === 'PENDING' ? t('mechanicLiveTask.confirmBtn') :
+               appointment.status === 'CONFIRMED' ? t('mechanicLiveTask.startWorkBtn') :
+               appointment.status === 'IN_PROGRESS' ? t('mechanicLiveTask.finishBtn') :
+               t('mechanicLiveTask.resumeBtn')}
             </button>
           )}
 
@@ -163,7 +165,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
                   ? 'bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white border-blue-600/20 hover:border-blue-500'
                   : 'bg-amber-950/20 text-amber-500/40 border-amber-500/10 cursor-not-allowed'
               }`}
-              title={isVehicleReceived ? 'Gestionar Tareas y Piezas' : 'Recepciona el vehículo primero'}
+              title={isVehicleReceived ? t('mechanicLiveTask.manageTasksParts') : t('appointmentsTab.receptionTooltip')}
             >
               {isVehicleReceived ? (
                 <FileText className="w-5 h-5" />
@@ -178,7 +180,7 @@ export const MechanicLiveTask: React.FC<MechanicLiveTaskProps> = ({ appointment,
               onClick={markAsDelayed}
               disabled={isUpdating}
               className="px-4 py-4 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white rounded-2xl border border-red-600/20 transition-all group-hover:border-red-600"
-              title="Informar Retraso"
+              title={t('mechanicLiveTask.informDelay')}
             >
               <Clock className="w-5 h-5" />
             </button>

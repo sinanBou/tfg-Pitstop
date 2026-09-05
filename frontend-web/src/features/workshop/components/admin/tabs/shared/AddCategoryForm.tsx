@@ -1,5 +1,6 @@
 import React from 'react';
 import { InputField } from '@/components/common/InputField/InputField';
+import { useTranslation } from '@/i18n';
 
 interface AddCategoryFormProps {
   title: string;
@@ -24,6 +25,7 @@ export const AddCategoryForm: React.FC<AddCategoryFormProps> = ({
   submitting,
   colorVariant = 'red'
 }) => {
+  const { t } = useTranslation();
   const btnColorClass = colorVariant === 'red'
     ? 'bg-red-600 hover:bg-red-500'
     : 'bg-blue-600 hover:bg-blue-500';
@@ -47,14 +49,14 @@ export const AddCategoryForm: React.FC<AddCategoryFormProps> = ({
             onClick={onCancel}
             className="px-4 py-3 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-neutral-400 transition-all cursor-pointer"
           >
-            Cancelar
+            {t('shared.cancel')}
           </button>
           <button
             type="submit"
             disabled={submitting}
             className={`px-5 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white transition-all disabled:opacity-50 cursor-pointer ${btnColorClass}`}
           >
-            {submitting ? 'Creando...' : 'Crear Categoría'}
+            {submitting ? t('shared.creating') : t('shared.createCategory')}
           </button>
         </div>
       </div>

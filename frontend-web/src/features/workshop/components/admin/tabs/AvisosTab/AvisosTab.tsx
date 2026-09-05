@@ -10,6 +10,7 @@ import { AvisoMetricCard } from './AvisoMetricCard';
 import { AvisoPanel } from './AvisoPanel';
 import { useToast } from '@/hooks/useToast';
 import { Calendar, Edit } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente AvisosTab.
@@ -44,6 +45,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
   fetchWorkshopData,
   onGoToPlanning,
 }) => {
+  const { t } = useTranslation();
   const [inventory, setInventory] = useState<WorkshopInventory[]>([]);
   const [categories, setCategories] = useState<{ id: string; displayName: string }[]>([]);
   const [loadingInv, setLoadingInv] = useState(true);
@@ -173,17 +175,17 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
       {/* Indicadores de cantidad arriba */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <AvisoMetricCard 
-          title="Solicitudes de Cita" 
+          title={t('avisosTab.appointmentRequests')} 
           value={pendingApps.length} 
           alert={pendingApps.length > 0} 
         />
         <AvisoMetricCard 
-          title="Citas Confirmadas" 
+          title={t('avisosTab.confirmedAppointmentsTitle')} 
           value={confirmedApps.length} 
           alert={false} 
         />
         <AvisoMetricCard 
-          title="Trabajos Finalizados" 
+          title={t('avisosTab.completedJobsTitle')} 
           value={readyJobs.length} 
           alert={false} 
         />
@@ -194,13 +196,13 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
         
         {/* PANEL IZQUIERDO: RETRASOS DE CITAS Y TAREAS */}
         <AvisoPanel
-          title="Retrasos de Citas y Tareas"
+          title={t('avisosTab.delayedPanelTitle')}
           badgeCount={delayedApps.length}
           badgeVariant="warning"
           indicatorColor="bg-amber-500"
           borderColor="border-amber-500/10"
           isEmpty={delayedApps.length === 0}
-          emptyStateMessage="Sin retrasos registrados"
+          emptyStateMessage={t('avisosTab.noDelaysMessage')}
         >
           {delayedApps.map((app) => (
             <div
@@ -209,22 +211,22 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-start">
-                  <Badge variant="warning">RETRASADO</Badge>
+                  <Badge variant="warning">{t('avisosTab.delayedBadge')}</Badge>
                   <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-bold">
                     {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h
                   </span>
                 </div>
                 
                 <h4 className="text-sm font-extrabold text-white group-hover:text-amber-500 transition-colors flex items-center gap-1.5 mt-2 uppercase">
-                  {app.vehicleDisplay || 'Vehículo'}
+                  {app.vehicleDisplay || t('avisosTab.vehicleLabel')}
                 </h4>
                 
                 <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
-                  Cliente: {app.clientFullName || 'N/A'}
+                  {t('avisosTab.clientLabel')}: {app.clientFullName || 'N/A'}
                 </p>
                 
                 <p className="text-xs text-neutral-500 font-medium leading-relaxed italic border-t border-neutral-800/60 pt-2">
-                  "{app.serviceType || 'Servicio'}: {app.description || 'Sin descripción'}"
+                  "{app.serviceType || t('avisosTab.serviceLabel')}: {app.description || t('avisosTab.noDescription')}"
                 </p>
               </div>
 
@@ -245,7 +247,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                   className="w-full py-2.5 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 mt-2"
                 >
                   <Calendar className="w-3.5 h-3.5" strokeWidth={2.5} />
-                  Ir a Planificación
+                  {t('avisosTab.goToPlanning')}
                 </button>
               )}
             </div>
@@ -254,15 +256,15 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
         {/* PANEL DERECHO: ALERTAS DE STOCK DE ALMACÉN */}
         <AvisoPanel
-          title="Alertas de Stock de Almacén"
+          title={t('avisosTab.stockAlertsPanelTitle')}
           badgeCount={lowStockItems.length}
           badgeVariant="danger"
           indicatorColor="bg-red-500"
           borderColor="border-red-500/10"
           isEmpty={lowStockItems.length === 0}
-          emptyStateMessage="Todo el stock está correcto"
+          emptyStateMessage={t('avisosTab.allStockCorrectMessage')}
           isLoading={loadingInv}
-          loadingMessage="Analizando existencias..."
+          loadingMessage={t('avisosTab.analyzingStock')}
         >
           {lowStockItems.map((item) => {
             const stockVal = item.stockQuantity;
@@ -275,12 +277,12 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                 key={item.id}
                 onClick={() => handleStartEdit(item)}
                 className="bg-black/30 border border-neutral-800/80 p-5 rounded-2xl flex flex-col gap-4 group hover:border-red-500/50 hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(239,68,68,0.06)] transition-all cursor-pointer select-none"
-                title="Haga clic para gestionar y editar este repuesto"
+                title={t('avisosTab.clickToManagePart')}
               >
                 <div className="flex justify-between items-start gap-4">
                   <div className="space-y-1 min-w-0 flex-1">
                     <Badge variant={isCritical ? 'danger' : 'neutral'}>
-                      {isCritical ? 'CRÍTICO: SIN STOCK' : 'STOCK BAJO'}
+                      {isCritical ? t('avisosTab.criticalNoStock') : t('avisosTab.lowStock')}
                     </Badge>
                     <h4 className="text-sm font-extrabold text-white group-hover:text-red-500 transition-colors flex items-center gap-1.5 mt-2 truncate">
                       {item.part.name}
@@ -295,11 +297,11 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                     <span className="text-xs font-mono font-black text-white block">
                       {stockVal}{' '}
                       <span className="text-neutral-500 text-[10px] font-normal">
-                        de {item.avisoThreshold} uds.
+                        {t('avisosTab.ofUnits', { count: item.avisoThreshold })}
                       </span>
                     </span>
                     <span className="text-[8px] font-black uppercase text-neutral-500 block tracking-widest mt-1">
-                      UMBRAL: {item.avisoThreshold}
+                      {t('avisosTab.thresholdLabel')}: {item.avisoThreshold}
                     </span>
                   </div>
                 </div>
@@ -315,9 +317,9 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                     />
                   </div>
                   <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider flex justify-between">
-                    <span>Nivel de Stock actual</span>
+                    <span>{t('avisosTab.currentStockLevel')}</span>
                     <span className={isCritical ? 'text-red-500 font-black' : 'text-neutral-300 font-black'}>
-                      {isCritical ? 'Agotado' : 'Haga clic para editar'}
+                      {isCritical ? t('avisosTab.outOfStock') : t('avisosTab.clickToEdit')}
                     </span>
                   </p>
                 </div>
@@ -332,8 +334,8 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
       <BaseModal
         isOpen={editingItem !== null}
         onClose={() => setEditingItem(null)}
-        title="Editar Repuesto"
-        subtitle={editingItem ? `Categoría: ${editingItem.part.category.displayName}` : ''}
+        title={t('avisosTab.editPartModalTitle')}
+        subtitle={editingItem ? `${t('common.category') || 'Categoría'}: ${editingItem.part.category.displayName}` : ''}
         theme="red"
       >
         {editingItem && (
@@ -342,8 +344,8 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
               {/* Seleccionable de Categoría / Carpeta */}
               <div className="md:col-span-2 space-y-1">
                 <SearchableSelect
-                  label="Mover a otra carpeta / categoría"
-                  placeholder="Selecciona una carpeta o categoría..."
+                  label={t('avisosTab.moveFolderCategory')}
+                  placeholder={t('avisosTab.selectFolderPlaceholder')}
                   options={categories.map((c) => c.displayName)}
                   value={categories.find((c) => c.id === editCategoryId)?.displayName || ''}
                   onChange={(displayName) => {
@@ -357,7 +359,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Nombre */}
               <InputField
-                label="Nombre del repuesto"
+                label={t('avisosTab.partNameLabel')}
                 type="text"
                 required
                 value={editName}
@@ -367,7 +369,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Referencia OEM */}
               <InputField
-                label="Referencia OEM"
+                label={t('avisosTab.oemRefLabel')}
                 type="text"
                 value={editOemRef}
                 onChange={(e) => setEditOemRef(e.target.value)}
@@ -375,7 +377,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Fabricante */}
               <InputField
-                label="Fabricante / Marca"
+                label={t('avisosTab.manufacturerLabel')}
                 type="text"
                 value={editManufacturer}
                 onChange={(e) => setEditManufacturer(e.target.value)}
@@ -383,7 +385,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Ficha técnica */}
               <InputField
-                label="Ficha Técnica / Especificaciones"
+                label={t('avisosTab.techSpecsLabel')}
                 multiline
                 rows={3}
                 value={editSpecs}
@@ -393,7 +395,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Cantidad Actual */}
               <InputField
-                label="Stock actual"
+                label={t('avisosTab.currentStockInput')}
                 type="number"
                 required
                 value={editStockQty}
@@ -402,7 +404,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Umbral Mínimo */}
               <InputField
-                label="Umbral de aviso"
+                label={t('avisosTab.avisoThresholdInput')}
                 type="number"
                 required
                 value={editAvisoThreshold}
@@ -411,7 +413,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Precio Coste */}
               <InputField
-                label="Precio de Coste (€)"
+                label={t('avisosTab.costPriceInput')}
                 type="number"
                 required
                 value={editCostPrice}
@@ -420,7 +422,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
               {/* Precio Venta */}
               <InputField
-                label="Precio de Venta (€)"
+                label={t('avisosTab.retailPriceInput')}
                 type="number"
                 required
                 value={editRetailPrice}
@@ -435,14 +437,14 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                 onClick={() => setEditingItem(null)}
                 className="w-1/2 !py-3"
               >
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 disabled={savingEdit}
                 className="w-1/2 !py-3 bg-red-600 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(239,68,68,0.2)]"
               >
-                {savingEdit ? 'Guardando...' : 'Guardar Cambios'}
+                {savingEdit ? t('avisosTab.saving') : t('common.saveChanges')}
               </Button>
             </div>
           </form>

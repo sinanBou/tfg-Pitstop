@@ -1,5 +1,6 @@
 import React from 'react';
 import { InputField } from '@/components/common/InputField/InputField';
+import { useTranslation } from '@/i18n';
 
 interface PartFormInlineProps {
   title: string;
@@ -48,26 +49,28 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
   onCancel,
   submitting
 }) => {
+  const { t } = useTranslation();
+
   return (
     <form onSubmit={onSubmit} className="p-5 bg-neutral-950 border border-neutral-800/40 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-300">
       <p className="text-xs font-black text-red-500 uppercase tracking-widest">{title}</p>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <InputField
-          label="Referencia OEM"
+          label={t('avisosTab.oemRefLabel')}
           value={oemRef}
           onChange={e => setOemRef(e.target.value)}
           placeholder="Ej: REF-1020 (Opcional)..."
         />
         <InputField
-          label="Nombre del Repuesto"
+          label={t('avisosTab.partNameLabel')}
           required
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Ej: Disco de freno delantero"
         />
         <InputField
-          label="Fabricante"
+          label={t('avisosTab.manufacturerLabel')}
           value={manufacturer}
           onChange={e => setManufacturer(e.target.value)}
           placeholder="Ej: Brembo, Bosch..."
@@ -76,7 +79,7 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField
-          label="Especificaciones Técnicas"
+          label={t('avisosTab.techSpecsLabel')}
           value={specs}
           onChange={e => setSpecs(e.target.value)}
           placeholder="Ej: Diámetro 280mm, ventilado..."
@@ -84,7 +87,7 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
         <div className="grid grid-cols-4 gap-2">
           <div className="col-span-2">
             <InputField
-              label="Stock"
+              label={t('avisosTab.currentStockInput')}
               type="number"
               required
               value={stockQty}
@@ -93,7 +96,7 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
           </div>
           <div className="col-span-2">
             <InputField
-              label="Umbral Aviso"
+              label={t('avisosTab.avisoThresholdInput')}
               type="number"
               required
               value={avisoThreshold}
@@ -105,7 +108,7 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
 
       <div className="grid grid-cols-2 gap-4">
         <InputField
-          label="Precio Coste (€)"
+          label={t('avisosTab.costPriceInput')}
           type="number"
           step="0.01"
           required
@@ -115,7 +118,7 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
           mono
         />
         <InputField
-          label="Precio Venta (€)"
+          label={t('avisosTab.retailPriceInput')}
           type="number"
           step="0.01"
           required
@@ -132,16 +135,17 @@ export const PartFormInline: React.FC<PartFormInlineProps> = ({
           onClick={onCancel}
           className="px-4 py-3 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-neutral-400 transition-all cursor-pointer"
         >
-          Cancelar
+          {t('common.cancel')}
         </button>
         <button
           type="submit"
           disabled={submitting}
           className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-wider text-white transition-all disabled:opacity-50 cursor-pointer"
         >
-          {submitting ? 'Procesando...' : submitLabel}
+          {submitting ? t('common.processing') : submitLabel}
         </button>
       </div>
     </form>
   );
 };
+

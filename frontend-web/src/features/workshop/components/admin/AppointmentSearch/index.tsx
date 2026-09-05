@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, X, Building2, ArrowRight } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface AppointmentSearchProps {
   appointments: any[];
@@ -7,6 +8,7 @@ interface AppointmentSearchProps {
 }
 
 export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointments, onSelectDate }) => {
+  const { t, language } = useTranslation();
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
           value={query}
           onChange={(e) => { setQuery(e.target.value); setIsOpen(true); }}
           onFocus={() => setIsOpen(true)}
-          placeholder="Buscar matrícula o cliente..."
+          placeholder={t('appointmentSearch.placeholder')}
           className="bg-white/5 border border-white/10 hover:border-white/20 focus:border-red-500/50 focus:bg-white/10 text-white pl-12 pr-6 h-[54px] rounded-xl text-xs font-bold w-64 md:w-80 outline-none transition-all placeholder:text-neutral-600 shadow-2xl"
         />
         {query && (
@@ -75,10 +77,10 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
                 <div className="flex-1 min-w-0">
                   <div className="flex justify-between items-start mb-0.5">
                     <span className="text-white font-black uppercase text-[11px] truncate tracking-tight">{app.vehicleDisplay}</span>
-                    <span className="text-neutral-500 text-[9px] font-mono shrink-0 ml-2">{new Date(app.dateTime).toLocaleDateString()}</span>
+                    <span className="text-neutral-500 text-[9px] font-mono shrink-0 ml-2">{new Date(app.dateTime).toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES')}</span>
                   </div>
                   <div className="text-[10px] text-neutral-500 font-bold uppercase truncate group-hover/item:text-neutral-300 transition-colors">
-                    {app.clientFullName || 'Cliente anon.'}
+                    {app.clientFullName || t('appointmentSearch.anonymousClient')}
                   </div>
                 </div>
                 <div className="shrink-0 opacity-0 group-hover/item:opacity-100 transition-opacity pr-2">
@@ -88,7 +90,7 @@ export const AppointmentSearch: React.FC<AppointmentSearchProps> = ({ appointmen
             ))}
           </div>
           <div className="bg-neutral-950/50 p-2 border-t border-neutral-800 flex justify-center">
-             <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600 italic">Resultados para "{query}"</span>
+             <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600 italic">{t('appointmentSearch.resultsFor', { query })}</span>
           </div>
         </div>
       )}

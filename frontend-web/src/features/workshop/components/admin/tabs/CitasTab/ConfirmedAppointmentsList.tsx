@@ -7,6 +7,7 @@ import { InputField } from '@/components/common/InputField/InputField';
 import { Button } from '@/components/common/Button/Button';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { useTranslation } from '@/i18n';
 
 interface ConfirmedAppointmentsListProps {
   appointments: any[];
@@ -21,6 +22,7 @@ export const ConfirmedAppointmentsList = ({
   onCheckInAppointment,
   onUpdateStatus
 }: ConfirmedAppointmentsListProps) => {
+  const { t, language } = useTranslation();
   const [confirmedSearch, setConfirmedSearch] = useState('');
   const toast = useToast();
   
@@ -80,9 +82,9 @@ export const ConfirmedAppointmentsList = ({
       isOpen: true,
       type: 'cancel',
       appId: id,
-      title: 'Cancelar Cita',
-      description: '¿Deseas cancelar esta cita? El cliente verá la notificación de cancelación en su panel.',
-      confirmText: 'Sí, Cancelar',
+      title: t('citasTab.cancelModalTitle'),
+      description: t('citasTab.cancelModalDesc'),
+      confirmText: t('citasTab.cancelModalConfirm'),
       theme: 'red'
     });
   };
@@ -128,14 +130,14 @@ export const ConfirmedAppointmentsList = ({
     <div className="mt-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <h3 className="text-white font-black uppercase tracking-widest text-sm flex items-center gap-3">
-          Citas Confirmadas
+          {t('citasTab.confirmedTitle')}
           <span className="bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full text-[10px]">{confirmedAppointments.length}</span>
         </h3>
         
         <div className="relative max-w-xs w-full">
           <input
             type="text"
-            placeholder="Buscar por vehículo, servicio..."
+            placeholder={t('citasTab.searchPlaceholder')}
             value={confirmedSearch}
             onChange={(e) => setConfirmedSearch(e.target.value)}
             className="w-full bg-black/50 border border-neutral-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-neutral-600 focus:outline-none focus:border-emerald-500/50 transition-colors"
@@ -159,13 +161,13 @@ export const ConfirmedAppointmentsList = ({
                 <div className="text-[10px] font-black uppercase text-emerald-500 tracking-widest">{app.serviceType}</div>
                 <div className="flex items-center gap-1.5">
                   {app.status === 'IN_PROGRESS' && (
-                    <span className="bg-blue-500/10 text-blue-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-blue-500/20">En Curso</span>
+                    <span className="bg-blue-500/10 text-blue-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-blue-500/20">{t('citasTab.inCourseBadge')}</span>
                   )}
                   {app.status === 'DELAYED' && (
-                    <span className="bg-amber-500/10 text-amber-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-amber-500/20 animate-pulse">Retrasada</span>
+                    <span className="bg-amber-500/10 text-amber-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-amber-500/20 animate-pulse">{t('citasTab.delayedBadge')}</span>
                   )}
                   {app.vehicleReceived && (
-                    <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-emerald-500/20">En Taller</span>
+                    <span className="bg-emerald-500/10 text-emerald-400 text-[8px] font-black px-2 py-0.5 rounded-full uppercase border border-emerald-500/20">{t('citasTab.inWorkshopBadge')}</span>
                   )}
                 </div>
               </div>
@@ -176,10 +178,10 @@ export const ConfirmedAppointmentsList = ({
                 <div className="text-lg font-black text-white leading-none">{app.vehicleDisplay}</div>
               </div>
               {app.clientFullName && (
-                <div className="text-neutral-400 text-xs font-bold mt-0.5">Cliente: <span className="text-neutral-200">{app.clientFullName}</span></div>
+                <div className="text-neutral-400 text-xs font-bold mt-0.5">{t('avisosTab.clientLabel')}: <span className="text-neutral-200">{app.clientFullName}</span></div>
               )}
               <div className="text-neutral-400 text-xs font-mono mt-2 mb-2">
-                {new Date(app.dateTime).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}{' '}
+                {new Date(app.dateTime).toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', { day: '2-digit', month: '2-digit' })}{' '}
                 {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}{' '}
                 h
               </div>
@@ -189,11 +191,11 @@ export const ConfirmedAppointmentsList = ({
                 <div className="mt-3 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl space-y-1.5">
                   <div className="flex items-center gap-2 text-emerald-400 font-black text-[9px] uppercase tracking-widest">
                     <Check className="w-3.5 h-3.5" strokeWidth={3} />
-                    Vehículo Recibido
+                    {t('citasTab.vehicleReceivedTitle')}
                   </div>
                   {app.receptionKilometers !== null && (
                     <div className="text-[11px] font-bold text-neutral-300">
-                      Kilómetros: <span className="font-mono text-white bg-black/30 px-1.5 py-0.5 rounded">{app.receptionKilometers.toLocaleString()} Km</span>
+                      {t('citasTab.kilometersLabel')}: <span className="font-mono text-white bg-black/30 px-1.5 py-0.5 rounded">{app.receptionKilometers.toLocaleString()} Km</span>
                     </div>
                   )}
                   {app.receptionNotes && (
@@ -215,7 +217,7 @@ export const ConfirmedAppointmentsList = ({
                     className="w-full !px-4 !py-2.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-white border border-emerald-500/20 flex items-center justify-center gap-1.5 mt-4 animate-pulse-subtle"
                   >
                     <Upload className="w-3.5 h-3.5" strokeWidth={2.5} />
-                    Recepcionar Vehículo
+                    {t('citasTab.checkInVehicleBtn')}
                   </Button>
                 )
               )}
@@ -230,16 +232,16 @@ export const ConfirmedAppointmentsList = ({
                       isOpen: true,
                       type: 'delay',
                       appId: app.id,
-                      title: 'Retrasar Cita',
-                      description: '¿Seguro que deseas marcar esta cita como retrasada?',
-                      confirmText: 'Sí, Marcar',
+                      title: t('citasTab.delayModalTitle'),
+                      description: t('citasTab.delayModalDesc'),
+                      confirmText: t('citasTab.delayModalConfirm'),
                       theme: 'amber'
                     });
                   }}
                   className="flex-1 !px-3 !py-2 bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-white border border-amber-500/20 flex items-center justify-center gap-1 font-bold text-xs"
                 >
                   <Clock className="w-3.5 h-3.5" />
-                  Retrasar
+                  {t('citasTab.delayBtn')}
                 </Button>
               )}
               <Button 
@@ -247,14 +249,14 @@ export const ConfirmedAppointmentsList = ({
                 onClick={() => handleDelete(app.id)}
                 className="flex-1 !px-3 !py-2"
               >
-                Cancelar
+                {t('citasTab.cancelBtn')}
               </Button>
             </div>
           </Card>
         ))}
         {confirmedAppointments.length === 0 && confirmedSearch.trim() && (
           <div className="col-span-full py-8 text-center text-neutral-500 text-xs uppercase tracking-widest font-bold">
-            No se encontraron citas confirmadas para "{confirmedSearch}".
+            {t('citasTab.noConfirmedFound', { search: confirmedSearch })}
           </div>
         )}
       </div>
@@ -270,35 +272,35 @@ export const ConfirmedAppointmentsList = ({
           >
             <h2 className="text-xl md:text-2xl font-black uppercase tracking-wider text-white mb-2 flex items-center gap-2">
               <FileText className="w-6 h-6 text-emerald-500" strokeWidth={2.5} />
-              Recepcionar Vehículo
+              {t('citasTab.checkInModalTitle')}
             </h2>
             {selectedAppointmentDetails && (
               <p className="text-neutral-400 text-xs font-bold uppercase tracking-widest mb-6">
-                Coche: <span className="text-white">{selectedAppointmentDetails.vehicleDisplay}</span>
+                {t('common.vehicle')}: <span className="text-white">{selectedAppointmentDetails.vehicleDisplay}</span>
               </p>
             )}
 
             <form onSubmit={handleCheckInSubmit} className="space-y-5">
               <div className="relative">
                 <InputField
-                  label="Kilómetros actuales"
+                  label={t('citasTab.currentKmLabel')}
                   type="number"
                   required
                   value={kilometers}
                   onChange={(e) => setKilometers(e.target.value)}
-                  placeholder="Ej: 142000"
+                  placeholder={t('citasTab.receptionKmPlaceholder')}
                   focusVariant="emerald"
                 />
                 <span className="absolute right-4 bottom-3.5 text-xs font-black uppercase text-neutral-600">Km</span>
               </div>
 
               <InputField
-                label="Notas de recepción (Estado, desperfectos...)"
+                label={t('citasTab.receptionNotesLabel')}
                 multiline
                 rows={4}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Ej: Desperfecto leve en el parachoques delantero izquierdo. Viene con rueda de repuesto puesta..."
+                placeholder={t('citasTab.receptionNotesPlaceholder')}
                 focusVariant="emerald"
               />
 
@@ -312,7 +314,7 @@ export const ConfirmedAppointmentsList = ({
                   }}
                   className="w-1/2 !py-3"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -322,7 +324,7 @@ export const ConfirmedAppointmentsList = ({
                   {isSubmitting ? (
                     <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin"></div>
                   ) : (
-                    'Confirmar'
+                    t('common.confirm')
                   )}
                 </Button>
               </div>

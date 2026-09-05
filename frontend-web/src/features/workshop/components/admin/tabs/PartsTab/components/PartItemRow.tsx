@@ -1,8 +1,8 @@
 import React from 'react';
 import type { WorkshopInventory } from '@/features/workshop';
 import { Edit, Trash } from '@/assets/icons';
-
 import { formatCurrency } from '@/utils/formatters';
+import { useTranslation } from '@/i18n';
 
 interface PartItemRowProps {
   item: WorkshopInventory;
@@ -15,6 +15,7 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
   onStartEdit,
   onDelete
 }) => {
+  const { t } = useTranslation();
   const isLowStock = item.stockQuantity <= item.avisoThreshold;
 
   return (
@@ -27,7 +28,7 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
     >
       <div className="flex items-start md:items-center gap-3 min-w-0 flex-1">
         <span className="text-[10px] font-black text-neutral-500 font-mono tracking-widest uppercase shrink-0 px-2 py-1 bg-neutral-900 rounded-lg">
-          {item.part.oemReference || 'SIN REF'}
+          {item.part.oemReference || t('partsTab.noRef')}
         </span>
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -52,15 +53,15 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
             : 'bg-green-500/5 border-green-500/15 text-green-400'
         }`}>
           {isLowStock && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
-          Stock: {item.stockQuantity} uds.
-          {isLowStock && <span className="text-[8px] font-black uppercase text-amber-500/80">(Aviso ≤ {item.avisoThreshold})</span>}
+          {t('partsTab.stockQtyUnits', { count: item.stockQuantity })}
+          {isLowStock && <span className="text-[8px] font-black uppercase text-amber-500/80">{t('partsTab.avisoSubText', { threshold: item.avisoThreshold })}</span>}
         </div>
 
         {/* Prices details */}
         <div className="px-2.5 py-1 bg-neutral-900 border border-neutral-800 rounded-xl text-[10px] font-bold flex gap-3 text-neutral-400 font-mono">
-          <div><span className="text-[8px] text-neutral-600 font-sans uppercase">Coste:</span> {formatCurrency(item.costPrice)}</div>
+          <div><span className="text-[8px] text-neutral-600 font-sans uppercase">{t('partsTab.costLabel')}</span> {formatCurrency(item.costPrice)}</div>
           <div className="border-l border-neutral-800 pl-3">
-            <span className="text-[8px] text-neutral-600 font-sans uppercase">Venta:</span> <span className="text-white font-bold">{formatCurrency(item.retailPrice)}</span>
+            <span className="text-[8px] text-neutral-600 font-sans uppercase">{t('partsTab.saleLabel')}</span> <span className="text-white font-bold">{formatCurrency(item.retailPrice)}</span>
           </div>
         </div>
 
@@ -68,7 +69,7 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
         <button
           onClick={onStartEdit}
           className="p-2 text-neutral-500 hover:text-red-400 hover:bg-neutral-800/40 rounded-xl transition-all cursor-pointer"
-          title="Modificar Repuesto"
+          title={t('partsTab.modifyTooltip')}
         >
           <Edit className="w-4 h-4" />
         </button>
@@ -77,7 +78,7 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
         <button
           onClick={onDelete}
           className="p-2 text-neutral-600 hover:text-red-500 hover:bg-neutral-800/40 rounded-xl transition-all cursor-pointer"
-          title="Eliminar Repuesto"
+          title={t('partsTab.deleteTooltip')}
         >
           <Trash className="w-4 h-4" />
         </button>
@@ -85,3 +86,4 @@ export const PartItemRow: React.FC<PartItemRowProps> = ({
     </div>
   );
 };
+

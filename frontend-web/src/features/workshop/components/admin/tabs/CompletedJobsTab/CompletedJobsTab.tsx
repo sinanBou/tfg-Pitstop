@@ -3,6 +3,7 @@ import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { CheckCircle, Check, Archive } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface CompletedJobsTabProps {
   readyJobs: any[];
@@ -15,6 +16,7 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
   onCompleteJob,
   onMarkPickedUp,
 }) => {
+  const { t } = useTranslation();
   const [processingId, setProcessingId] = useState<string | null>(null);
   // Optimistic removal — hide cards instantly while API runs
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -46,10 +48,10 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
       <div className="flex flex-col items-center justify-center py-24 opacity-40">
         <CheckCircle className="w-16 h-16 text-neutral-700 mb-4" strokeWidth={1.5} />
         <p className="text-neutral-500 text-sm font-black uppercase tracking-widest">
-          No hay trabajos pendientes de aprobación
+          {t('completedJobsTab.noJobsPendingApproval')}
         </p>
         <p className="text-neutral-600 text-xs mt-2">
-          Cuando los mecánicos completen todas las tareas de una cita, aparecerán aquí.
+          {t('completedJobsTab.noJobsSubtext')}
         </p>
       </div>
     );
@@ -67,7 +69,10 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-amber-500 animate-pulse" />
             <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
-              {pendingApproval.length} {pendingApproval.length === 1 ? 'trabajo pendiente' : 'trabajos pendientes'} de aprobación
+              {pendingApproval.length === 1 
+                ? t('completedJobsTab.pendingApprovalCount', { count: pendingApproval.length })
+                : t('completedJobsTab.pendingApprovalCountPlural', { count: pendingApproval.length })
+              }
             </h3>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -90,7 +95,10 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-green-500 animate-pulse" />
             <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
-              {awaitingPickup.length} {awaitingPickup.length === 1 ? 'vehículo esperando' : 'vehículos esperando'} recogida
+              {awaitingPickup.length === 1
+                ? t('completedJobsTab.awaitingPickupCount', { count: awaitingPickup.length })
+                : t('completedJobsTab.awaitingPickupCountPlural', { count: awaitingPickup.length })
+              }
             </h3>
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -111,9 +119,9 @@ export const CompletedJobsTab: React.FC<CompletedJobsTabProps> = ({
           isOpen={confirmPickupId !== null}
           onClose={() => setConfirmPickupId(null)}
           onConfirm={handleConfirmPickedUp}
-          title="Confirmar Recogida"
-          description="¿Confirmar que el cliente ha recogido su vehículo?"
-          confirmText="Sí, Confirmar"
+          title={t('completedJobsTab.confirmPickupModalTitle')}
+          description={t('completedJobsTab.confirmPickupModalDesc')}
+          confirmText={t('completedJobsTab.confirmPickupModalConfirm')}
           theme="green"
         />
       )}
@@ -130,6 +138,7 @@ interface JobCardProps {
 }
 
 const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction }) => {
+  const { t, language } = useTranslation();
   const dateObj = new Date(job.dateTime);
   const isApprove = phase === 'approve';
 
@@ -156,7 +165,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
                   ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
                   : 'bg-green-500/10 border-green-500/20 text-green-400'
               }`}>
-                {isApprove ? 'Pendiente de Aprobación' : 'Cliente Avisado'}
+                {isApprove ? t('completedJobsTab.pendingApprovalBadge') : t('completedJobsTab.clientNotifiedBadge')}
               </span>
             </div>
             <h4 className="text-lg font-black uppercase tracking-tight text-white truncate">
@@ -169,18 +178,18 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
         {/* Details */}
         <div className="bg-black/30 rounded-xl p-4 border border-white/5 space-y-2">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Servicio</span>
+            <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">{t('avisosTab.serviceLabel')}</span>
             <span className="text-white text-xs font-bold truncate max-w-[60%] text-right">{job.serviceType || job.description}</span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Fecha entrada</span>
+            <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">{t('completedJobsTab.entryDateLabel')}</span>
             <span className="text-white text-xs font-mono">
-              {dateObj.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}
+              {dateObj.toLocaleDateString(language === 'en' ? 'en-US' : 'es-ES', { day: '2-digit', month: '2-digit' })}
             </span>
           </div>
           {job.assignedEmployeeName && (
             <div className="flex justify-between items-center text-sm">
-              <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">Mecánico</span>
+              <span className="text-neutral-500 text-[10px] font-black uppercase tracking-widest">{t('common.mechanic')}</span>
               <span className="text-white text-xs font-bold">{job.assignedEmployeeName}</span>
             </div>
           )}
@@ -201,12 +210,12 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
           ) : isApprove ? (
             <>
               <Check className="w-4 h-4" strokeWidth={2.5} />
-              Completar Trabajo — Avisar al Cliente
+              {t('completedJobsTab.completeJobBtn')}
             </>
           ) : (
             <>
               <Archive className="w-4 h-4" strokeWidth={2} />
-              Vehículo Recogido
+              {t('completedJobsTab.vehiclePickedUpBtn')}
             </>
           )}
         </Button>
@@ -214,3 +223,4 @@ const JobCard: React.FC<JobCardProps> = ({ job, phase, isProcessing, onAction })
     </Card>
   );
 };
+

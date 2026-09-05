@@ -1,6 +1,7 @@
 import React from 'react';
 import { PlanningTimeline } from './PlanningTimeline';
 import { Card } from '@/components/common/Card/Card';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente AppointmentsTab.
@@ -52,6 +53,8 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({
     onViewChecklist,
     includeOwnerInPlanning = false
 }) => {
+  const { t } = useTranslation();
+
   // Preparamos las columnas para el Manager (todas)
   const mechanics = employees.filter(e => {
     if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
@@ -59,12 +62,12 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({
     return false;
   });
   const columns = [
-    { id: 'unassigned', title: 'SIN ASIGNAR', employeeId: null },
+    { id: 'unassigned', title: t('appointmentsTab.unassigned'), employeeId: null },
     ...mechanics.map(m => ({
       id: m.id,
-      title: `${m.firstname} ${m.lastname}`.trim() || 'Mecánico',
+      title: `${m.firstname} ${m.lastname}`.trim() || t('appointmentsTab.mechanic'),
       employeeId: m.id as string,
-      role: m.role === 'WORKSHOP_OWNER' ? 'Dueño' : m.role === 'WORKSHOP_MANAGER' ? 'Gerente' : 'Mecánico',
+      role: m.role === 'WORKSHOP_OWNER' ? t('appointmentsTab.owner') : m.role === 'WORKSHOP_MANAGER' ? t('appointmentsTab.manager') : t('appointmentsTab.mechanic'),
       profilePictureUrl: m.profilePictureUrl
     }))
   ];

@@ -1,5 +1,6 @@
 import React from 'react';
 import { InputField } from '@/components/common/InputField/InputField';
+import { useTranslation } from '@/i18n';
 
 interface TaskFormInlineProps {
   title: string;
@@ -40,28 +41,30 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
   onCancel,
   submitting
 }) => {
+  const { t } = useTranslation();
+
   return (
     <form onSubmit={onSubmit} className="p-5 bg-neutral-950 border border-neutral-800/40 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-300">
       <p className="text-xs font-black text-red-500 uppercase tracking-widest">{title}</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <InputField
-          label="Nombre de la tarea"
+          label={t('tasksTab.taskNameLabel')}
           required
           value={name}
           onChange={e => setName(e.target.value)}
-          placeholder="Ej: Reparar radiador exterior, Carga de refrigerante..."
+          placeholder={t('tasksTab.taskNamePlaceholder')}
         />
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-widest ml-1 mb-0.5">Tipo de Cálculo de Tiempo</label>
+          <label className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-widest ml-1 mb-0.5">{t('tasksTab.calcTypeFixed')}</label>
           <select
             value={calcType}
             onChange={e => setCalcType(e.target.value as any)}
             className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-red-500/50 transition-all font-semibold cursor-pointer"
           >
-            <option value="fixed">Fijo (Tiempo determinado)</option>
-            <option value="cylinder">Por Cilindros (Coches/Motores)</option>
-            <option value="wheel">Por Ruedas (Neumáticos)</option>
+            <option value="fixed">{t('tasksTab.calcTypeFixed')}</option>
+            <option value="cylinder">{t('tasksTab.calcTypeCylinder')}</option>
+            <option value="wheel">{t('tasksTab.calcTypeWheel')}</option>
           </select>
         </div>
       </div>
@@ -70,7 +73,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
         {calcType === 'fixed' && (
           <div className="max-w-[200px]">
             <InputField
-              label="Horas Estimadas Fijas"
+              label={t('tasksTab.hoursLabel')}
               type="number"
               step="0.05"
               required
@@ -83,7 +86,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
         {calcType === 'cylinder' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <InputField
-              label="Horas Base (4 Cilindros)"
+              label={t('tasksTab.hours4CilLabel')}
               type="number"
               step="0.05"
               required
@@ -92,12 +95,12 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
               mono
             />
             <InputField
-              label="Horas Extra por Cilindro Adicional"
+              label={t('tasksTab.hoursExtraCilLabel')}
               type="number"
               step="0.05"
               value={hoursCilExtra}
               onChange={e => setHoursCilExtra(e.target.value)}
-              placeholder="Opcional (Ej: 0.25)"
+              placeholder="0.25"
               mono
             />
           </div>
@@ -105,7 +108,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
         {calcType === 'wheel' && (
           <div className="max-w-[200px]">
             <InputField
-              label="Horas por Rueda"
+              label={t('tasksTab.hoursPerWheelLabel')}
               type="number"
               step="0.05"
               required
@@ -123,16 +126,17 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
           onClick={onCancel}
           className="px-4 py-3 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-neutral-400 transition-all cursor-pointer"
         >
-          Cancelar
+          {t('common.cancel')}
         </button>
         <button
           type="submit"
           disabled={submitting}
           className="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-wider text-white transition-all disabled:opacity-50 cursor-pointer"
         >
-          {submitting ? 'Procesando...' : submitLabel}
+          {submitting ? t('common.processing') : submitLabel}
         </button>
       </div>
     </form>
   );
 };
+

@@ -9,6 +9,7 @@ import { Card } from '@/components/common/Card/Card';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Search, X, Box } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 export interface CatalogTask {
   id: string;
@@ -42,6 +43,7 @@ interface TasksTabProps {
  * según tipos flexibles (horas fijas, tarifa progresiva por cilindros o por número de ruedas).
  */
 export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [categories, setCategories] = useState<TaskCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -286,9 +288,9 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       isOpen: true,
       type: 'task',
       id,
-      title: 'Eliminar Tarea',
-      description: '¿Seguro que deseas eliminar esta tarea del catálogo de tu taller? Las citas pasadas no se verán afectadas.',
-      confirmText: 'Sí, Eliminar',
+      title: t('tasksTab.deleteTaskTitle'),
+      description: t('tasksTab.deleteTaskDesc'),
+      confirmText: t('common.confirm'),
       theme: 'red'
     });
   };
@@ -300,35 +302,35 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       isOpen: true,
       type: 'category',
       id: categoryId,
-      title: 'Eliminar Categoría',
-      description: '¿Seguro que deseas eliminar esta categoría de tu catálogo? Debe estar vacía.',
-      confirmText: 'Sí, Eliminar',
+      title: t('partsTab.deleteCatTitle'),
+      description: t('partsTab.deleteCatDesc'),
+      confirmText: t('common.confirm'),
       theme: 'red'
     });
   };
 
   // Filtered categories based on search term
   const filteredCategories = categories.map(cat => {
-    const catMatches = cat.displayName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchedTasks = cat.tasks.filter(task => 
+    const matchedTasks = cat.tasks.filter(task =>
       task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.code.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+    const catMatches = cat.displayName.toLowerCase().includes(searchTerm.toLowerCase());
+    
     if (catMatches || matchedTasks.length > 0) {
       return {
         ...cat,
-        tasks: catMatches && matchedTasks.length === 0 ? cat.tasks : matchedTasks
+        tasks: matchedTasks
       };
     }
     return null;
-  }).filter((cat): cat is TaskCategory => cat !== null);
+  }).filter(Boolean) as TaskCategory[];
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-neutral-500 gap-4">
         <div className="w-12 h-12 border-2 border-neutral-800 border-t-red-600 rounded-full animate-spin" />
-        <p className="text-xs uppercase tracking-widest font-black">Cargando catálogo del taller...</p>
+        <p className="text-xs uppercase tracking-widest font-black">{t('tasksTab.loadingCatalog')}</p>
       </div>
     );
   }
@@ -337,9 +339,9 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
     <div className="space-y-6 text-white animate-fade-in-up select-none">
       {/* Title block */}
       <TabHeader
-        title="Catálogo de Servicios"
-        subtitle="Controla y personaliza las tareas mecánicas de tu taller"
-        actionLabel="Nueva Categoría"
+        title={t('tasksTab.title')}
+        subtitle={t('tasksTab.subtitle')}
+        actionLabel={t('partsTab.newCategoryBtn')}
         onActionClick={() => setShowAddCat(!showAddCat)}
         colorVariant="red"
       />
@@ -353,7 +355,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
           type="text"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
-          placeholder="Buscar servicios por descripción o código (ej: alternador, 1.10, frenos)..."
+          placeholder={t('tasksTab.searchPlaceholder')}
           className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-12 pr-12 py-3.5 text-white text-xs focus:outline-none focus:border-red-500/50 focus:bg-black/40 transition-all placeholder-neutral-500 font-semibold"
         />
         {searchTerm && (
@@ -369,9 +371,9 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       {/* Add Category Form Panel */}
       {showAddCat && (
         <AddCategoryForm
-          title="Crear Nueva Categoría de Servicios"
-          label="Nombre de la Categoría"
-          placeholder="Ej: Aire Acondicionado, Transmisión, Suspensión..."
+          title={t('tasksTab.createCategoryTitle')}
+          label={t('partsTab.categoryNameLabel')}
+          placeholder={t('tasksTab.categoryNamePlaceholder')}
           value={newCatName}
           onChange={setNewCatName}
           onSubmit={handleCreateCategory}
@@ -385,11 +387,11 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
       <div className="space-y-4">
         {categories.length === 0 ? (
           <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-neutral-900/80 border-neutral-800/40 shadow-sm">
-            <p className="text-neutral-400 text-sm font-semibold uppercase tracking-wider">No hay categorías configuradas para tu taller.</p>
+            <p className="text-neutral-400 text-sm font-semibold uppercase tracking-wider">{t('tasksTab.noCategories')}</p>
           </Card>
         ) : filteredCategories.length === 0 ? (
           <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-neutral-900/80 border-neutral-800/40 shadow-sm">
-            <p className="text-neutral-400 text-sm font-semibold">No se encontraron resultados para la búsqueda "{searchTerm}".</p>
+            <p className="text-neutral-400 text-sm font-semibold">{t('tasksTab.noSearchHits', { search: searchTerm })}</p>
           </Card>
         ) : (
           filteredCategories.map(cat => {
@@ -413,9 +415,9 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                   onToggle={() => toggleCategory(cat.id)}
                   onToggleAddPart={() => setAddingTaskCatId(isAddingTaskHere ? null : cat.id)}
                   onDelete={(e) => handleDeleteCategory(e, cat.id)}
-                  addLabel="Añadir Tarea"
-                  itemLabelSingle="Tarea"
-                  itemLabelPlural="Tareas"
+                  addLabel={t('tasksTab.addTaskSubmit')}
+                  itemLabelSingle={t('workshopDashboard.tasksTab')}
+                  itemLabelPlural={t('workshopDashboard.tasksTab')}
                   gender="f"
                   icon={Box}
                   colorVariant="red"
@@ -425,8 +427,8 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                 {isAddingTaskHere && (
                   <div className="mx-6 mb-6">
                     <TaskFormInline
-                      title={`Nueva tarea en ${cat.displayName}`}
-                      submitLabel="Añadir Tarea"
+                      title={t('tasksTab.addTaskTitle', { catName: cat.displayName })}
+                      submitLabel={t('tasksTab.addTaskSubmit')}
                       name={newTaskName}
                       setName={setNewTaskName}
                       calcType={newTaskCalcType}
@@ -450,7 +452,7 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                 {isExpanded && (
                   <div className="px-6 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     {cat.tasks.length === 0 ? (
-                      <p className="text-xs text-neutral-500 italic py-2 text-center">Esta categoría no tiene tareas configuradas.</p>
+                      <p className="text-xs text-neutral-500 italic py-2 text-center">{t('tasksTab.noTasksInCat')}</p>
                     ) : (
                       cat.tasks.map(task => {
                         const isEditingThis = editingTask?.id === task.id;
@@ -459,8 +461,8 @@ export const TasksTab: React.FC<TasksTabProps> = ({ workshopId }) => {
                           return (
                             <TaskFormInline
                               key={task.id}
-                              title={`Modificar tarea ${task.name}`}
-                              submitLabel="Guardar Cambios"
+                              title={t('tasksTab.modifyTaskTitle', { name: task.name })}
+                              submitLabel={t('common.saveChanges')}
                               name={editingTaskName}
                               setName={setEditingTaskName}
                               calcType={editingCalcType}

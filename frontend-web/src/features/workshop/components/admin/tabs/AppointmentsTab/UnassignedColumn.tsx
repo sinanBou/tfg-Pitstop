@@ -3,6 +3,7 @@ import { getBrandLogo } from '@/assets/BrandLogos';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { CheckCircle, Edit, Lock, FileText, X } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface UnassignedAppointment {
   id: string;
@@ -48,6 +49,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
   readOnly = false,
   columnWidth,
 }) => {
+  const { t } = useTranslation();
   const toast = useToast();
   const [draggedId, setDraggedId] = useState<string | null>(null);
   const [confirmDeleteApp, setConfirmDeleteApp] = useState<UnassignedAppointment | null>(null);
@@ -81,7 +83,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
       : '';
     ghost.innerHTML = `
       <span style="width:6px;height:6px;border-radius:50%;background:${app.isTask ? '#3b82f6' : '#ef4444'};flex-shrink:0"></span>
-      <span style="font-size:12px;font-weight:900;letter-spacing:0.5px;text-transform:uppercase">${app.vehicleDisplay || 'Cita'}</span>
+      <span style="font-size:12px;font-weight:900;letter-spacing:0.5px;text-transform:uppercase">${app.vehicleDisplay || t('appointmentsTab.appointmentLabel')}</span>
       ${dur ? `<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.5);font-family:monospace;padding:2px 6px;background:rgba(255,255,255,0.06);border-radius:6px;border:1px solid rgba(255,255,255,0.08)">${dur}</span>` : ''}
     `;
     document.body.appendChild(ghost);
@@ -135,7 +137,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
           <div className="flex flex-col items-center justify-center h-full text-center px-4 py-12 opacity-50">
             <CheckCircle className="w-10 h-10 text-neutral-600 mb-3" strokeWidth={1.5} />
             <p className="text-neutral-600 text-[10px] font-black uppercase tracking-widest">
-              Sin citas pendientes
+              {t('appointmentsTab.noUnassignedApps')}
             </p>
           </div>
         ) : (
@@ -166,7 +168,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                     <div className="flex items-center gap-2">
                       <div className={`w-1.5 h-1.5 rounded-full ${app.isTask ? 'bg-emerald-400' : 'bg-blue-400'} animate-pulse`} />
                       <span className={`text-[9px] font-black uppercase tracking-widest ${app.isTask ? 'text-emerald-400' : 'text-blue-400'}`}>
-                        {app.isTask ? 'Tarea' : 'Cita'}
+                        {app.isTask ? t('appointmentsTab.taskLabel') : t('appointmentsTab.appointmentLabel')}
                       </span>
                     </div>
                     <div className="flex items-center gap-1.5 text-white text-[11px] font-black font-mono">
@@ -215,7 +217,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               if (!isReceived) return;
-                              onManage ? onManage(app) : toast.info(`Gestionar: ${app.vehicleDisplay}`);
+                              onManage ? onManage(app) : toast.info(`${t('appointmentsTab.manage')}: ${app.vehicleDisplay}`);
                             }}
                             disabled={!isReceived}
                             className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
@@ -223,14 +225,14 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                                 ? 'text-neutral-400 hover:text-white hover:bg-white/10 cursor-pointer'
                                 : 'text-amber-500/50 cursor-not-allowed'
                             }`}
-                            title={isReceived ? 'Gestionar' : 'Recepciona el vehículo primero'}
+                            title={isReceived ? t('appointmentsTab.manageTooltip') : t('appointmentsTab.receptionTooltip')}
                           >
                             {isReceived ? (
                               <Edit className="w-3 h-3" />
                             ) : (
                               <Lock className="w-3 h-3" />
                             )}
-                            {isReceived ? 'Gestionar' : 'Recepción'}
+                            {isReceived ? t('appointmentsTab.manage') : t('appointmentsTab.reception')}
                           </button>
 
                           {app.isTask && app.serviceType && onViewChecklist && (
@@ -242,7 +244,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                                   ? 'text-blue-400 hover:text-white hover:bg-blue-500/20 cursor-pointer'
                                   : 'text-amber-500/40 cursor-not-allowed'
                               }`}
-                              title={isReceived ? 'Ver checklist' : 'Recepciona el vehículo primero'}
+                              title={isReceived ? t('appointmentsTab.viewChecklistTooltip') : t('appointmentsTab.receptionTooltip')}
                             >
                               <FileText className="w-3 h-3" />
                             </button>
@@ -252,7 +254,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                             <button
                               onClick={(e) => handleDelete(e, app)}
                               className="flex items-center justify-center w-7 h-7 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all cursor-pointer"
-                              title="Eliminar"
+                              title={t('common.delete')}
                             >
                               <X className="w-3 h-3" strokeWidth={2.5} />
                             </button>
@@ -271,7 +273,7 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
       {sorted.length > 0 && (
         <div className="sticky bottom-0 flex items-center justify-center py-2 bg-gradient-to-t from-neutral-900/95 via-neutral-900/80 to-transparent pointer-events-none">
           <span className="px-3 py-1 bg-blue-500/15 border border-blue-500/20 rounded-full text-[9px] font-black uppercase tracking-widest text-blue-400">
-            {sorted.length} {sorted.length === 1 ? 'cita' : 'citas'}
+            {sorted.length} {t('appointmentsTab.appointmentLabel')}
           </span>
         </div>
       )}
@@ -280,13 +282,13 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
           isOpen={!!confirmDeleteApp}
           onClose={() => setConfirmDeleteApp(null)}
           onConfirm={handleConfirmDelete}
-          title={confirmDeleteApp.isTask ? "Eliminar Tarea" : "Eliminar Cita"}
+          title={confirmDeleteApp.isTask ? t('appointmentsTab.deleteTaskTitle') : t('appointmentsTab.deleteAppointmentTitle')}
           description={
             confirmDeleteApp.isTask
-              ? "¿Estás seguro de que deseas eliminar esta tarea de forma permanente?"
-              : "¿Estás seguro de que deseas eliminar esta cita de forma permanente?\n\nSe borrará también del panel de cliente."
+              ? t('appointmentsTab.deleteTaskDesc')
+              : t('appointmentsTab.deleteUnassignedAppointmentDesc')
           }
-          confirmText="Sí, Eliminar"
+          confirmText={t('appointmentsTab.confirmDelete')}
           theme="red"
         />
       )}
