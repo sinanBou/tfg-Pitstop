@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { askMechanic, askManual, checkAiHealth } from '../services/aiApi';
 import type { ChatMessage } from '../types/aiAssistant';
+import { useTranslation } from '@/i18n';
 
 /**
  * Decodifica de forma segura la carga útil (payload) de un token JWT.
@@ -31,6 +32,7 @@ const decodeToken = (token: string | null) => {
  * @param userRole Rol del usuario actual para ajustar el manual del asistente de IA.
  */
 export function useAiChat(userRole: string) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   
   // Obtener el identificador único del usuario para aislar completamente su historial
@@ -51,7 +53,7 @@ export function useAiChat(userRole: string) {
     return [
       {
         role: 'assistant',
-        content: `¡Hola! Soy tu asistente inteligente de **Pitstop**. 🤖\n\n¿En qué te puedo ayudar hoy? Escribe tu consulta abajo.`
+        content: t('aiAssistant.welcomeMsg')
       }
     ];
   });
@@ -77,11 +79,11 @@ export function useAiChat(userRole: string) {
       setMessages([
         {
           role: 'assistant',
-          content: `¡Hola! Soy tu asistente inteligente de **Pitstop**. 🤖\n\n¿En qué te puedo ayudar hoy? Escribe tu consulta abajo.`
+          content: t('aiAssistant.welcomeMsg')
         }
       ]);
     }
-  }, [chatKey]);
+  }, [chatKey, t]);
 
   // Guardar mensajes en la caché de sesión para mantener el chat fluido al cambiar de página
   useEffect(() => {
@@ -142,7 +144,7 @@ export function useAiChat(userRole: string) {
     try {
       let reply = '';
       if (!isServerUp) {
-        reply = 'El asistente IA no está disponible en estos momentos';
+        reply = t('aiAssistant.serviceUnavailable');
       } else if (mode === 'mechanics') {
         // Enviar consulta de mecánica directa con historial
         reply = await askMechanic(userText, messages.slice(-6)); // Enviamos las últimas 3 parejas de mensajes como contexto
@@ -158,7 +160,7 @@ export function useAiChat(userRole: string) {
         ...prev,
         {
           role: 'assistant',
-          content: 'Ocurrió un error inesperado al procesar tu solicitud. Por favor, inténtalo de nuevo.'
+          content: t('aiAssistant.unexpectedError')
         }
       ]);
     } finally {
@@ -169,7 +171,7 @@ export function useAiChat(userRole: string) {
   const clearChat = () => {
     const defaultWelcome = {
       role: 'assistant',
-      content: `¡Hola! Soy tu asistente inteligente de **Pitstop**. 🤖\n\n¿En qué te puedo ayudar hoy? Escribe tu consulta abajo.`
+      content: t('aiAssistant.welcomeMsg')
     } as ChatMessage;
     setMessages([defaultWelcome]);
     sessionStorage.removeItem(chatKey);

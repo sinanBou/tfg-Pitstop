@@ -1,6 +1,7 @@
 import React from 'react';
 import type { VehicleDTO } from '@/features/client';
 import { Car } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface VehicleStepProps {
   vehicles: VehicleDTO[];
@@ -13,6 +14,8 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
   selectedVehicleId,
   onSelect
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="animate-in fade-in slide-in-from-right-8 duration-500 flex-1">
       <div className="grid gap-3">
@@ -30,14 +33,14 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
               <div>
                 <p className="text-lg text-white font-black tracking-wide group-hover:text-blue-400 transition-colors uppercase">{v.brand} {v.model}</p>
                 <p className="text-xs text-neutral-500 font-mono mt-0.5 flex items-center gap-2">
-                  Matrícula: <span className="text-neutral-300 bg-neutral-800/50 px-2 rounded-md py-0.5">{v.licensePlate}</span>
+                  {t('vehicleModal.licensePlate')}: <span className="text-neutral-300 bg-neutral-800/50 px-2 rounded-md py-0.5">{v.licensePlate}</span>
                 </p>
               </div>
             </div>
           </button>
         )) : (
           <div className="py-12 text-center border-2 border-dashed border-neutral-800 rounded-3xl bg-neutral-900/20">
-            <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest">No hay vehículos registrados.</p>
+            <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest">{t('appointmentModal.noVehiclesRegistered')}</p>
           </div>
         )}
       </div>

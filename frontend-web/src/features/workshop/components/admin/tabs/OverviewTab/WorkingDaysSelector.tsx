@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { Calendar } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface WorkingDaysSelectorProps {
   workshopData: any;
@@ -11,6 +12,8 @@ export const WorkingDaysSelector: React.FC<WorkingDaysSelectorProps> = ({
   workshopData,
   diasSemana
 }) => {
+  const { t } = useTranslation();
+
   return (
     <Card variant="neutral" glow={false} border={false} padding="lg" className="transition-all duration-300 !rounded-2xl">
       <div className="flex items-center gap-3 mb-8">
@@ -18,8 +21,8 @@ export const WorkingDaysSelector: React.FC<WorkingDaysSelectorProps> = ({
           <Calendar className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500">Horario de Operaciones</p>
-          <p className="text-xs font-black text-white uppercase mt-0.5">Días Laborables del Taller</p>
+          <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500">{t('overviewTab.operatingHoursHeader')}</p>
+          <p className="text-xs font-black text-white uppercase mt-0.5">{t('overviewTab.workshopWorkingDays')}</p>
         </div>
       </div>
       

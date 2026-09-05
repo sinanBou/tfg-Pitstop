@@ -4,6 +4,7 @@ import { Button } from '@/components/common/Button/Button';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Calendar, CheckCircle, X } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface ClientAppointmentCardProps {
   appointment: any;
@@ -23,6 +24,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
   appointment,
   deleteAppointment,
 }) => {
+  const { t } = useTranslation();
   const isCancellable = !['IN_PROGRESS', 'DELAYED', 'COMPLETED', 'CANCELLED'].includes(appointment.status);
   const [confirmCancelOpen, setConfirmCancelOpen] = useState(false);
 
@@ -61,12 +63,12 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
                     ? 'bg-red-500/10 text-red-400 border border-red-500/20'
                     : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
           }`}>
-            {appointment.status === 'COMPLETED' ? '✓ Listo'
-              : appointment.status === 'IN_PROGRESS' ? 'En Proceso'
-              : appointment.status === 'CONFIRMED' ? 'Confirmada'
-              : appointment.status === 'DELAYED' ? 'Retrasada'
-              : appointment.status === 'CANCELLED' ? 'Cancelada'
-              : 'Pendiente'}
+            {appointment.status === 'COMPLETED' ? `✓ ${t('status.readyForPickup')}`
+              : appointment.status === 'IN_PROGRESS' ? t('status.inProgress')
+              : appointment.status === 'CONFIRMED' ? t('status.confirmed')
+              : appointment.status === 'DELAYED' ? t('status.delayed')
+              : appointment.status === 'CANCELLED' ? t('status.cancelled')
+              : t('status.pending')}
           </span>
         </div>
 
@@ -75,8 +77,8 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
           <div className="flex items-center gap-3 px-5 py-4 bg-green-500/10 border border-green-500/20 rounded-2xl mb-4 animate-pulse">
             <CheckCircle className="w-6 h-6 text-green-400 shrink-0" />
             <div>
-              <p className="text-green-400 text-xs font-black uppercase tracking-widest">Vehículo Listo</p>
-              <p className="text-green-300/70 text-[11px] mt-0.5 font-bold">Tu coche está preparado. Ya puedes pasar a recogerlo.</p>
+              <p className="text-green-400 text-xs font-black uppercase tracking-widest">{t('appointmentCard.readyBannerTitle')}</p>
+              <p className="text-green-300/70 text-[11px] mt-0.5 font-bold">{t('appointmentCard.readyBannerDesc')}</p>
             </div>
           </div>
         )}
@@ -84,7 +86,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
         {/* Ficha técnica del Vehículo y Taller */}
         <div className="space-y-3 mb-8 mt-auto bg-black/30 p-5 rounded-2xl border border-white/5 shadow-inner">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">Vehículo</span>
+            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">{t('common.vehicle')}</span>
             <span className="text-white font-mono flex items-center gap-1.5">
               <span className="shrink-0 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]">
                 {getBrandLogo((appointment.vehicleDisplay || appointment.vehiclePlate || '').split(' ')[0])}
@@ -93,7 +95,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
             </span>
           </div>
           <div className="flex justify-between items-center text-sm">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">Taller</span>
+            <span className="text-neutral-500 font-bold uppercase tracking-wider text-[10px]">{t('common.workshop')}</span>
             <span className="text-white font-mono">{appointment.workshopName}</span>
           </div>
         </div>
@@ -106,7 +108,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
             glow={false}
             className="w-full !py-4 shadow-sm mt-auto"
           >
-            Cancelar Cita
+            {t('appointmentCard.cancelBtn')}
             <X className="w-4 h-4 group-hover/btn:scale-110 transition-transform" />
           </Button>
         ) : (
@@ -115,7 +117,7 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
               ? 'bg-green-500/5 border-green-500/20 text-green-400'
               : 'bg-neutral-900/20 border-neutral-800/50 text-neutral-600'
           }`}>
-            {appointment.status === 'COMPLETED' ? '✓ Vehículo Listo para Recoger' : appointment.status === 'CANCELLED' ? 'Cita Cancelada' : 'Cita en Proceso'}
+            {appointment.status === 'COMPLETED' ? t('appointmentCard.readyForPickup') : appointment.status === 'CANCELLED' ? t('appointmentCard.cancelledStatus') : t('appointmentCard.inProgressStatus')}
           </div>
         )}
       </div>
@@ -128,9 +130,10 @@ export const ClientAppointmentCard: React.FC<ClientAppointmentCardProps> = ({
             setConfirmCancelOpen(false);
             deleteAppointment(appointment.id);
           }}
-          title="Cancelar Cita"
-          description="¿Deseas cancelar esta cita de forma permanente?"
-          confirmText="Sí, Cancelar"
+          title={t('appointmentCard.cancelTitle')}
+          description={t('appointmentCard.cancelDesc')}
+          confirmText={t('common.confirm')}
+          cancelText={t('common.cancel')}
           theme="red"
         />
       )}

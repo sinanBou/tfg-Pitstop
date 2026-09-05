@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { MapPin } from '@/assets/icons';
 import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePreviewModal';
+import { useTranslation } from '@/i18n';
 
 interface WorkshopProfileCardProps {
   workshopData: any;
@@ -9,6 +10,7 @@ interface WorkshopProfileCardProps {
 }
 
 export const WorkshopProfileCard: React.FC<WorkshopProfileCardProps> = ({ workshopData, userRole }) => {
+  const { t } = useTranslation();
   const [isLogoPreviewOpen, setIsLogoPreviewOpen] = useState(false);
   const showCif = userRole === 'WORKSHOP_OWNER';
 
@@ -37,7 +39,7 @@ export const WorkshopProfileCard: React.FC<WorkshopProfileCardProps> = ({ worksh
           </div>
           {showCif && workshopData?.cif && (
             <div className="bg-neutral-900 border border-neutral-850 px-8 py-4 rounded-2xl flex flex-col items-center shadow-2xl shrink-0">
-              <span className="text-[9px] uppercase tracking-widest text-neutral-500 font-black mb-1">Identificador Fiscal</span>
+              <span className="text-[9px] uppercase tracking-widest text-neutral-500 font-black mb-1">{t('overviewTab.taxIdLabel')}</span>
               <span className="text-white font-mono font-black tracking-[0.2em] text-lg">{workshopData?.cif}</span>
             </div>
           )}

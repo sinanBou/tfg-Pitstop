@@ -6,6 +6,7 @@ import { X, Check } from '@/assets/icons';
 import { DeleteAccountSection } from '@/components/common/DeleteAccountSection';
 import { useToast } from '@/hooks/useToast';
 import { API_BASE_URL } from '@/config/api';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente MiPerfilCliente.
@@ -51,6 +52,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
   setProfileForm,
   onSubmit,
 }) => {
+  const { t } = useTranslation();
   const [profileSaved, setProfileSaved] = useState(false);
   const toast = useToast();
 
@@ -80,12 +82,12 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
     setPasswordSuccess('');
 
     if (newPassword.length < 6) {
-      setPasswordError('La nueva contraseña debe tener al menos 6 caracteres.');
+      setPasswordError(t('profile.passwordChanged'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Las nuevas contraseñas no coinciden.');
+      setPasswordError(t('auth.confirmPassword'));
       return;
     }
 
@@ -105,7 +107,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
       });
 
       if (response.ok) {
-        setPasswordSuccess('Contraseña cambiada correctamente.');
+        setPasswordSuccess(t('profile.passwordChanged'));
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
@@ -113,13 +115,13 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         const text = await response.text();
         try {
           const json = JSON.parse(text);
-          setPasswordError(json.message || 'Error al cambiar la contraseña.');
+          setPasswordError(json.message || t('common.error'));
         } catch {
-          setPasswordError(text || 'La contraseña actual es incorrecta o no tiene permitido el cambio local.');
+          setPasswordError(text || t('common.error'));
         }
       }
     } catch {
-      setPasswordError('Error de conexión con el servidor.');
+      setPasswordError(t('common.error'));
     } finally {
       setPasswordLoading(false);
     }
@@ -137,7 +139,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         }
       });
       if (response.ok) {
-        toast.success('Tu cuenta ha sido eliminada correctamente.');
+        toast.success(t('profile.deleteAccountTitle'));
         setTimeout(() => {
           localStorage.clear();
           sessionStorage.clear();
@@ -145,7 +147,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         }, 1500);
       } else {
         const text = await response.text();
-        let errorMsg = 'Error al eliminar la cuenta.';
+        let errorMsg = t('common.error');
         try {
           const json = JSON.parse(text);
           errorMsg = json.message || errorMsg;
@@ -155,7 +157,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         toast.error(errorMsg);
       }
     } catch {
-      toast.error('Error de conexión con el servidor.');
+      toast.error(t('common.error'));
     } finally {
       setDeleteLoading(false);
     }
@@ -198,7 +200,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         <div className="p-10 overflow-y-auto flex-1 profile-scrollbar">
           <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
             <h3 className="text-3xl font-black uppercase tracking-widest text-white">
-              Mi Perfil
+              {t('profile.title')}
             </h3>
           </header>
 
@@ -219,14 +221,14 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             {/* Datos Personales */}
             <div className="grid grid-cols-2 gap-6">
               <InputField
-                label="Nombre"
+                label={t('profile.firstname')}
                 required
                 value={profileForm.firstname}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, firstname: e.target.value })}
                 focusVariant="blue"
               />
               <InputField
-                label="Apellido"
+                label={t('profile.lastname')}
                 required
                 value={profileForm.lastname}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, lastname: e.target.value })}
@@ -237,16 +239,16 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             {/* Datos Fijos de Sistema */}
             <div className="grid grid-cols-2 gap-6">
               <InputField
-                label="Email (No modificable)"
+                label={t('profile.emailFixed')}
                 disabled
                 value={clientProfile.email}
                 mono
                 focusVariant="blue"
               />
               <InputField
-                label="NIF / CIF (No modificable)"
+                label={t('profile.nifFixed')}
                 disabled
-                value={clientProfile.nif || 'No asignado'}
+                value={clientProfile.nif || t('common.none')}
                 mono
                 focusVariant="blue"
               />
@@ -255,20 +257,20 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             {/* Datos Editables de Contacto */}
             <div className="grid grid-cols-2 gap-6">
               <InputField
-                label="Teléfono de Contacto"
+                label={t('profile.contactPhone')}
                 type="tel"
                 required
                 value={profileForm.phoneNumber}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, phoneNumber: e.target.value })}
-                placeholder="Introduce tu número de teléfono..."
+                placeholder={t('profile.phonePlaceholder')}
                 focusVariant="blue"
               />
               <InputField
-                label="Dirección de Residencia"
+                label={t('profile.residenceAddress')}
                 required
                 value={profileForm.address}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, address: e.target.value })}
-                placeholder="Introduce tu dirección de residencia..."
+                placeholder={t('profile.addressPlaceholder')}
                 focusVariant="blue"
               />
             </div>
@@ -277,7 +279,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
               {profileSaved && (
                 <span className="text-emerald-500 text-xs font-black uppercase tracking-widest flex items-center gap-2 animate-fade-in-up">
                   <Check className="w-4 h-4" />
-                  Perfil actualizado con éxito
+                  {t('profile.updatedSuccess')}
                 </span>
               )}
               <Button
@@ -286,7 +288,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
                 glow={false}
                 className="bg-blue-600 hover:bg-blue-500 text-white"
               >
-                Guardar Cambios
+                {t('common.saveChanges')}
               </Button>
             </div>
           </form>
@@ -297,13 +299,13 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
           {/* Sección de Cambio de Contraseña */}
           <section className="relative z-10 space-y-6">
             <h4 className="text-lg font-black uppercase tracking-widest text-white mb-2">
-              Seguridad: Cambiar Contraseña
+              {t('profile.securityPassword')}
             </h4>
             
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <div className="grid grid-cols-3 gap-6">
                 <InputField
-                  label="Clave Actual"
+                  label={t('profile.currentPassword')}
                   type="password"
                   required
                   value={currentPassword}
@@ -312,7 +314,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
                   focusVariant="blue"
                 />
                 <InputField
-                  label="Clave Nueva"
+                  label={t('profile.newPassword')}
                   type="password"
                   required
                   value={newPassword}
@@ -321,12 +323,12 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
                   focusVariant="blue"
                 />
                 <InputField
-                  label="Repetir Clave"
+                  label={t('profile.repeatPassword')}
                   type="password"
                   required
                   value={confirmPassword}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-                  placeholder="Repite la contraseña"
+                  placeholder="••••••••"
                   focusVariant="blue"
                 />
               </div>
@@ -350,7 +352,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
                   disabled={passwordLoading}
                   className="bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 hover:border-neutral-600 transition-all shadow-md active:scale-[0.98]"
                 >
-                  {passwordLoading ? 'Cambiando...' : 'Actualizar Contraseña'}
+                  {passwordLoading ? t('common.processing') : t('profile.updatePasswordBtn')}
                 </Button>
               </div>
             </form>
@@ -364,7 +366,7 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
             <DeleteAccountSection
               onDeleteAccount={handleDeleteAccount}
               isLoading={deleteLoading}
-              warningMessage="Esta acción es irreversible. Se eliminarán de forma permanente todos tus vehículos, citas pendientes e historial de reparaciones."
+              warningMessage={t('profile.deleteAccountWarningClient')}
             />
           </section>
         </div>

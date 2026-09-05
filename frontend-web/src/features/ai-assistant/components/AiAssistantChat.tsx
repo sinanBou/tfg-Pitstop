@@ -64,7 +64,7 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
                 <h3 className="text-sm font-semibold text-white tracking-wide font-sans m-0">{t('aiAssistant.title')}</h3>
                 <span className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5 uppercase tracking-widest font-medium">
                   <span className={`w-1.5 h-1.5 rounded-full inline-block ${isServerUp ? 'bg-green-500' : 'bg-red-500'}`} />
-                  {isServerUp ? 'Conectado (Groq AI)' : 'Desconectado'}
+                  {isServerUp ? t('aiAssistant.connectedStatus') : t('aiAssistant.disconnectedStatus')}
                 </span>
               </div>
             </div>
@@ -73,7 +73,7 @@ export const AiAssistantChat: React.FC<AiAssistantChatProps> = ({ userRole }) =>
               <button 
                 onClick={clearChat} 
                 className="bg-transparent border-none text-slate-400 hover:text-white hover:bg-white/5 p-1.5 rounded-lg cursor-pointer transition-colors duration-200 flex justify-center items-center"
-                title="Limpiar"
+                title={t('aiAssistant.clearChat')}
               >
                 <Trash className="w-4 h-4" />
               </button>

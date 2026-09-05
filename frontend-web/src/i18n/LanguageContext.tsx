@@ -15,15 +15,36 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguageState] = useState<Language>(() => {
-    const saved = localStorage.getItem('pitstop_language') as Language;
-    if (saved === 'es' || saved === 'en') return saved;
-    const browserLang = navigator.language.slice(0, 2);
-    return browserLang === 'en' ? 'en' : 'es';
+    try {
+      if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined' && typeof window.localStorage.getItem === 'function') {
+        const saved = window.localStorage.getItem('pitstop_language') as Language;
+        if (saved === 'es' || saved === 'en') return saved;
+      }
+    } catch {
+      // Storage unavailable or mocked
+    }
+    try {
+      if (typeof navigator !== 'undefined' && navigator.language) {
+        const browserLang = navigator.language.slice(0, 2);
+        return browserLang === 'en' ? 'en' : 'es';
+      }
+    } catch {
+      // Navigator unavailable
+    }
+    return 'es';
   });
 
   useEffect(() => {
-    localStorage.setItem('pitstop_language', language);
-    document.documentElement.lang = language;
+    try {
+      if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined' && typeof window.localStorage.setItem === 'function') {
+        window.localStorage.setItem('pitstop_language', language);
+      }
+    } catch {
+      // Storage unavailable
+    }
+    if (typeof document !== 'undefined' && document.documentElement) {
+      document.documentElement.lang = language;
+    }
   }, [language]);
 
   const setLanguage = (lang: Language) => {

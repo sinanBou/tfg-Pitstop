@@ -4,8 +4,10 @@ import InputGroup from '@/components/common/InputGroup/InputGroup';
 import { Button } from '@/components/common/Button/Button';
 import { resetPassword } from '@/features/auth/services/authService';
 import { useToast } from '@/hooks/useToast';
+import { useTranslation } from '@/i18n';
 
 function ResetPassword() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') || '';
   const navigate = useNavigate();
@@ -36,19 +38,19 @@ function ResetPassword() {
     const newErrors = { password: '', confirmPassword: '', general: '' };
 
     if (!token) {
-      newErrors.general = 'Falta el token de recuperación en la dirección URL.';
+      newErrors.general = t('resetPasswordPage.tokenMissing');
       setErrors(newErrors);
       toast.error(newErrors.general);
       return;
     }
 
     if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres.';
+      newErrors.password = t('resetPasswordPage.minLengthError');
       hasError = true;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Las contraseñas no coinciden.';
+      newErrors.confirmPassword = t('resetPasswordPage.mismatchError');
       hasError = true;
     }
 
@@ -60,10 +62,10 @@ function ResetPassword() {
     setIsLoading(true);
     try {
       await resetPassword(token, formData.password);
-      toast.success('Tu contraseña se ha actualizado con éxito.');
+      toast.success(t('resetPasswordPage.success'));
       navigate('/login');
     } catch (err: any) {
-      const msg = err.message || 'Error al restablecer la contraseña.';
+      const msg = err.message || t('common.error');
       newErrors.general = msg;
       setErrors(newErrors);
       toast.error(msg);
@@ -85,13 +87,13 @@ function ResetPassword() {
         <div className="bg-neutral-950/60 backdrop-blur-xl p-10 sm:p-12 rounded-[2.5rem] border border-neutral-800/60 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative overflow-hidden group">
 
           <div className="mb-10 text-center">
-            <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">Nueva Clave</h2>
-            <p className="text-neutral-500 text-sm font-medium tracking-wide">Introduce tu nueva contraseña de acceso</p>
+            <h2 className="text-4xl font-black text-white uppercase tracking-tighter mb-2">{t('resetPasswordPage.title')}</h2>
+            <p className="text-neutral-500 text-sm font-medium tracking-wide">{t('resetPasswordPage.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <InputGroup 
-              label="Nueva Contraseña" 
+              label={t('auth.newPassword')} 
               name="password" 
               type="password" 
               value={formData.password} 
@@ -101,7 +103,7 @@ function ResetPassword() {
             />
 
             <InputGroup 
-              label="Confirmar Nueva Contraseña" 
+              label={t('auth.confirmPassword')} 
               name="confirmPassword" 
               type="password" 
               value={formData.confirmPassword} 
@@ -122,7 +124,7 @@ function ResetPassword() {
               variant="primary"
               className="mt-6 w-full py-4 rounded-2xl shadow-[0_0_20px_rgba(220,38,38,0.3)] hover:shadow-[0_0_30px_rgba(220,38,38,0.5)]"
             >
-              {isLoading ? 'Guardando...' : 'Cambiar contraseña'}
+              {isLoading ? t('resetPasswordPage.saving') : t('resetPasswordPage.submitBtn')}
             </Button>
           </form>
         </div>

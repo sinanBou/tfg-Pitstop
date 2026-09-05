@@ -2,6 +2,7 @@ import React from 'react';
 import { Card } from '@/components/common/Card/Card';
 import { BRAND_LOGOS, getBrandLogo } from '@/assets/BrandLogos';
 import { Car, Trash } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente VehicleCard.
@@ -29,6 +30,7 @@ interface VehicleCardProps {
 export const VehicleCard: React.FC<VehicleCardProps> = ({ 
   brand, plate, variant = 'blue', onClick, onDelete, index = 0 
 }) => {
+  const { t } = useTranslation();
   const brandKey = brand.split(' ')[0].toUpperCase().trim();
   const cleanBrand = brandKey === 'MERCEDES' ? 'MERCEDES-BENZ' : brandKey;
   const hasLogo = cleanBrand in BRAND_LOGOS;
@@ -58,7 +60,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
              </div>
              <div className="flex items-center gap-4">
                 <div className="flex flex-col items-end">
-                   <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest leading-none mb-1">Matrícula</p>
+                   <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest leading-none mb-1">{t('clientDashboard.vehiclePlate')}</p>
                    <p className="text-white font-mono font-black text-xl tracking-[0.1em]">{plate}</p>
                 </div>
                 {onDelete && (
@@ -68,7 +70,7 @@ export const VehicleCard: React.FC<VehicleCardProps> = ({
                          onDelete();
                       }}
                       className="w-8 h-8 bg-red-500/10 border border-red-500/30 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shadow-lg shadow-red-500/5 cursor-pointer ml-2 relative z-20"
-                      title="Eliminar Vehículo"
+                      title={t('common.delete')}
                    >
                       <Trash className="w-4 h-4" />
                    </button>

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { WorkshopMinDTO } from '@/features/client';
 import { ChevronLeft, ChevronRight, Calendar, Info } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface ScheduleStepProps {
   viewDate: Date;
@@ -27,12 +28,17 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
   availableSlots,
   isLoadingSlots
 }) => {
+  const { t, language } = useTranslation();
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
   
   // Nombres de meses y días
-  const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-  const daysOfWeek = ["L", "M", "X", "J", "V", "S", "D"];
+  const monthNames = language === 'en'
+    ? ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    : ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+  const daysOfWeek = language === 'en'
+    ? ["M", "T", "W", "T", "F", "S", "S"]
+    : ["L", "M", "X", "J", "V", "S", "D"];
 
   // Calcular días del mes
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -122,7 +128,7 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
               <div className="h-full flex flex-col items-center justify-center text-center py-12">
                 <Calendar className="w-12 h-12 text-neutral-600 mb-3" strokeWidth={1.5} />
                 <p className="text-neutral-500 text-xs font-black uppercase tracking-widest leading-relaxed">
-                  Selecciona un día del calendario<br/>para ver las horas disponibles
+                  {t('appointmentModal.selectDayPrompt')}
                 </p>
               </div>
             ) : (
@@ -130,12 +136,12 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
                 {isLoadingSlots ? (
                   <div className="flex-1 flex flex-col items-center justify-center py-12 opacity-70">
                      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-                     <p className="text-[10px] font-black text-white uppercase tracking-widest animate-pulse">Sincronizando agenda...</p>
+                     <p className="text-[10px] font-black text-white uppercase tracking-widest animate-pulse">{t('appointmentModal.syncingSchedule')}</p>
                   </div>
                 ) : (
                   <div className="flex-1 flex flex-col">
                     <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block mb-4 ml-1">
-                      Horarios Disponibles para el {selectedDate.split('-').reverse().join('/')}
+                      {t('appointmentModal.slotsForDate', { date: selectedDate.split('-').reverse().join('/') })}
                     </label>
                     <div className="grid grid-cols-3 gap-2.5 max-h-[280px] overflow-y-auto custom-scrollbar pr-1">
                       {availableSlots.length > 0 ? (
@@ -173,12 +179,12 @@ export const ScheduleStep: React.FC<ScheduleStepProps> = ({
                           return isClosed ? (
                             <div className="col-span-3 py-12 text-center border border-dashed border-blue-900/50 bg-blue-900/10 rounded-2xl flex flex-col items-center justify-center gap-2">
                               <Info className="w-8 h-8 text-blue-500/70" strokeWidth={1.5} />
-                              <p className="text-blue-400/80 text-[10px] font-black uppercase tracking-widest">Taller cerrado este día</p>
+                              <p className="text-blue-400/80 text-[10px] font-black uppercase tracking-widest">{t('appointmentModal.workshopClosed')}</p>
                             </div>
                           ) : (
                             <div className="col-span-3 py-12 text-center border border-dashed border-neutral-800 bg-neutral-900/30 rounded-2xl flex flex-col items-center justify-center gap-2">
                               <Info className="w-8 h-8 text-neutral-600" strokeWidth={1.5} />
-                              <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">Sin huecos disponibles</p>
+                              <p className="text-neutral-400 text-[10px] font-black uppercase tracking-widest">{t('appointmentModal.noSlotsAvailable')}</p>
                             </div>
                           );
                         })()

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/common/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { AlertTriangle } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface DeleteAccountSectionProps {
   onDeleteAccount: () => Promise<void>;
@@ -15,10 +16,14 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
   onDeleteAccount,
   isLoading = false,
   isDisabled = false,
-  disabledMessage = 'No tienes permisos para realizar esta acción.',
-  warningMessage = 'Esta acción es irreversible. Se eliminarán permanentemente todos tus datos y registros asociados del sistema.',
+  disabledMessage,
+  warningMessage,
 }) => {
+  const { t } = useTranslation();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const effectiveDisabledMsg = disabledMessage || t('profile.ownerDeleteRestriction');
+  const effectiveWarningMsg = warningMessage || t('profile.deleteAccountWarningClient');
 
   const handleConfirm = async () => {
     setIsConfirmOpen(false);
@@ -36,10 +41,10 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
         </div>
         <div className="flex-1 space-y-1">
           <h4 className="text-sm font-black uppercase tracking-wider text-red-400">
-            Acciones Críticas: Eliminación de Cuenta
+            {t('profile.criticalActionsHeader')}
           </h4>
           <p className="text-xs text-neutral-400 font-semibold leading-relaxed">
-            {isDisabled ? disabledMessage : warningMessage}
+            {isDisabled ? effectiveDisabledMsg : effectiveWarningMsg}
           </p>
         </div>
       </div>
@@ -47,7 +52,7 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
       <div className="flex justify-end pt-2 relative z-10">
         {isDisabled ? (
           <div className="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-950/40 border border-red-900/40 px-4 py-2.5 rounded-xl select-none">
-            Acción Deshabilitada
+            {t('profile.actionDisabled')}
           </div>
         ) : (
           <Button
@@ -57,7 +62,7 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
             onClick={() => setIsConfirmOpen(true)}
             className="bg-red-600 hover:bg-red-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-red-950/50"
           >
-            {isLoading ? 'Eliminando...' : 'Eliminar Cuenta'}
+            {isLoading ? t('profile.deletingAccount') : t('profile.deleteAccountTitle')}
           </Button>
         )}
       </div>
@@ -66,10 +71,10 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         onConfirm={handleConfirm}
-        title="¿Eliminar tu cuenta?"
-        description="Esta acción eliminará todos tus datos personales, configuraciones y registros de forma permanente y no se podrá deshacer."
-        confirmText="Sí, Eliminar Cuenta"
-        cancelText="Cancelar"
+        title={t('profile.modalDeleteTitle')}
+        description={t('profile.modalDeleteDesc')}
+        confirmText={t('profile.modalDeleteConfirm')}
+        cancelText={t('common.cancel')}
         theme="red"
         isLoading={isLoading}
       />

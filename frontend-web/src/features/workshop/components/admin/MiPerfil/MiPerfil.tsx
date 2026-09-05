@@ -6,6 +6,7 @@ import { X, Camera, Check } from '@/assets/icons';
 import { DeleteAccountSection } from '@/components/common/DeleteAccountSection';
 import { useToast } from '@/hooks/useToast';
 import { API_BASE_URL } from '@/config/api';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente MiPerfil (Taller/Personal).
@@ -60,6 +61,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
   onDeleteAvatar,
   onPreviewImage,
 }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -146,12 +148,12 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
     setPasswordSuccess('');
 
     if (newPassword.length < 6) {
-      setPasswordError('La nueva contraseña debe tener al menos 6 caracteres.');
+      setPasswordError(t('profile.passwordChanged'));
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordError('Las nuevas contraseñas no coinciden.');
+      setPasswordError(t('auth.confirmPassword'));
       return;
     }
 
@@ -171,7 +173,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
       });
 
       if (response.ok) {
-        setPasswordSuccess('Contraseña cambiada correctamente.');
+        setPasswordSuccess(t('profile.passwordChanged'));
         setCurrentPassword('');
         setNewPassword('');
         setConfirmPassword('');
@@ -179,13 +181,13 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         const text = await response.text();
         try {
           const json = JSON.parse(text);
-          setPasswordError(json.message || 'Error al cambiar la contraseña.');
+          setPasswordError(json.message || t('common.error'));
         } catch {
-          setPasswordError(text || 'La contraseña actual es incorrecta o no tiene permitido el cambio local.');
+          setPasswordError(text || t('common.error'));
         }
       }
     } catch {
-      setPasswordError('Error de conexión con el servidor.');
+      setPasswordError(t('common.error'));
     } finally {
       setPasswordLoading(false);
     }
@@ -202,7 +204,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         }
       });
       if (response.ok) {
-        toast.success('Tu cuenta ha sido eliminada correctamente.');
+        toast.success(t('profile.deleteAccountTitle'));
         setTimeout(() => {
           localStorage.clear();
           sessionStorage.clear();
@@ -210,7 +212,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         }, 1500);
       } else {
         const text = await response.text();
-        let errorMsg = 'Error al eliminar la cuenta.';
+        let errorMsg = t('common.error');
         try {
           const json = JSON.parse(text);
           errorMsg = json.message || errorMsg;
@@ -220,7 +222,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         toast.error(errorMsg);
       }
     } catch {
-      toast.error('Error de conexión con el servidor.');
+      toast.error(t('common.error'));
     } finally {
       setDeleteLoading(false);
     }
@@ -264,10 +266,10 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
           <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
             <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-              Mis Datos Personales
+              {t('profile.personalData')}
             </p>
             <h3 className="text-3xl font-black uppercase tracking-widest text-white">
-              Mi Perfil
+              {t('profile.title')}
             </h3>
           </header>
 
@@ -316,7 +318,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                     disabled={uploadingAvatar}
                     className="px-3 py-1.5 text-[9px] h-fit"
                   >
-                    {employeeProfile.profilePictureUrl ? 'Cambiar Imagen' : 'Añadir Imagen'}
+                    {employeeProfile.profilePictureUrl ? t('profile.changeImage') : t('profile.addImage')}
                   </Button>
                   {employeeProfile.profilePictureUrl && (
                     <Button
@@ -324,7 +326,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                       onClick={onPreviewImage}
                       className="px-3 py-1.5 text-[9px] h-fit"
                     >
-                      Ver Foto
+                      {t('profile.viewPhoto')}
                     </Button>
                   )}
                   {employeeProfile.profilePictureUrl && (
@@ -334,18 +336,18 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                       disabled={uploadingAvatar}
                       className="px-3 py-1.5 text-[9px] h-fit"
                     >
-                      Eliminar
+                      {t('profile.deletePhoto')}
                     </Button>
                   )}
                 </div>
-                <p className="text-[10px] text-neutral-500 font-medium">PNG, JPG de hasta 5MB. S3 presigned-url cifrado.</p>
+                <p className="text-[10px] text-neutral-500 font-medium">{t('profile.photoRestrictions')}</p>
               </div>
             </div>
 
             {/* Form Fields */}
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Nombre</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.firstname')}</label>
                 <input
                   type="text"
                   required
@@ -355,7 +357,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Apellido</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.lastname')}</label>
                 <input
                   type="text"
                   required
@@ -367,13 +369,13 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Dirección de Residencia</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.residenceAddress')}</label>
               <input
                 type="text"
                 value={profileForm.address}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, address: e.target.value })}
                 className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
-                placeholder="Introduce tu dirección de residencia..."
+                placeholder={t('profile.addressPlaceholder')}
               />
             </div>
 
@@ -381,7 +383,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
               {profileSaved && (
                 <span className="text-green-500 text-xs font-black uppercase tracking-widest flex items-center gap-2 animate-fade-in-up">
                   <Check className="w-4 h-4" strokeWidth={2} />
-                  Perfil actualizado
+                  {t('profile.updatedSuccess')}
                 </span>
               )}
               <Button
@@ -389,7 +391,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                 variant="primary"
                 glow={true}
               >
-                Guardar Perfil
+                {t('common.save')}
               </Button>
             </div>
           </form>
@@ -401,13 +403,13 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
           <section className="relative z-10 space-y-6">
             <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-              Seguridad: Cambiar Contraseña
+              {t('profile.securityPassword')}
             </p>
             
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
               <div className="grid grid-cols-3 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Clave Actual</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.currentPassword')}</label>
                   <input
                     type="password"
                     required
@@ -418,7 +420,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Clave Nueva</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.newPassword')}</label>
                   <input
                     type="password"
                     required
@@ -429,13 +431,13 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">Repetir Clave</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.repeatPassword')}</label>
                   <input
                     type="password"
                     required
                     value={confirmPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
-                    placeholder="Repite la contraseña"
+                    placeholder="••••••••"
                     className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
                   />
                 </div>
@@ -460,7 +462,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                   disabled={passwordLoading}
                   className="bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 hover:border-neutral-600 transition-all shadow-md active:scale-[0.98]"
                 >
-                  {passwordLoading ? 'Cambiando...' : 'Actualizar Contraseña'}
+                  {passwordLoading ? t('common.processing') : t('profile.updatePasswordBtn')}
                 </Button>
               </div>
             </form>
@@ -475,8 +477,8 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
               onDeleteAccount={handleDeleteAccount}
               isLoading={deleteLoading}
               isDisabled={isOwner && hasWorkshops !== false}
-              disabledMessage="Los propietarios de taller no pueden eliminar su cuenta directamente. Debes dar de baja tus talleres primero."
-              warningMessage="Esta acción es irreversible. Se eliminarán permanentemente tus credenciales y te desvinculará de toda la gestión del taller."
+              disabledMessage={t('profile.ownerDeleteRestriction')}
+              warningMessage={t('profile.deleteAccountWarningStaff')}
             />
           </section>
         </div>
@@ -486,9 +488,9 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
           isOpen={isConfirmDeleteOpen}
           onClose={() => setIsConfirmDeleteOpen(false)}
           onConfirm={handleConfirmDelete}
-          title="Eliminar Foto de Perfil"
-          description="¿Estás seguro de que deseas eliminar tu imagen de perfil? Esta acción es instantánea."
-          confirmText="Sí, Eliminar"
+          title={t('profile.deletePhotoTitle')}
+          description={t('profile.deletePhotoDesc')}
+          confirmText={t('common.confirm')}
           theme="red"
         />
       )}

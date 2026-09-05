@@ -1,6 +1,7 @@
 import React from 'react';
 import type { WorkshopMinDTO } from '@/features/client';
 import { Search, Building, MapPin } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface WorkshopStepProps {
   searchTerm: string;
@@ -25,6 +26,8 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
   onLoadMore,
   onPreviewLogo
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="animate-in fade-in slide-in-from-right-8 duration-500 flex-1 flex flex-col">
       {/* BARRA DE BÚSQUEDA */}
@@ -32,7 +35,7 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
         <input 
           type="text"
           autoFocus
-          placeholder="Busca por nombre, CIF o dirección..."
+          placeholder={t('appointmentModal.searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => onSearchTermChange(e.target.value)}
           className="w-full bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-white focus:outline-none focus:border-blue-600/50 focus:bg-black transition-all placeholder-neutral-600"
@@ -83,7 +86,7 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
         {isSearching && (
           <div className="py-8 flex flex-col items-center gap-2 opacity-50">
              <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500">Buscando...</p>
+             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-500">{t('appointmentModal.searching')}</p>
           </div>
         )}
 
@@ -93,13 +96,13 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
             onClick={onLoadMore}
             className="w-full py-4 bg-neutral-900/50 hover:bg-neutral-900 border border-neutral-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:text-white transition-all shadow-sm"
           >
-            Cargar más talleres
+            {t('appointmentModal.loadMoreWorkshops')}
           </button>
         )}
 
         {!isSearching && searchResults.length === 0 && (
           <div className="py-12 text-center border-2 border-dashed border-neutral-800 rounded-3xl bg-neutral-900/20">
-             <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest animate-pulse">Sin resultados</p>
+             <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest animate-pulse">{t('appointmentModal.noResults')}</p>
           </div>
         )}
       </div>

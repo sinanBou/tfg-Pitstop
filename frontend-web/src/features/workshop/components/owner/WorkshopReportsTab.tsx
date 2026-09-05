@@ -8,6 +8,7 @@ import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { PartsStatsWidget } from '@/components/common/PartsStatsWidget/PartsStatsWidget';
 import { BackButton } from '@/components/common/BackButton/BackButton';
 import { Card } from '@/components/common/Card/Card';
+import { useTranslation } from '@/i18n';
 
 interface Invoice {
   id: string;
@@ -30,6 +31,7 @@ interface WorkshopReportsTabProps {
 }
 
 export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) {
+  const { t } = useTranslation();
   const [invoicesByWorkshop, setInvoicesByWorkshop] = useState<Record<string, Invoice[]>>({});
   const [loading, setLoading] = useState(true);
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(null);
@@ -110,8 +112,8 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
 
       return {
         id: w.id,
-        name: w.companyName || 'Taller',
-        address: w.address || 'Dirección no especificada',
+        name: w.companyName || t('common.workshop'),
+        address: w.address || '',
         revenue,
         count,
         avgTicket: count > 0 ? revenue / count : 0
@@ -137,14 +139,14 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
       sortedByRevenue,
       topWorkshop
     };
-  }, [workshops, filteredInvoicesByWorkshop]);
+  }, [workshops, filteredInvoicesByWorkshop, t]);
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
         <div className="w-8 h-8 border-4 border-neutral-800 border-t-neutral-400 rounded-full animate-spin" />
         <p className="text-neutral-500 text-xs font-black uppercase tracking-widest animate-pulse">
-          Consolidando Métricas del Grupo Corporativo...
+          {t('ownerDashboard.consolidatingMetrics')}
         </p>
       </div>
     );
@@ -160,10 +162,10 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
           <div className="flex items-center gap-4">
             <BackButton 
               onClick={() => setSelectedWorkshopId(null)} 
-              title="Volver a Vista General" 
+              title={t('common.back')} 
             />
             <div>
-              <span className="text-[9px] font-black uppercase tracking-widest text-red-500">Auditoría Individual de Taller</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-red-500">{t('ownerDashboard.individualAuditTitle')}</span>
               <h2 className="text-xl font-black uppercase tracking-tight text-white mt-0.5">
                 {selectedWorkshop?.companyName}
               </h2>
@@ -181,13 +183,15 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
         <ReportsTab workshopId={selectedWorkshopId} />
       </div>
     );
-  }  // ── RENDERIZADO DE LA VISTA GLOBAL COMPARATIVA ──
+  }
+
+  // ── RENDERIZADO DE LA VISTA GLOBAL COMPARATIVA ──
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Cabecera y Selector de Mes */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-900 pb-4">
         <div>
-          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">Análisis General</h2>
+          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">{t('ownerDashboard.generalAnalysisTitle')}</h2>
         </div>
         <MonthSelector selectedMonth={selectedMonth} onChange={setSelectedMonth} />
       </div>
@@ -195,19 +199,19 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
       {/* 1. WIDGETS KPIs COMBINADOS */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <MetricCard 
-          label="Ingresos Totales" 
+          label={t('ownerDashboard.totalRevenue')} 
           value={formatCurrency(globalStats.combinedRevenue)} 
         />
         <MetricCard 
-          label="Citas Completadas" 
+          label={t('ownerDashboard.completedAppointments')} 
           value={globalStats.combinedJobs} 
         />
         <MetricCard 
-          label="Precio Medio" 
+          label={t('ownerDashboard.averagePrice')} 
           value={formatCurrency(globalStats.avgTicket)} 
         />
         <MetricCard 
-          label="Número de Talleres" 
+          label={t('ownerDashboard.workshopCount')} 
           value={workshops.length} 
         />
       </div>
@@ -229,12 +233,12 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
         >
           <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
             <h3 className="text-xs font-black uppercase tracking-widest text-neutral-200">
-              Facturación por Centro
+              {t('ownerDashboard.revenueByCenter')}
             </h3>
           </div>
 
           {globalStats.sortedByRevenue.length === 0 ? (
-            <p className="text-xs text-neutral-500 italic py-6 text-center">No hay datos de ingresos en este período.</p>
+            <p className="text-xs text-neutral-500 italic py-6 text-center">{t('ownerDashboard.noRevenueDataPeriod')}</p>
           ) : (
             <div className="space-y-6">
               {globalStats.sortedByRevenue.map((w, idx) => {
@@ -254,7 +258,7 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
                         onClick={() => setSelectedWorkshopId(w.id)}
                         className="text-[9px] font-black uppercase tracking-widest text-neutral-500 hover:text-white transition-colors cursor-pointer"
                       >
-                        Ver Detalles →
+                        {t('ownerDashboard.viewDetails')}
                       </button>
                     </div>
                   </div>

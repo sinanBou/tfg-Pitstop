@@ -2,6 +2,7 @@ import { type VehicleRequest } from '@/features/client';
 import { SearchableSelect } from '@/components/common/SearchableSelect/SearchableSelect';
 import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useVehicleForm } from '../hooks/useVehicleForm';
+import { useTranslation } from '@/i18n';
 
 // 1. Definimos una interfaz clara para las props del Modal
 /**
@@ -32,6 +33,7 @@ const POPULAR_BRANDS = [
  * registrar metadatos del coche como matrícula, número de bastidor (VIN), año de fabricación y color.
  */
 export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModels }: VehicleModalProps) => {
+  const { t } = useTranslation();
   const {
     loading,
     makes,
@@ -48,23 +50,23 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Nuevo Vehículo"
+      title={t('vehicleModal.title')}
       theme="blue"
       showDot={false}
     >
       <form onSubmit={handleSubmit} className="space-y-5 flex-1 flex flex-col justify-between h-full">
           <div className="grid grid-cols-2 gap-4">
             <SearchableSelect 
-              label="Marca" 
-              placeholder="Seleccionar..." 
+              label={t('vehicleModal.brand')} 
+              placeholder={t('vehicleModal.placeholderSelect')} 
               options={makes} 
               value={formData.brand} 
               onChange={val => setFormData({...formData, brand: val, model: ''})} 
               popularOptions={POPULAR_BRANDS}
             />
             <SearchableSelect 
-              label="Modelo" 
-              placeholder="Seleccionar..." 
+              label={t('vehicleModal.model')} 
+              placeholder={t('vehicleModal.placeholderSelect')} 
               options={models} 
               value={formData.model} 
               onChange={val => setFormData({...formData, model: val})} 
@@ -75,7 +77,7 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">Matrícula</label>
+              <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">{t('vehicleModal.licensePlate')}</label>
               <input 
                 required
                 type="text" 
@@ -86,7 +88,7 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
               />
             </div>
             <div className="space-y-1">
-              <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">Año</label>
+              <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">{t('vehicleModal.year')}</label>
               <input 
                 required
                 type="number" 
@@ -98,10 +100,10 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">VIN (Bastidor)</label>
+            <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">{t('vehicleModal.vin')}</label>
             <input 
               type="text" 
-              placeholder="Opcional"
+              placeholder={t('vehicleModal.placeholderVin')}
               className="w-full bg-black/50 border border-neutral-800 rounded-xl p-3 text-xs text-white font-mono focus:border-blue-500 focus:outline-none transition-all placeholder:text-neutral-700"
               value={formData.vin}
               onChange={e => setFormData({...formData, vin: e.target.value.toUpperCase()})}
@@ -109,10 +111,10 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">Color</label>
+            <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">{t('vehicleModal.color')}</label>
             <input 
               type="text" 
-              placeholder="Ej: Negro Mate"
+              placeholder={t('vehicleModal.placeholderColor')}
               className="w-full bg-black/50 border border-neutral-800 rounded-xl p-3 text-sm text-white focus:border-blue-500 focus:outline-none transition-all placeholder:text-neutral-700"
               value={formData.color}
               onChange={e => setFormData({...formData, color: e.target.value})}
@@ -125,14 +127,14 @@ export const VehicleModal = ({ isOpen, onClose, onSubmit, fetchMakes, fetchModel
               onClick={onClose}
               className="flex-1 py-3 rounded-xl border border-neutral-800 text-neutral-400 text-xs font-black uppercase hover:bg-white/5 transition-colors"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button 
               type="submit" 
               disabled={loading}
               className="flex-1 py-3 rounded-xl bg-blue-600 text-white text-xs font-black uppercase hover:bg-blue-500 transition-all shadow-[0_0_20px_rgba(37,99,235,0.3)] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Procesando...' : 'Confirmar Registro'}
+              {loading ? t('common.processing') : t('vehicleModal.confirmBtn')}
             </button>
           </div>
         </form>

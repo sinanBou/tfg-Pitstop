@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { VehicleModal } from './VehicleModal';
+import { LanguageProvider } from '@/i18n';
 
 describe('VehicleModal', () => {
   const mockOnClose = vi.fn();
@@ -8,57 +9,47 @@ describe('VehicleModal', () => {
   const mockFetchMakes = vi.fn().mockResolvedValue(['BMW', 'Audi']);
   const mockFetchModels = vi.fn().mockResolvedValue(['Serie 3', 'A4']);
 
+  const renderModal = (isOpen: boolean) => {
+    return render(
+      <LanguageProvider>
+        <VehicleModal 
+          isOpen={isOpen} 
+          onClose={mockOnClose} 
+          onSubmit={mockOnSubmit} 
+          fetchMakes={mockFetchMakes} 
+          fetchModels={mockFetchModels} 
+        />
+      </LanguageProvider>
+    );
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it('no debe renderizar nada si isOpen es false', () => {
-    const { container } = render(
-      <VehicleModal 
-        isOpen={false} 
-        onClose={mockOnClose} 
-        onSubmit={mockOnSubmit} 
-        fetchMakes={mockFetchMakes} 
-        fetchModels={mockFetchModels} 
-      />
-    );
+    const { container } = renderModal(false);
 
     expect(container.firstChild).toBeNull();
   });
 
   it('debe renderizar el formulario correctamente cuando isOpen es true', async () => {
     await act(async () => {
-      render(
-        <VehicleModal 
-          isOpen={true} 
-          onClose={mockOnClose} 
-          onSubmit={mockOnSubmit} 
-          fetchMakes={mockFetchMakes} 
-          fetchModels={mockFetchModels} 
-        />
-      );
+      renderModal(true);
     });
 
-    expect(screen.getByRole('heading', { name: /Nuevo Vehículo/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Nuevo Vehículo|New Vehicle/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText('0000XXX')).toBeInTheDocument();
   });
 
   it('debe enviar los datos del formulario al hacer submit', async () => {
     await act(async () => {
-      render(
-        <VehicleModal 
-          isOpen={true} 
-          onClose={mockOnClose} 
-          onSubmit={mockOnSubmit} 
-          fetchMakes={mockFetchMakes} 
-          fetchModels={mockFetchModels} 
-        />
-      );
+      renderModal(true);
     });
 
     const plateInput = screen.getByPlaceholderText('0000XXX');
     const yearInput = screen.getByDisplayValue(new Date().getFullYear().toString());
-    const colorInput = screen.getByPlaceholderText('Ej: Negro Mate');
+    const colorInput = screen.getByPlaceholderText(/Ej: Negro Mate|e.g. Matte Black/i);
 
     await act(async () => {
       fireEvent.change(plateInput, { target: { value: '1234ABC' } });

@@ -2,6 +2,7 @@ import type { UserDTO } from '../types/client.types';
 import { WorkshopVehicleCard } from '@/components/common/Card/WorkshopVehicleCard';
 import { Card } from '@/components/common/Card/Card';
 import { Mail, Car, Calendar } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente ClientOverviewTab.
@@ -22,6 +23,8 @@ interface ClientOverviewTabProps {
  * con sus correspondientes estados de servicio actualizados en tiempo real.
  */
 export function ClientOverviewTab({ vehicles, appointments, userProfile }: ClientOverviewTabProps) {
+  const { t } = useTranslation();
+
   // Override status dynamically to follow strict business rules:
   // - If a vehicle has an active appointment in status 'COMPLETED', it's 'COMPLETED' ("Listo para Recoger").
   // - If it has an active appointment in status 'IN_PROGRESS', it's 'IN_PROGRESS' ("En Curso").
@@ -50,14 +53,14 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 relative z-10">
             <div>
                <p className="text-[10px] uppercase font-bold tracking-widest text-blue-500 mb-2 flex items-center gap-2">
-                  Panel de Cliente
+                  {t('clientDashboard.clientPortal')}
                </p>
                <h2 className="text-3xl md:text-5xl font-black tracking-tighter  mb-2">
-                 Hola, {userProfile?.firstname || 'Conductor'}
+                 {t('clientDashboard.hello')}, {userProfile?.firstname || t('common.driver')}
                </h2>
                <p className="text-neutral-400 font-medium tracking-wide flex items-center gap-2 text-sm">
                   <Mail className="w-4 h-4 text-neutral-500" />
-                  {userProfile?.email || 'Cargando perfil...'}
+                  {userProfile?.email || t('common.loading')}
                </p>
             </div>
          </div>
@@ -65,7 +68,7 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
 
       {/* SECTION: VISTA GENERAL METRICAS (Colocado Arriba) */}
       <div className="space-y-6">
-         <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest">Resumen de Cuenta</h3>
+         <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest">{t('clientDashboard.accountSummary')}</h3>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {vehicles.length > 0 ? (
                <Card variant="neutral" padding="none" rounded="2xl" className="p-6 relative overflow-hidden group hover:border-blue-500/40 transition-all duration-300 hover:shadow-2xl">
@@ -73,16 +76,16 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
                      <Car className="w-16 h-16 text-blue-500" strokeWidth={1} />
                   </div>
                   <div className="relative z-10 flex flex-col h-full">
-                     <h4 className="text-neutral-400 font-bold uppercase tracking-widest text-xs mb-4">Tu Garaje</h4>
+                     <h4 className="text-neutral-400 font-bold uppercase tracking-widest text-xs mb-4">{t('clientDashboard.yourGarage')}</h4>
                      <p className="text-4xl font-black text-white leading-none mb-1">{vehicles.length}</p>
-                     <p className="text-[10px] font-mono text-blue-400 uppercase tracking-widest mt-auto">Vehículos Activos</p>
+                     <p className="text-[10px] font-mono text-blue-400 uppercase tracking-widest mt-auto">{t('clientDashboard.activeVehicles')}</p>
                   </div>
                </Card>
             ) : (
                <Card variant="neutral" padding="none" rounded="2xl" className="p-6 relative overflow-hidden group transition-all duration-300">
                   <div className="relative z-10 flex flex-col items-center justify-center text-center h-full opacity-50">
-                     <p className="text-lg font-black text-white uppercase mb-1">Sin Actividad</p>
-                     <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">Garaje vacío</p>
+                     <p className="text-lg font-black text-white uppercase mb-1">{t('clientDashboard.noActivity')}</p>
+                     <p className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest">{t('clientDashboard.emptyGarage')}</p>
                   </div>
                </Card>
             )}
@@ -92,7 +95,7 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
                   <Calendar className="w-16 h-16 text-blue-500" strokeWidth={1} />
                </div>
                <div className="relative z-10 flex flex-col h-full">
-                  <h4 className="text-neutral-400 font-bold uppercase tracking-widest text-xs mb-4">Citas</h4>
+                  <h4 className="text-neutral-400 font-bold uppercase tracking-widest text-xs mb-4">{t('nav.appointments')}</h4>
                   <p className="text-4xl font-black text-white leading-none mb-1">{appointments.length}</p>
                </div>
             </Card>
@@ -104,7 +107,7 @@ export function ClientOverviewTab({ vehicles, appointments, userProfile }: Clien
          <div className="space-y-4 animate-fade-in">
             <div className="flex justify-between items-center">
                <h3 className="text-sm font-black text-neutral-500 uppercase tracking-widest flex items-center gap-2">
-                  En reparación ({cochesEnTaller.length})
+                  {t('clientDashboard.inRepair')} ({cochesEnTaller.length})
                </h3>
             </div>
             <div className="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x scroll-smooth">

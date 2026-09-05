@@ -4,6 +4,7 @@ import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
 import { Plus, Building } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 /**
  * Propiedades del componente ClientVehiclesTab.
@@ -23,6 +24,7 @@ interface ClientVehiclesTabProps {
  * junto con la confirmación de eliminación segura por medio de un modal premium.
  */
 export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: ClientVehiclesTabProps) {
+  const { t } = useTranslation();
   // Estados para controlar el modal de confirmación premium
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [confirmDeleteName, setConfirmDeleteName] = useState<string>('');
@@ -46,8 +48,8 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: C
     <div>
       <div className="flex justify-between items-center mb-10 animate-fade-in">
          <div>
-            <h2 className="text-2xl font-black text-white uppercase tracking-widest">Mi Garaje</h2>
-            <p className="text-neutral-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Gestiona tu flota de vehículos activa</p>
+            <h2 className="text-2xl font-black text-white uppercase tracking-widest">{t('clientDashboard.myGarageTitle')}</h2>
+            <p className="text-neutral-500 text-[10px] font-black uppercase tracking-[0.2em] mt-1">{t('clientDashboard.manageActiveFleet')}</p>
          </div>
          <Button 
             onClick={onAddVehicle}
@@ -55,7 +57,7 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: C
             className="shadow-[0_0_30px_rgba(239,68,68,0.1)] hover:shadow-[0_0_40px_rgba(239,68,68,0.4)] flex items-center gap-2"
          >
             <Plus className="w-4 h-4" strokeWidth={3} />
-            Añadir Nuevo Vehículo
+            {t('clientDashboard.addVehicle')}
          </Button>
       </div>
 
@@ -78,7 +80,7 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: C
       ) : (
          <Card variant="neutral" padding="none" rounded="2xl" className="py-32 flex flex-col items-center justify-center bg-black/20 border border-dashed border-neutral-800">
             <Building className="w-16 h-16 text-neutral-800 mb-6" strokeWidth={1} />
-            <p className="text-neutral-600 font-black uppercase tracking-[0.3em] text-xs">Garaje Vacío</p>
+            <p className="text-neutral-600 font-black uppercase tracking-[0.3em] text-xs">{t('clientDashboard.emptyGarage')}</p>
          </Card>
       )}
 
@@ -90,10 +92,10 @@ export function ClientVehiclesTab({ vehicles, onAddVehicle, onDeleteVehicle }: C
             setConfirmDeleteName('');
          }}
          onConfirm={handleDeleteConfirm}
-         title="¿Eliminar Vehículo?"
-         description={`¿Estás seguro de que deseas eliminar permanentemente tu vehículo "${confirmDeleteName}"? Esta acción borrará todas sus citas y tareas asociadas.`}
-         confirmText="Sí, Confirmar"
-         cancelText="Cancelar"
+         title={t('clientDashboard.deleteVehicleTitle')}
+         description={`${t('clientDashboard.deleteVehicleDesc')} ${confirmDeleteName ? `("${confirmDeleteName}")` : ''}`}
+         confirmText={t('common.confirm')}
+         cancelText={t('common.cancel')}
          theme="red"
          isLoading={isDeleting}
       />

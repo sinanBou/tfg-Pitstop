@@ -4,6 +4,7 @@ import { BaseModal } from '@/components/common/BaseModal/BaseModal';
 import { useToast } from '@/hooks/useToast';
 import * as workshopService from '../../services/workshopService';
 import { ArrowRight } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface WorkshopCreationModalProps {
   isOpen: boolean;
@@ -12,18 +13,20 @@ interface WorkshopCreationModalProps {
   ownerId: string | null;
 }
 
-const diasSemana = [
-  { value: 'LUNES', label: 'Lunes' },
-  { value: 'MARTES', label: 'Martes' },
-  { value: 'MIERCOLES', label: 'Miércoles' },
-  { value: 'JUEVES', label: 'Jueves' },
-  { value: 'VIERNES', label: 'Viernes' },
-  { value: 'SABADO', label: 'Sábado' },
-  { value: 'DOMINGO', label: 'Domingo' },
-];
-
 export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: WorkshopCreationModalProps) {
+  const { t } = useTranslation();
   const toast = useToast();
+
+  const diasSemana = [
+    { value: 'LUNES', label: t('days.monday') },
+    { value: 'MARTES', label: t('days.tuesday') },
+    { value: 'MIERCOLES', label: t('days.wednesday') },
+    { value: 'JUEVES', label: t('days.thursday') },
+    { value: 'VIERNES', label: t('days.friday') },
+    { value: 'SABADO', label: t('days.saturday') },
+    { value: 'DOMINGO', label: t('days.sunday') },
+  ];
+
   const [form, setForm] = useState({
     cif: '',
     companyName: '',
@@ -71,19 +74,19 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.companyName.trim()) {
-      toast.warning("El Nombre Comercial es obligatorio");
+      toast.warning(t('workshopCreationModal.companyNameRequired'));
       return;
     }
     if (!form.cif.trim()) {
-      toast.warning("El CIF es obligatorio");
+      toast.warning(t('workshopCreationModal.cifRequired'));
       return;
     }
     if (!form.address.trim()) {
-      toast.warning("La Sede Física (Dirección) es obligatoria");
+      toast.warning(t('workshopCreationModal.addressRequired'));
       return;
     }
     if (form.workingDays.length === 0) {
-      toast.warning("Debes seleccionar al menos un día de trabajo");
+      toast.warning(t('workshopCreationModal.selectOneWorkingDay'));
       return;
     }
 
@@ -97,7 +100,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
 
       await workshopService.createWorkshop(payload);
 
-      toast.success("Taller creado con éxito.");
+      toast.success(t('workshopCreationModal.creationSuccess'));
       onClose();
       setForm({
         cif: '',
@@ -119,8 +122,8 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      title="Nuevo Taller"
-      subtitle="Configuración de Negocio"
+      title={t('workshopCreationModal.title')}
+      subtitle={t('workshopCreationModal.subtitle')}
       theme="red"
     >
       <form onSubmit={handleSubmit} className="space-y-6 flex-1 flex flex-col">
@@ -128,36 +131,36 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
           {/* Datos del Negocio (Izquierda) */}
           <div className="w-full md:w-1/2 space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">Nombre Comercial *</label>
+              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.companyName')}</label>
               <input 
                 type="text" 
                 required 
                 value={form.companyName} 
                 onChange={e => setForm({...form, companyName: e.target.value})} 
                 className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-bold placeholder-neutral-700" 
-                placeholder="Ej. Talleres Motosport" 
+                placeholder={t('workshopCreationModal.companyNamePlaceholder')} 
               />
             </div>
             
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">CIF *</label>
+              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.cif')}</label>
               <input 
                 type="text" 
                 required 
                 value={form.cif} 
                 onChange={e => setForm({...form, cif: e.target.value})} 
                 className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-mono font-bold placeholder-neutral-700" 
-                placeholder="B12345678" 
+                placeholder={t('workshopCreationModal.cifPlaceholder')} 
               />
             </div>
 
             <div className="space-y-2">
               <AddressAutocomplete 
-                label="Sede Física (Dirección) *" 
+                label={t('workshopCreationModal.address')} 
                 name="address" 
                 value={form.address} 
                 onChange={(val: string) => setForm({...form, address: val})} 
-                placeholder="Calle, Número, Ciudad..." 
+                placeholder={t('workshopCreationModal.addressPlaceholder')} 
               />
             </div>
           </div>
@@ -165,7 +168,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
           {/* Horario y Días (Derecha) */}
           <div className="w-full md:w-1/2 space-y-4">
             <div className="space-y-3">
-              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">Días Operativos *</label>
+              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.operatingDays')}</label>
               <div className="flex flex-wrap gap-2">
                 {diasSemana.map(dia => (
                   <button 
@@ -186,7 +189,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">Apertura (HH:mm)</label>
+                <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.openTime')}</label>
                 <input 
                   type="text" 
                   name="openTime" 
@@ -198,7 +201,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">Cierre (HH:mm)</label>
+                <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.closeTime')}</label>
                 <input 
                   type="text" 
                   name="closeTime" 
@@ -220,13 +223,13 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
             onClick={onClose}
             className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
           >
-            Cancelar
+            {t('common.cancel')}
           </button>
           <button 
             type="submit" 
             className="px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-widest text-white transition-all flex items-center gap-2 active:scale-95 shadow-[0_0_30px_rgba(220,38,38,0.3)]"
           >
-            Activar Taller
+            {t('workshopCreationModal.activateWorkshop')}
             <ArrowRight className="w-4 h-4" />
           </button>
         </div>

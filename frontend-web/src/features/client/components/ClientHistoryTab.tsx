@@ -5,6 +5,7 @@ import { Button } from '@/components/common/Button/Button';
 import { printInvoicePDF as importPrintInvoicePDF } from '@/utils/InvoicePdfPrinter';
 import { useToast } from '@/hooks/useToast';
 import { Calendar, Check, FileText, X } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 
 interface NotificationItem {
@@ -22,6 +23,7 @@ interface ClientHistoryTabProps {
 }
 
 export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProps) {
+  const { t } = useTranslation();
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
   const toast = useToast();
@@ -79,7 +81,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
     });
 
     uniqueApps.forEach(app => {
-      const vehicleDisplay = app.vehicleDisplay || app.vehicleName || 'Vehículo';
+      const vehicleDisplay = app.vehicleDisplay || app.vehicleName || t('common.vehicle');
       const appDate = app.dateTime ? new Date(app.dateTime) : null;
       if (!appDate) return;
 
@@ -94,8 +96,8 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
         list.push({
           id: `${app.id}-cancel`,
           type: 'cancel',
-          title: 'Cita Rechazada/Cancelada',
-          message: `Su cita para el vehículo ${vehicleDisplay} ha sido rechazada o cancelada por el taller.`,
+          title: t('clientHistory.notifCancelledTitle'),
+          message: `${t('clientHistory.notifCancelledMsg')} (${vehicleDisplay})`,
           dateTime: cancelDate,
           appointmentId: app.id
         });
@@ -111,8 +113,8 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
         list.push({
           id: `${app.id}-confirm`,
           type: 'confirm',
-          title: 'Cita Confirmada',
-          message: `Su cita para el vehículo ${vehicleDisplay} ha sido confirmada y programada.`,
+          title: t('clientHistory.notifConfirmedTitle'),
+          message: `${t('clientHistory.notifConfirmedMsg')} (${vehicleDisplay})`,
           dateTime: confirmDate,
           appointmentId: app.id
         });
@@ -128,8 +130,8 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
         list.push({
           id: `${app.id}-complete`,
           type: 'complete',
-          title: 'Trabajo Finalizado',
-          message: `Se ha finalizado el trabajo en su vehículo ${vehicleDisplay}. Puede acudir a recogerlo.`,
+          title: t('clientHistory.notifCompletedTitle'),
+          message: `${t('clientHistory.notifCompletedMsg')} (${vehicleDisplay})`,
           dateTime: completeDate,
           appointmentId: app.id
         });
@@ -145,8 +147,8 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
         list.push({
           id: `${app.id}-invoice`,
           type: 'invoice',
-          title: 'Factura Generada',
-          message: `Se ha generado la factura de su vehículo ${vehicleDisplay}.`,
+          title: t('clientHistory.notifInvoiceTitle'),
+          message: `${t('clientHistory.notifInvoiceMsg')} (${vehicleDisplay})`,
           dateTime: invoiceDate,
           appointmentId: app.id
         });
@@ -160,7 +162,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
       const weights = { invoice: 3, complete: 2, confirm: 1, cancel: 0 };
       return weights[b.type] - weights[a.type];
     });
-  }, [appointments, history]);
+  }, [appointments, history, t]);
 
   const printInvoicePDF = (inv: any, translated?: string) => {
     importPrintInvoicePDF(inv, translated, (msg) => toast.warning(msg));
@@ -472,13 +474,13 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
           <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
-            Actividad y Notificaciones
+            {t('clientHistory.activityNotifs')}
           </h3>
         </div>
 
         {notifications.length === 0 ? (
           <Card variant="neutral" padding="none" rounded="2xl" className="p-6 bg-neutral-900/10 text-center text-neutral-600 text-xs py-10">
-            No tienes notificaciones o actividad registrada en tus citas.
+            {t('clientHistory.noNotifs')}
           </Card>
         ) : (
           <div className="space-y-3">
@@ -558,7 +560,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
                       ) : (
                         <>
                           <FileText className="w-3 h-3" />
-                          Descargar PDF
+                          {t('clientHistory.downloadPDF')}
                         </>
                       )}
                     </Button>

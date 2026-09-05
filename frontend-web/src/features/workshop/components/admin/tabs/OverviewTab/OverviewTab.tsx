@@ -4,42 +4,31 @@ import { Users, Clock } from '@/assets/icons';
 import { WelcomeHeader } from './WelcomeHeader';
 import { WorkshopProfileCard } from './WorkshopProfileCard';
 import { WorkingDaysSelector } from './WorkingDaysSelector';
+import { useTranslation } from '@/i18n';
 
-/**
- * Propiedades del componente OverviewTab.
- */
 interface OverviewTabProps {
-  /** Objeto de datos con la información global del taller (nombre, dirección, horario, contador de vehículos). */
   workshopData: any;
-  /** Mapeo de valores de días de la semana legibles. */
   diasSemana: Array<{value: string, label: string}>;
-  /** Perfil del empleado actualmente autenticado (opcional). */
   employeeProfile?: any;
-  /** Rol del usuario logueado en la aplicación (opcional). */
   userRole?: string;
 }
 
-/**
- * Pestaña Resumen/Vista General del panel de Administración del taller.
- * Presenta el saludo inicial personalizado, información básica del taller,
- * recuento de vehículos actualmente estacionados/reparándose en las instalaciones,
- * tamaño de la plantilla contratada, y horario con días de apertura.
- */
 export const OverviewTab: React.FC<OverviewTabProps> = ({ 
-
   workshopData, 
   diasSemana,
   employeeProfile,
   userRole
 }) => {
+  const { t } = useTranslation();
+
   const getRoleLabel = (role: string) => {
-    if (role === 'WORKSHOP_OWNER') return 'Dueño';
-    if (role === 'WORKSHOP_MANAGER') return 'Gerente';
-    if (role === 'WORKSHOP_STAFF') return 'Mecánico';
-    return role || 'Personal';
+    if (role === 'WORKSHOP_OWNER') return t('roles.owner');
+    if (role === 'WORKSHOP_MANAGER') return t('roles.manager');
+    if (role === 'WORKSHOP_STAFF') return t('roles.staff');
+    return role || t('roles.staff');
   };
 
-  const userName = employeeProfile ? `${employeeProfile.firstname} ${employeeProfile.lastname}` : 'Cargando...';
+  const userName = employeeProfile ? `${employeeProfile.firstname} ${employeeProfile.lastname}` : t('common.loading');
   const userRoleLabel = getRoleLabel(userRole || employeeProfile?.role || '');
 
   return (
@@ -59,11 +48,11 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
          <Card variant="neutral" glow={false} border={false} padding="lg" className="lg:col-span-1 relative overflow-hidden group !rounded-2xl">
             <div className="relative z-10 flex flex-col h-full justify-between">
                <div>
-                  <p className="text-[10px] uppercase font-black tracking-[0.2em] text-red-500 mb-2">Estado del Taller</p>
+                  <p className="text-[10px] uppercase font-black tracking-[0.2em] text-red-500 mb-2">{t('overviewTab.workshopStatus')}</p>
                   <p className="text-7xl font-black text-white tracking-tighter drop-shadow-xl">{workshopData?.vehiclesCurrentCount || 0}</p>
                </div>
                <div className="mt-8">
-                  <p className="text-sm font-black text-white tracking-widest uppercase">Vehículos en Taller</p>
+                  <p className="text-sm font-black text-white tracking-widest uppercase">{t('overviewTab.vehiclesInWorkshop')}</p>
                </div>
             </div>
          </Card>
@@ -77,7 +66,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                   </div>
                   <div>
                      <p className="text-5xl font-black text-white tracking-tighter">{workshopData?.totalEmployees || 0}</p>
-                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500 mt-2">Plantilla Registrada</p>
+                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500 mt-2">{t('overviewTab.registeredStaff')}</p>
                   </div>
                </Card>
 
@@ -88,9 +77,9 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                   </div>
                   <div>
                      <p className="text-3xl font-black text-white font-mono tracking-tight">
-                       {workshopData?.openTime?.slice(0,5) || '--'} <span className="text-neutral-600 font-sans text-sm mx-1">a</span> {workshopData?.closeTime?.slice(0,5) || '--'}
+                       {workshopData?.openTime?.slice(0,5) || '--'} <span className="text-neutral-600 font-sans text-sm mx-1">-</span> {workshopData?.closeTime?.slice(0,5) || '--'}
                      </p>
-                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500 mt-2">Horario Apertura</p>
+                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500 mt-2">{t('overviewTab.openingHours')}</p>
                   </div>
                </Card>
             </div>

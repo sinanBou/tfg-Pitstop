@@ -5,6 +5,7 @@ import { ImagePreviewModal } from '@/components/common/ImagePreviewModal/ImagePr
 import { Card } from '@/components/common/Card/Card';
 import { Button } from '@/components/common/Button/Button';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
+import { useTranslation } from '@/i18n';
 
 interface WorkshopManagementTabProps {
   workshops: any[];
@@ -17,6 +18,7 @@ const WorkshopIcon = () => (
 );
 
 export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorkshop }: WorkshopManagementTabProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewUrl, setPreviewUrl] = useState('');
@@ -44,14 +46,14 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-         <p className="text-neutral-500 text-sm font-medium">Gestión de sucursales activas</p>
+         <p className="text-neutral-500 text-sm font-medium">{t('ownerDashboard.activeBranchesManagement')}</p>
          <Button 
             variant="secondary"
             onClick={onAddWorkshop}
             className="!px-6 !py-3 bg-red-600/10 hover:bg-red-600 text-red-500 hover:text-white border border-red-500/30 font-black text-[10px] uppercase tracking-widest transition-all shadow-[0_0_20px_rgba(220,38,38,0.1)] hover:shadow-[0_0_30px_rgba(220,38,38,0.4)] flex items-center gap-2"
          >
             <Plus className="w-4 h-4" />
-            Nuevo Taller
+            {t('ownerDashboard.newWorkshopBtn')}
          </Button>
       </div>
 
@@ -113,7 +115,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
                      className="flex-1 !py-4 bg-neutral-800/50 border border-neutral-700/50 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-gradient-to-r hover:from-red-600 hover:to-red-500 hover:border-red-500 transition-all shadow-sm group/btn overflow-hidden"
                   >
                      <span className="flex items-center justify-center gap-2 relative z-10">
-                        Gestionar
+                        {t('ownerDashboard.manageWorkshopBtn')}
                         <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                      </span>
                   </Button>
@@ -125,7 +127,7 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
                         setConfirmDeleteName(workshop.companyName);
                      }}
                      className="p-4 bg-red-950/20 hover:bg-red-600 border border-red-900/40 hover:border-red-500 text-red-500 hover:text-white rounded-xl transition-all cursor-pointer flex items-center justify-center group/trash"
-                     title="Eliminar Taller"
+                     title={t('ownerDashboard.deleteWorkshopTitle')}
                   >
                      <Trash className="w-4 h-4 group-hover/trash:scale-110 transition-transform" />
                   </button>
@@ -151,10 +153,10 @@ export function WorkshopManagementTab({ workshops, onAddWorkshop, onDeleteWorksh
             setConfirmDeleteName('');
          }}
          onConfirm={handleDeleteConfirm}
-         title="¿Eliminar Taller?"
-         description={`¿Estás seguro de que deseas eliminar permanentemente el taller "${confirmDeleteName}"? Esta acción es irreversible, desasociará a todos los empleados e historiales y no se puede deshacer.`}
-         confirmText="Sí, Confirmar"
-         cancelText="Cancelar"
+         title={t('ownerDashboard.deleteWorkshopModalTitle')}
+         description={t('ownerDashboard.deleteWorkshopModalDesc', { name: confirmDeleteName })}
+         confirmText={t('ownerDashboard.confirmDeleteBtn')}
+         cancelText={t('common.cancel')}
          theme="red"
          isLoading={isDeleting}
       />

@@ -1,12 +1,15 @@
 import React from 'react';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { Building } from '@/assets/icons';
+import { useTranslation } from '@/i18n';
 
 interface WorkshopVehicleCardProps {
   vehicle: any;
 }
 
 export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicle }) => {
+  const { t } = useTranslation();
+
   const getProgressWidth = (status: string) => {
     switch (status) {
       case 'PENDING': return '10%';
@@ -20,11 +23,11 @@ export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicl
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'PENDING': return 'Pendiente';
-      case 'CONFIRMED': return 'Confirmado';
-      case 'IN_PROGRESS': return 'En Curso';
-      case 'DELAYED': return 'Retrasado';
-      case 'COMPLETED': return 'Listo para Recoger';
+      case 'PENDING': return t('status.pending');
+      case 'CONFIRMED': return t('status.confirmed');
+      case 'IN_PROGRESS': return t('status.inProgress');
+      case 'DELAYED': return t('status.delayed');
+      case 'COMPLETED': return t('status.readyForPickup');
       default: return status.replace('_', ' ');
     }
   };
@@ -105,7 +108,7 @@ export const WorkshopVehicleCard: React.FC<WorkshopVehicleCardProps> = ({ vehicl
         {/* Barra de Progreso */}
         <div className="mt-auto">
           <div className="flex justify-between items-center mb-1.5">
-            <span className="text-[8px] font-black uppercase tracking-widest text-neutral-500 font-bold">Progreso Reparación</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-neutral-500 font-bold">{t('workshopVehicleCard.repairProgress')}</span>
           </div>
           <div className="h-2 w-full bg-neutral-950 rounded-full overflow-hidden shadow-inner border border-neutral-800/50">
             <div 

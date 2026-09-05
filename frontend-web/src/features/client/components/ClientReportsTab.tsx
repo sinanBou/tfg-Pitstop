@@ -7,6 +7,7 @@ import { MetricCard } from '@/components/common/MetricCard/MetricCard';
 import { ProgressBar } from '@/components/common/ProgressBar/ProgressBar';
 import { printInvoicePDF } from '@/utils/InvoicePdfPrinter';
 import { useToast } from '@/hooks/useToast';
+import { useTranslation } from '@/i18n';
 
 
 interface ClientReportsTabProps {
@@ -26,22 +27,23 @@ interface ClientKpisGridProps {
 }
 
 function ClientKpisGrid({ totalSpent, totalAppointments, totalVehicles, avgCost }: ClientKpisGridProps) {
+  const { t } = useTranslation();
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
       <MetricCard 
-        label="Gasto Acumulado" 
+        label={t('clientReports.accumulatedSpent')} 
         value={`${totalSpent.toFixed(2)}€`} 
       />
       <MetricCard 
-        label="Citas Totales" 
+        label={t('clientReports.totalAppointments')} 
         value={totalAppointments} 
       />
       <MetricCard 
-        label="Mi Flota" 
-        value={`${totalVehicles} ${totalVehicles === 1 ? 'Vehículo' : 'Vehículos'}`} 
+        label={t('clientReports.myFleet')} 
+        value={`${totalVehicles} ${totalVehicles === 1 ? t('common.vehicle') : t('clientDashboard.activeVehicles')}`} 
       />
       <MetricCard 
-        label="Precio Medio" 
+        label={t('clientReports.avgPrice')} 
         value={`${avgCost.toFixed(2)}€`} 
       />
     </div>
@@ -56,17 +58,18 @@ interface VehicleSpendAnalysisProps {
 }
 
 function VehicleSpendAnalysis({ statsByVehicle }: VehicleSpendAnalysisProps) {
+  const { t } = useTranslation();
   return (
     <div className="bg-neutral-950 border border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6">
       <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
         <h3 className="text-xs font-black uppercase tracking-widest text-neutral-200">
-          Gastos por Vehículo
+          {t('clientReports.expensesByVehicle')}
         </h3>
-        <span className="text-[10px] text-neutral-500 font-mono">Inversión detallada</span>
+        <span className="text-[10px] text-neutral-500 font-mono">{t('clientReports.detailedInvestment')}</span>
       </div>
 
       {statsByVehicle.length === 0 ? (
-        <p className="text-xs text-neutral-500 italic py-6 text-center">Registra vehículos para ver su desglose.</p>
+        <p className="text-xs text-neutral-500 italic py-6 text-center">{t('clientReports.noVehiclesRegistered')}</p>
       ) : (
         <div className="space-y-5">
           {statsByVehicle.map((v, idx) => {
@@ -78,7 +81,7 @@ function VehicleSpendAnalysis({ statsByVehicle }: VehicleSpendAnalysisProps) {
                 key={idx}
                 label={`${v.brand} ${v.model}`}
                 sublabel={v.licensePlate}
-                valueText={`${v.spent.toFixed(2)}€ (${v.count} ${v.count === 1 ? 'reparación' : 'reparaciones'})`}
+                valueText={`${v.spent.toFixed(2)}€ (${v.count})`}
                 percentage={percent}
               />
             );
@@ -101,20 +104,21 @@ interface RecentInvoicesListProps {
 }
 
 function RecentInvoicesList({ invoices, downloadingId, onDownload, translateServiceCodes, formatToDDMMYYYY }: RecentInvoicesListProps) {
+  const { t } = useTranslation();
   return (
     <div className="bg-neutral-950 border border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6">
       <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
         <div>
           <h3 className="text-xs font-black uppercase tracking-widest text-neutral-200">
-            Últimas Facturas Emitidas
+            {t('clientReports.latestInvoices')}
           </h3>
-          <p className="text-[10px] text-neutral-500 mt-1">Impresión rápida y descarga de facturas en PDF oficial.</p>
+          <p className="text-[10px] text-neutral-500 mt-1">{t('clientReports.quickPrintSub')}</p>
         </div>
-        <span className="text-[10px] text-neutral-500 font-mono">Máx. 5 registros</span>
+        <span className="text-[10px] text-neutral-500 font-mono">{t('clientReports.maxRecords')}</span>
       </div>
 
       {invoices.length === 0 ? (
-        <p className="text-xs text-neutral-500 italic py-6 text-center">No hay facturas procesadas aún en este período.</p>
+        <p className="text-xs text-neutral-500 italic py-6 text-center">{t('clientReports.noInvoicesPeriod')}</p>
       ) : (
         <div className="space-y-3">
           {invoices.map((inv, idx) => (
@@ -162,6 +166,7 @@ function RecentInvoicesList({ invoices, downloadingId, onDownload, translateServ
  * ── COMPONENTE PRINCIPAL: CLIENT REPORTS TAB ──
  */
 export function ClientReportsTab({ history = [], vehicles = [], appointments = [] }: ClientReportsTabProps) {
+  const { t } = useTranslation();
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
@@ -302,8 +307,8 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
       {/* Cabecera y Selector de Mes */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-900 pb-4">
         <div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500">Panel del Cliente</span>
-          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">Analíticas de Flota y Gastos</h2>
+          <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500">{t('clientReports.subtitle')}</span>
+          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">{t('clientReports.title')}</h2>
         </div>
         <MonthSelector selectedMonth={selectedMonth} onChange={setSelectedMonth} />
       </div>
