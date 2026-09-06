@@ -44,7 +44,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
   const { t } = useTranslation();
 
   return (
-    <form onSubmit={onSubmit} className="p-5 bg-neutral-950 border border-neutral-800/40 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-300">
+    <form onSubmit={onSubmit} className="p-5 bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800/40 rounded-2xl space-y-4 animate-in slide-in-from-top-2 duration-300">
       <p className="text-xs font-black text-red-500 uppercase tracking-widest">{title}</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -56,11 +56,11 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
           placeholder={t('tasksTab.taskNamePlaceholder')}
         />
         <div className="flex flex-col gap-1">
-          <label className="text-[10px] text-neutral-400 font-extrabold uppercase tracking-widest ml-1 mb-0.5">{t('tasksTab.calcTypeFixed')}</label>
+          <label className="text-[10px] text-slate-600 dark:text-neutral-400 font-extrabold uppercase tracking-widest ml-1 mb-0.5">{t('tasksTab.calcTypeFixed')}</label>
           <select
             value={calcType}
             onChange={e => setCalcType(e.target.value as any)}
-            className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:border-red-500/50 transition-all font-semibold cursor-pointer"
+            className="bg-white dark:bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-xl px-4 py-3 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-red-500/50 transition-all font-semibold cursor-pointer"
           >
             <option value="fixed">{t('tasksTab.calcTypeFixed')}</option>
             <option value="cylinder">{t('tasksTab.calcTypeCylinder')}</option>
@@ -69,7 +69,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
         </div>
       </div>
 
-      <div className="p-4 bg-neutral-900/40 border border-neutral-800/30 rounded-xl">
+      <div className="p-4 bg-slate-100/70 dark:bg-neutral-900/40 border border-slate-200 dark:border-neutral-800/30 rounded-xl">
         {calcType === 'fixed' && (
           <div className="max-w-[200px]">
             <InputField
@@ -124,7 +124,7 @@ export const TaskFormInline: React.FC<TaskFormInlineProps> = ({
         <button
           type="button"
           onClick={onCancel}
-          className="px-4 py-3 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-neutral-400 transition-all cursor-pointer"
+          className="px-4 py-3 rounded-xl border border-slate-300 hover:border-slate-400 dark:border-neutral-800 dark:hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-neutral-400 transition-all cursor-pointer"
         >
           {t('common.cancel')}
         </button>

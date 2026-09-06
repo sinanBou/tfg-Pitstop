@@ -32,7 +32,7 @@ export default function AddressAutocomplete({ label, value, onChange, error, pla
 
   return (
     <div className="w-full relative group z-50" ref={containerRef}>
-      <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 block mb-1.5">
+      <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-1 block mb-1.5">
         {label}
       </label>
       <div className="flex gap-3">

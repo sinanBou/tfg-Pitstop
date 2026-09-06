@@ -49,7 +49,11 @@ import {
   ChevronsDown,
   Archive,
   Download,
-  Camera
+  Camera,
+  GripVertical,
+  Maximize2,
+  Minimize2,
+  LayoutDashboard
 } from 'lucide-react';
 
 export {
@@ -104,5 +108,9 @@ export {
   ChevronsDown,
   Archive,
   Download,
-  Camera
+  Camera,
+  GripVertical,
+  Maximize2,
+  Minimize2,
+  LayoutDashboard
 };

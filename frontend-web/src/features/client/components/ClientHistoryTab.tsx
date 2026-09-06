@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import { API_BASE_URL } from '@/config/api';
 import { Card } from '@/components/common/Card/Card';
-import { Button } from '@/components/common/Button/Button';
 import { printInvoicePDF as importPrintInvoicePDF } from '@/utils/InvoicePdfPrinter';
 import { useToast } from '@/hooks/useToast';
-import { Calendar, Check, FileText, X } from '@/assets/icons';
+import { getBrandLogo } from '@/assets/BrandLogos';
+import { Calendar, Check, FileText, X, Clock, Wrench } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
-
 
 interface NotificationItem {
   id: string;
@@ -26,6 +25,7 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
   const { t } = useTranslation();
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [catalogMap, setCatalogMap] = useState<Map<string, string>>(new Map());
+  const [activeSubTab, setActiveSubTab] = useState<'jobs' | 'notifications'>('jobs');
   const toast = useToast();
 
   useEffect(() => {
@@ -67,8 +67,24 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
     return translated.join(', ');
   };
 
+  const completedJobs = useMemo(() => {
+    const all = [...(appointments || []), ...(history || [])];
+    const seen = new Set<string>();
+    const unique = all.filter(app => {
+      if (!app?.id || seen.has(app.id)) return false;
+      seen.add(app.id);
+      return true;
+    });
 
-  // Generar notificaciones dinámicas en base a citas y facturas
+    return unique
+      .filter(app => ['COMPLETED', 'PICKED_UP'].includes(app.status))
+      .sort((a, b) => {
+        const dateA = new Date(a.actualEndTime || a.dateTime || a.date || 0).getTime();
+        const dateB = new Date(b.actualEndTime || b.dateTime || b.date || 0).getTime();
+        return dateB - dateA;
+      });
+  }, [appointments, history]);
+
   const notifications = useMemo(() => {
     const list: NotificationItem[] = [];
     const all = [...(appointments || []), ...(history || [])];
@@ -85,81 +101,29 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
       const appDate = app.dateTime ? new Date(app.dateTime) : null;
       if (!appDate) return;
 
-      // 0. Cita Cancelada/Rechazada
       if (app.status === 'CANCELLED') {
-        const cancelDate = app.actualEndTime 
-          ? new Date(app.actualEndTime) 
-          : app.confirmedAt 
-            ? new Date(app.confirmedAt) 
-            : new Date(appDate.getTime());
-
-        list.push({
-          id: `${app.id}-cancel`,
-          type: 'cancel',
-          title: t('clientHistory.notifCancelledTitle'),
-          message: `${t('clientHistory.notifCancelledMsg')} (${vehicleDisplay})`,
-          dateTime: cancelDate,
-          appointmentId: app.id
-        });
+        const cancelDate = app.actualEndTime ? new Date(app.actualEndTime) : app.confirmedAt ? new Date(app.confirmedAt) : new Date(appDate.getTime());
+        list.push({ id: `${app.id}-cancel`, type: 'cancel', title: t('clientHistory.notifCancelledTitle'), message: `${t('clientHistory.notifCancelledMsg')} (${vehicleDisplay})`, dateTime: cancelDate, appointmentId: app.id });
       }
 
-      // 1. Cita Confirmada (siempre que esté en CONFIRMED, IN_PROGRESS, COMPLETED, PICKED_UP)
       if (['CONFIRMED', 'IN_PROGRESS', 'COMPLETED', 'PICKED_UP'].includes(app.status)) {
-        // Usar la fecha de confirmación real guardada en la base de datos si existe, de lo contrario estimar 24h antes
-        const confirmDate = app.confirmedAt 
-          ? new Date(app.confirmedAt) 
-          : new Date(appDate.getTime() - 24 * 3600 * 1000);
-
-        list.push({
-          id: `${app.id}-confirm`,
-          type: 'confirm',
-          title: t('clientHistory.notifConfirmedTitle'),
-          message: `${t('clientHistory.notifConfirmedMsg')} (${vehicleDisplay})`,
-          dateTime: confirmDate,
-          appointmentId: app.id
-        });
+        const confirmDate = app.confirmedAt ? new Date(app.confirmedAt) : new Date(appDate.getTime() - 24 * 3600 * 1000);
+        list.push({ id: `${app.id}-confirm`, type: 'confirm', title: t('clientHistory.notifConfirmedTitle'), message: `${t('clientHistory.notifConfirmedMsg')} (${vehicleDisplay})`, dateTime: confirmDate, appointmentId: app.id });
       }
 
-      // 2. Trabajo Finalizado (si está COMPLETED, PICKED_UP)
       if (['COMPLETED', 'PICKED_UP'].includes(app.status)) {
-        // Usamos el fin real registrado en el backend, o estimamos 2 horas después de la cita programada
-        const completeDate = app.actualEndTime 
-          ? new Date(app.actualEndTime) 
-          : new Date(appDate.getTime() + 2 * 3600 * 1000);
+        const completeDate = app.actualEndTime ? new Date(app.actualEndTime) : new Date(appDate.getTime() + 2 * 3600 * 1000);
+        list.push({ id: `${app.id}-complete`, type: 'complete', title: t('clientHistory.notifCompletedTitle'), message: `${t('clientHistory.notifCompletedMsg')} (${vehicleDisplay})`, dateTime: completeDate, appointmentId: app.id });
 
-        list.push({
-          id: `${app.id}-complete`,
-          type: 'complete',
-          title: t('clientHistory.notifCompletedTitle'),
-          message: `${t('clientHistory.notifCompletedMsg')} (${vehicleDisplay})`,
-          dateTime: completeDate,
-          appointmentId: app.id
-        });
-      }
-
-      // 3. Factura Generada (si está COMPLETED, PICKED_UP)
-      if (['COMPLETED', 'PICKED_UP'].includes(app.status)) {
-        // Usamos el fin real + 1 minuto, o estimamos 2 horas + 1 minuto después de la cita programada
-        const invoiceDate = app.actualEndTime
-          ? new Date(new Date(app.actualEndTime).getTime() + 60 * 1000)
-          : new Date(appDate.getTime() + 2 * 3600 * 1000 + 60 * 1000);
-
-        list.push({
-          id: `${app.id}-invoice`,
-          type: 'invoice',
-          title: t('clientHistory.notifInvoiceTitle'),
-          message: `${t('clientHistory.notifInvoiceMsg')} (${vehicleDisplay})`,
-          dateTime: invoiceDate,
-          appointmentId: app.id
-        });
+        const invoiceDate = app.actualEndTime ? new Date(new Date(app.actualEndTime).getTime() + 60 * 1000) : new Date(appDate.getTime() + 2 * 3600 * 1000 + 60 * 1000);
+        list.push({ id: `${app.id}-invoice`, type: 'invoice', title: t('clientHistory.notifInvoiceTitle'), message: `${t('clientHistory.notifInvoiceMsg')} (${vehicleDisplay})`, dateTime: invoiceDate, appointmentId: app.id });
       }
     });
 
-    // Ordenar notificaciones por fecha de más reciente a más antigua y por prioridad si la hora coincide
     return list.sort((a, b) => {
       const diff = b.dateTime.getTime() - a.dateTime.getTime();
       if (diff !== 0) return diff;
-      const weights = { invoice: 3, complete: 2, confirm: 1, cancel: 0 };
+      const weights: Record<string, number> = { invoice: 3, complete: 2, confirm: 1, cancel: 0 };
       return weights[b.type] - weights[a.type];
     });
   }, [appointments, history, t]);
@@ -167,287 +131,6 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
   const printInvoicePDF = (inv: any, translated?: string) => {
     importPrintInvoicePDF(inv, translated, (msg) => toast.warning(msg));
   };
-  /*
-  const old_printInvoicePDF = (inv: Invoice) => {
-    const parsedParts: PartItem[] = JSON.parse(inv.partsJson || '[]');
-    const dateObj = new Date(inv.createdAt);
-    const formattedDate = dateObj.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) {
-      alert('Por favor, permite las ventanas emergentes para descargar la factura.');
-      return;
-    }
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Factura - ${inv.vehicleDisplay}</title>
-        <meta charset="utf-8" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
-        <style>
-          body {
-            font-family: 'Inter', sans-serif;
-            margin: 0;
-            padding: 40px;
-            color: #171717;
-            background-color: #ffffff;
-            font-size: 13px;
-            line-height: 1.5;
-          }
-          header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #f3f4f6;
-            padding-bottom: 30px;
-            margin-bottom: 30px;
-          }
-          .logo-area h1 {
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: -1px;
-            margin: 0;
-            color: #3b82f6;
-          }
-          .logo-area p {
-            margin: 4px 0 0 0;
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: #737373;
-          }
-          .meta-area {
-            text-align: right;
-          }
-          .meta-area h2 {
-            font-size: 16px;
-            font-weight: 900;
-            margin: 0 0 8px 0;
-            text-transform: uppercase;
-            color: #171717;
-          }
-          .meta-area p {
-            margin: 2px 0;
-            font-size: 12px;
-            color: #525252;
-          }
-          .grid-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            margin-bottom: 40px;
-          }
-          .card-details {
-            background-color: #fafafa;
-            border: 1px solid #f3f4f6;
-            border-radius: 16px;
-            padding: 20px;
-          }
-          .card-details h3 {
-            font-size: 11px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #737373;
-            margin: 0 0 12px 0;
-          }
-          .card-details p {
-            margin: 6px 0;
-            font-size: 13px;
-          }
-          .card-details span {
-            font-weight: 700;
-            color: #171717;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-          }
-          th {
-            background-color: #f9fafb;
-            text-transform: uppercase;
-            font-size: 10px;
-            font-weight: 900;
-            letter-spacing: 1px;
-            color: #737373;
-            text-align: left;
-            padding: 12px 16px;
-            border-bottom: 2px solid #e5e7eb;
-          }
-          td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #f3f4f6;
-            color: #404040;
-          }
-          .text-right {
-            text-align: right;
-          }
-          .table-title {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #404040;
-            margin-bottom: 12px;
-            margin-top: 30px;
-          }
-          .totals-section {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 40px;
-          }
-          .totals-box {
-            width: 300px;
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 20px;
-            box-sizing: border-box;
-          }
-          .totals-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            font-size: 12px;
-            color: #525252;
-          }
-          .totals-row.final {
-            margin-top: 14px;
-            border-top: 2px solid #e5e7eb;
-            padding-top: 14px;
-            font-size: 16px;
-            font-weight: 900;
-            color: #3b82f6;
-          }
-          footer {
-            margin-top: 60px;
-            text-align: center;
-            border-top: 1px solid #f3f4f6;
-            padding-top: 30px;
-            color: #a3a3a3;
-            font-size: 11px;
-          }
-          @media print {
-            body {
-              padding: 0;
-            }
-            .no-print {
-              display: none;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <header>
-          <div class="logo-area">
-            <h1>PITSTOP</h1>
-            <p>Soporte de Taller Inteligente</p>
-          </div>
-          <div class="meta-area">
-            <h2>Factura Simplificada</h2>
-            <p><strong>Nº Factura:</strong> PS-${inv.id.substring(0, 8).toUpperCase()}</p>
-            <p><strong>Fecha de Emisión:</strong> ${formattedDate}</p>
-          </div>
-        </header>
-
-        <div class="grid-details">
-          <div class="card-details">
-            <h3>Datos del Cliente</h3>
-            <p><span>Nombre:</span> ${inv.clientFullName}</p>
-            <p><span>Servicio contratado:</span> ${inv.description}</p>
-          </div>
-          <div class="card-details">
-            <h3>Datos del Vehículo</h3>
-            <p><span>Vehículo:</span> ${inv.vehicleDisplay}</p>
-            <p><span>Tarifa aplicada:</span> ${inv.laborRate.toFixed(2)}€ / hora</p>
-          </div>
-        </div>
-
-        <div class="table-title">Desglose de Mano de Obra</div>
-        <table>
-          <thead>
-            <tr>
-              <th>Concepto / Tarea</th>
-              <th class="text-right">Horas de Trabajo</th>
-              <th class="text-right">Importe</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Mano de obra especializada del servicio (${inv.serviceType || 'Base'})</td>
-              <td class="text-right">${(inv.totalLabor / inv.laborRate).toFixed(2)} h</td>
-              <td class="text-right">${inv.totalLabor.toFixed(2)} €</td>
-            </tr>
-          </tbody>
-        </table>
-
-        ${parsedParts.length > 0 ? `
-          <div class="table-title">Materiales y Repuestos Utilizados</div>
-          <table>
-            <thead>
-              <tr>
-                <th>Pieza / Repuesto</th>
-                <th class="text-right">Cantidad</th>
-                <th class="text-right">Precio Unitario</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${parsedParts.map(p => `
-                <tr>
-                  <td>${p.name}</td>
-                  <td class="text-right">1</td>
-                  <td class="text-right">${p.price.toFixed(2)} €</td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        ` : ''}
-
-        <div class="totals-section">
-          <div class="totals-box">
-            <div class="totals-row">
-              <span>Mano de Obra</span>
-              <span>${inv.totalLabor.toFixed(2)} €</span>
-            </div>
-            <div class="totals-row">
-              <span>Repuestos y Materiales</span>
-              <span>${inv.totalParts.toFixed(2)} €</span>
-            </div>
-            <div class="totals-row final">
-              <span>Total a Pagar</span>
-              <span>${inv.totalPrice.toFixed(2)} €</span>
-            </div>
-          </div>
-        </div>
-
-        <footer>
-          <p>Gracias por confiar en Pitstop. Este documento sirve como justificante de liquidación y pago.</p>
-          <p>© ${new Date().getFullYear()} PitStop S.L. - Todos los derechos reservados.</p>
-        </footer>
-
-        <script>
-          window.onload = function() {
-            window.print();
-            setTimeout(function() { window.close(); }, 500);
-          }
-        </script>
-      </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-  };
-  */
 
   const handleDownloadInvoice = async (appointmentId: string) => {
     setDownloadingId(appointmentId);
@@ -456,121 +139,108 @@ export function ClientHistoryTab({ history, appointments }: ClientHistoryTabProp
       const res = await fetch(`${API_BASE_URL}/invoices/appointment/${appointmentId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      if (!res.ok) throw new Error('No se pudo encontrar la factura de este trabajo.');
+      if (!res.ok) throw new Error('No se pudo encontrar la factura.');
       const inv = await res.json();
       const translated = translateServiceCodes(inv.serviceType || inv.description, inv.description);
       printInvoicePDF(inv, translated);
     } catch (err: any) {
-      toast.error(err.message || 'Error al descargar la factura.');
+      toast.error(err.message || 'Error al descargar.');
     } finally {
       setDownloadingId(null);
     }
   };
 
   return (
-    <div className="space-y-12">
-      {/* ── NOTIFICACIONES DE ESTADO ── */}
-      <div className="space-y-4">
+    <div className="space-y-6 animate-fade-in-up">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white/90 dark:bg-neutral-900/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-slate-200/80 dark:border-neutral-800/80 shadow-sm">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-          <h3 className="text-[11px] font-black uppercase tracking-widest text-neutral-400">
-            {t('clientHistory.activityNotifs')}
-          </h3>
+          <button onClick={() => setActiveSubTab('jobs')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${activeSubTab === 'jobs' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>
+            <Wrench className="w-3.5 h-3.5" />
+            <span>Trabajos Realizados</span>
+            <span className={`px-1.5 py-0.2 rounded-md text-[9px] font-mono font-black ${activeSubTab === 'jobs' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-neutral-700'}`}>{completedJobs.length}</span>
+          </button>
+          <button onClick={() => setActiveSubTab('notifications')} className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 ${activeSubTab === 'notifications' ? 'bg-blue-600 text-white shadow-md shadow-blue-600/20' : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700'}`}>
+            <Clock className="w-3.5 h-3.5" />
+            <span>{t('clientHistory.activityNotifs')}</span>
+            <span className={`px-1.5 py-0.2 rounded-md text-[9px] font-mono font-black ${activeSubTab === 'notifications' ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-neutral-700'}`}>{notifications.length}</span>
+          </button>
         </div>
+      </div>
 
-        {notifications.length === 0 ? (
-          <Card variant="neutral" padding="none" rounded="2xl" className="p-6 bg-neutral-900/10 text-center text-neutral-600 text-xs py-10">
-            {t('clientHistory.noNotifs')}
-          </Card>
-        ) : (
-          <div className="space-y-3">
-            {notifications.map(notif => {
-              const formattedTime = notif.dateTime.toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-              });
-
-              // Determinar icono y colores premium según tipo de notificación
-              let borderClass = 'border-neutral-800 bg-neutral-900/20';
-              let badgeColor = 'bg-blue-600/10 border-blue-500/20 text-blue-400';
-              let icon = (
-                <Calendar className="w-4 h-4 text-blue-400" />
-              );
-
-              if (notif.type === 'complete') {
-                borderClass = 'border-green-500/10 bg-green-500/5';
-                badgeColor = 'bg-green-600/10 border-green-500/20 text-green-400';
-                icon = (
-                  <Check className="w-4 h-4 text-green-400" />
-                );
-              } else if (notif.type === 'invoice') {
-                borderClass = 'border-emerald-500/10 bg-emerald-500/5';
-                badgeColor = 'bg-emerald-600/10 border-emerald-500/20 text-emerald-400';
-                icon = (
-                  <FileText className="w-4 h-4 text-emerald-400" />
-                );
-              } else if (notif.type === 'cancel') {
-                borderClass = 'border-red-500/10 bg-red-500/5';
-                badgeColor = 'bg-red-600/10 border-red-500/20 text-red-400';
-                icon = (
-                  <X className="w-4 h-4 text-red-400" />
-                );
-              }
-
-              return (
-                <div
-                  key={notif.id}
-                  className={`border rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300 ${borderClass}`}
-                >
-                  <div className="flex items-start gap-4">
-                    {/* Icon Circle */}
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${badgeColor}`}>
-                      {icon}
-                    </div>
-
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-black uppercase tracking-wider text-white">
-                          {notif.title}
-                        </span>
-                        <span className="text-[10px] font-mono text-neutral-500">
-                          {formattedTime}
-                        </span>
+      {activeSubTab === 'jobs' && (
+        <div className="space-y-4">
+          {completedJobs.length === 0 ? (
+            <Card variant="neutral" padding="none" rounded="2xl" className="p-12 text-center flex flex-col items-center">
+              <Wrench className="w-6 h-6 mb-3 text-slate-400" />
+              <p className="text-slate-700 dark:text-neutral-300 font-black uppercase tracking-widest text-xs">Sin intervenciones aún</p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {completedJobs.map(job => {
+                const formattedDate = new Date(job.actualEndTime || job.dateTime || job.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+                return (
+                  <div key={job.id} className="p-5 rounded-2xl bg-white/95 dark:bg-neutral-900/90 border border-slate-200/80 dark:border-neutral-800/80 shadow-sm hover:border-blue-500/30 transition-all flex flex-col justify-between gap-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center shrink-0 text-blue-600 dark:text-blue-400 [&_svg]:w-6 [&_svg]:h-6 [&_div]:w-6 [&_div]:h-6 [&_div]:text-[10px]">
+                          {getBrandLogo((job.vehicleDisplay || job.vehiclePlate || '').split(' ')[0])}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-black text-slate-900 dark:text-white leading-tight">{job.vehicleDisplay || job.vehiclePlate || t('common.vehicle')}</h4>
+                          <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">{job.workshopName}</span>
+                        </div>
                       </div>
-                      <p className="text-xs text-neutral-400 leading-relaxed font-medium">
-                        {notif.message}
-                      </p>
+                      <span className="px-2.5 py-1 rounded-lg bg-green-500/10 border border-green-500/20 text-green-700 dark:text-green-400 text-[9px] font-black uppercase tracking-wider shrink-0">
+                        ✓ {job.status === 'PICKED_UP' ? 'Entregado' : 'Finalizado'}
+                      </span>
+                    </div>
+                    <div className="p-3 bg-slate-50/80 dark:bg-neutral-950/50 rounded-xl border border-slate-200/60 dark:border-white/5">
+                      <p className="text-xs font-bold text-slate-800 dark:text-neutral-200">{translateServiceCodes(job.serviceType || job.description, job.description)}</p>
+                      <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 block mt-0.5">Fecha: {formattedDate}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-sm font-black font-mono text-slate-900 dark:text-white">{Number(job.totalPrice || 0).toFixed(2)}€</span>
+                      <button onClick={() => handleDownloadInvoice(job.id)} disabled={downloadingId === job.id} className="ml-auto px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-sm transition-all cursor-pointer disabled:opacity-50">
+                        {downloadingId === job.id ? <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><FileText className="w-3.5 h-3.5" /> PDF</>}
+                      </button>
                     </div>
                   </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
-                  {/* Factura Download Button */}
+      {activeSubTab === 'notifications' && (
+        <div className="space-y-3">
+          {notifications.length === 0 ? (
+            <Card variant="neutral" padding="none" rounded="2xl" className="p-10 text-center text-xs text-slate-500 dark:text-neutral-400">{t('clientHistory.noNotifs')}</Card>
+          ) : (
+            notifications.map(notif => {
+              const formattedTime = notif.dateTime.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+              let icon = <Calendar className="w-4 h-4" />;
+              if (notif.type === 'complete') icon = <Check className="w-4 h-4" />;
+              else if (notif.type === 'invoice') icon = <FileText className="w-4 h-4" />;
+              else if (notif.type === 'cancel') icon = <X className="w-4 h-4" />;
+              return (
+                <div key={notif.id} className="border border-slate-200/80 dark:border-neutral-800/80 rounded-2xl p-4 flex items-center justify-between gap-4 bg-white/95 dark:bg-neutral-900/90 shadow-sm">
+                  <div className="flex items-start gap-3.5">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center border border-blue-500/20 bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400 shrink-0">{icon}</div>
+                    <div>
+                      <div className="flex items-center gap-2"><span className="text-xs font-black uppercase text-slate-900 dark:text-white">{notif.title}</span><span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">{formattedTime}</span></div>
+                      <p className="text-xs text-slate-600 dark:text-neutral-400 mt-0.5">{notif.message}</p>
+                    </div>
+                  </div>
                   {notif.type === 'invoice' && (
-                    <Button
-                      onClick={() => handleDownloadInvoice(notif.appointmentId)}
-                      disabled={downloadingId === notif.appointmentId}
-                      glow={false}
-                      className="!px-4 !py-2 !text-[9px] !rounded-xl bg-emerald-600 hover:bg-emerald-500 hover:border-transparent text-white shrink-0"
-                    >
-                      {downloadingId === notif.appointmentId ? (
-                        <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <>
-                          <FileText className="w-3 h-3" />
-                          {t('clientHistory.downloadPDF')}
-                        </>
-                      )}
-                    </Button>
+                    <button onClick={() => handleDownloadInvoice(notif.appointmentId)} className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black uppercase cursor-pointer transition-all shadow-sm">PDF</button>
                   )}
                 </div>
               );
-            })}
-          </div>
-        )}
-      </div>
+            })
+          )}
+        </div>
+      )}
     </div>
   );
 }

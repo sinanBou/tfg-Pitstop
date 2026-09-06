@@ -42,15 +42,15 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
   return (
     <div className="space-y-6 flex flex-col">
       {/* Resumen Vehículo */}
-      <div className="p-4 bg-red-600/10 border border-red-600/20 rounded-2xl flex items-center gap-4 shrink-0">
+      <div className="p-4 bg-red-50 dark:bg-red-600/10 border border-red-200 dark:border-red-600/20 rounded-2xl flex items-center gap-4 shrink-0">
         <div className="shrink-0 w-10 h-10 bg-red-600 text-white rounded-xl flex items-center justify-center font-black">
           {selectedVehicle?.licensePlate.charAt(0)}
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-black text-red-500 uppercase tracking-widest leading-none mb-1">Vehículo Confirmado</p>
-          <p className="text-white font-black uppercase text-sm">{selectedVehicle?.brand} {selectedVehicle?.model} • {selectedVehicle?.licensePlate}</p>
+          <p className="text-[10px] font-black text-red-600 dark:text-red-500 uppercase tracking-widest leading-none mb-1">Vehículo Confirmado</p>
+          <p className="text-slate-900 dark:text-white font-black uppercase text-sm">{selectedVehicle?.brand} {selectedVehicle?.model} • {selectedVehicle?.licensePlate}</p>
         </div>
-        <button onClick={onPrev} className="text-neutral-500 hover:text-white transition-colors">
+        <button onClick={onPrev} className="text-slate-400 hover:text-slate-700 dark:text-neutral-500 dark:hover:text-white transition-colors">
            <Edit className="w-5 h-5" />
         </button>
       </div>
@@ -58,16 +58,16 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
       {/* Grid Lateral: Calendario Izquierda, Detalles Derecha */}
       <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-0">
         {/* CALENDARIO (Izquierda) */}
-        <div className="w-full md:w-[420px] bg-neutral-900/50 border border-neutral-800 p-5 rounded-3xl shrink-0">
+        <div className="w-full md:w-[420px] bg-slate-100 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800 p-5 rounded-3xl shrink-0">
           <div className="flex items-center justify-between mb-4 px-1">
-            <h3 className="text-xs font-black uppercase tracking-widest text-white italic">
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-white italic">
               {monthNames[month]} <span className="text-red-600">{year}</span>
             </h3>
             <div className="flex gap-2">
-              <button onClick={prevMonth} className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white border border-transparent hover:border-neutral-700">
+              <button onClick={prevMonth} className="p-1.5 hover:bg-slate-200/60 dark:hover:bg-neutral-800 rounded-lg transition-colors text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white border border-transparent hover:border-slate-300 dark:hover:border-neutral-700">
                 <ChevronLeft className="w-3.5 h-3.5" strokeWidth={2.5} />
               </button>
-              <button onClick={nextMonth} className="p-1.5 hover:bg-neutral-800 rounded-lg transition-colors text-neutral-400 hover:text-white border border-transparent hover:border-neutral-700">
+              <button onClick={nextMonth} className="p-1.5 hover:bg-slate-200/60 dark:hover:bg-neutral-800 rounded-lg transition-colors text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white border border-transparent hover:border-slate-300 dark:hover:border-neutral-700">
                 <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
               </button>
             </div>
@@ -75,7 +75,7 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
 
           <div className="grid grid-cols-7 gap-1 mb-1">
             {daysOfWeek.map(d => (
-              <div key={d} className="text-center text-[9px] font-black text-neutral-500 py-1">{d}</div>
+              <div key={d} className="text-center text-[9px] font-black text-slate-400 dark:text-neutral-500 py-1">{d}</div>
             ))}
           </div>
 
@@ -114,9 +114,9 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
                   }}
                   className={`
                     aspect-square rounded-lg text-xs font-bold transition-all flex flex-col items-center justify-center relative group
-                    ${(isPast || isClosed) ? 'text-neutral-700 opacity-20 cursor-not-allowed' : 
+                    ${(isPast || isClosed) ? 'text-slate-300 dark:text-neutral-700 opacity-30 cursor-not-allowed' : 
                       isSelected ? 'bg-red-600 text-white shadow-[0_0_10px_rgba(220,38,38,0.4)]' : 
-                      'bg-neutral-800/40 border border-neutral-800 text-neutral-400 hover:border-red-500/50 hover:text-white'}
+                      'bg-white dark:bg-neutral-800/40 border border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-400 hover:border-red-500/50 hover:text-red-600 dark:hover:text-white'}
                   `}
                 >
                   {day}
@@ -133,25 +133,25 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
         <div className="flex-1 w-full space-y-4">
           {/* Duración Estimada */}
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 ml-1 italic">Duración Estimada</label>
-            <div className="flex items-center gap-4 bg-black/40 border border-neutral-800 p-3 rounded-xl">
+            <label className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-neutral-500 ml-1 italic">Duración Estimada</label>
+            <div className="flex items-center gap-4 bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-3 rounded-xl">
               <input 
                 type="range" min="15" max="240" step="15"
                 className="flex-1 accent-red-600"
                 value={appointmentForm.estimatedDuration}
                 onChange={e => setAppointmentForm({...appointmentForm, estimatedDuration: parseInt(e.target.value)})}
               />
-              <span className="text-white font-mono text-xs w-14 text-right">{appointmentForm.estimatedDuration}m</span>
+              <span className="text-slate-900 dark:text-white font-mono text-xs w-14 text-right">{appointmentForm.estimatedDuration}m</span>
             </div>
           </div>
 
           {/* Horas Disponibles */}
           <div className="space-y-2">
-            <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block ml-1 italic">Horas Disponibles</label>
+            <label className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-neutral-500 block ml-1 italic">Horas Disponibles</label>
             {!appointmentForm.date ? (
-              <div className="text-center py-4 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl flex flex-col items-center justify-center p-4">
-                <Calendar className="w-5 h-5 text-neutral-600 mb-1" />
-                <p className="text-[9px] text-neutral-600 font-bold uppercase tracking-wider">Selecciona un día en el calendario</p>
+              <div className="text-center py-4 bg-slate-100 dark:bg-neutral-900/10 border border-slate-200 dark:border-neutral-800/60 rounded-2xl flex flex-col items-center justify-center p-4">
+                <Calendar className="w-5 h-5 text-slate-400 dark:text-neutral-600 mb-1" />
+                <p className="text-[9px] text-slate-400 dark:text-neutral-600 font-bold uppercase tracking-wider">Selecciona un día en el calendario</p>
               </div>
             ) : (
               <div className="grid grid-cols-3 gap-2">
@@ -164,14 +164,14 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
                       className={`py-2 rounded-lg text-xs font-bold font-mono transition-all border ${
                         appointmentForm.time === s 
                           ? 'bg-red-600 text-white border-red-500 shadow-[0_0_10px_rgba(220,38,38,0.3)]' 
-                          : 'bg-black/40 border-neutral-800 text-neutral-400 hover:border-red-500/50 hover:text-white'
+                          : 'bg-slate-100 dark:bg-black/40 border-slate-200 dark:border-neutral-800 text-slate-700 dark:text-neutral-400 hover:border-red-500/50 hover:text-red-600 dark:hover:text-white'
                       }`}
                     >
                       {s}h
                     </button>
                   ))
                 ) : (
-                  <p className="col-span-3 text-center py-4 bg-red-600/5 border border-red-600/10 rounded-xl text-[10px] font-black uppercase text-red-500 tracking-widest italic">No hay disponibilidad para este día</p>
+                  <p className="col-span-3 text-center py-4 bg-red-50 dark:bg-red-600/5 border border-red-200 dark:border-red-600/10 rounded-xl text-[10px] font-black uppercase text-red-600 dark:text-red-500 tracking-widest italic">No hay disponibilidad para este día</p>
                 )}
               </div>
             )}
@@ -179,10 +179,10 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
 
           {/* Servicio */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500 ml-1">Servicio</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-1">Servicio</label>
             <input 
               placeholder="Ej: Revisión Pre-ITV" 
-              className="bg-black/40 border border-neutral-800 p-3.5 rounded-xl text-white outline-none focus:border-red-600 transition-all font-bold placeholder:text-neutral-700 text-xs" 
+              className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-3.5 rounded-xl text-slate-900 dark:text-white outline-none focus:border-red-600 transition-all font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700 text-xs" 
               value={appointmentForm.serviceType} 
               onChange={e => setAppointmentForm({...appointmentForm, serviceType: e.target.value})} 
             />
@@ -190,10 +190,10 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
 
           {/* Descripción / Notas */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500 ml-1">Descripción / Notas</label>
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-1">Descripción / Notas</label>
             <textarea 
               placeholder="Detalles extra del trabajo..." 
-              className="bg-black/40 border border-neutral-800 p-3.5 rounded-xl text-white outline-none focus:border-red-600 min-h-[70px] resize-none transition-all placeholder:text-neutral-700 text-xs" 
+              className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-3.5 rounded-xl text-slate-900 dark:text-white outline-none focus:border-red-600 min-h-[70px] resize-none transition-all placeholder:text-slate-400 dark:placeholder:text-neutral-700 text-xs" 
               value={appointmentForm.description} 
               onChange={e => setAppointmentForm({...appointmentForm, description: e.target.value})} 
             />
@@ -202,11 +202,11 @@ export const AppointmentStep: React.FC<AppointmentStepProps> = ({
       </div>
 
       {/* Footer / Registrar Cita */}
-      <div className="mt-8 pt-6 border-t border-neutral-800 flex justify-end gap-3 shrink-0">
+      <div className="mt-8 pt-6 border-t border-slate-200 dark:border-neutral-800 flex justify-end gap-3 shrink-0">
         <button
           type="button"
           onClick={onPrev}
-          className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
+          className="px-6 py-3.5 rounded-xl border border-slate-200 dark:border-neutral-800 hover:bg-slate-100 dark:hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-all active:scale-95"
         >
           Atrás
         </button>

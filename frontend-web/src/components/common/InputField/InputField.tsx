@@ -27,13 +27,13 @@ export const InputField: React.FC<InputFieldProps> = ({
     neutral: 'focus:border-neutral-700'
   };
 
-  const baseInputStyles = `w-full bg-neutral-950 border rounded-xl px-4 py-3 text-white text-xs focus:outline-none focus:bg-black/40 transition-all font-semibold ${
+  const baseInputStyles = `w-full bg-slate-100 dark:bg-neutral-950 border rounded-xl px-4 py-3 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-600 text-xs focus:outline-none focus:bg-white dark:focus:bg-black/40 transition-all font-semibold ${
     focusStyles[focusVariant]
   } ${
-    error ? 'border-red-500/50' : 'border-neutral-800'
+    error ? 'border-red-500/50' : 'border-slate-300 dark:border-neutral-800'
   }`;
   
-  const labelStyles = `text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1 block mb-1.5`;
+  const labelStyles = `text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-1 block mb-1.5`;
 
   return (
     <div className={`flex flex-col w-full ${className}`}>

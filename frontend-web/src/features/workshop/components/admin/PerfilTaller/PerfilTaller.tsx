@@ -92,7 +92,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
 
   return createPortal(
     <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
-      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
+      <div className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-[3rem] relative shadow-2xl dark:shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col">
         {/* Glow decorativo */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
 
@@ -100,19 +100,19 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-8 right-8 p-3 bg-black/40 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
+          className="absolute top-8 right-8 p-3 bg-slate-100 hover:bg-slate-200 dark:bg-black/40 dark:hover:bg-neutral-800 text-slate-500 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
         >
           <X className="w-6 h-6" strokeWidth={2.5} />
         </button>
 
         {/* Contenido con scroll */}
         <div className="p-10 overflow-y-auto flex-1">
-          <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
+          <header className="mb-10 relative z-10 border-b border-slate-200 dark:border-white/5 pb-6">
             <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               {t('common.workshopSettings')}
             </p>
-            <h3 className="text-3xl font-black uppercase tracking-widest text-white">
+            <h3 className="text-3xl font-black uppercase tracking-widest text-slate-900 dark:text-white">
               {t('profile.title')}
             </h3>
           </header>
@@ -120,7 +120,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
           <form onSubmit={onSubmit} className="relative z-10 space-y-8">
             {/* Contenedor de subida de Logo del Taller */}
             {onUploadLogo && onDeleteLogo && onPreviewLogo && (
-              <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5">
+              <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200 dark:border-white/5">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -137,7 +137,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                       fileInputRef.current?.click();
                     }
                   }}
-                  className="w-20 h-20 bg-neutral-950 border border-neutral-800 rounded-[2rem] flex items-center justify-center text-white font-black text-3xl shadow-2xl relative overflow-hidden group/avatar cursor-pointer shrink-0"
+                  className="w-20 h-20 bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-[2rem] flex items-center justify-center text-slate-900 dark:text-white font-black text-3xl shadow-md dark:shadow-2xl relative overflow-hidden group/avatar cursor-pointer shrink-0"
                 >
                   {uploadingLogo ? (
                     <div className="w-6 h-6 border-t-2 border-red-600 rounded-full animate-spin"></div>
@@ -148,7 +148,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <Building2 className="w-8 h-8 text-neutral-600" strokeWidth={1.5} />
+                    <Building2 className="w-8 h-8 text-slate-400 dark:text-neutral-600" strokeWidth={1.5} />
                   )}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover/avatar:opacity-100 transition-opacity flex items-center justify-center">
                     <Camera className="w-5 h-5 text-white" strokeWidth={2} />
@@ -185,54 +185,52 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                       </Button>
                     )}
                   </div>
-                  <p className="text-[10px] text-neutral-500 font-medium">{t('profile.photoRestrictions')}</p>
+                  <p className="text-[10px] text-slate-500 dark:text-neutral-500 font-medium">{t('profile.photoRestrictions')}</p>
                 </div>
               </div>
             )}
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopCreationModal.openTime')}</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2">{t('workshopCreationModal.openTime')}</label>
                 <input
                   type="time"
                   value={settingsForm.openTime}
                   onChange={e => setSettingsForm({ ...settingsForm, openTime: e.target.value })}
-                  style={{ colorScheme: 'dark' }}
-                  className="bg-black/40 border border-neutral-800 text-white p-4 rounded-xl focus:outline-none focus:border-red-500 font-mono text-sm font-bold"
+                  className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none focus:border-red-500 font-mono text-sm font-bold"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopCreationModal.closeTime')}</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2">{t('workshopCreationModal.closeTime')}</label>
                 <input
                   type="time"
                   value={settingsForm.closeTime}
                   onChange={e => setSettingsForm({ ...settingsForm, closeTime: e.target.value })}
-                  style={{ colorScheme: 'dark' }}
-                  className="bg-black/40 border border-neutral-800 text-white p-4 rounded-xl focus:outline-none focus:border-red-500 font-mono text-sm font-bold"
+                  className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none focus:border-red-500 font-mono text-sm font-bold"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('appointmentModal.scheduledDate')}</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2">{t('appointmentModal.scheduledDate')}</label>
                 <input
                   type="number"
                   value={settingsForm.slotDurationMinutes}
                   onChange={e => setSettingsForm({ ...settingsForm, slotDurationMinutes: e.target.value })}
-                  className="bg-black/40 border border-neutral-800 text-white p-4 rounded-xl focus:outline-none focus:border-red-500 text-sm font-bold font-mono"
+                  className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none focus:border-red-500 text-sm font-bold font-mono"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopDashboard.hourlyRate')}</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2">{t('workshopDashboard.hourlyRate')}</label>
                 <input
                   type="number"
                   step="0.01"
                   value={settingsForm.hourlyRate}
                   onChange={e => setSettingsForm({ ...settingsForm, hourlyRate: e.target.value })}
-                  className="bg-black/40 border border-neutral-800 text-white p-4 rounded-xl focus:outline-none focus:border-red-500 text-sm font-bold font-mono"
+                  className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none focus:border-red-500 text-sm font-bold font-mono"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-3">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2">{t('workshopCreationModal.operatingDays')}</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2">{t('workshopCreationModal.operatingDays')}</label>
               <div className="flex flex-wrap gap-2">
                 {diasSemana.map(dia => (
                   <button
@@ -247,7 +245,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                     className={`px-4 py-3 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 active:scale-95 border cursor-pointer ${
                       settingsForm.workingDays.includes(dia.value)
                         ? 'bg-red-600 border-red-500 text-white shadow-[0_0_20px_rgba(220,38,38,0.45)]'
-                        : 'bg-neutral-950/60 border-neutral-800/80 text-neutral-400 hover:text-white hover:border-neutral-700'
+                        : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900 hover:border-slate-300 dark:bg-neutral-950/60 dark:border-neutral-800/80 dark:text-neutral-400 dark:hover:text-white dark:hover:border-neutral-700'
                     }`}
                   >
                     {t(dia.labelKey as any)}
@@ -256,13 +254,13 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between p-6 bg-black/40 border border-neutral-800 rounded-3xl gap-4">
+            <div className="flex flex-col md:flex-row items-center justify-between p-6 bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 rounded-3xl gap-4">
               <div className="space-y-1 text-left">
-                <h4 className="text-white text-xs font-black uppercase tracking-wider flex items-center gap-2">
+                <h4 className="text-slate-900 dark:text-white text-xs font-black uppercase tracking-wider flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
                   {t('workshopAdminDashboard.unassigned')}
                 </h4>
-                <p className="text-neutral-500 text-[10px] font-medium leading-relaxed">
+                <p className="text-slate-500 dark:text-neutral-500 text-[10px] font-medium leading-relaxed">
                   Si se activa esta opción, el propietario del taller se incorporará a la agenda de planificación general y se le podrán asignar citas y tareas.
                 </p>
               </div>
@@ -270,7 +268,7 @@ export const PerfilTaller: React.FC<PerfilTallerProps> = ({
                 type="button"
                 onClick={() => setSettingsForm({ ...settingsForm, includeOwnerInPlanning: !settingsForm.includeOwnerInPlanning })}
                 className={`relative inline-flex h-8 w-16 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out focus:outline-none ${
-                  settingsForm.includeOwnerInPlanning ? "bg-red-600" : "bg-neutral-800"
+                  settingsForm.includeOwnerInPlanning ? "bg-red-600" : "bg-slate-300 dark:bg-neutral-800"
                 }`}
               >
                 <span

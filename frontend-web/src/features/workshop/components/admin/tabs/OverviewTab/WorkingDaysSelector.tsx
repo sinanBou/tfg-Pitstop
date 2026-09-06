@@ -15,14 +15,14 @@ export const WorkingDaysSelector: React.FC<WorkingDaysSelectorProps> = ({
   const { t } = useTranslation();
 
   return (
-    <Card variant="neutral" glow={false} border={false} padding="lg" className="transition-all duration-300 !rounded-2xl">
+    <Card variant="neutral" glow={false} border={false} padding="lg" className="transition-all duration-300 !rounded-2xl border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none bg-white dark:bg-neutral-900/30">
       <div className="flex items-center gap-3 mb-8">
-        <div className="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
+        <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
           <Calendar className="w-5 h-5" />
         </div>
         <div>
-          <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500">{t('overviewTab.operatingHoursHeader')}</p>
-          <p className="text-xs font-black text-white uppercase mt-0.5">{t('overviewTab.workshopWorkingDays')}</p>
+          <p className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-500 dark:text-neutral-500">{t('overviewTab.operatingHoursHeader')}</p>
+          <p className="text-xs font-black text-slate-900 dark:text-white uppercase mt-0.5">{t('overviewTab.workshopWorkingDays')}</p>
         </div>
       </div>
       
@@ -41,7 +41,7 @@ export const WorkingDaysSelector: React.FC<WorkingDaysSelectorProps> = ({
                 className={`px-5 py-4 flex-grow text-center rounded-2xl text-[10px] lg:text-xs font-black uppercase tracking-wider transition-all duration-300 border ${
                   isWorkingDay 
                     ? 'bg-red-600/10 border-red-500/30 text-red-500 shadow-[0_0_20px_rgba(220,38,38,0.15)] font-black' 
-                    : 'bg-neutral-950/40 border-neutral-900 text-neutral-700/50'
+                    : 'bg-slate-100 dark:bg-neutral-950/40 border-slate-200 dark:border-neutral-900 text-slate-400 dark:text-neutral-700/50'
                 }`}
               >
                 {dia.label}

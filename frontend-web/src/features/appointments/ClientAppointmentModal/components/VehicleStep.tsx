@@ -24,23 +24,23 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
             key={v.id}
             type="button"
             onClick={() => onSelect(v.id)}
-            className={`relative p-5 rounded-2xl border transition-all text-left group overflow-hidden ${selectedVehicleId === v.id ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-neutral-800 bg-black/40 hover:border-blue-500/50 hover:bg-neutral-900/60'}`}
+            className={`relative p-5 rounded-2xl border transition-all text-left group overflow-hidden cursor-pointer ${selectedVehicleId === v.id ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-slate-200 dark:border-neutral-800 bg-slate-100 dark:bg-black/40 hover:border-blue-500/50 hover:bg-slate-200/60 dark:hover:bg-neutral-900/60'}`}
           >
             <div className="flex items-center gap-4 relative z-10">
-              <div className={`p-3 rounded-xl transition-colors ${selectedVehicleId === v.id ? 'bg-blue-500/20 text-blue-400' : 'bg-neutral-800 text-neutral-400 group-hover:text-blue-400'}`}>
+              <div className={`p-3 rounded-xl transition-colors ${selectedVehicleId === v.id ? 'bg-blue-500/20 text-blue-500 dark:text-blue-400' : 'bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 group-hover:text-blue-500 dark:group-hover:text-blue-400'}`}>
                  <Car className="w-6 h-6" strokeWidth={1.5} />
               </div>
               <div>
-                <p className="text-lg text-white font-black tracking-wide group-hover:text-blue-400 transition-colors uppercase">{v.brand} {v.model}</p>
-                <p className="text-xs text-neutral-500 font-mono mt-0.5 flex items-center gap-2">
-                  {t('vehicleModal.licensePlate')}: <span className="text-neutral-300 bg-neutral-800/50 px-2 rounded-md py-0.5">{v.licensePlate}</span>
+                <p className="text-lg text-slate-900 dark:text-white font-black tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors uppercase">{v.brand} {v.model}</p>
+                <p className="text-xs text-slate-500 dark:text-neutral-500 font-mono mt-0.5 flex items-center gap-2">
+                  {t('vehicleModal.licensePlate')}: <span className="text-slate-800 dark:text-neutral-300 bg-slate-200/80 dark:bg-neutral-800/50 px-2 rounded-md py-0.5">{v.licensePlate}</span>
                 </p>
               </div>
             </div>
           </button>
         )) : (
-          <div className="py-12 text-center border-2 border-dashed border-neutral-800 rounded-3xl bg-neutral-900/20">
-            <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest">{t('appointmentModal.noVehiclesRegistered')}</p>
+          <div className="py-12 text-center border-2 border-dashed border-slate-200 dark:border-neutral-800 rounded-3xl bg-slate-100/50 dark:bg-neutral-900/20">
+            <p className="text-slate-500 dark:text-neutral-500 text-sm font-bold uppercase tracking-widest">{t('appointmentModal.noVehiclesRegistered')}</p>
           </div>
         )}
       </div>

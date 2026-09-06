@@ -32,7 +32,7 @@ export const HeroSection: React.FC = () => {
         <Button 
           onClick={() => navigate('/login')} 
           variant="ghost"
-          className="border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-white transition-all duration-300 scale-105 active:scale-95 px-10 py-4"
+          className="!bg-neutral-900/80 hover:!bg-neutral-800 !text-white hover:!text-white !border !border-neutral-700 hover:!border-neutral-500 transition-all duration-300 scale-105 active:scale-95 px-10 py-4 shadow-lg shadow-black/40 backdrop-blur-sm"
         >
           <span className="relative z-10 flex items-center gap-3">
             {t('common.login')}

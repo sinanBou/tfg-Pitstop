@@ -248,7 +248,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         }
       `}</style>
       
-      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-[3rem] relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-[3rem] relative shadow-2xl dark:shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Glow decorativo */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/5 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
 
@@ -256,26 +256,26 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-8 right-8 p-3 bg-black/40 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
+          className="absolute top-8 right-8 p-3 bg-slate-100 hover:bg-slate-200 dark:bg-black/40 dark:hover:bg-neutral-800 text-slate-500 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
         >
           <X className="w-6 h-6" strokeWidth={2.5} />
         </button>
 
         {/* Contenido con scroll */}
         <div className="p-10 overflow-y-auto flex-1 profile-scrollbar">
-          <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
+          <header className="mb-10 relative z-10 border-b border-slate-200 dark:border-white/5 pb-6">
             <p className="text-[10px] uppercase font-bold tracking-widest text-red-500 mb-2 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
               {t('profile.personalData')}
             </p>
-            <h3 className="text-3xl font-black uppercase tracking-widest text-white">
+            <h3 className="text-3xl font-black uppercase tracking-widest text-slate-900 dark:text-white">
               {t('profile.title')}
             </h3>
           </header>
 
           <form onSubmit={handleFormSubmit} className="relative z-10 space-y-8">
             {/* Avatar Upload Container */}
-            <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5">
+            <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200 dark:border-white/5">
               <input
                 type="file"
                 ref={fileInputRef}
@@ -292,7 +292,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                     fileInputRef.current?.click();
                   }
                 }}
-                className="w-20 h-20 bg-neutral-950 border border-neutral-800 rounded-[2rem] flex items-center justify-center text-white font-black text-3xl shadow-2xl relative overflow-hidden group/avatar cursor-pointer shrink-0"
+                className="w-20 h-20 bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-[2rem] flex items-center justify-center text-slate-900 dark:text-white font-black text-3xl shadow-md dark:shadow-2xl relative overflow-hidden group/avatar cursor-pointer shrink-0"
               >
                 {uploadingAvatar ? (
                   <div className="w-6 h-6 border-t-2 border-red-600 rounded-full animate-spin"></div>
@@ -340,41 +340,41 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
                     </Button>
                   )}
                 </div>
-                <p className="text-[10px] text-neutral-500 font-medium">{t('profile.photoRestrictions')}</p>
+                <p className="text-[10px] text-slate-500 dark:text-neutral-500 font-medium">{t('profile.photoRestrictions')}</p>
               </div>
             </div>
 
             {/* Form Fields */}
             <div className="grid grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.firstname')}</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2 h-6 flex items-center">{t('profile.firstname')}</label>
                 <input
                   type="text"
                   required
                   value={profileForm.firstname}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, firstname: e.target.value })}
-                  className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
+                  className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700"
                 />
               </div>
               <div className="flex flex-col gap-2">
-                <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.lastname')}</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2 h-6 flex items-center">{t('profile.lastname')}</label>
                 <input
                   type="text"
                   required
                   value={profileForm.lastname}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, lastname: e.target.value })}
-                  className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold"
+                  className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700"
                 />
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.residenceAddress')}</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2 h-6 flex items-center">{t('profile.residenceAddress')}</label>
               <input
                 type="text"
                 value={profileForm.address}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProfileForm({ ...profileForm, address: e.target.value })}
-                className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700"
                 placeholder={t('profile.addressPlaceholder')}
               />
             </div>
@@ -397,7 +397,7 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
           </form>
 
           {/* Separador */}
-          <div className="my-10 border-b border-white/5"></div>
+          <div className="my-10 border-b border-slate-200 dark:border-white/5"></div>
 
           {/* Sección de Cambio de Contraseña */}
           <section className="relative z-10 space-y-6">
@@ -407,69 +407,68 @@ export const MiPerfil: React.FC<MiPerfilProps> = ({
             </p>
             
             <form onSubmit={handlePasswordSubmit} className="space-y-6">
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.currentPassword')}</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2 h-6 flex items-center">{t('profile.currentPassword')}</label>
                   <input
                     type="password"
                     required
                     value={currentPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCurrentPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                    className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.newPassword')}</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2 h-6 flex items-center">{t('profile.newPassword')}</label>
                   <input
                     type="password"
                     required
                     value={newPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                    className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700"
                   />
                 </div>
                 <div className="flex flex-col gap-2">
-                  <label className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 ml-2 h-6 flex items-center">{t('profile.repeatPassword')}</label>
+                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-2 h-6 flex items-center">{t('profile.repeatPassword')}</label>
                   <input
                     type="password"
                     required
                     value={confirmPassword}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="bg-black/40 border border-neutral-800 focus:border-red-500/50 text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-neutral-700"
+                    className="bg-slate-100 dark:bg-black/40 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 text-slate-900 dark:text-white p-4 rounded-xl focus:outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:placeholder:text-neutral-700"
                   />
                 </div>
               </div>
 
               {passwordError && (
                 <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center animate-fade-in-up">
-                  <p className="text-red-400 text-xs font-black uppercase tracking-widest">{passwordError}</p>
+                  <p className="text-red-600 dark:text-red-400 text-xs font-black uppercase tracking-widest">{passwordError}</p>
                 </div>
               )}
 
               {passwordSuccess && (
                 <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center animate-fade-in-up">
-                  <p className="text-green-400 text-xs font-black uppercase tracking-widest">{passwordSuccess}</p>
+                  <p className="text-green-600 dark:text-green-400 text-xs font-black uppercase tracking-widest">{passwordSuccess}</p>
                 </div>
               )}
 
               <div className="pt-2 flex justify-end">
-                <Button
+                <button
                   type="submit"
-                  variant="primary"
                   disabled={passwordLoading}
-                  className="bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 hover:border-neutral-600 transition-all shadow-md active:scale-[0.98]"
+                  className="px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-red-600 hover:bg-red-500 text-white transition-all shadow-md hover:shadow-lg hover:shadow-red-600/25 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {passwordLoading ? t('common.processing') : t('profile.updatePasswordBtn')}
-                </Button>
+                </button>
               </div>
             </form>
           </section>
 
           {/* Separador */}
-          <div className="my-10 border-b border-white/5"></div>
+          <div className="my-10 border-b border-slate-200 dark:border-white/5"></div>
 
           {/* Sección crítica: Eliminación de Cuenta */}
           <section className="relative z-10 pb-6">

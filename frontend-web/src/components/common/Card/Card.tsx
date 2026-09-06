@@ -25,15 +25,15 @@ export const Card: React.FC<CardProps> = ({
   rounded = 'default'
 }) => {
   const variantStyles = {
-    red: 'border-red-900/30 group-hover:border-red-500/50 shadow-[0_0_30px_rgba(220,38,38,0.1)]',
-    blue: 'border-blue-900/30 group-hover:border-blue-500/50 shadow-[0_0_30px_rgba(37,99,235,0.1)]',
-    neutral: 'border-neutral-800/60 group-hover:border-white/10 shadow-lg'
+    red: 'border-red-200 dark:border-red-900/30 group-hover:border-red-500/50 shadow-[0_0_30px_rgba(220,38,38,0.08)] dark:shadow-[0_0_30px_rgba(220,38,38,0.1)]',
+    blue: 'border-blue-200 dark:border-blue-900/30 group-hover:border-blue-500/50 shadow-[0_0_30px_rgba(37,99,235,0.08)] dark:shadow-[0_0_30px_rgba(37,99,235,0.1)]',
+    neutral: 'border-slate-200/90 dark:border-neutral-800/60 group-hover:border-slate-300 dark:group-hover:border-white/10 shadow-[0_4px_20px_-4px_rgba(15,23,42,0.05)] dark:shadow-lg'
   };
 
   const glowStyles = {
-    red: 'bg-red-600/10 group-hover:bg-red-600/20',
-    blue: 'bg-blue-600/10 group-hover:bg-blue-600/20',
-    neutral: 'bg-white/5'
+    red: 'bg-red-500/10 dark:bg-red-600/10 group-hover:bg-red-500/20 dark:group-hover:bg-red-600/20',
+    blue: 'bg-blue-500/10 dark:bg-blue-600/10 group-hover:bg-blue-500/20 dark:group-hover:bg-blue-600/20',
+    neutral: 'bg-slate-900/5 dark:bg-white/5'
   };
 
   const paddingStyles = {
@@ -54,7 +54,7 @@ export const Card: React.FC<CardProps> = ({
     <div 
       onClick={onClick}
       className={`
-        relative group bg-neutral-900/80 backdrop-blur-2xl transition-all duration-500 overflow-hidden
+        relative group bg-white/90 dark:bg-neutral-900/80 text-slate-900 dark:text-white backdrop-blur-2xl transition-all duration-500 overflow-hidden
         ${roundedStyles[rounded]}
         ${border ? `border ${variantStyles[variant]}` : ''}
         ${paddingStyles[padding]}

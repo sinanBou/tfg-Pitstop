@@ -317,10 +317,10 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
         onClick={onClose}
       />
 
-      <div className="relative bg-gradient-to-br from-neutral-900 via-neutral-950 to-black border border-neutral-800 rounded-[2.5rem] w-full max-w-4xl overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.9)] flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-300">
+      <div className="relative bg-white dark:bg-gradient-to-br dark:from-neutral-900 dark:via-neutral-950 dark:to-black border border-slate-200 dark:border-neutral-800 rounded-[2.5rem] w-full max-w-4xl overflow-hidden shadow-2xl dark:shadow-[0_0_100px_rgba(0,0,0,0.9)] flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-300">
 
         {/* Progress line */}
-        <div className="h-1 w-full bg-neutral-900 shrink-0">
+        <div className="h-1 w-full bg-slate-100 dark:bg-neutral-900 shrink-0">
           <div
             className="h-full bg-gradient-to-r from-blue-600 to-blue-400 transition-all duration-500"
             style={{ width: selectedTasks.length > 0 ? `${Math.min(100, (totalHours / 16) * 100)}%` : '0%' }}
@@ -328,15 +328,15 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
         </div>
 
         {/* Header */}
-        <div className="p-8 pb-5 border-b border-neutral-800/50 bg-neutral-950/20 flex justify-between items-start shrink-0">
+        <div className="p-8 pb-5 border-b border-slate-200 dark:border-neutral-800/50 bg-slate-100/80 dark:bg-neutral-950/20 flex justify-between items-start shrink-0">
           <div>
-            <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest mb-1">{t('mechanicTaskModal.title')}</p>
-            <h2 className="text-2xl font-black uppercase tracking-[0.08em] text-white">
+            <p className="text-[10px] text-slate-500 dark:text-neutral-500 font-black uppercase tracking-widest mb-1">{t('mechanicTaskModal.title')}</p>
+            <h2 className="text-2xl font-black uppercase tracking-[0.08em] text-slate-900 dark:text-white">
               {appointment?.vehicleDisplay}
             </h2>
-            <p className="text-neutral-400 text-xs mt-1">{appointment?.clientFullName}</p>
+            <p className="text-slate-600 dark:text-neutral-400 text-xs mt-1">{appointment?.clientFullName}</p>
           </div>
-          <button onClick={onClose} className="p-3 text-neutral-500 hover:text-white hover:bg-neutral-800/50 rounded-2xl transition-all">
+          <button onClick={onClose} className="p-3 text-slate-400 hover:text-slate-700 hover:bg-slate-100 dark:text-neutral-500 dark:hover:text-white dark:hover:bg-neutral-800/50 rounded-2xl transition-all">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -345,24 +345,24 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
         <div className="flex flex-1 overflow-hidden">
 
           {/* Left: Category list + task selector */}
-          <div className="flex flex-col w-[65%] border-r border-neutral-800/60 overflow-hidden">
+          <div className="flex flex-col w-[65%] border-r border-slate-200 dark:border-neutral-800/60 overflow-hidden">
 
             {/* Search bar only */}
-            <div className="p-5 border-b border-neutral-800/40 shrink-0">
-              <label className="text-[10px] font-black uppercase tracking-widest text-neutral-500 block mb-1">{t('mechanicTaskModal.searchTaskLabel')}</label>
+            <div className="p-5 border-b border-slate-200 dark:border-neutral-800/40 shrink-0">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 block mb-1">{t('mechanicTaskModal.searchTaskLabel')}</label>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder={t('mechanicTaskModal.searchTaskPlaceholder')}
-                className="w-full bg-neutral-800/60 border border-neutral-700 rounded-xl px-4 py-2 text-white text-sm placeholder-neutral-600 focus:outline-none focus:border-blue-500/60"
+                className="w-full bg-slate-100 dark:bg-neutral-800/60 border border-slate-200 dark:border-neutral-700 rounded-xl px-4 py-2 text-slate-900 dark:text-white text-sm placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-blue-500/60"
               />
             </div>
 
             {/* Category tabs — dimmed during global search */}
-            <div className="flex overflow-x-auto gap-1 px-4 py-3 shrink-0 border-b border-neutral-800/40 custom-scrollbar">
+            <div className="flex overflow-x-auto gap-1 px-4 py-3 shrink-0 border-b border-slate-200 dark:border-neutral-800/40 custom-scrollbar">
               {searchQuery.trim() && (
-                <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider whitespace-nowrap bg-blue-600/20 text-blue-400 border border-blue-500/30 shrink-0">
+                <span className="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider whitespace-nowrap bg-blue-600/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 shrink-0">
                   {t('mechanicTaskModal.globalSearch')}
                 </span>
               )}
@@ -372,10 +372,10 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                   onClick={() => { setActiveCategory(s.key); setSearchQuery(''); }}
                   className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all ${
                     searchQuery.trim()
-                      ? 'bg-neutral-800/30 text-neutral-600 hover:text-neutral-400'
+                      ? 'bg-slate-100 text-slate-400 hover:text-slate-600 dark:bg-neutral-800/30 dark:text-neutral-600 dark:hover:text-neutral-400'
                       : activeCategory === s.key
                         ? 'bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]'
-                        : 'bg-neutral-800/60 text-neutral-400 hover:text-white hover:bg-neutral-700/60'
+                        : 'bg-slate-100 text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 dark:bg-neutral-800/60 dark:text-neutral-400 dark:hover:text-white dark:hover:bg-neutral-700/60'
                   }`}
                 >
                   {s.label}
@@ -386,19 +386,19 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
             {/* Task list */}
             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
               {loadingCatalog ? (
-                <div className="text-center py-20 text-neutral-500 flex flex-col items-center justify-center gap-3">
-                  <div className="w-8 h-8 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
+                <div className="text-center py-20 text-slate-400 dark:text-neutral-500 flex flex-col items-center justify-center gap-3">
+                  <div className="w-8 h-8 border-2 border-slate-200 dark:border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
                   <p className="text-xs uppercase tracking-widest font-black">{t('mechanicTaskModal.loadingCatalog')}</p>
                 </div>
               ) : (
                 <>
                   {searchQuery.trim() && (
-                    <p className="text-[10px] text-neutral-500 font-black uppercase tracking-widest pb-1">
+                    <p className="text-[10px] text-slate-500 dark:text-neutral-500 font-black uppercase tracking-widest pb-1">
                       {t(filteredTasks.length === 1 ? 'mechanicTaskModal.resultsCount' : 'mechanicTaskModal.resultsCount_plural', { count: filteredTasks.length })}
                     </p>
                   )}
                   {filteredTasks.length === 0 && (
-                    <p className="text-neutral-600 text-center py-12 text-sm">{t('mechanicTaskModal.noTasksFound')}</p>
+                    <p className="text-slate-400 dark:text-neutral-600 text-center py-12 text-sm">{t('mechanicTaskModal.noTasksFound')}</p>
                   )}
                   {(filteredTasks as any[]).map((task: any) => {
                     const hours = calcHoursForTask(task, cylinders, wheels);
@@ -410,13 +410,13 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                         onClick={() => toggleTask(task)}
                         className={`w-full text-left px-4 py-3 rounded-2xl border transition-all flex items-center justify-between gap-3 group ${
                           selected
-                            ? 'border-blue-500/50 bg-blue-600/10 text-white'
-                            : 'border-neutral-800 bg-neutral-900/40 text-neutral-400 hover:border-neutral-700 hover:text-white'
+                            ? 'border-blue-500/50 bg-blue-50/70 dark:bg-blue-600/10 text-slate-900 dark:text-white'
+                            : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:text-slate-900 dark:border-neutral-800 dark:bg-neutral-900/40 dark:text-neutral-400 dark:hover:border-neutral-700 dark:hover:text-white'
                         }`}
                       >
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all ${
-                            selected ? 'bg-blue-600 border-blue-600' : 'border-neutral-600 group-hover:border-neutral-400'
+                            selected ? 'bg-blue-600 border-blue-600' : 'border-slate-300 group-hover:border-slate-400 dark:border-neutral-600 dark:group-hover:border-neutral-400'
                           }`}>
                             {selected && (
                               <Check className="w-3 h-3 text-white" strokeWidth={3} />
@@ -424,13 +424,13 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                           </div>
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className={`text-[10px] font-black tracking-widest ${selected ? 'text-blue-400' : 'text-neutral-600'}`}>
+                              <span className={`text-[10px] font-black tracking-widest ${selected ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-neutral-600'}`}>
                                 {task.codigo}
                               </span>
                               {/* Cylinder badge: shows count when task scales by cylinders */}
                               {wheelBased === false && isCylinderTask(task) && (
                                 <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
-                                  selected ? 'bg-neutral-600/40 text-neutral-300' : 'bg-neutral-800/60 text-neutral-500'
+                                  selected ? 'bg-slate-200 text-slate-700 dark:bg-neutral-600/40 dark:text-neutral-300' : 'bg-slate-100 text-slate-500 dark:bg-neutral-800/60 dark:text-neutral-500'
                                 }`}>
                                   {cylinders} cil.
                                 </span>
@@ -438,22 +438,22 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
                               {/* Wheel badge: shows multiplier when task scales by wheels */}
                               {wheelBased && (
                                 <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
-                                  selected ? 'bg-blue-600/30 text-blue-300' : 'bg-blue-900/30 text-blue-600'
+                                  selected ? 'bg-blue-100 text-blue-700 dark:bg-blue-600/30 dark:text-blue-300' : 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-600'
                                 }`}>
                                   ×{wheels} {t('mechanicTaskModal.wheels').toLowerCase()}
                                 </span>
                               )}
                               {/* Category badge during global search */}
                               {searchQuery.trim() && task._sectionLabel && (
-                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-neutral-800 text-neutral-500">
+                                <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-500 dark:bg-neutral-800 dark:text-neutral-500">
                                   {task._sectionLabel}
                                 </span>
                               )}
                             </div>
-                            <span className="text-xs font-medium truncate block">{task.tarea}</span>
+                            <span className="text-xs font-medium truncate block text-slate-800 dark:text-neutral-200">{task.tarea}</span>
                           </div>
                         </div>
-                        <span className={`text-xs font-black shrink-0 ${selected ? 'text-blue-400' : 'text-neutral-600'}`}>
+                        <span className={`text-xs font-black shrink-0 ${selected ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-neutral-600'}`}>
                           {hours.toFixed(1)} h
                         </span>
                       </button>
@@ -466,31 +466,31 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
 
           {/* Right: Summary panel */}
           <div className="w-[35%] flex flex-col overflow-hidden">
-            <div className="p-5 border-b border-neutral-800/40 shrink-0">
-              <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-3">{t('mechanicTaskModal.workSummary')}</p>
+            <div className="p-5 border-b border-slate-200 dark:border-neutral-800/40 shrink-0">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 mb-3">{t('mechanicTaskModal.workSummary')}</p>
 
               {/* Hours summary */}
-              <div className="bg-neutral-900/60 border border-neutral-800 rounded-2xl p-4 mb-4">
+              <div className="bg-slate-100 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 rounded-2xl p-4 mb-4">
                 <div className="flex justify-between items-start">
                   <div>
-                    <div className="text-4xl font-black text-white mb-1">
-                      {totalHours.toFixed(1)}<span className="text-lg text-neutral-500 ml-1">h</span>
+                    <div className="text-4xl font-black text-slate-900 dark:text-white mb-1">
+                      {totalHours.toFixed(1)}<span className="text-lg text-slate-400 dark:text-neutral-500 ml-1">h</span>
                     </div>
-                    <p className="text-[10px] text-neutral-500 uppercase tracking-widest">{t('mechanicTaskModal.estimatedMinutes', { count: totalMinutes })}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-neutral-500 uppercase tracking-widest">{t('mechanicTaskModal.estimatedMinutes', { count: totalMinutes })}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-3xl font-black text-blue-400 mb-1">
-                      {(totalHours * (appointment?.workshopHourlyRate ?? 50.0)).toFixed(2)}<span className="text-xs text-neutral-500 ml-1">€</span>
+                    <div className="text-3xl font-black text-blue-600 dark:text-blue-400 mb-1">
+                      {(totalHours * (appointment?.workshopHourlyRate ?? 50.0)).toFixed(2)}<span className="text-xs text-slate-400 dark:text-neutral-500 ml-1">€</span>
                     </div>
-                    <p className="text-[9px] text-neutral-500 uppercase tracking-widest">
+                    <p className="text-[9px] text-slate-500 dark:text-neutral-500 uppercase tracking-widest">
                       {t('mechanicTaskModal.laborRateLabel', { rate: (appointment?.workshopHourlyRate ?? 50.0).toFixed(2) })}
                     </p>
                   </div>
                 </div>
                 {totalHours > 8 && (
                   <div className="mt-3 flex items-center gap-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-xl">
-                    <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
-                    <p className="text-amber-400 text-[10px] font-black uppercase tracking-wider">
+                    <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400 shrink-0" />
+                    <p className="text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
                       {t('mechanicTaskModal.multiDayWarning')}
                     </p>
                   </div>
@@ -500,40 +500,40 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
               {/* Controls in Summary Panel */}
               <div className="flex flex-col gap-3 mb-4">
                 {showCylinderCounter && (
-                  <div className="flex items-center justify-between p-3 bg-neutral-800/20 border border-neutral-700/20 rounded-2xl">
+                  <div className="flex items-center justify-between p-3 bg-slate-100 dark:bg-neutral-800/20 border border-slate-200 dark:border-neutral-700/20 rounded-2xl">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-black text-neutral-500 uppercase tracking-widest">{t('mechanicTaskModal.engine')}</span>
-                      <span className="text-xs text-white font-bold">{t('mechanicTaskModal.cylinders')}</span>
+                      <span className="text-[9px] font-black text-slate-400 dark:text-neutral-500 uppercase tracking-widest">{t('mechanicTaskModal.engine')}</span>
+                      <span className="text-xs text-slate-900 dark:text-white font-bold">{t('mechanicTaskModal.cylinders')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setCylinders(c => Math.max(0, c - 1))}
-                        className="w-7 h-7 rounded-lg bg-neutral-800 text-white hover:bg-neutral-700 flex items-center justify-center transition-all active:scale-90"
+                        className="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700 flex items-center justify-center transition-all active:scale-90"
                       >−</button>
-                      <span className={`text-sm font-black w-4 text-center ${cylinders === 0 ? 'text-red-400' : 'text-white'}`}>{cylinders}</span>
+                      <span className={`text-sm font-black w-4 text-center ${cylinders === 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}>{cylinders}</span>
                       <button
                         onClick={() => setCylinders(c => Math.min(16, c + 1))}
-                        className="w-7 h-7 rounded-lg bg-neutral-800 text-white hover:bg-neutral-700 flex items-center justify-center transition-all active:scale-90"
+                        className="w-7 h-7 rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700 flex items-center justify-center transition-all active:scale-90"
                       >+</button>
                     </div>
                   </div>
                 )}
 
                 {showWheelCounter && (
-                  <div className="flex items-center justify-between p-3 bg-blue-500/5 border border-blue-500/10 rounded-2xl">
+                  <div className="flex items-center justify-between p-3 bg-blue-50/60 dark:bg-blue-500/5 border border-blue-200 dark:border-blue-500/10 rounded-2xl">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-black text-blue-500/60 uppercase tracking-widest">{t('mechanicTaskModal.wheels')}</span>
-                      <span className="text-xs text-blue-400 font-bold">{t('mechanicTaskModal.replacement')}</span>
+                      <span className="text-[9px] font-black text-blue-600/70 dark:text-blue-500/60 uppercase tracking-widest">{t('mechanicTaskModal.wheels')}</span>
+                      <span className="text-xs text-blue-700 dark:text-blue-400 font-bold">{t('mechanicTaskModal.replacement')}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <button
                         onClick={() => setWheels(w => Math.max(0, w - 1))}
-                        className="w-7 h-7 rounded-lg bg-blue-900/40 text-blue-300 border border-blue-700/30 hover:bg-blue-800 flex items-center justify-center transition-all active:scale-90"
+                        className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/30 dark:hover:bg-blue-800 flex items-center justify-center transition-all active:scale-90"
                       >−</button>
-                      <span className={`text-sm font-black w-4 text-center ${wheels === 0 ? 'text-red-400' : 'text-blue-300'}`}>{wheels}</span>
+                      <span className={`text-sm font-black w-4 text-center ${wheels === 0 ? 'text-red-500 dark:text-red-400' : 'text-blue-700 dark:text-blue-300'}`}>{wheels}</span>
                       <button
                         onClick={() => setWheels(w => Math.min(8, w + 1))}
-                        className="w-7 h-7 rounded-lg bg-blue-900/40 text-blue-300 border border-blue-700/30 hover:bg-blue-800 flex items-center justify-center transition-all active:scale-90"
+                        className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 border border-blue-300 hover:bg-blue-200 dark:bg-blue-900/40 dark:text-blue-300 dark:border-blue-700/30 dark:hover:bg-blue-800 flex items-center justify-center transition-all active:scale-90"
                       >+</button>
                     </div>
                   </div>
@@ -545,21 +545,21 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
             <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-2">
               {selectedTasks.length === 0 ? (
                 <div className="text-center py-12">
-                  <FileText className="w-10 h-10 text-neutral-700 mx-auto mb-3" strokeWidth={1.5} />
-                  <p className="text-neutral-600 text-xs">{t('mechanicTaskModal.selectTasksHint')}</p>
+                  <FileText className="w-10 h-10 text-slate-300 dark:text-neutral-700 mx-auto mb-3" strokeWidth={1.5} />
+                  <p className="text-slate-400 dark:text-neutral-600 text-xs">{t('mechanicTaskModal.selectTasksHint')}</p>
                 </div>
               ) : (
                 selectedTasks.map(({ task }) => (
-                  <div key={task.codigo} className="flex items-center justify-between gap-2 px-3 py-2 bg-blue-600/5 border border-blue-500/20 rounded-xl">
+                  <div key={task.codigo} className="flex items-center justify-between gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-600/5 border border-blue-200 dark:border-blue-500/20 rounded-xl">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black text-blue-400 uppercase tracking-wider">{task.codigo}</p>
-                      <p className="text-xs text-neutral-300 truncate">{task.tarea}</p>
+                      <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-wider">{task.codigo}</p>
+                      <p className="text-xs text-slate-700 dark:text-neutral-300 truncate">{task.tarea}</p>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-xs font-black text-blue-400">{calcHoursForTask(task, cylinders, wheels).toFixed(1)}h</span>
+                      <span className="text-xs font-black text-blue-600 dark:text-blue-400">{calcHoursForTask(task, cylinders, wheels).toFixed(1)}h</span>
                       <button
                         onClick={() => toggleTask(task)}
-                        className="w-5 h-5 flex items-center justify-center text-neutral-500 hover:text-red-400 transition-colors"
+                        className="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 transition-colors"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -570,14 +570,14 @@ export const MechanicTaskModal: React.FC<MechanicTaskModalProps> = ({
             </div>
 
             {/* Footer: error + submit */}
-            <div className="p-5 border-t border-neutral-800/50 shrink-0 space-y-3">
+            <div className="p-5 border-t border-slate-200 dark:border-neutral-800/50 shrink-0 space-y-3">
               {error && (
-                <p className="text-red-400 text-xs font-bold bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">{error}</p>
+                <p className="text-red-500 dark:text-red-400 text-xs font-bold bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl px-3 py-2">{error}</p>
               )}
               <button
                 onClick={handleSubmit}
                 disabled={loading || selectedTasks.length === 0}
-                className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]"
+                className="w-full py-4 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-100 disabled:text-slate-400 dark:disabled:bg-neutral-800 dark:disabled:text-neutral-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(37,99,235,0.3)] hover:shadow-[0_0_30px_rgba(37,99,235,0.5)]"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

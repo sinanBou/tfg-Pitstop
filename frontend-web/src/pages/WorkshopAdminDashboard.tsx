@@ -21,7 +21,6 @@ import { MechanicSearch } from '@/features/workshop/components/admin/MechanicSea
 import { CitasTab } from '@/features/workshop/components/admin/tabs/CitasTab';
 import { PlanningTimeline } from '@/features/workshop/components/admin/tabs/AppointmentsTab/PlanningTimeline';
 import { Card } from '@/components/common/Card/Card';
-import { Button } from '@/components/common/Button/Button';
 import { TaskChecklistModal } from '@/features/workshop/components/modals/TaskChecklistModal/index';
 import { MechanicTaskModal } from '@/features/workshop/components/modals/MechanicTaskModal/index';
 import { PerfilTaller } from '@/features/workshop/components/admin/PerfilTaller/PerfilTaller';
@@ -110,7 +109,7 @@ export default function WorkshopAdminDashboard() {
   }, [employeeProfile]);
 
   if (loading) return (
-    <div className="min-h-screen bg-black flex items-center justify-center">
+    <div className="min-h-screen bg-slate-100 dark:bg-black flex items-center justify-center">
        <div className="w-16 h-16 border-t-2 border-red-600 rounded-full animate-spin"></div>
     </div>
   );
@@ -122,7 +121,7 @@ export default function WorkshopAdminDashboard() {
     t('workshopDashboard.appointmentsTab'), 
     t('workshopDashboard.timelineTab'), 
     t('common.status'), 
-    t('common.mechanic'), 
+    t('workshopDashboard.agendaTab'), 
     t('workshopDashboard.tasksTab'), 
     t('workshopDashboard.partsTab'), 
     t('nav.reports'), 
@@ -171,47 +170,47 @@ export default function WorkshopAdminDashboard() {
     : null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-red-500/30 selection:text-white pb-32">
+    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 text-slate-900 dark:text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200/50 via-slate-100 to-slate-200/40 dark:from-neutral-900 dark:via-black dark:to-black relative selection:bg-red-500/30 selection:text-white pb-32">
       <DashboardHeader 
         type="workshop" 
         profilePictureUrl={employeeProfile?.profilePictureUrl}
         onOpenProfile={() => setIsProfileOpen(true)}
         onOpenWorkshopSettings={() => setIsWorkshopSettingsOpen(true)}
       />
+
       <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
          
          <div className="max-w-7xl mx-auto p-6 md:p-12 space-y-8 animate-fade-in-up">
             
             <header className="space-y-6">
                {/* Fila Superior: Título y Botones Principales */}
-               <div className="flex justify-between items-center border-b border-neutral-800/60 pb-6">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-neutral-800/60 pb-6">
                   <div>
                     {isOwner && (
                       <Link 
                         to="/owner-dashboard" 
-                        className="flex items-center gap-2 text-neutral-500 hover:text-white mb-2 text-[10px] font-black uppercase tracking-widest transition-all group w-fit"
+                        className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white mb-2 text-[10px] font-black uppercase tracking-widest transition-all group w-fit"
                       >
                         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                         {t('workshopAdminDashboard.backToMyWorkshops')}
                       </Link>
                     )}
-                    <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-black uppercase tracking-[0.12em] text-slate-900 dark:text-white">
                        {SECCIONES[activeTab]}
                     </h1>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      variant="secondary"
+                  <div className="flex items-center gap-3">
+                    <button 
+                      type="button"
                       onClick={() => setIsAppModalOpen(true)}
-                      className="!px-6 !py-4"
+                      className="px-5 h-[46px] bg-red-600 hover:bg-red-500 active:scale-95 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-red-600/20 flex items-center gap-2 cursor-pointer shrink-0"
                     >
-                      <Plus className="w-4 h-4 text-red-500" />
+                      <Plus className="w-4 h-4 text-white" />
                       {t('workshopAdminDashboard.newAppointment')}
-                    </Button>
+                    </button>
                   </div>
                </div>
-
             </header>
 
             {/* Panel Tabs Wrapper */}
@@ -261,12 +260,12 @@ export default function WorkshopAdminDashboard() {
                   variant="neutral"
                   rounded="2xl"
                   padding="none"
-                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                  className="bg-white/90 dark:bg-neutral-900/20 border-slate-200 dark:border-neutral-800/60 shadow-sm dark:shadow-none overflow-hidden"
                 >
                   {/* Toolbar dentro del contenedor */}
-                  <div className="flex flex-wrap items-center gap-4 p-5 border-b border-neutral-800/60">
+                  <div className="flex flex-wrap items-center gap-4 p-5 border-b border-slate-200 dark:border-neutral-800/60">
                     <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
-                    <div className="h-10 w-[1px] bg-neutral-800/60 mx-1 hidden md:block"></div>
+                    <div className="h-10 w-[1px] bg-slate-200 dark:bg-neutral-800/60 mx-1 hidden md:block"></div>
                     <MechanicSearch
                       mechanics={employees.filter(e => {
                         if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
@@ -275,14 +274,14 @@ export default function WorkshopAdminDashboard() {
                       }) as any}
                       onSelectMechanic={() => {}}
                     />
-                    <Button
-                      variant="secondary"
+                    <button
+                      type="button"
                       onClick={goToNextUnassignedDate}
-                      className="!px-5 !py-3 bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 border border-blue-600/20 hover:border-blue-500/40 group/btn"
+                      className="px-5 h-[46px] bg-blue-50 hover:bg-blue-100 dark:bg-blue-600/10 dark:hover:bg-blue-600/20 text-blue-600 dark:text-blue-500 border border-blue-200 dark:border-blue-600/20 hover:border-blue-300 dark:hover:border-blue-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn cursor-pointer"
                     >
                       <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                       {t('workshopAdminDashboard.unassigned')}
-                    </Button>
+                    </button>
                     <div className="ml-auto">
                       <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="red" />
                     </div>
@@ -312,7 +311,7 @@ export default function WorkshopAdminDashboard() {
                   variant="neutral"
                   rounded="2xl"
                   padding="lg"
-                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                  className="bg-white dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none overflow-hidden"
                 >
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
@@ -328,22 +327,22 @@ export default function WorkshopAdminDashboard() {
                   variant="neutral"
                   rounded="2xl"
                   padding="none"
-                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden animate-fade-in-up"
+                  className="bg-white dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none overflow-hidden animate-fade-in-up"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center justify-between p-5 border-b border-neutral-800/60 gap-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between p-5 border-b border-slate-200 dark:border-neutral-800/60 gap-4">
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex items-center gap-2 px-4 py-2 bg-green-500/10 border border-green-500/20 rounded-full">
                         <span className="text-green-500 text-[10px] font-black uppercase tracking-widest">{t('workshopAdminDashboard.mySchedule')}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 rounded-xl px-3 py-1.5">
-                        <span className="text-[10px] text-neutral-500 font-black uppercase tracking-widest">{t('workshopAdminDashboard.viewScheduleOf')}</span>
+                      <div className="flex items-center gap-2 bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-xl px-3 py-1.5">
+                        <span className="text-[10px] text-slate-500 dark:text-neutral-500 font-black uppercase tracking-widest">{t('workshopAdminDashboard.viewScheduleOf')}</span>
                         <select
                           value={selectedAgendaEmployeeId || ''}
                           onChange={(e) => setSelectedAgendaEmployeeId(e.target.value || null)}
-                          className="bg-transparent text-white text-xs font-black uppercase tracking-wider focus:outline-none cursor-pointer border-none p-0 pr-6"
+                          className="bg-transparent text-slate-900 dark:text-white text-xs font-black uppercase tracking-wider focus:outline-none cursor-pointer border-none p-0 pr-6"
                         >
-                          <option value={employeeProfile?.id || ''} className="bg-neutral-950 text-white">
+                          <option value={employeeProfile?.id || ''} className="bg-white text-slate-900 dark:bg-neutral-950 dark:text-white">
                             {t('workshopAdminDashboard.mine', { name: employeeProfile?.firstname || t('workshopAdminDashboard.me') })}
                           </option>
                           {employees
@@ -354,7 +353,7 @@ export default function WorkshopAdminDashboard() {
                               return false;
                             })
                             .map((emp: any) => (
-                              <option key={emp.id} value={emp.id} className="bg-neutral-950 text-white">
+                              <option key={emp.id} value={emp.id} className="bg-white text-slate-900 dark:bg-neutral-950 dark:text-white">
                                 {emp.firstname} {emp.lastname} ({emp.role === 'WORKSHOP_MANAGER' ? t('roles.manager') : emp.role === 'WORKSHOP_OWNER' ? t('roles.owner') : t('roles.staff')})
                               </option>
                             ))
@@ -397,7 +396,7 @@ export default function WorkshopAdminDashboard() {
                   variant="neutral"
                   rounded="2xl"
                   padding="lg"
-                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                  className="bg-white dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none overflow-hidden"
                 >
                   <TasksTab workshopId={id} />
                 </Card>
@@ -409,7 +408,7 @@ export default function WorkshopAdminDashboard() {
                   variant="neutral"
                   rounded="2xl"
                   padding="lg"
-                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                  className="bg-white dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none overflow-hidden"
                 >
                   <PartsTab workshopId={id} />
                 </Card>
@@ -421,7 +420,7 @@ export default function WorkshopAdminDashboard() {
                   variant="neutral"
                   rounded="2xl"
                   padding="lg"
-                  className="bg-neutral-900/20 border-neutral-800/60 overflow-hidden"
+                  className="bg-white dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none overflow-hidden"
                 >
                   <ReportsTab workshopId={id} />
                 </Card>

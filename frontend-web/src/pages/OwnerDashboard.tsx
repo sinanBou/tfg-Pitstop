@@ -49,11 +49,11 @@ export default function OwnerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-red-500/30 selection:text-white pb-32">
+    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 text-slate-900 dark:text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200/50 via-slate-100 to-slate-200/40 dark:from-neutral-900 dark:via-black dark:to-black relative selection:bg-red-500/30 selection:text-red-900 dark:selection:text-white pb-32">
       
       {/* Fondo Glow Estático Global */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-neutral-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/5 dark:bg-red-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-neutral-400/10 dark:bg-neutral-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
 
       {/* Main Content Area */}
       <DashboardHeader 
@@ -64,9 +64,9 @@ export default function OwnerDashboard() {
 
       <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
         <div className="max-w-6xl mx-auto p-6 md:p-12 space-y-12 animate-fade-in-up">
-            <header className="flex justify-between items-end border-b border-neutral-800/60 pb-6 mb-8">
+            <header className="flex justify-between items-end border-b border-slate-200 dark:border-neutral-800/60 pb-6 mb-8">
                <div>
-                  <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                  <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                      {SECCIONES[activeTab]}
                   </h1>
                </div>

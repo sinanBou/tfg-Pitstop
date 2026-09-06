@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from '@/i18n';
 import { LanguageSelector } from '@/components/common/LanguageSelector/LanguageSelector';
+import { ThemeSelector } from '@/components/common/ThemeSelector';
 
 export function HomeHeader() {
   const location = useLocation();
@@ -17,14 +18,15 @@ export function HomeHeader() {
   };
 
   return (
-    <nav className="bg-zinc-950 backdrop-blur-md h-16 w-full px-5 py-3 flex items-center justify-between text-white border-b border-white/10 z-50 relative">
+    <nav className="bg-white/80 dark:bg-zinc-950 backdrop-blur-md h-16 w-full px-5 py-3 flex items-center justify-between text-slate-900 dark:text-white border-b border-slate-200 dark:border-white/10 z-50 relative transition-colors">
       <div className="text-xl p-1">
-        <Link to="/" className="font-bold text-3xl sm:text-4xl italic tracking-tighter">
+        <Link to="/" className="font-bold text-3xl sm:text-4xl italic tracking-tighter text-slate-900 dark:text-white">
           PitStop
         </Link>
       </div>
 
       <div className="flex items-center gap-3">
+        <ThemeSelector />
         <LanguageSelector />
 
         {homeBar && (

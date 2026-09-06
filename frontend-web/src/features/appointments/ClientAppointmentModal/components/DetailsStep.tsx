@@ -26,45 +26,45 @@ export const DetailsStep: React.FC<DetailsStepProps> = ({
       <div className="space-y-4 flex-1">
         <div className="grid grid-cols-2 gap-3 mb-6">
           {/* Resumen Mini */}
-          <div className="bg-black/40 border border-neutral-800 rounded-xl p-3 flex flex-col justify-center">
-             <p className="text-[9px] font-black uppercase tracking-widest text-neutral-500 mb-1">{t('appointmentModal.scheduledDate')}</p>
-             <p className="text-white text-sm font-bold truncate">
+          <div className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 rounded-xl p-3 flex flex-col justify-center">
+             <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 mb-1">{t('appointmentModal.scheduledDate')}</p>
+             <p className="text-slate-900 dark:text-white text-sm font-bold truncate">
                {formData.date ? formData.date.split('-').reverse().join('-') : ''} - {formData.time}h
              </p>
           </div>
-          <div className="bg-black/40 border border-neutral-800 rounded-xl p-3 flex flex-col justify-center">
-             <p className="text-[9px] font-black uppercase tracking-widest text-neutral-500 mb-1">{t('appointmentModal.selectedWorkshop')}</p>
-             <p className="text-white text-sm font-bold truncate">{selectedWorkshop?.companyName || t('common.workshop')}</p>
+          <div className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 rounded-xl p-3 flex flex-col justify-center">
+             <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 mb-1">{t('appointmentModal.selectedWorkshop')}</p>
+             <p className="text-slate-900 dark:text-white text-sm font-bold truncate">{selectedWorkshop?.companyName || t('common.workshop')}</p>
           </div>
         </div>
 
         <div>
-          <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block mb-2 ml-1">
+          <label className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-neutral-500 block mb-2 ml-1">
             {t('appointmentModal.serviceSubject')}
           </label>
           <input 
             type="text" 
             placeholder={t('appointmentModal.serviceSubjectPlaceholder')}
             value={formData.serviceType}
-            className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-4 text-white font-medium outline-none focus:border-blue-600 focus:bg-black transition-all placeholder-neutral-600"
+            className="w-full bg-slate-100 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-xl p-4 text-slate-900 dark:text-white font-medium outline-none focus:border-blue-600 focus:bg-white dark:focus:bg-black transition-all placeholder-slate-400 dark:placeholder-neutral-600"
             onChange={(e) => onServiceTypeChange(e.target.value)}
           />
         </div>
         
         <div>
-          <label className="text-[10px] uppercase font-black tracking-widest text-neutral-500 block mb-2 ml-1">
+          <label className="text-[10px] uppercase font-black tracking-widest text-slate-500 dark:text-neutral-500 block mb-2 ml-1">
             {t('appointmentModal.additionalDetails')}
           </label>
           <textarea 
             placeholder={t('appointmentModal.additionalDetailsPlaceholder')}
             value={formData.description}
-            className="w-full bg-neutral-900 border border-neutral-700 rounded-xl p-4 text-white text-sm outline-none focus:border-blue-600 focus:bg-black transition-all h-28 resize-none placeholder-neutral-600"
+            className="w-full bg-slate-100 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-xl p-4 text-slate-900 dark:text-white text-sm outline-none focus:border-blue-600 focus:bg-white dark:focus:bg-black transition-all h-28 resize-none placeholder-slate-400 dark:placeholder-neutral-600"
             onChange={(e) => onDescriptionChange(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="mt-8 flex justify-end items-center bg-black/50 -mx-8 -mb-8 p-6 px-8 border-t border-neutral-800">
+      <div className="mt-8 flex justify-end items-center bg-slate-100/80 dark:bg-black/50 -mx-8 -mb-8 p-6 px-8 border-t border-slate-200 dark:border-neutral-800">
          <button 
           type="button"
           onClick={onFinish}

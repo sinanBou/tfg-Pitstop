@@ -21,10 +21,10 @@ export const TabHeader: React.FC<TabHeaderProps> = ({
     : 'from-blue-600 to-blue-500 hover:shadow-[0_0_20px_rgba(37,99,235,0.4)]';
 
   return (
-    <div className="flex justify-between items-center bg-neutral-900/80 border border-neutral-800/40 rounded-2xl p-6 shadow-sm">
+    <div className="flex justify-between items-center bg-white/80 dark:bg-neutral-900/80 border border-slate-200 dark:border-neutral-800/40 rounded-2xl p-6 shadow-sm">
       <div>
-        <h2 className="text-2xl font-black uppercase tracking-tight text-white">{title}</h2>
-        <p className="text-xs text-neutral-400 font-bold uppercase tracking-widest mt-1">{subtitle}</p>
+        <h2 className="text-2xl font-black uppercase tracking-tight text-slate-900 dark:text-white">{title}</h2>
+        <p className="text-xs text-slate-500 dark:text-neutral-400 font-bold uppercase tracking-widest mt-1">{subtitle}</p>
       </div>
       <button
         onClick={onActionClick}

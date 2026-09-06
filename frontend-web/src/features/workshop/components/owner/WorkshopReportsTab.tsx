@@ -144,8 +144,8 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
-        <div className="w-8 h-8 border-4 border-neutral-800 border-t-neutral-400 rounded-full animate-spin" />
-        <p className="text-neutral-500 text-xs font-black uppercase tracking-widest animate-pulse">
+        <div className="w-8 h-8 border-4 border-slate-300 border-t-slate-600 dark:border-neutral-800 dark:border-t-neutral-400 rounded-full animate-spin" />
+        <p className="text-slate-500 dark:text-neutral-400 text-xs font-black uppercase tracking-widest animate-pulse">
           {t('ownerDashboard.consolidatingMetrics')}
         </p>
       </div>
@@ -158,7 +158,7 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
     return (
       <div className="space-y-6 animate-fade-in-up">
         {/* Barra superior de navegación interna */}
-        <div className="flex items-center justify-between border-b border-neutral-800/60 pb-6 mb-6">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-neutral-800/60 pb-6 mb-6">
           <div className="flex items-center gap-4">
             <BackButton 
               onClick={() => setSelectedWorkshopId(null)} 
@@ -166,14 +166,14 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
             />
             <div>
               <span className="text-[9px] font-black uppercase tracking-widest text-red-500">{t('ownerDashboard.individualAuditTitle')}</span>
-              <h2 className="text-xl font-black uppercase tracking-tight text-white mt-0.5">
+              <h2 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-white mt-0.5">
                 {selectedWorkshop?.companyName}
               </h2>
             </div>
           </div>
           <div className="text-right hidden sm:block">
-            <span className="text-[10px] text-neutral-500 font-mono">{selectedWorkshop?.address}</span>
-            <span className="bg-neutral-900 px-2 py-0.5 border border-neutral-800 rounded text-[9px] font-mono text-neutral-400 ml-2">
+            <span className="text-[10px] text-slate-500 dark:text-neutral-500 font-mono">{selectedWorkshop?.address}</span>
+            <span className="bg-slate-100 dark:bg-neutral-900 px-2 py-0.5 border border-slate-200 dark:border-neutral-800 rounded text-[9px] font-mono text-slate-600 dark:text-neutral-400 ml-2">
               ID: {selectedWorkshop?.id.substring(0, 8).toUpperCase()}
             </span>
           </div>
@@ -189,9 +189,9 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Cabecera y Selector de Mes */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-900 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-neutral-800 pb-4">
         <div>
-          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">{t('ownerDashboard.generalAnalysisTitle')}</h2>
+          <h2 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white mt-0.5">{t('ownerDashboard.generalAnalysisTitle')}</h2>
         </div>
         <MonthSelector selectedMonth={selectedMonth} onChange={setSelectedMonth} />
       </div>
@@ -229,16 +229,16 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
           border={false}
           padding="lg"
           rounded="2xl"
-          className="bg-neutral-950 border border-neutral-900 space-y-6"
+          className="bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-900 space-y-6 shadow-sm"
         >
-          <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-neutral-200">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-900 pb-4">
+            <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-neutral-200">
               {t('ownerDashboard.revenueByCenter')}
             </h3>
           </div>
 
           {globalStats.sortedByRevenue.length === 0 ? (
-            <p className="text-xs text-neutral-500 italic py-6 text-center">{t('ownerDashboard.noRevenueDataPeriod')}</p>
+            <p className="text-xs text-slate-500 dark:text-neutral-500 italic py-6 text-center">{t('ownerDashboard.noRevenueDataPeriod')}</p>
           ) : (
             <div className="space-y-6">
               {globalStats.sortedByRevenue.map((w, idx) => {
@@ -256,7 +256,7 @@ export function WorkshopReportsTab({ workshops = [] }: WorkshopReportsTabProps) 
                     <div className="text-right mt-1">
                       <button
                         onClick={() => setSelectedWorkshopId(w.id)}
-                        className="text-[9px] font-black uppercase tracking-widest text-neutral-500 hover:text-white transition-colors cursor-pointer"
+                        className="text-[9px] font-black uppercase tracking-widest text-slate-500 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white transition-colors cursor-pointer"
                       >
                         {t('ownerDashboard.viewDetails')}
                       </button>

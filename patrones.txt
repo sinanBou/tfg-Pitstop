@@ -57,3 +57,40 @@ Ubicación: `ai-service/services/rag_service.py`
 -------------------------------------------------------------------------------
 Ubicación: Spring Framework (`@Service`, `@Component`, `@Repository`, `@RestController`) y Python Services (`groq_service`, `rag_service`).
 - Descripción: Garantiza instancias únicas e inyectables de servicios sin acoplamiento directo en la instanciación.
+
+-------------------------------------------------------------------------------
+9. THEME STRATEGY & OBSERVER PATTERN (Frontend Theme Engine)
+-------------------------------------------------------------------------------
+Ubicación: `frontend-web/src/utils/theme/themeStrategy.ts`, `frontend-web/src/context/ThemeContext/ThemeContext.tsx`, `frontend-web/src/hooks/useTheme.ts`
+- Patrón Strategy: Desacopla la lógica de resolución del tema activo ('light', 'dark', 'system') en una estrategia pura (`resolveThemeStrategy`), permitiendo extender nuevos temas o reglas de cálculo sin acoplar la capa de presentación.
+- Patrón Observer: Escucha reactivamente los eventos del sistema operativo (`window.matchMedia('(prefers-color-scheme: dark)')`) para notificar automáticamente al contexto global cuando el usuario conmuta la configuración de su dispositivo en tiempo real.
+- Patrón Provider (Inyección de Dependencias React): Inyecta el estado y las operaciones de tema en todo el árbol de componentes sin prop drilling.
+
+-------------------------------------------------------------------------------
+10. PRESENTATIONAL & CONTAINER PATTERN (Planning Agenda & Timeline Engine)
+-------------------------------------------------------------------------------
+Ubicación: `frontend-web/src/features/workshop/components/admin/tabs/AppointmentsTab/`
+- Componentes Contenedor: `PlanningTimeline.tsx`, `AppointmentsTab.tsx`
+- Componentes Presentacionales: `AppointmentBlock.tsx`, `UnassignedColumn.tsx`, `AppointmentCard.tsx`
+- Descripción: Separa de manera estricta la lógica de negocio (detección de colisiones de horarios, cálculo de horas operativas, algoritmo de solapamiento de carriles *lane clustering*, snap magnético de 30 minutos y re-planificación) de la representación visual de las citas del taller. Los bloques de cita y tarjetas actúan como componentes puros e independientes que reciben propiedades tipadas y emiten eventos desacoplados, garantizando máxima mantenibilidad y modularidad.
+
+-------------------------------------------------------------------------------
+11. PORTAL PATTERN & ESCAPE STACKING CONTEXT (Fullscreen Dispatch Engine)
+-------------------------------------------------------------------------------
+Ubicación: `frontend-web/src/features/workshop/components/admin/tabs/AppointmentsTab/PlanningTimeline.tsx`
+- Técnica / Patrón: React Portal (`createPortal(timelineContent, document.body)`) & Stacking Context Isolation.
+- Descripción: Resuelve el atrapamiento de contenedores con `backdrop-filter`, `transform` o `overflow: hidden` (especificación CSS W3C de *containing block*). Teleporta el nodo DOM del Dispatcher de Planificación directamente al `document.body` al activar el modo de pantalla completa. Integra una transición suave (`animate-fullscreen-expand` con curva cúbica `cubic-bezier(0.16, 1, 0.3, 1)`), bloqueo ergonómico de scroll del fondo, soporte para tecla Escape y sincronización con el Fullscreen API nativo del navegador.
+
+-------------------------------------------------------------------------------
+12. STATE-DRIVEN STEPPER & DUAL-VIEW ADAPTER PATTERN (Client Dashboard Lifecycle Engine)
+-------------------------------------------------------------------------------
+Ubicación: `frontend-web/src/components/common/Card/ClientAppointmentCard.tsx`, `frontend-web/src/features/client/components/ClientHistoryTab.tsx`, `frontend-web/src/features/client/components/ClientOverviewTab.tsx`
+- State-Driven Stepper Pattern: Modela el ciclo de vida del vehículo en el taller (`PENDING` -> `CONFIRMED` -> `IN_PROGRESS` / `READY` -> `COMPLETED`) como una máquina de estados discretos unidireccionales reflejada en un Stepper interactivo de 4 pasos con cálculo semántico de progreso (0%, 33%, 66%, 100%), micro-estados de error/cancelación y banners de recogida. Proporciona retroalimentación visual inmediata con colores semánticos (verde esmeralda, azul cobalto, rojo carmesí).
+- Dual-View Adapter Pattern: Desacopla la visualización de datos históricos entre dos perspectivas con contratos de datos distintos: una vista de "Trabajos Realizados" (orientada al vehículo, tipo de servicio, coste y descarga de factura PDF) y una vista de "Registro de Actividad" (flujo cronológico de eventos del sistema), permitiendo alternar dinámicamente sin duplicar llamadas de red ni alterar el estado subyacente.
+
+-------------------------------------------------------------------------------
+13. AUTOMOTIVE IDENTIFIER RECOGNITION & DOMAIN VISUAL LANGUAGE PATTERN
+-------------------------------------------------------------------------------
+Ubicación: `frontend-web/src/features/workshop/components/admin/tabs/CitasTab/`, `frontend-web/src/features/workshop/components/admin/tabs/CompletedJobsTab/`, `frontend-web/src/features/workshop/components/admin/tabs/ReportsTab/`, `frontend-web/src/components/common/Card/VehicleCard.tsx`
+- Automotive Identifier Recognition: Algoritmo de reconocimiento y extracción de matrículas europeas mediante patrones de expresiones regulares desacoplado de las respuestas de API del backend. Formatea de manera declarativa la placa física europea con banda azul (`[E] 1234-BBB`) en las tarjetas de solicitudes pendientes, citas confirmadas, órdenes de trabajo finalizadas y facturas emitidas.
+- Domain Visual Language: Homogeneización de la interfaz en torno al dominio de la automoción profesional, mapeando logotipos de marcas de fabricantes, estados de taller discretos (vehículo en taller, kilometraje de recepción, repuestos bajo umbral crítico) y retroalimentación de alto contraste tanto en tema claro como oscuro.

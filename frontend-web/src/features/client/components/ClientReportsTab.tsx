@@ -60,16 +60,16 @@ interface VehicleSpendAnalysisProps {
 function VehicleSpendAnalysis({ statsByVehicle }: VehicleSpendAnalysisProps) {
   const { t } = useTranslation();
   return (
-    <div className="bg-neutral-950 border border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6">
-      <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
-        <h3 className="text-xs font-black uppercase tracking-widest text-neutral-200">
+    <div className="bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6 shadow-sm dark:shadow-none">
+      <div className="flex items-center justify-between border-b border-slate-200 dark:border-neutral-900 pb-4">
+        <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-neutral-200">
           {t('clientReports.expensesByVehicle')}
         </h3>
-        <span className="text-[10px] text-neutral-500 font-mono">{t('clientReports.detailedInvestment')}</span>
+        <span className="text-[10px] text-slate-500 dark:text-neutral-500 font-mono">{t('clientReports.detailedInvestment')}</span>
       </div>
 
       {statsByVehicle.length === 0 ? (
-        <p className="text-xs text-neutral-500 italic py-6 text-center">{t('clientReports.noVehiclesRegistered')}</p>
+        <p className="text-xs text-slate-500 dark:text-neutral-500 italic py-6 text-center">{t('clientReports.noVehiclesRegistered')}</p>
       ) : (
         <div className="space-y-5">
           {statsByVehicle.map((v, idx) => {
@@ -106,46 +106,46 @@ interface RecentInvoicesListProps {
 function RecentInvoicesList({ invoices, downloadingId, onDownload, translateServiceCodes, formatToDDMMYYYY }: RecentInvoicesListProps) {
   const { t } = useTranslation();
   return (
-    <div className="bg-neutral-950 border border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6">
-      <div className="flex items-center justify-between border-b border-neutral-900 pb-4">
+    <div className="bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-900 rounded-[1.5rem] p-6 md:p-8 space-y-6 shadow-sm dark:shadow-none">
+      <div className="flex items-center justify-between border-b border-slate-200 dark:border-neutral-900 pb-4">
         <div>
-          <h3 className="text-xs font-black uppercase tracking-widest text-neutral-200">
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-900 dark:text-neutral-200">
             {t('clientReports.latestInvoices')}
           </h3>
-          <p className="text-[10px] text-neutral-500 mt-1">{t('clientReports.quickPrintSub')}</p>
+          <p className="text-[10px] text-slate-500 dark:text-neutral-500 mt-1">{t('clientReports.quickPrintSub')}</p>
         </div>
-        <span className="text-[10px] text-neutral-500 font-mono">{t('clientReports.maxRecords')}</span>
+        <span className="text-[10px] text-slate-500 dark:text-neutral-500 font-mono">{t('clientReports.maxRecords')}</span>
       </div>
 
       {invoices.length === 0 ? (
-        <p className="text-xs text-neutral-500 italic py-6 text-center">{t('clientReports.noInvoicesPeriod')}</p>
+        <p className="text-xs text-slate-500 dark:text-neutral-500 italic py-6 text-center">{t('clientReports.noInvoicesPeriod')}</p>
       ) : (
         <div className="space-y-3">
           {invoices.map((inv, idx) => (
             <div 
               key={idx}
-              className="bg-neutral-950 border border-neutral-900/60 hover:border-neutral-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300"
+              className="bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-900/60 hover:border-slate-300 dark:hover:border-neutral-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300"
             >
               <div className="flex items-center gap-4">
-                <div className="shrink-0 flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6 [&_div]:w-6 [&_div]:h-6 [&_div]:text-[10px] text-neutral-400">
+                <div className="shrink-0 flex items-center justify-center [&_svg]:w-6 [&_svg]:h-6 [&_div]:w-6 [&_div]:h-6 [&_div]:text-[10px] text-slate-500 dark:text-neutral-400">
                   {getBrandLogo((inv.vehicleName || '').split(' ')[0])}
                 </div>
                 <div>
-                  <h4 className="text-xs font-black uppercase text-white">{inv.vehicleName}</h4>
-                  <p className="text-[10px] text-neutral-400 mt-0.5">{translateServiceCodes(inv.serviceType, inv.description)}</p>
-                  <span className="text-[9px] font-mono text-neutral-500">{formatToDDMMYYYY(inv.finishDate)}</span>
+                  <h4 className="text-xs font-black uppercase text-slate-900 dark:text-white">{inv.vehicleName}</h4>
+                  <p className="text-[10px] text-slate-600 dark:text-neutral-400 mt-0.5">{translateServiceCodes(inv.serviceType, inv.description)}</p>
+                  <span className="text-[9px] font-mono text-slate-500 dark:text-neutral-500">{formatToDDMMYYYY(inv.finishDate)}</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-4 self-end sm:self-center">
-                <span className="text-xs font-black font-mono text-neutral-300">{inv.totalCost.toFixed(2)}€</span>
+                <span className="text-xs font-black font-mono text-slate-900 dark:text-neutral-300">{inv.totalCost.toFixed(2)}€</span>
                 <button
                   onClick={() => onDownload(inv.id)}
                   disabled={downloadingId === inv.id}
-                  className="px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 hover:border-neutral-700 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-1.5 shrink-0 active:scale-95 disabled:opacity-50 font-mono"
+                  className="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 dark:bg-neutral-900 dark:hover:bg-neutral-800 text-slate-800 dark:text-neutral-300 hover:text-slate-900 dark:hover:text-white border border-slate-300 dark:border-neutral-800 hover:border-slate-400 dark:hover:border-neutral-700 text-[9px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center gap-1.5 shrink-0 active:scale-95 disabled:opacity-50 font-mono"
                 >
                   {downloadingId === inv.id ? (
-                    <div className="w-3.5 h-3.5 border-2 border-neutral-400/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-slate-400/30 border-t-slate-800 dark:border-neutral-400/30 dark:border-t-white rounded-full animate-spin" />
                   ) : (
                     <>
                       <FileText className="w-3.5 h-3.5" />
@@ -305,10 +305,10 @@ export function ClientReportsTab({ history = [], vehicles = [], appointments = [
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Cabecera y Selector de Mes */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-neutral-900 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-neutral-900 pb-4">
         <div>
-          <span className="text-[9px] font-black uppercase tracking-widest text-neutral-500">{t('clientReports.subtitle')}</span>
-          <h2 className="text-lg font-black uppercase tracking-tight text-white mt-0.5">{t('clientReports.title')}</h2>
+          <span className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500">{t('clientReports.subtitle')}</span>
+          <h2 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-white mt-0.5">{t('clientReports.title')}</h2>
         </div>
         <MonthSelector selectedMonth={selectedMonth} onChange={setSelectedMonth} />
       </div>

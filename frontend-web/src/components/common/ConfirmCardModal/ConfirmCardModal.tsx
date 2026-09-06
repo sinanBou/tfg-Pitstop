@@ -62,12 +62,12 @@ export const ConfirmCardModal: React.FC<ConfirmCardModalProps> = ({
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Overlay de fondo difuminado */}
       <div 
-        className="absolute inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300" 
+        className="absolute inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm transition-opacity duration-300" 
         onClick={onClose} 
       />
 
       {/* Contenedor tipo Card Compacto */}
-      <div className="relative bg-neutral-900/95 backdrop-blur-2xl border border-neutral-800 rounded-3xl w-full max-w-md flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-300 p-6 md:p-8 z-10">
+      <div className="relative bg-white dark:bg-neutral-900/95 backdrop-blur-2xl border border-slate-200 dark:border-neutral-800 rounded-3xl w-full max-w-md flex flex-col overflow-hidden shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-300 p-6 md:p-8 z-10">
         
         {/* Glow decorativo de fondo */}
         <div className={`absolute top-0 right-0 w-48 h-48 ${glowColor} rounded-full blur-[80px] -mr-24 -mt-24 pointer-events-none`}></div>
@@ -79,7 +79,7 @@ export const ConfirmCardModal: React.FC<ConfirmCardModalProps> = ({
               <AlertTriangle className="w-7 h-7 animate-pulse" />
             </div>
             
-            <h3 className="text-xl font-black uppercase tracking-wider text-white leading-tight">
+            <h3 className="text-xl font-black uppercase tracking-wider text-slate-900 dark:text-white leading-tight">
               {title}
             </h3>
             
@@ -88,12 +88,12 @@ export const ConfirmCardModal: React.FC<ConfirmCardModalProps> = ({
             </p>
           </div>
 
-          <div className="flex gap-3 justify-end border-t border-neutral-800/50 pt-6">
+          <div className="flex gap-3 justify-end border-t border-slate-200 dark:border-neutral-800/50 pt-6">
             <button
               type="button"
               disabled={isLoading}
               onClick={onClose}
-              className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all cursor-pointer active:scale-95 disabled:opacity-50"
+              className="px-6 py-3.5 rounded-xl border border-slate-300 dark:border-neutral-800 hover:border-slate-400 dark:hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-all cursor-pointer active:scale-95 disabled:opacity-50"
             >
               {cancelText}
             </button>

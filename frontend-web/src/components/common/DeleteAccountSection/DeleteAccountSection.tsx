@@ -43,7 +43,7 @@ export const DeleteAccountSection: React.FC<DeleteAccountSectionProps> = ({
           <h4 className="text-sm font-black uppercase tracking-wider text-red-400">
             {t('profile.criticalActionsHeader')}
           </h4>
-          <p className="text-xs text-neutral-400 font-semibold leading-relaxed">
+          <p className="text-xs text-slate-600 dark:text-neutral-400 font-semibold leading-relaxed">
             {isDisabled ? effectiveDisabledMsg : effectiveWarningMsg}
           </p>
         </div>

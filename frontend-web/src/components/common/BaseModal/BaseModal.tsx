@@ -47,15 +47,15 @@ export const BaseModal = ({
         data-testid="modal-overlay"
       />
       
-      {/* Landscape Modal Container: Wider than tall (max-w-5xl, h-[85vh] max-h-[650px]) */}
-      <div className="relative bg-neutral-900/95 backdrop-blur-2xl border border-neutral-800 rounded-2xl w-full max-w-5xl h-[85vh] max-h-[650px] flex flex-col overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-300">
+      {/* Landscape Modal Container */}
+      <div className="relative bg-white/95 dark:bg-neutral-900/95 text-slate-900 dark:text-white backdrop-blur-2xl border border-slate-200 dark:border-neutral-800 rounded-2xl w-full max-w-5xl h-[85vh] max-h-[650px] flex flex-col overflow-hidden shadow-2xl dark:shadow-[0_0_50px_rgba(0,0,0,0.9)] animate-in fade-in zoom-in-95 duration-300">
         
         {/* Glow decorativo */}
         <div className={`absolute top-0 right-0 w-64 h-64 ${glowColor} rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none`}></div>
         
         {/* Barra de progreso visual con brillo (Opcional) */}
         {progressBarWidth && (
-          <div className="flex h-1.5 w-full bg-neutral-900 relative z-20">
+          <div className="flex h-1.5 w-full bg-slate-200 dark:bg-neutral-900 relative z-20">
             <div 
               className={`${barColor} transition-all duration-700 ease-out relative`} 
               style={{ width: progressBarWidth }}
@@ -66,9 +66,9 @@ export const BaseModal = ({
         )}
 
         {/* Cabecera del Modal */}
-        <div className="relative p-6 px-8 border-b border-neutral-800/50 bg-neutral-950/50 flex justify-between items-center z-10 shrink-0">
+        <div className="relative p-6 px-8 border-b border-slate-200 dark:border-neutral-800/50 bg-slate-100/90 dark:bg-neutral-950/50 flex justify-between items-center z-10 shrink-0">
           <div>
-            <h2 className="text-white text-2xl font-black uppercase tracking-widest flex items-center gap-3">
+            <h2 className="text-slate-900 dark:text-white text-2xl font-black uppercase tracking-widest flex items-center gap-3">
               {title}
               {showDot && (
                 <span className="flex h-2 w-2 relative">
@@ -78,10 +78,10 @@ export const BaseModal = ({
               )}
             </h2>
             {subtitle && (
-              <p className="text-[10px] text-neutral-500 font-mono mt-1 uppercase">{subtitle}</p>
+              <p className="text-[10px] text-slate-500 dark:text-neutral-500 font-mono mt-1 uppercase">{subtitle}</p>
             )}
           </div>
-          <button onClick={onClose} className="p-2 text-neutral-500 hover:text-white hover:bg-neutral-800 rounded-xl transition-colors" data-testid="modal-close-btn">
+          <button onClick={onClose} className="p-2 text-slate-500 dark:text-neutral-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-neutral-800 rounded-xl transition-colors cursor-pointer" data-testid="modal-close-btn">
             <X className="w-6 h-6" />
           </button>
         </div>

@@ -38,9 +38,9 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
           placeholder={t('appointmentModal.searchPlaceholder')}
           value={searchTerm}
           onChange={(e) => onSearchTermChange(e.target.value)}
-          className="w-full bg-neutral-900/80 border border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-white focus:outline-none focus:border-blue-600/50 focus:bg-black transition-all placeholder-neutral-600"
+          className="w-full bg-slate-100 dark:bg-neutral-900/80 border border-slate-300 dark:border-neutral-800 rounded-2xl p-4 pl-12 text-sm text-slate-900 dark:text-white focus:outline-none focus:border-blue-600/50 focus:bg-white dark:focus:bg-black transition-all placeholder-slate-400 dark:placeholder-neutral-600"
         />
-        <Search className="w-5 h-5 text-neutral-600 absolute left-4 top-1/2 -translate-y-1/2" />
+        <Search className="w-5 h-5 text-slate-400 dark:text-neutral-600 absolute left-4 top-1/2 -translate-y-1/2" />
       </div>
 
       <div className="grid gap-3 flex-1 overflow-y-auto pr-1 max-h-[350px] custom-scrollbar scroll-smooth">
@@ -49,11 +49,11 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
             key={w.id}
             type="button"
             onClick={() => onSelect(w.id)}
-            className={`p-5 rounded-2xl border transition-all text-left flex items-start gap-4 group ${
-              selectedWorkshopId === w.id ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-neutral-800 bg-black/40 hover:border-blue-500/50 hover:bg-neutral-900/60'
+            className={`p-5 rounded-2xl border transition-all text-left flex items-start gap-4 group cursor-pointer ${
+              selectedWorkshopId === w.id ? 'border-blue-500 bg-blue-500/10 shadow-[0_0_20px_rgba(59,130,246,0.15)]' : 'border-slate-200 dark:border-neutral-800 bg-slate-100 dark:bg-black/40 hover:border-blue-500/50 hover:bg-slate-200/60 dark:hover:bg-neutral-900/60'
             }`}
           >
-            <div className={`w-12 h-12 shrink-0 rounded-xl overflow-hidden flex items-center justify-center transition-colors ${selectedWorkshopId === w.id ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-neutral-800 text-neutral-400 group-hover:text-blue-400 border border-neutral-700/50'}`}>
+            <div className={`w-12 h-12 shrink-0 rounded-xl overflow-hidden flex items-center justify-center transition-colors ${selectedWorkshopId === w.id ? 'bg-blue-500/20 text-blue-500 dark:text-blue-400 border border-blue-500/30' : 'bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 group-hover:text-blue-500 dark:group-hover:text-blue-400 border border-slate-300 dark:border-neutral-700/50'}`}>
                {w.logoPictureUrl ? (
                   <img 
                      src={w.logoPictureUrl} 
@@ -70,12 +70,12 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
             </div>
             <div className="flex-1">
               <div className="flex justify-between items-start mb-1">
-                 <p className="text-lg text-white font-black uppercase tracking-wide group-hover:text-blue-400 transition-colors">{w.companyName}</p>
-                 {w.cif && <span className="text-[9px] font-mono text-neutral-600 bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-800">{w.cif}</span>}
+                 <p className="text-lg text-slate-900 dark:text-white font-black uppercase tracking-wide group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{w.companyName}</p>
+                 {w.cif && <span className="text-[9px] font-mono text-slate-600 dark:text-neutral-400 bg-slate-200 dark:bg-neutral-900 px-1.5 py-0.5 rounded border border-slate-300 dark:border-neutral-800">{w.cif}</span>}
               </div>
               {w.address && (
-                 <p className="text-xs text-neutral-400 font-mono tracking-tight flex items-center gap-1.5 mb-2">
-                   <MapPin className="w-3.5 h-3.5 text-neutral-500" />
+                 <p className="text-xs text-slate-600 dark:text-neutral-400 font-mono tracking-tight flex items-center gap-1.5 mb-2">
+                   <MapPin className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500" />
                    {w.address}
                  </p>
               )}
@@ -94,15 +94,15 @@ export const WorkshopStep: React.FC<WorkshopStepProps> = ({
           <button 
             type="button"
             onClick={onLoadMore}
-            className="w-full py-4 bg-neutral-900/50 hover:bg-neutral-900 border border-neutral-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-neutral-500 hover:text-white transition-all shadow-sm"
+            className="w-full py-4 bg-slate-200/70 hover:bg-slate-200 dark:bg-neutral-900/50 dark:hover:bg-neutral-900 border border-slate-300 dark:border-neutral-800 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-600 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white transition-all shadow-sm cursor-pointer"
           >
             {t('appointmentModal.loadMoreWorkshops')}
           </button>
         )}
 
         {!isSearching && searchResults.length === 0 && (
-          <div className="py-12 text-center border-2 border-dashed border-neutral-800 rounded-3xl bg-neutral-900/20">
-             <p className="text-neutral-500 text-sm font-bold uppercase tracking-widest animate-pulse">{t('appointmentModal.noResults')}</p>
+          <div className="py-12 text-center border-2 border-dashed border-slate-200 dark:border-neutral-800 rounded-3xl bg-slate-100/50 dark:bg-neutral-900/20">
+             <p className="text-slate-500 dark:text-neutral-500 text-sm font-bold uppercase tracking-widest animate-pulse">{t('appointmentModal.noResults')}</p>
           </div>
         )}
       </div>

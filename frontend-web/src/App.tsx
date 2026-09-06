@@ -17,6 +17,7 @@ import WorkshopAdminDashboard from '@/pages/WorkshopAdminDashboard';
 import WorkerDashboard from '@/pages/WorkerDashboard';
 
 import { LanguageProvider } from '@/i18n';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 function App() {
   const location = useLocation();
@@ -34,11 +35,12 @@ function App() {
   const isPublicRoute = ['/', '/login', '/registration', '/forgot-password', '/reset-password'].includes(location.pathname);
 
   return (
-    <LanguageProvider>
-      <ToastProvider>
-        <div className="h-full bg-black text-white flex flex-col relative">
-          {/* CONTENIDO CAMBIANTE */}
-          <main className="bg-black h-screen w-full">
+    <ThemeProvider>
+      <LanguageProvider>
+        <ToastProvider>
+          <div className="h-full bg-slate-100 dark:bg-black text-slate-900 dark:text-white flex flex-col relative transition-colors duration-200">
+            {/* CONTENIDO CAMBIANTE */}
+            <main className="bg-slate-100 dark:bg-black h-screen w-full transition-colors duration-200">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -59,6 +61,7 @@ function App() {
         </div>
       </ToastProvider>
     </LanguageProvider>
+    </ThemeProvider>
   );
 }
 

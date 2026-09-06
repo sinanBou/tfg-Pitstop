@@ -327,56 +327,56 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
     >
       <div className="space-y-6 flex-1 flex flex-col animate-none">
         {/* Info Cita */}
-        <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-5 space-y-3 shrink-0">
+        <div className="bg-slate-100 dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/60 rounded-2xl p-5 space-y-3 shrink-0">
           <div className="flex justify-between items-center text-xs">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.vehicle')}</span>
-            <span className="text-white font-extrabold">{job?.vehicleDisplay}</span>
+            <span className="text-slate-500 dark:text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.vehicle')}</span>
+            <span className="text-slate-900 dark:text-white font-extrabold">{job?.vehicleDisplay}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.client')}</span>
-            <span className="text-white font-extrabold">{job?.clientFullName}</span>
+            <span className="text-slate-500 dark:text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.client')}</span>
+            <span className="text-slate-900 dark:text-white font-extrabold">{job?.clientFullName}</span>
           </div>
           <div className="flex justify-between items-center text-xs">
-            <span className="text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.laborRate')}</span>
-            <span className="text-green-400 font-extrabold">{laborRate.toFixed(2)}€ / h</span>
+            <span className="text-slate-500 dark:text-neutral-500 font-bold uppercase tracking-wider">{t('invoiceModal.laborRate')}</span>
+            <span className="text-green-600 dark:text-green-400 font-extrabold">{laborRate.toFixed(2)}€ / h</span>
           </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-6 items-start flex-1">
           {/* Mano de Obra (Izquierda) */}
-          <div className="w-full md:w-1/2 space-y-3 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl p-5">
-            <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">{t('invoiceModal.laborTitle')}</h4>
+          <div className="w-full md:w-1/2 space-y-3 bg-slate-100/70 dark:bg-neutral-900/10 border border-slate-200 dark:border-neutral-800/60 rounded-2xl p-5">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-neutral-400">{t('invoiceModal.laborTitle')}</h4>
             
             {loadingCatalog ? (
-              <div className="text-center py-6 text-neutral-500 text-xs font-bold uppercase tracking-wider animate-pulse">
+              <div className="text-center py-6 text-slate-500 dark:text-neutral-500 text-xs font-bold uppercase tracking-wider animate-pulse">
                 {t('invoiceModal.loadingCatalogTimes')}
               </div>
             ) : resolvedTasks.length === 0 ? (
-              <div className="text-center py-6 text-neutral-500 text-xs border border-dashed border-neutral-800 rounded-xl">
+              <div className="text-center py-6 text-slate-500 dark:text-neutral-500 text-xs border border-dashed border-slate-300 dark:border-neutral-800 rounded-xl">
                 {t('invoiceModal.noMappedTasks')}
               </div>
             ) : (
-              <div className="border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900">
+              <div className="border border-slate-200 dark:border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-slate-200 dark:divide-neutral-900">
                 {resolvedTasks.map((tItem, idx) => (
-                  <div key={idx} className="bg-neutral-900/10 px-4 py-3 flex justify-between items-center text-sm">
+                  <div key={idx} className="bg-white dark:bg-neutral-900/10 px-4 py-3 flex justify-between items-center text-sm">
                     <div>
-                      <p className="text-white font-bold text-xs">{tItem.name}</p>
-                      <p className="text-[9px] text-neutral-500 font-mono mt-0.5">{t('invoiceModal.taskCode')} {tItem.code}</p>
+                      <p className="text-slate-900 dark:text-white font-bold text-xs">{tItem.name}</p>
+                      <p className="text-[9px] text-slate-400 dark:text-neutral-500 font-mono mt-0.5">{t('invoiceModal.taskCode')} {tItem.code}</p>
                     </div>
-                    <span className="text-neutral-400 font-mono text-xs">{tItem.hours.toFixed(2)}h</span>
+                    <span className="text-slate-600 dark:text-neutral-400 font-mono text-xs">{tItem.hours.toFixed(2)}h</span>
                   </div>
                 ))}
-                <div className="bg-neutral-900/40 px-4 py-3 flex justify-between items-center text-xs font-black uppercase tracking-widest text-neutral-300">
+                <div className="bg-slate-100 dark:bg-neutral-900/40 px-4 py-3 flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-700 dark:text-neutral-300">
                   <span>{t('invoiceModal.totalHours')}</span>
-                  <span className="text-white font-mono">{totalLaborHours.toFixed(2)}h ({totalLaborCost.toFixed(2)}€)</span>
+                  <span className="text-slate-900 dark:text-white font-mono">{totalLaborHours.toFixed(2)}h ({totalLaborCost.toFixed(2)}€)</span>
                 </div>
               </div>
             )}
           </div>
 
           {/* Repuestos / Piezas Compradas (Derecha) */}
-          <div className="w-full md:w-1/2 space-y-4 bg-neutral-900/10 border border-neutral-800/60 rounded-2xl p-5">
-            <h4 className="text-xs font-black uppercase tracking-widest text-neutral-400">{t('invoiceModal.partsTitle')}</h4>
+          <div className="w-full md:w-1/2 space-y-4 bg-slate-100/70 dark:bg-neutral-900/10 border border-slate-200 dark:border-neutral-800/60 rounded-2xl p-5">
+            <h4 className="text-xs font-black uppercase tracking-widest text-slate-600 dark:text-neutral-400">{t('invoiceModal.partsTitle')}</h4>
             
             {/* Formulario rápido con buscador de autocompletado */}
             <form onSubmit={handleAddPart} className="flex gap-2 shrink-0 relative">
@@ -392,13 +392,13 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                   }}
                   onFocus={() => setShowDropdown(true)}
                   placeholder={t('invoiceModal.searchPartPlaceholder')}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all font-semibold text-white animate-none"
+                  className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-3 py-2.5 text-xs placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all font-semibold text-slate-900 dark:text-white animate-none"
                 />
                 
                 {showDropdown && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-                    <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 divide-y divide-neutral-900 custom-scrollbar">
+                    <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-xl shadow-xl dark:shadow-2xl z-50 divide-y divide-slate-100 dark:divide-neutral-900 custom-scrollbar">
                       {filteredInventory.map(inv => (
                         <button
                           key={inv.id}
@@ -409,10 +409,10 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                             setShowDropdown(false);
                           }}
                           disabled={inv.stockQuantity === 0}
-                          className="w-full text-left px-3 py-2.5 text-xs hover:bg-neutral-900 flex justify-between items-center transition-all disabled:opacity-50"
+                          className="w-full text-left px-3 py-2.5 text-xs hover:bg-slate-100 dark:hover:bg-neutral-900 flex justify-between items-center transition-all disabled:opacity-50"
                         >
-                          <span className="text-white font-semibold">{inv.part.name}</span>
-                          <span className="text-[10px] text-neutral-400 font-mono">
+                          <span className="text-slate-900 dark:text-white font-semibold">{inv.part.name}</span>
+                          <span className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono">
                             {inv.stockQuantity} uds. - {inv.retailPrice.toFixed(2)}€
                           </span>
                         </button>
@@ -426,15 +426,15 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                             setSelectedInvId('custom');
                             setShowDropdown(false);
                           }}
-                          className="w-full text-left px-3 py-2.5 text-xs bg-green-950/20 hover:bg-green-900/20 text-green-400 font-bold flex items-center gap-1.5 transition-all"
+                          className="w-full text-left px-3 py-2.5 text-xs bg-green-500/10 dark:bg-green-950/20 hover:bg-green-500/20 dark:hover:bg-green-900/20 text-green-600 dark:text-green-400 font-bold flex items-center gap-1.5 transition-all"
                         >
                           <span>{t('invoiceModal.customPartLabel')}</span>
-                          <span className="text-white italic font-normal">"{partQuery.trim()}"</span>
+                          <span className="text-slate-900 dark:text-white italic font-normal">"{partQuery.trim()}"</span>
                         </button>
                       )}
                       
                       {filteredInventory.length === 0 && partQuery.trim().length === 0 && (
-                        <div className="px-3 py-3 text-center text-xs text-neutral-500 font-medium">
+                        <div className="px-3 py-3 text-center text-xs text-slate-500 dark:text-neutral-500 font-medium">
                           {t('invoiceModal.typeToSearchCustom')}
                         </div>
                       )}
@@ -450,7 +450,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                 value={quantityToUse}
                 onChange={e => setQuantityToUse(parseInt(e.target.value) || 1)}
                 placeholder={t('invoiceModal.quantityPlaceholder')}
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
+                className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-slate-900 dark:text-white"
               />
               
               <input 
@@ -460,7 +460,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                 value={discountPercent || ''}
                 onChange={e => setDiscountPercent(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
                 placeholder={t('invoiceModal.discountPlaceholder')}
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-white"
+                className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-2 py-2.5 text-xs placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-green-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-slate-900 dark:text-white"
                 title="Descuento opcional en porcentaje (0-100)"
               />
 
@@ -475,14 +475,14 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
 
             {/* Listado de Piezas */}
             {parts.length === 0 ? (
-              <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center border border-dashed border-neutral-900 rounded-xl">
-                <Box className="w-8 h-8 text-neutral-800 mb-1" strokeWidth={1.5} />
+              <div className="text-center py-12 text-slate-400 dark:text-neutral-600 text-xs flex flex-col items-center justify-center border border-dashed border-slate-300 dark:border-neutral-900 rounded-xl">
+                <Box className="w-8 h-8 text-slate-300 dark:text-neutral-800 mb-1" strokeWidth={1.5} />
                 <p className="text-[10px] font-bold uppercase tracking-wider">{t('invoiceModal.noPartsAdded')}</p>
               </div>
             ) : (
-              <div className="border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 max-h-[200px] overflow-y-auto custom-scrollbar">
+              <div className="border border-slate-200 dark:border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-slate-100 dark:divide-neutral-900 max-h-[200px] overflow-y-auto custom-scrollbar">
                 {hasMissingPrices && (
-                  <div className="bg-yellow-600/10 border-b border-yellow-500/20 px-4 py-2 flex items-center gap-2 text-[10px] text-yellow-400 font-bold uppercase tracking-wider">
+                  <div className="bg-yellow-600/10 border-b border-yellow-500/20 px-4 py-2 flex items-center gap-2 text-[10px] text-yellow-600 dark:text-yellow-400 font-bold uppercase tracking-wider">
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                     {t('invoiceModal.missingPricesWarning')}
                   </div>
@@ -491,11 +491,11 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                   <div key={idx} className={`px-4 py-3 flex justify-between items-center text-xs ${
                     p.price === null || p.price === undefined || p.price <= 0
                       ? 'bg-yellow-600/5 border-l-2 border-l-yellow-500'
-                      : 'bg-neutral-900/10'
+                      : 'bg-white dark:bg-neutral-900/10'
                   }`}>
                     <div className="flex flex-col min-w-0">
-                      <span className="text-white font-medium truncate max-w-[130px]">{p.name}</span>
-                      <span className="text-[10px] text-neutral-500 font-semibold">Cant: {p.quantityUsed ?? 1} uds.</span>
+                      <span className="text-slate-900 dark:text-white font-medium truncate max-w-[130px]">{p.name}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-neutral-500 font-semibold">Cant: {p.quantityUsed ?? 1} uds.</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       {p.price === null || p.price === undefined || p.price <= 0 ? (
@@ -505,11 +505,11 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                             step="0.01"
                             min="0"
                             placeholder="0.00"
-                            className="bg-neutral-900 border border-yellow-500/40 rounded-lg px-2 py-1 text-white text-xs font-mono w-20 text-center focus:outline-none focus:border-yellow-400 transition-all"
+                            className="bg-white dark:bg-neutral-900 border border-yellow-500/40 rounded-lg px-2 py-1 text-slate-900 dark:text-white text-xs font-mono w-20 text-center focus:outline-none focus:border-yellow-400 transition-all"
                             onBlur={e => handleUpdatePartPrice(idx, e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
                           />
-                          <span className="text-yellow-500 text-[10px] font-bold">€</span>
+                          <span className="text-yellow-600 dark:text-yellow-500 text-[10px] font-bold">€</span>
                         </div>
                       ) : (
                         <input
@@ -517,7 +517,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                           step="0.01"
                           min="0"
                           defaultValue={p.price.toFixed(2)}
-                          className="bg-transparent border border-transparent hover:border-neutral-700 focus:border-green-500 rounded-lg px-2 py-1 text-neutral-400 text-xs font-mono w-20 text-right focus:outline-none focus:text-white transition-all"
+                          className="bg-transparent border border-transparent hover:border-slate-300 dark:hover:border-neutral-700 focus:border-green-500 rounded-lg px-2 py-1 text-slate-700 dark:text-neutral-400 text-xs font-mono w-20 text-right focus:outline-none focus:text-slate-900 dark:focus:text-white transition-all"
                           onBlur={e => handleUpdatePartPrice(idx, e.target.value)}
                           onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
                         />
@@ -525,16 +525,16 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
                       <button
                         type="button"
                         onClick={() => handleRemovePart(p.partId)}
-                        className="text-neutral-500 hover:text-red-400 transition-all"
+                        className="text-slate-400 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 transition-all"
                       >
                         <Trash className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 ))}
-                <div className="bg-neutral-900/40 px-4 py-3 flex justify-between items-center text-xs font-black uppercase tracking-widest text-neutral-300">
+                <div className="bg-slate-100 dark:bg-neutral-900/40 px-4 py-3 flex justify-between items-center text-xs font-black uppercase tracking-widest text-slate-700 dark:text-neutral-300">
                   <span>{t('invoiceModal.totalParts')}</span>
-                  <span className="text-white font-mono">{totalPartsCost.toFixed(2)}€</span>
+                  <span className="text-slate-900 dark:text-white font-mono">{totalPartsCost.toFixed(2)}€</span>
                 </div>
               </div>
             )}
@@ -542,23 +542,23 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
         </div>
 
         {/* Resumen Total */}
-        <div className="bg-green-500/5 border border-green-500/20 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shrink-0">
-          <div className="flex gap-6 text-xs text-neutral-400 font-bold uppercase tracking-wider">
-            <div>{t('invoiceModal.laborTitle')}: <span className="font-mono text-white ml-1">{totalLaborCost.toFixed(2)}€</span></div>
-            <div>{t('invoiceModal.totalParts')}: <span className="font-mono text-white ml-1">{totalPartsCost.toFixed(2)}€</span></div>
+        <div className="bg-green-500/10 border border-green-500/30 rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shrink-0">
+          <div className="flex gap-6 text-xs text-slate-600 dark:text-neutral-400 font-bold uppercase tracking-wider">
+            <div>{t('invoiceModal.laborTitle')}: <span className="font-mono text-slate-900 dark:text-white ml-1">{totalLaborCost.toFixed(2)}€</span></div>
+            <div>{t('invoiceModal.totalParts')}: <span className="font-mono text-slate-900 dark:text-white ml-1">{totalPartsCost.toFixed(2)}€</span></div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-neutral-400 text-xs font-bold uppercase tracking-wider">{t('invoiceModal.totalPVP')}</span>
-            <span className="text-green-400 text-2xl font-mono font-black">{finalTotal.toFixed(2)}€</span>
+            <span className="text-slate-600 dark:text-neutral-400 text-xs font-bold uppercase tracking-wider">{t('invoiceModal.totalPVP')}</span>
+            <span className="text-green-600 dark:text-green-400 text-2xl font-mono font-black">{finalTotal.toFixed(2)}€</span>
           </div>
         </div>
 
         {/* Footer Actions */}
-        <div className="mt-auto pt-6 border-t border-neutral-800/50 flex justify-end gap-3 shrink-0">
+        <div className="mt-auto pt-6 border-t border-slate-200 dark:border-neutral-800/50 flex justify-end gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
+            className="px-6 py-3.5 rounded-xl border border-slate-300 hover:border-slate-400 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 dark:border-neutral-800 dark:hover:border-neutral-700 dark:text-neutral-400 dark:hover:text-white transition-all active:scale-95"
           >
             {t('common.cancel')}
           </button>
@@ -568,7 +568,7 @@ export const GenerateInvoiceModal: React.FC<GenerateInvoiceModalProps> = ({
             disabled={submitting || hasMissingPrices}
             className={`px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95 ${
               hasMissingPrices
-                ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed'
+                ? 'bg-slate-200 text-slate-400 dark:bg-neutral-800 dark:text-neutral-500 cursor-not-allowed'
                 : 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_30px_rgba(34,197,94,0.3)] disabled:opacity-50'
             }`}
           >

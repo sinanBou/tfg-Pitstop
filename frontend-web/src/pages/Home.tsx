@@ -10,7 +10,7 @@ export default function Home() {
   const { t } = useTranslation();
 
   return (
-    <div className="w-full flex flex-col bg-zinc-950 font-sans selection:bg-red-600/30 selection:text-white relative overflow-hidden">
+    <div className="dark w-full flex flex-col bg-zinc-950 text-white font-sans selection:bg-red-600/30 selection:text-white relative overflow-hidden">
       
       {/* Global Background Glows */}
       <div className="fixed top-[-20%] left-[-10%] w-[800px] h-[800px] bg-red-600/10 rounded-full blur-[150px] mix-blend-screen pointer-events-none"></div>
@@ -26,7 +26,7 @@ export default function Home() {
                <Button 
                  onClick={() => navigate('/login')} 
                  variant="ghost"
-                 className="!px-4 !py-2.5 !text-[10px] md:!text-xs border-transparent hover:border-neutral-800"
+                 className="!px-4 !py-2.5 !text-[10px] md:!text-xs !text-white hover:!text-white !bg-transparent hover:!bg-white/10 !border !border-neutral-700/80 hover:!border-neutral-500 transition-all duration-300"
                >
                  {t('common.login')}
                </Button>

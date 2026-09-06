@@ -1,1 +1,80 @@
-@import 'tailwindcss'
+@import 'tailwindcss';
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+:root {
+  /* Paleta Semántica - Light Mode Ergonómico (Anti-deslumbramiento / Eye-Care) */
+  --color-bg-app: #f1f5f9;       /* Slate-100 suave anti-fatiga (~93% luminancia, absorbe el exceso de fotones) */
+  --color-bg-surface: #ffffff;   /* Superficie de tarjetas limpia */
+  --color-bg-elevated: #e2e8f0;  /* Superficies secundarias e inputs */
+  
+  --color-border-base: #cbd5e1;  /* Slate-300: bordes nítidos sin forzar el enfoque */
+  --color-border-subtle: #e2e8f0;
+  --color-border-focus: #dc2626;
+
+  --color-text-primary: #0f172a;   /* Slate-900: evita la vibración óptica del negro absoluto #000 */
+  --color-text-secondary: #334155; /* Slate-700 (Ratio > 7:1) */
+  --color-text-muted: #64748b;     /* Slate-500 (Ratio > 4.5:1) */
+
+  --color-accent-primary: #dc2626; /* Brand PitStop Red */
+  --color-accent-hover: #b91c1c;
+  --color-accent-secondary: #2563eb; /* Tech Blue */
+
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--color-bg-app);
+  color: var(--color-text-primary);
+}
+
+.dark {
+  /* Paleta Semántica - Dark Mode (Garantía WCAG AA) */
+  --color-bg-app: #09090b;
+  --color-bg-surface: #141417;
+  --color-bg-elevated: #202024;
+  
+  --color-border-base: #27272a;
+  --color-border-subtle: #18181b;
+  --color-border-focus: #ef4444;
+
+  --color-text-primary: #fafafa;   /* Ratio > 18:1 */
+  --color-text-secondary: #a1a1aa; /* Ratio > 6.5:1 */
+  --color-text-muted: #71717a;     /* Ratio > 4.5:1 */
+
+  --color-accent-primary: #ef4444; /* Racing Red Glow */
+  --color-accent-hover: #f87171;
+  --color-accent-secondary: #3b82f6;
+
+  color-scheme: dark;
+}
+
+@theme {
+  --color-app-bg: var(--color-bg-app);
+  --color-surface: var(--color-bg-surface);
+  --color-surface-elevated: var(--color-bg-elevated);
+  --color-border-main: var(--color-border-base);
+  --color-border-soft: var(--color-border-subtle);
+  --color-content-primary: var(--color-text-primary);
+  --color-content-secondary: var(--color-text-secondary);
+  --color-content-muted: var(--color-text-muted);
+  --color-brand-red: var(--color-accent-primary);
+  --color-brand-blue: var(--color-accent-secondary);
+}
+
+@keyframes fullscreenExpand {
+  0% {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fullscreen-expand {
+  animation: fullscreenExpand 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform, opacity;
+}
+

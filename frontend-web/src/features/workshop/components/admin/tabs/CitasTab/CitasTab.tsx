@@ -54,7 +54,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
         variant="neutral"
         rounded="2xl"
         padding="lg"
-        className="bg-neutral-900/30 border-neutral-800/60"
+        className="bg-white/90 dark:bg-neutral-900/30 border-slate-200 dark:border-neutral-800/60 shadow-sm dark:shadow-none"
       >
         {/* Toolbar: Pendientes + Calendario */}
         <div className="flex flex-wrap items-center gap-4 mb-8">
@@ -79,7 +79,7 @@ export const CitasTab: React.FC<CitasTabProps> = ({
         />
         
         {pendingAppointments.length > 0 && (
-          <p className="text-[10px] text-neutral-500 uppercase tracking-widest mt-6 text-center">
+          <p className="text-[10px] text-slate-500 dark:text-neutral-500 uppercase tracking-widest mt-6 text-center">
             {t('citasTab.confirmedMoveInfo')}
           </p>
         )}

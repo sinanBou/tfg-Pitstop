@@ -70,7 +70,7 @@ export const ClientAppointmentModal: React.FC<ClientAppointmentModalProps> = (pr
               )}
               <div>
                 <p className="text-blue-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1.5">{t('appointmentModal.stepCounter', { step })}</p>
-                <h3 className="text-2xl font-black uppercase text-white leading-none">
+                <h3 className="text-2xl font-black uppercase text-slate-900 dark:text-white leading-none">
                   {step === 1 && t('appointmentModal.stepVehicle')}
                   {step === 2 && t('appointmentModal.stepWorkshop')}
                   {step === 3 && t('appointmentModal.stepSchedule')}

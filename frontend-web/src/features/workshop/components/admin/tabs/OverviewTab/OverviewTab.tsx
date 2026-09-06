@@ -45,14 +45,14 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
          
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
          {/* Active Vehicles Card */}
-         <Card variant="neutral" glow={false} border={false} padding="lg" className="lg:col-span-1 relative overflow-hidden group !rounded-2xl">
+         <Card variant="neutral" glow={false} border={false} padding="lg" className="lg:col-span-1 relative overflow-hidden group !rounded-2xl border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none bg-white dark:bg-neutral-900/30">
             <div className="relative z-10 flex flex-col h-full justify-between">
                <div>
                   <p className="text-[10px] uppercase font-black tracking-[0.2em] text-red-500 mb-2">{t('overviewTab.workshopStatus')}</p>
-                  <p className="text-7xl font-black text-white tracking-tighter drop-shadow-xl">{workshopData?.vehiclesCurrentCount || 0}</p>
+                  <p className="text-7xl font-black text-slate-900 dark:text-white tracking-tighter drop-shadow-xl">{workshopData?.vehiclesCurrentCount || 0}</p>
                </div>
                <div className="mt-8">
-                  <p className="text-sm font-black text-white tracking-widest uppercase">{t('overviewTab.vehiclesInWorkshop')}</p>
+                  <p className="text-sm font-black text-slate-900 dark:text-white tracking-widest uppercase">{t('overviewTab.vehiclesInWorkshop')}</p>
                </div>
             </div>
          </Card>
@@ -60,26 +60,26 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
          <div className="lg:col-span-3 flex flex-col gap-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                {/* Employees Summary Card */}
-               <Card variant="neutral" glow={false} border={false} padding="md" className="h-[160px] flex flex-col justify-between transition-all duration-300 group !rounded-2xl">
-                  <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-neutral-800/60 text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
+               <Card variant="neutral" glow={false} border={false} padding="md" className="h-[160px] flex flex-col justify-between transition-all duration-300 group !rounded-2xl border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none bg-white dark:bg-neutral-900/30">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800/60 text-slate-600 dark:text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
                       <Users className="w-6 h-6" strokeWidth={1.5} />
                   </div>
                   <div>
-                     <p className="text-5xl font-black text-white tracking-tighter">{workshopData?.totalEmployees || 0}</p>
-                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500 mt-2">{t('overviewTab.registeredStaff')}</p>
+                     <p className="text-5xl font-black text-slate-900 dark:text-white tracking-tighter">{workshopData?.totalEmployees || 0}</p>
+                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-500 dark:text-neutral-500 mt-2">{t('overviewTab.registeredStaff')}</p>
                   </div>
                </Card>
 
                {/* Schedule Brief Card */}
-               <Card variant="neutral" glow={false} border={false} padding="md" className="h-[160px] flex flex-col justify-between transition-all duration-300 group !rounded-2xl">
-                  <div className="w-12 h-12 rounded-2xl bg-neutral-900 border border-neutral-800/60 text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
+               <Card variant="neutral" glow={false} border={false} padding="md" className="h-[160px] flex flex-col justify-between transition-all duration-300 group !rounded-2xl border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none bg-white dark:bg-neutral-900/30">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800/60 text-slate-600 dark:text-neutral-400 flex items-center justify-center group-hover:bg-red-600/10 group-hover:text-red-500 transition-all duration-300">
                       <Clock className="w-6 h-6" strokeWidth={1.5} />
                   </div>
                   <div>
-                     <p className="text-3xl font-black text-white font-mono tracking-tight">
-                       {workshopData?.openTime?.slice(0,5) || '--'} <span className="text-neutral-600 font-sans text-sm mx-1">-</span> {workshopData?.closeTime?.slice(0,5) || '--'}
+                     <p className="text-3xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+                       {workshopData?.openTime?.slice(0,5) || '--'} <span className="text-slate-400 dark:text-neutral-600 font-sans text-sm mx-1">-</span> {workshopData?.closeTime?.slice(0,5) || '--'}
                      </p>
-                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-neutral-500 mt-2">{t('overviewTab.openingHours')}</p>
+                     <p className="text-[10px] uppercase font-black tracking-[0.2em] text-slate-500 dark:text-neutral-500 mt-2">{t('overviewTab.openingHours')}</p>
                   </div>
                </Card>
             </div>

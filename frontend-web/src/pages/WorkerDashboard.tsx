@@ -150,10 +150,10 @@ export default function WorkerDashboard() {
     : null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-red-500/30 selection:text-white pb-32">
+    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 text-slate-900 dark:text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200/50 via-slate-100 to-slate-200/40 dark:from-neutral-900 dark:via-black dark:to-black relative selection:bg-red-500/30 selection:text-red-900 dark:selection:text-white pb-32">
       
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
-      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-neutral-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-red-600/5 dark:bg-red-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-neutral-400/10 dark:bg-neutral-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
 
       <DashboardHeader 
         type="workshop" 
@@ -166,9 +166,9 @@ export default function WorkerDashboard() {
             
             <header className="space-y-6">
                {/* Fila Superior: Título y Botones Principales */}
-               <div className="flex justify-between items-center border-b border-neutral-800/60 pb-6">
+               <div className="flex justify-between items-center border-b border-slate-200 dark:border-neutral-800/60 pb-6">
                   <div>
-                     <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+                     <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-slate-900 dark:text-white dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
                         {SECCIONES[activeTab]}
                      </h1>
                   </div>
@@ -176,7 +176,7 @@ export default function WorkerDashboard() {
                   <div className="flex items-center gap-4">
                      <button 
                        onClick={() => setIsAppModalOpen(true)}
-                       className="px-6 h-[54px] bg-white/5 hover:bg-white/10 text-white border border-white/10 hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2"
+                       className="px-6 h-[54px] bg-white hover:bg-slate-50 dark:bg-white/5 dark:hover:bg-white/10 text-slate-900 dark:text-white border border-slate-300 dark:border-white/10 hover:border-slate-400 dark:hover:border-white/20 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-sm flex items-center gap-2 cursor-pointer"
                      >
                        <Plus className="w-4 h-4 text-red-500" />
                        Nueva Cita
@@ -199,10 +199,10 @@ export default function WorkerDashboard() {
 
               {/* TAB: AGENDA (Mi Agenda Personal / Timeline - Siempre fija para Mecánicos) */}
               {SECCIONES[activeTab] === 'AGENDA' && (
-                  <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
-                    <div className="flex items-center justify-between p-5 border-b border-neutral-800/60">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-500/20 rounded-full">
-                        <span className="text-blue-400 text-[10px] font-black uppercase tracking-widest">Mi Agenda</span>
+                  <div className="bg-white dark:bg-neutral-900/20 rounded-[2rem] border border-slate-200 dark:border-neutral-800/60 shadow-sm overflow-hidden animate-fade-in-up">
+                    <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-neutral-800/60">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-full">
+                        <span className="text-blue-600 dark:text-blue-400 text-[10px] font-black uppercase tracking-widest">Mi Agenda</span>
                       </div>
                       <DateNavigator selectedDate={selectedDate} onChange={setSelectedDate} variant="blue" />
                     </div>
@@ -232,11 +232,11 @@ export default function WorkerDashboard() {
 
               {/* TAB: PLANIFICACIÓN (Habilitable opcionalmente - Como el Gerente) */}
               {SECCIONES[activeTab] === 'PLANIFICACIÓN' && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden animate-fade-in-up">
+                <div className="bg-white dark:bg-neutral-900/20 rounded-[2rem] border border-slate-200 dark:border-neutral-800/60 shadow-sm overflow-hidden animate-fade-in-up">
                   {/* Toolbar dentro del contenedor */}
-                  <div className="flex flex-wrap items-center gap-4 p-5 border-b border-neutral-800/60">
+                  <div className="flex flex-wrap items-center gap-4 p-5 border-b border-slate-200 dark:border-neutral-800/60">
                     <AppointmentSearch appointments={appointments} onSelectDate={setSelectedDate} />
-                    <div className="h-10 w-[1px] bg-neutral-800/60 mx-1 hidden md:block"></div>
+                    <div className="h-10 w-[1px] bg-slate-200 dark:bg-neutral-800/60 mx-1 hidden md:block"></div>
                     <MechanicSearch
                       mechanics={employees.filter(e => {
                         if (e.role === 'WORKSHOP_STAFF' || e.role === 'WORKSHOP_MANAGER') return true;
@@ -247,7 +247,7 @@ export default function WorkerDashboard() {
                     />
                     <button
                       onClick={goToNextUnassignedDate}
-                      className="px-5 h-[46px] bg-blue-600/10 hover:bg-blue-600/20 text-blue-500 border border-blue-600/20 hover:border-blue-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn"
+                      className="px-5 h-[46px] bg-blue-50 hover:bg-blue-100 dark:bg-blue-600/10 dark:hover:bg-blue-600/20 text-blue-600 dark:text-blue-500 border border-blue-200 dark:border-blue-600/20 hover:border-blue-300 dark:hover:border-blue-500/40 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 group/btn cursor-pointer"
                     >
                       <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                       Sin Asignar
@@ -305,21 +305,21 @@ export default function WorkerDashboard() {
 
               {/* TAB: TAREAS (Habilitable opcionalmente - Como el Gerente) */}
               {SECCIONES[activeTab] === 'TAREAS' && employeeProfile?.workshopId && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                <div className="bg-white dark:bg-neutral-900/20 rounded-[2rem] border border-slate-200 dark:border-neutral-800/60 shadow-sm overflow-hidden p-6 animate-fade-in-up">
                   <TasksTab workshopId={employeeProfile.workshopId} />
                 </div>
               )}
 
               {/* TAB: ALMACÉN (Habilitable opcionalmente - Como el Gerente) */}
               {SECCIONES[activeTab] === 'ALMACÉN' && employeeProfile?.workshopId && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                <div className="bg-white dark:bg-neutral-900/20 rounded-[2rem] border border-slate-200 dark:border-neutral-800/60 shadow-sm overflow-hidden p-6 animate-fade-in-up">
                   <PartsTab workshopId={employeeProfile.workshopId} />
                 </div>
               )}
 
               {/* TAB: FINALIZADOS (Habilitable opcionalmente - Como el Gerente) */}
               {SECCIONES[activeTab] === 'FINALIZADOS' && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                <div className="bg-white dark:bg-neutral-900/20 rounded-[2rem] border border-slate-200 dark:border-neutral-800/60 shadow-sm overflow-hidden p-6 animate-fade-in-up">
                   <CompletedJobsTab
                     readyJobs={readyForCompletion}
                     onCompleteJob={(job) => setInvoicingJob(job)}
@@ -330,7 +330,7 @@ export default function WorkerDashboard() {
 
               {/* TAB: INFORMES (Habilitable opcionalmente) */}
               {SECCIONES[activeTab] === 'INFORMES' && employeeProfile?.workshopId && (
-                <div className="bg-neutral-900/20 rounded-[2rem] border border-neutral-800/60 overflow-hidden p-6 animate-fade-in-up">
+                <div className="bg-white dark:bg-neutral-900/20 rounded-[2rem] border border-slate-200 dark:border-neutral-800/60 shadow-sm overflow-hidden p-6 animate-fade-in-up">
                   <ReportsTab workshopId={employeeProfile.workshopId} />
                 </div>
               )}

@@ -207,25 +207,25 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
           {delayedApps.map((app) => (
             <div
               key={app.id}
-              className="bg-black/30 border border-neutral-800/80 p-5 rounded-2xl flex flex-col justify-between gap-4 group hover:border-amber-500/50 hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(245,158,11,0.06)] transition-all relative overflow-hidden"
+              className="bg-white dark:bg-black/30 border border-slate-200 dark:border-neutral-800/80 p-5 rounded-2xl flex flex-col justify-between gap-4 group hover:border-amber-500/50 hover:bg-slate-100/70 dark:hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(245,158,11,0.06)] transition-all relative overflow-hidden"
             >
               <div className="space-y-2">
                 <div className="flex justify-between items-start">
                   <Badge variant="warning">{t('avisosTab.delayedBadge')}</Badge>
-                  <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-wider font-bold">
+                  <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-500 uppercase tracking-wider font-bold">
                     {new Date(app.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })} h
                   </span>
                 </div>
                 
-                <h4 className="text-sm font-extrabold text-white group-hover:text-amber-500 transition-colors flex items-center gap-1.5 mt-2 uppercase">
+                <h4 className="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors flex items-center gap-1.5 mt-2 uppercase">
                   {app.vehicleDisplay || t('avisosTab.vehicleLabel')}
                 </h4>
                 
-                <p className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
+                <p className="text-[10px] text-slate-600 dark:text-neutral-400 font-bold uppercase tracking-wider">
                   {t('avisosTab.clientLabel')}: {app.clientFullName || 'N/A'}
                 </p>
                 
-                <p className="text-xs text-neutral-500 font-medium leading-relaxed italic border-t border-neutral-800/60 pt-2">
+                <p className="text-xs text-slate-600 dark:text-neutral-500 font-medium leading-relaxed italic border-t border-slate-200 dark:border-neutral-800/60 pt-2">
                   "{app.serviceType || t('avisosTab.serviceLabel')}: {app.description || t('avisosTab.noDescription')}"
                 </p>
               </div>
@@ -276,7 +276,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
               <div
                 key={item.id}
                 onClick={() => handleStartEdit(item)}
-                className="bg-black/30 border border-neutral-800/80 p-5 rounded-2xl flex flex-col gap-4 group hover:border-red-500/50 hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(239,68,68,0.06)] transition-all cursor-pointer select-none"
+                className="bg-white dark:bg-black/30 border border-slate-200 dark:border-neutral-800/80 p-5 rounded-2xl flex flex-col gap-4 group hover:border-red-500/50 hover:bg-slate-100/70 dark:hover:bg-neutral-900/40 hover:scale-[1.01] shadow-sm hover:shadow-[0_0_20px_rgba(239,68,68,0.06)] transition-all cursor-pointer select-none"
                 title={t('avisosTab.clickToManagePart')}
               >
                 <div className="flex justify-between items-start gap-4">
@@ -284,23 +284,23 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
                     <Badge variant={isCritical ? 'danger' : 'neutral'}>
                       {isCritical ? t('avisosTab.criticalNoStock') : t('avisosTab.lowStock')}
                     </Badge>
-                    <h4 className="text-sm font-extrabold text-white group-hover:text-red-500 transition-colors flex items-center gap-1.5 mt-2 truncate">
+                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white group-hover:text-red-500 transition-colors flex items-center gap-1.5 mt-2 truncate">
                       {item.part.name}
-                      <Edit className="w-3.5 h-3.5 text-neutral-500 group-hover:text-red-500 opacity-40 group-hover:opacity-100 transition-all shrink-0" strokeWidth={2.5} />
+                      <Edit className="w-3.5 h-3.5 text-slate-400 group-hover:text-red-500 dark:text-neutral-500 opacity-40 group-hover:opacity-100 transition-all shrink-0" strokeWidth={2.5} />
                     </h4>
-                    <p className="text-[10px] text-neutral-500 uppercase font-bold tracking-wider truncate">
+                    <p className="text-[10px] text-slate-600 dark:text-neutral-500 uppercase font-bold tracking-wider truncate">
                       OEM: {item.part.oemReference || 'N/A'} • Fab: {item.part.manufacturer || 'N/A'}
                     </p>
                   </div>
 
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-mono font-black text-white block">
+                    <span className="text-xs font-mono font-black text-slate-900 dark:text-white block">
                       {stockVal}{' '}
-                      <span className="text-neutral-500 text-[10px] font-normal">
+                      <span className="text-slate-500 dark:text-neutral-500 text-[10px] font-normal">
                         {t('avisosTab.ofUnits', { count: item.avisoThreshold })}
                       </span>
                     </span>
-                    <span className="text-[8px] font-black uppercase text-neutral-500 block tracking-widest mt-1">
+                    <span className="text-[8px] font-black uppercase text-slate-500 dark:text-neutral-500 block tracking-widest mt-1">
                       {t('avisosTab.thresholdLabel')}: {item.avisoThreshold}
                     </span>
                   </div>
@@ -308,17 +308,17 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
 
                 {/* Barra de progreso de alerta */}
                 <div className="space-y-1.5">
-                  <div className="w-full h-2 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+                  <div className="w-full h-2 bg-slate-200 dark:bg-neutral-900 rounded-full overflow-hidden border border-slate-300 dark:border-neutral-800">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        isCritical ? 'bg-red-600' : 'bg-white/80'
+                        isCritical ? 'bg-red-600' : 'bg-slate-700 dark:bg-white/80'
                       }`}
                       style={{ width: `${percent}%` }}
                     />
                   </div>
-                  <p className="text-[9px] text-neutral-500 font-bold uppercase tracking-wider flex justify-between">
+                  <p className="text-[9px] text-slate-500 dark:text-neutral-500 font-bold uppercase tracking-wider flex justify-between">
                     <span>{t('avisosTab.currentStockLevel')}</span>
-                    <span className={isCritical ? 'text-red-500 font-black' : 'text-neutral-300 font-black'}>
+                    <span className={isCritical ? 'text-red-500 font-black' : 'text-slate-700 dark:text-neutral-300 font-black'}>
                       {isCritical ? t('avisosTab.outOfStock') : t('avisosTab.clickToEdit')}
                     </span>
                   </p>
@@ -430,7 +430,7 @@ export const AvisosTab: React.FC<AvisosTabProps> = ({
               />
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-neutral-800/60 mt-4">
+            <div className="flex gap-4 pt-4 border-t border-slate-200 dark:border-neutral-800/60 mt-4">
               <Button
                 type="button"
                 variant="secondary"

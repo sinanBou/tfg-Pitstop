@@ -335,14 +335,14 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
     >
       <div className="space-y-6 flex-1 flex flex-col justify-between h-full">
         {/* Info cabecera rápida */}
-        <div className="bg-neutral-900/30 border border-neutral-800/60 rounded-2xl p-4 flex justify-between items-center text-xs shrink-0">
+        <div className="bg-slate-100 dark:bg-neutral-900/30 border border-slate-200 dark:border-neutral-800/60 rounded-2xl p-4 flex justify-between items-center text-xs shrink-0">
           <div className="flex gap-4">
-            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">{t('taskChecklistModal.client')}</span> <span className="text-white font-extrabold">{item.clientFullName}</span></div>
-            <div><span className="text-neutral-500 font-bold uppercase tracking-wider mr-1">{t('taskChecklistModal.duration')}</span> <span className="text-white font-extrabold font-mono">{item.estimatedDuration || '--'} min</span></div>
+            <div><span className="text-slate-500 dark:text-neutral-500 font-bold uppercase tracking-wider mr-1">{t('taskChecklistModal.client')}</span> <span className="text-slate-900 dark:text-white font-extrabold">{item.clientFullName}</span></div>
+            <div><span className="text-slate-500 dark:text-neutral-500 font-bold uppercase tracking-wider mr-1">{t('taskChecklistModal.duration')}</span> <span className="text-slate-900 dark:text-white font-extrabold font-mono">{item.estimatedDuration || '--'} min</span></div>
           </div>
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white/5 border border-white/10 rounded-lg">
-            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-400">{t('taskChecklistModal.progress')}</span>
-            <span className="text-white text-xs font-black">{completedCount}/{totalCount}</span>
+          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-200/50 dark:bg-white/5 border border-slate-300/60 dark:border-white/10 rounded-lg">
+            <span className="text-[9px] font-black uppercase tracking-widest text-slate-600 dark:text-neutral-400">{t('taskChecklistModal.progress')}</span>
+            <span className="text-slate-900 dark:text-white text-xs font-black">{completedCount}/{totalCount}</span>
           </div>
         </div>
 
@@ -350,19 +350,19 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-0">
           {/* TAREAS (Izquierda) */}
           <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-400 flex items-center gap-2">
               {t('taskChecklistModal.serviceOperations')}
             </h4>
             
             <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar space-y-2">
               {loadingCatalog ? (
-                <div className="text-center py-12 text-neutral-500 flex flex-col items-center justify-center gap-2">
-                  <div className="w-6 h-6 border-2 border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
+                <div className="text-center py-12 text-slate-400 dark:text-neutral-500 flex flex-col items-center justify-center gap-2">
+                  <div className="w-6 h-6 border-2 border-slate-200 dark:border-neutral-800 border-t-blue-500 rounded-full animate-spin" />
                   <p className="text-[9px] uppercase tracking-widest font-black">{t('taskChecklistModal.mappingTasks')}</p>
                 </div>
               ) : checklist.length === 0 ? (
-                <div className="text-center py-12 bg-neutral-900/10 border border-neutral-800/40 rounded-2xl p-4">
-                  <p className="text-neutral-500 text-xs">{t('taskChecklistModal.noAssignedOperations')}</p>
+                <div className="text-center py-12 bg-slate-100 dark:bg-neutral-900/10 border border-slate-200 dark:border-neutral-800/40 rounded-2xl p-4">
+                  <p className="text-slate-500 dark:text-neutral-500 text-xs">{t('taskChecklistModal.noAssignedOperations')}</p>
                 </div>
               ) : (
                 checklist.map((ci) => (
@@ -371,15 +371,15 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                     onClick={() => toggleItem(ci.code)}
                     className={`w-full text-left px-4 py-3 rounded-2xl border transition-all flex items-center gap-3 group/check ${
                       ci.completed
-                        ? 'border-green-500/20 bg-green-600/5'
-                        : 'border-neutral-800 bg-neutral-900/20 hover:border-neutral-700'
+                        ? 'border-green-500/30 bg-green-500/10 dark:border-green-500/20 dark:bg-green-600/5'
+                        : 'border-slate-200 bg-white hover:border-slate-300 dark:border-neutral-800 dark:bg-neutral-900/20 dark:hover:border-neutral-700'
                     }`}
                   >
                     {/* Checkbox */}
                     <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all ${
                       ci.completed
                         ? 'bg-green-600 border-green-600'
-                        : 'border-neutral-600 group-hover/check:border-neutral-400'
+                        : 'border-slate-300 group-hover/check:border-slate-400 dark:border-neutral-600 dark:group-hover/check:border-neutral-400'
                     }`}>
                       {ci.completed && (
                         <Check className="w-3 h-3 text-white" strokeWidth={3.5} />
@@ -389,12 +389,12 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                     {/* Task info */}
                     <div className="flex-1 min-w-0">
                       <span className={`text-[8px] font-black tracking-widest block leading-none ${
-                        ci.completed ? 'text-green-500' : 'text-neutral-600'
+                        ci.completed ? 'text-green-600 dark:text-green-500' : 'text-slate-400 dark:text-neutral-600'
                       }`}>
                         {ci.code}
                       </span>
                       <span className={`text-xs font-semibold block truncate transition-all ${
-                        ci.completed ? 'text-green-400/60 line-through opacity-50' : 'text-white'
+                        ci.completed ? 'text-green-600/60 dark:text-green-400/60 line-through opacity-50' : 'text-slate-900 dark:text-white'
                       }`}>
                         {ci.label}
                       </span>
@@ -407,7 +407,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
 
           {/* PIEZAS Y REPUESTOS (Derecha) */}
           <div className="w-full md:w-1/2 space-y-3 flex flex-col h-[260px]">
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 flex items-center gap-2">
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-400 flex items-center gap-2">
               {t('taskChecklistModal.materialsAndParts')}
             </h4>
 
@@ -425,13 +425,13 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                   }}
                   onFocus={() => setShowDropdown(true)}
                   placeholder={t('invoiceModal.searchPartPlaceholder')}
-                  className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-3 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all font-semibold text-white"
+                  className="w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-3 py-2 text-xs placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all font-semibold text-slate-900 dark:text-white"
                 />
                 
                 {showDropdown && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowDropdown(false)} />
-                    <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-neutral-950 border border-neutral-800 rounded-xl shadow-2xl z-50 divide-y divide-neutral-900 custom-scrollbar">
+                    <div className="absolute left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-xl shadow-2xl z-50 divide-y divide-slate-100 dark:divide-neutral-900 custom-scrollbar">
                       {filteredInventory.map(inv => (
                         <button
                           key={inv.id}
@@ -442,10 +442,10 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                             setShowDropdown(false);
                           }}
                           disabled={inv.stockQuantity === 0}
-                          className="w-full text-left px-3 py-2.5 text-xs hover:bg-neutral-900 flex justify-between items-center transition-all disabled:opacity-50"
+                          className="w-full text-left px-3 py-2.5 text-xs hover:bg-slate-100 dark:hover:bg-neutral-900 flex justify-between items-center transition-all disabled:opacity-50"
                         >
-                          <span className="text-white font-semibold">{inv.part.name}</span>
-                          <span className="text-[10px] text-neutral-400 font-mono">
+                          <span className="text-slate-900 dark:text-white font-semibold">{inv.part.name}</span>
+                          <span className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono">
                             {inv.stockQuantity} uds. - {inv.retailPrice.toFixed(2)}€
                           </span>
                         </button>
@@ -459,15 +459,15 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                             setSelectedInvId('custom');
                             setShowDropdown(false);
                           }}
-                          className="w-full text-left px-3 py-2.5 text-xs bg-red-950/20 hover:bg-red-900/20 text-red-400 font-bold flex items-center gap-1.5 transition-all"
+                          className="w-full text-left px-3 py-2.5 text-xs bg-red-50 hover:bg-red-100/60 dark:bg-red-950/20 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-bold flex items-center gap-1.5 transition-all"
                         >
                           <span>{t('invoiceModal.customPartLabel')}</span>
-                          <span className="text-white italic font-normal">"{partQuery.trim()}"</span>
+                          <span className="text-slate-900 dark:text-white italic font-normal">"{partQuery.trim()}"</span>
                         </button>
                       )}
                       
                       {filteredInventory.length === 0 && partQuery.trim().length === 0 && (
-                        <div className="px-3 py-3 text-center text-xs text-neutral-500 font-medium">
+                        <div className="px-3 py-3 text-center text-xs text-slate-500 dark:text-neutral-500 font-medium">
                           {t('invoiceModal.typeToSearchCustom')}
                         </div>
                       )}
@@ -483,7 +483,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                 value={quantityToUse}
                 onChange={e => setQuantityToUse(parseInt(e.target.value) || 1)}
                 placeholder={t('invoiceModal.quantityPlaceholder')}
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-white"
+                className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-16 shrink-0 font-mono font-medium text-center text-slate-900 dark:text-white"
               />
               
               <input 
@@ -493,7 +493,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
                 value={discountPercent || ''}
                 onChange={e => setDiscountPercent(Math.min(100, Math.max(0, parseInt(e.target.value) || 0)))}
                 placeholder={t('invoiceModal.discountPlaceholder')}
-                className="bg-neutral-900 border border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-white"
+                className="bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-2 py-2 text-xs placeholder-slate-400 dark:placeholder-neutral-600 focus:outline-none focus:border-red-500 transition-all w-20 shrink-0 font-mono font-medium text-center text-slate-900 dark:text-white"
                 title="Descuento opcional en porcentaje (0-100)"
               />
 
@@ -507,29 +507,29 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
             </form>
 
             {/* Lista de repuestos consumidos */}
-            <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar border border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-neutral-900 bg-neutral-950/20">
+            <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar border border-slate-200 dark:border-neutral-800/80 rounded-2xl overflow-hidden divide-y divide-slate-100 dark:divide-neutral-900 bg-slate-100/60 dark:bg-neutral-950/20">
               {parts.length === 0 ? (
-                <div className="text-center py-12 text-neutral-600 text-xs flex flex-col items-center justify-center p-4">
-                  <Box className="w-8 h-8 text-neutral-800 mb-1" strokeWidth={1.5} />
+                <div className="text-center py-12 text-slate-400 dark:text-neutral-600 text-xs flex flex-col items-center justify-center p-4">
+                  <Box className="w-8 h-8 text-slate-300 dark:text-neutral-800 mb-1" strokeWidth={1.5} />
                   <p className="text-[10px] font-bold uppercase tracking-wider">{t('taskChecklistModal.noPartsRegistered')}</p>
                 </div>
               ) : (
                 parts.map((p, idx) => (
-                  <div key={idx} className="bg-neutral-900/10 px-4 py-2.5 flex justify-between items-center text-xs">
+                  <div key={idx} className="bg-white dark:bg-neutral-900/10 px-4 py-2.5 flex justify-between items-center text-xs">
                     <div className="flex flex-col min-w-0">
-                      <span className="text-white font-semibold truncate max-w-[170px]">{p.name}</span>
-                      <span className="text-[10px] text-neutral-500 font-semibold">Cantidad: {p.quantityUsed} uds.</span>
+                      <span className="text-slate-900 dark:text-white font-semibold truncate max-w-[170px]">{p.name}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-neutral-500 font-semibold">Cantidad: {p.quantityUsed} uds.</span>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
                       {p.price <= 0 ? (
                         <span className="text-amber-500 font-black uppercase tracking-wider text-[9px] bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">{t('taskChecklistModal.pendingPrice')}</span>
                       ) : (
-                        <span className="text-neutral-400 font-mono">{(p.price * p.quantityUsed).toFixed(2)}€</span>
+                        <span className="text-slate-600 dark:text-neutral-400 font-mono">{(p.price * p.quantityUsed).toFixed(2)}€</span>
                       )}
                       <button
                         type="button"
                         onClick={() => handleRemovePart(p.partId)}
-                        className="text-neutral-500 hover:text-red-400 transition-all"
+                        className="text-slate-400 hover:text-red-500 dark:text-neutral-500 dark:hover:text-red-400 transition-all"
                       >
                         <Trash className="w-3.5 h-3.5" />
                       </button>
@@ -542,11 +542,11 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
         </div>
 
         {/* Footer / Botones */}
-        <div className="mt-auto pt-6 border-t border-neutral-800/50 flex justify-end gap-3 shrink-0">
+        <div className="mt-auto pt-6 border-t border-slate-200 dark:border-neutral-800/50 flex justify-end gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
+            className="px-6 py-3.5 rounded-xl border border-slate-200 dark:border-neutral-800 hover:bg-slate-100 dark:hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-all active:scale-95"
           >
             {t('taskChecklistModal.close')}
           </button>
@@ -556,7 +556,7 @@ export const TaskChecklistModal: React.FC<TaskChecklistModalProps> = ({
             className={`px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 active:scale-95 ${
               allDone
                 ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_20px_rgba(34,197,94,0.3)]'
-                : 'bg-neutral-800 text-neutral-600 cursor-not-allowed'
+                : 'bg-slate-100 text-slate-400 dark:bg-neutral-800 dark:text-neutral-600 cursor-not-allowed'
             }`}
           >
             {completing ? (

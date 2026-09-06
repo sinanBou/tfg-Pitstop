@@ -30,15 +30,15 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <div className="p-4 bg-blue-600/10 border border-blue-600/20 rounded-2xl flex items-center gap-4">
+      <div className="p-4 bg-blue-50 dark:bg-blue-600/10 border border-blue-200 dark:border-blue-600/20 rounded-2xl flex items-center gap-4">
         <div className="shrink-0 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black">
           {selectedClient?.firstname.charAt(0)}
         </div>
         <div className="flex-1">
-          <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none mb-1">Cliente Seleccionado</p>
-          <p className="text-white font-black uppercase text-sm">{selectedClient?.firstname} {selectedClient?.lastname}</p>
+          <p className="text-[10px] font-black text-blue-600 dark:text-blue-500 uppercase tracking-widest leading-none mb-1">Cliente Seleccionado</p>
+          <p className="text-slate-900 dark:text-white font-black uppercase text-sm">{selectedClient?.firstname} {selectedClient?.lastname}</p>
         </div>
-        <button onClick={onPrev} className="text-neutral-500 hover:text-white transition-colors">
+        <button onClick={onPrev} className="text-slate-400 hover:text-slate-700 dark:text-neutral-500 dark:hover:text-white transition-colors">
           <Edit className="w-5 h-5" />
         </button>
       </div>
@@ -46,14 +46,14 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
       <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar space-y-4">
         {searchResults.vehicles.length > 0 && (
           <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500 mb-3 ml-2 italic">Vehículos Asociados</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 mb-3 ml-2 italic">Vehículos Asociados</p>
             {searchResults.vehicles.map(v => (
-              <button key={v.id} onClick={() => onSelectVehicle(v)} className="w-full p-5 bg-neutral-900/40 hover:bg-neutral-800/60 border border-neutral-800 rounded-2xl flex items-center justify-between mb-2 group transition-all">
+              <button key={v.id} onClick={() => onSelectVehicle(v)} className="w-full p-5 bg-slate-100 dark:bg-neutral-900/40 hover:bg-slate-200/60 dark:hover:bg-neutral-800/60 border border-slate-200 dark:border-neutral-800 rounded-2xl flex items-center justify-between mb-2 group transition-all">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-600/10 text-blue-500 rounded-xl flex items-center justify-center font-black">{v.licensePlate.charAt(0)}</div>
+                  <div className="w-10 h-10 bg-blue-500/10 text-blue-600 dark:text-blue-500 rounded-xl flex items-center justify-center font-black">{v.licensePlate.charAt(0)}</div>
                   <div className="text-left">
-                    <p className="text-white font-black uppercase text-sm group-hover:text-blue-500 transition-colors">{v.licensePlate}</p>
-                    <p className="text-[10px] text-neutral-500 font-bold uppercase">{v.brand} {v.model}</p>
+                    <p className="text-slate-900 dark:text-white font-black uppercase text-sm group-hover:text-blue-600 dark:group-hover:text-blue-500 transition-colors">{v.licensePlate}</p>
+                    <p className="text-[10px] text-slate-500 dark:text-neutral-500 font-bold uppercase">{v.brand} {v.model}</p>
                   </div>
                 </div>
               </button>
@@ -61,9 +61,9 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
           </div>
         )}
 
-        <div className="p-8 text-center bg-neutral-900/20 border border-dashed border-neutral-800 rounded-[2rem] hover:bg-neutral-900/40 transition-all">
-            <p className="text-neutral-500 text-xs font-black uppercase tracking-widest mb-4 italic">¿Es un vehículo nuevo?</p>
-            <button onClick={() => setIsNewVehicle(true)} className="px-6 py-3 bg-white text-black font-black uppercase text-[10px] rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2 mx-auto">
+        <div className="p-8 text-center bg-slate-100/70 dark:bg-neutral-900/20 border border-dashed border-slate-200 dark:border-neutral-800 rounded-[2rem] hover:bg-slate-100 dark:hover:bg-neutral-900/40 transition-all">
+            <p className="text-slate-500 dark:text-neutral-500 text-xs font-black uppercase tracking-widest mb-4 italic">¿Es un vehículo nuevo?</p>
+            <button onClick={() => setIsNewVehicle(true)} className="px-6 py-3 bg-slate-900 text-white dark:bg-white dark:text-black font-black uppercase text-[10px] rounded-xl hover:bg-blue-600 hover:text-white transition-all shadow-lg active:scale-95 flex items-center gap-2 mx-auto">
               <Plus className="w-4 h-4" />
               Añadir Nuevo Vehículo
             </button>
@@ -71,8 +71,8 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
       </div>
 
       {isNewVehicle && (
-        <div className="p-8 bg-neutral-950 border border-neutral-800 rounded-[2rem] space-y-4 animate-in slide-in-from-bottom-4 duration-300">
-           <h3 className="text-white font-black uppercase text-sm mb-6 flex items-center gap-2 italic">Registro de Vehículo</h3>
+        <div className="p-8 bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-[2rem] space-y-4 animate-in slide-in-from-bottom-4 duration-300">
+           <h3 className="text-slate-900 dark:text-white font-black uppercase text-sm mb-6 flex items-center gap-2 italic">Registro de Vehículo</h3>
            <div className="grid grid-cols-2 gap-4">
               <SearchableSelect 
                 label="Marca" 
@@ -92,8 +92,8 @@ export const VehicleStep: React.FC<VehicleStepProps> = ({
               />
            </div>
            <div className="grid grid-cols-2 gap-4">
-              <input placeholder="Matrícula" className="bg-black/40 border border-neutral-800 p-5 rounded-2xl text-white text-xs outline-none focus:border-blue-600 transition-all font-bold uppercase" value={vehicleForm.licensePlate} onChange={e => setVehicleForm({...vehicleForm, licensePlate: e.target.value.toUpperCase()})} />
-              <input placeholder="VIN/Bastidor" className="bg-black/40 border border-neutral-800 p-5 rounded-2xl text-white text-xs outline-none focus:border-blue-600 transition-all font-bold uppercase" value={vehicleForm.vin} onChange={e => setVehicleForm({...vehicleForm, vin: e.target.value.toUpperCase()})} />
+              <input placeholder="Matrícula" className="bg-white dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-5 rounded-2xl text-slate-900 dark:text-white text-xs outline-none focus:border-blue-600 transition-all font-bold uppercase placeholder:text-slate-400 dark:placeholder:text-neutral-600" value={vehicleForm.licensePlate} onChange={e => setVehicleForm({...vehicleForm, licensePlate: e.target.value.toUpperCase()})} />
+              <input placeholder="VIN/Bastidor" className="bg-white dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-5 rounded-2xl text-slate-900 dark:text-white text-xs outline-none focus:border-blue-600 transition-all font-bold uppercase placeholder:text-slate-400 dark:placeholder:text-neutral-600" value={vehicleForm.vin} onChange={e => setVehicleForm({...vehicleForm, vin: e.target.value.toUpperCase()})} />
            </div>
            <button onClick={onCreateVehicle} disabled={loading || !vehicleForm.licensePlate || !vehicleForm.brand || !vehicleForm.model} className="w-full py-5 bg-blue-600 text-white font-black uppercase text-xs rounded-2xl hover:bg-blue-500 transition-all shadow-[0_0_30px_rgba(37,99,235,0.3)] disabled:opacity-50 active:scale-95">
              {loading ? 'Vinculando...' : 'Asociar Vehículo al Cliente'}

@@ -131,25 +131,25 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
           {/* Datos del Negocio (Izquierda) */}
           <div className="w-full md:w-1/2 space-y-4">
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.companyName')}</label>
+              <label className="text-[10px] font-black tracking-widest text-slate-500 dark:text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.companyName')}</label>
               <input 
                 type="text" 
                 required 
                 value={form.companyName} 
                 onChange={e => setForm({...form, companyName: e.target.value})} 
-                className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-bold placeholder-neutral-700" 
+                className="w-full bg-slate-100 dark:bg-neutral-900/50 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-bold placeholder-slate-400 dark:placeholder-neutral-700" 
                 placeholder={t('workshopCreationModal.companyNamePlaceholder')} 
               />
             </div>
             
             <div className="space-y-2">
-              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.cif')}</label>
+              <label className="text-[10px] font-black tracking-widest text-slate-500 dark:text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.cif')}</label>
               <input 
                 type="text" 
                 required 
                 value={form.cif} 
                 onChange={e => setForm({...form, cif: e.target.value})} 
-                className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-mono font-bold placeholder-neutral-700" 
+                className="w-full bg-slate-100 dark:bg-neutral-900/50 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all font-mono font-bold placeholder-slate-400 dark:placeholder-neutral-700" 
                 placeholder={t('workshopCreationModal.cifPlaceholder')} 
               />
             </div>
@@ -168,7 +168,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
           {/* Horario y Días (Derecha) */}
           <div className="w-full md:w-1/2 space-y-4">
             <div className="space-y-3">
-              <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.operatingDays')}</label>
+              <label className="text-[10px] font-black tracking-widest text-slate-500 dark:text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.operatingDays')}</label>
               <div className="flex flex-wrap gap-2">
                 {diasSemana.map(dia => (
                   <button 
@@ -178,7 +178,7 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
                     className={`px-3 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border cursor-pointer active:scale-95 ${
                       form.workingDays.includes(dia.value) 
                         ? 'bg-red-600 border-red-500 text-white shadow-[0_0_15px_rgba(220,38,38,0.45)]' 
-                        : 'bg-neutral-950/60 border-neutral-800/80 text-neutral-400 hover:text-white hover:border-neutral-700'
+                        : 'bg-slate-100 dark:bg-neutral-950/60 border-slate-300 dark:border-neutral-800/80 text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:border-slate-400 dark:hover:border-neutral-700'
                     }`}
                   >
                     {dia.label}
@@ -189,26 +189,26 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.openTime')}</label>
+                <label className="text-[10px] font-black tracking-widest text-slate-500 dark:text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.openTime')}</label>
                 <input 
                   type="text" 
                   name="openTime" 
                   required 
                   value={form.openTime} 
                   onChange={handleTimeChange} 
-                  className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all text-center font-mono text-xl font-bold" 
+                  className="w-full bg-slate-100 dark:bg-neutral-900/50 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all text-center font-mono text-xl font-bold" 
                   maxLength={5} 
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-[10px] font-black tracking-widest text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.closeTime')}</label>
+                <label className="text-[10px] font-black tracking-widest text-slate-500 dark:text-neutral-500 uppercase block ml-1">{t('workshopCreationModal.closeTime')}</label>
                 <input 
                   type="text" 
                   name="closeTime" 
                   required 
                   value={form.closeTime} 
                   onChange={handleTimeChange} 
-                  className="w-full bg-neutral-900/50 border border-neutral-800 text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all text-center font-mono text-xl font-bold" 
+                  className="w-full bg-slate-100 dark:bg-neutral-900/50 border border-slate-300 dark:border-neutral-800 text-slate-900 dark:text-white p-4 rounded-2xl focus:outline-none focus:border-red-600 transition-all text-center font-mono text-xl font-bold" 
                   maxLength={5} 
                 />
               </div>
@@ -217,17 +217,17 @@ export function WorkshopCreationModal({ isOpen, onClose, onSuccess, ownerId }: W
         </div>
 
         {/* Footer Actions */}
-        <div className="mt-auto pt-6 border-t border-neutral-800/50 flex justify-end gap-3 shrink-0">
+        <div className="mt-auto pt-6 border-t border-slate-200 dark:border-neutral-800/50 flex justify-end gap-3 shrink-0">
           <button
             type="button"
             onClick={onClose}
-            className="px-6 py-3.5 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-neutral-400 hover:text-white transition-all active:scale-95"
+            className="px-6 py-3.5 rounded-xl border border-slate-300 dark:border-neutral-800 hover:border-slate-400 dark:hover:border-neutral-700 text-xs font-bold uppercase tracking-widest text-slate-600 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-all active:scale-95 cursor-pointer"
           >
             {t('common.cancel')}
           </button>
           <button 
             type="submit" 
-            className="px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-widest text-white transition-all flex items-center gap-2 active:scale-95 shadow-[0_0_30px_rgba(220,38,38,0.3)]"
+            className="px-6 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-black uppercase tracking-widest text-white transition-all flex items-center gap-2 active:scale-95 shadow-[0_0_30px_rgba(220,38,38,0.3)] cursor-pointer"
           >
             {t('workshopCreationModal.activateWorkshop')}
             <ArrowRight className="w-4 h-4" />

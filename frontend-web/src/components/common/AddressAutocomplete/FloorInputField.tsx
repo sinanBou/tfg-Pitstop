@@ -12,7 +12,7 @@ export const FloorInputField: React.FC<FloorInputFieldProps> = ({ value, onChang
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder="Piso/Pta"
-      className="w-full bg-neutral-950 rounded-xl px-4 py-3 text-white text-xs font-semibold outline-none transition-all placeholder-neutral-600 border border-neutral-800 focus:border-red-500/50 focus:bg-black/40"
+      className="w-full bg-slate-100 dark:bg-neutral-950 rounded-xl px-4 py-3 text-slate-900 dark:text-white text-xs font-semibold outline-none transition-all placeholder-slate-400 dark:placeholder-neutral-600 border border-slate-300 dark:border-neutral-800 focus:border-red-500/50 focus:bg-slate-50 dark:focus:bg-black/40"
     />
   </div>
 );

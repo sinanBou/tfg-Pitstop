@@ -31,7 +31,7 @@ export const AddCategoryForm: React.FC<AddCategoryFormProps> = ({
     : 'bg-blue-600 hover:bg-blue-500';
 
   return (
-    <form onSubmit={onSubmit} className="bg-neutral-900/80 border border-neutral-800/40 rounded-2xl p-6 space-y-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+    <form onSubmit={onSubmit} className="bg-white/90 dark:bg-neutral-900/80 border border-slate-200 dark:border-neutral-800/40 rounded-2xl p-6 space-y-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
       <p className="text-xs font-black text-red-500 uppercase tracking-widest">{title}</p>
       <div className="flex gap-4 items-end">
         <div className="flex-1">
@@ -47,7 +47,7 @@ export const AddCategoryForm: React.FC<AddCategoryFormProps> = ({
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-3 rounded-xl border border-neutral-800 hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-neutral-400 transition-all cursor-pointer"
+            className="px-4 py-3 rounded-xl border border-slate-200 hover:border-slate-300 dark:border-neutral-800 dark:hover:border-neutral-700 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-neutral-400 transition-all cursor-pointer"
           >
             {t('shared.cancel')}
           </button>

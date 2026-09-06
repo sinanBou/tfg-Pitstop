@@ -11,6 +11,13 @@ import { ClientAppointmentsTab } from '@/features/client/components/ClientAppoin
 import { ClientHistoryTab } from '@/features/client/components/ClientHistoryTab';
 import { ClientReportsTab } from '@/features/client/components/ClientReportsTab';
 import { MiPerfilCliente } from '@/features/client/components/MiPerfilCliente';
+import { 
+  LayoutDashboard, 
+  Car, 
+  Calendar, 
+  Clock, 
+  FileText
+} from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
 export default function ClientDashboard() {
@@ -70,9 +77,17 @@ export default function ClientDashboard() {
     return <LoadingScreen message={t('common.loading')} theme="client" />;
   }
 
+  const tabIcons = [
+    LayoutDashboard,
+    Car,
+    Calendar,
+    Clock,
+    FileText
+  ];
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-900 via-black to-black relative selection:bg-blue-500/30 selection:text-white pb-24">    
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
+    <div className="min-h-screen bg-slate-100 dark:bg-zinc-950 text-slate-900 dark:text-white flex flex-col font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-200/50 via-slate-100 to-slate-200/40 dark:from-neutral-900 dark:via-black dark:to-black relative selection:bg-blue-500/30 selection:text-blue-900 dark:selection:text-white pb-28">    
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/5 dark:bg-blue-600/10 rounded-full blur-[120px] -z-10 mix-blend-screen pointer-events-none"></div>
 
       <DashboardHeader 
         type="client" 
@@ -80,22 +95,68 @@ export default function ClientDashboard() {
         onOpenProfile={() => setIsProfileOpen(true)}
       />
 
-      <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-4">
-         <div className="max-w-5xl mx-auto p-6 md:p-12 space-y-12 animate-fade-in-up">
+      <main className="flex-1 overflow-y-auto relative z-10 scrollbar-hide pt-2">
+         <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-4 space-y-6 animate-fade-in-up">
             
-            <header className="flex justify-between items-end border-b border-neutral-800/60 pb-6 mb-8">
-               <div>
-                  <h1 className="text-3xl md:text-4xl font-black uppercase tracking-[0.15em] text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.4)]">
-                     {SECCIONES[activeTab]}
-                  </h1>
+            {/* ── Barra de Navegación Superior Desktop & Título de Sección ── */}
+            <div className="flex items-center justify-between gap-4 border-b border-slate-200/80 dark:border-neutral-800/80 pb-5">
+               {/* Título de la sección activa */}
+               <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 shadow-sm">
+                     {(() => {
+                        const Icon = tabIcons[activeTab] || LayoutDashboard;
+                        return <Icon className="w-5 h-5" />;
+                     })()}
+                  </div>
+                  <div>
+                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 block leading-tight">
+                        {t('clientDashboard.clientPortal')}
+                     </span>
+                     <h1 className="text-2xl md:text-3xl font-black uppercase tracking-wider text-slate-900 dark:text-white leading-tight">
+                        {SECCIONES[activeTab]}
+                     </h1>
+                  </div>
                </div>
-            </header>
+            </div>
 
-            {activeTab === 0 && <ClientOverviewTab vehicles={vehicles} appointments={appointments} userProfile={userProfile} />}
-            {activeTab === 1 && <ClientVehiclesTab vehicles={vehicles} onAddVehicle={() => setIsModalOpen(true)} onDeleteVehicle={deleteVehicle} />}
-            {activeTab === 2 && <ClientAppointmentsTab appointments={appointments} onAddAppointment={() => setIsAppModalOpen(true)} deleteAppointment={deleteAppointment} />}
-            {activeTab === 3 && <ClientHistoryTab history={history} appointments={appointments} />}
-            {activeTab === 4 && <ClientReportsTab history={history} vehicles={vehicles} appointments={appointments} />}
+            {activeTab === 0 && (
+               <ClientOverviewTab 
+                  vehicles={vehicles} 
+                  appointments={appointments} 
+                  userProfile={userProfile} 
+                  onAddVehicle={() => setIsModalOpen(true)}
+                  onAddAppointment={() => setIsAppModalOpen(true)}
+                  onNavigateTab={setActiveTab}
+               />
+            )}
+            {activeTab === 1 && (
+               <ClientVehiclesTab 
+                  vehicles={vehicles} 
+                  appointments={appointments}
+                  onAddVehicle={() => setIsModalOpen(true)} 
+                  onDeleteVehicle={deleteVehicle} 
+               />
+            )}
+            {activeTab === 2 && (
+               <ClientAppointmentsTab 
+                  appointments={appointments} 
+                  onAddAppointment={() => setIsAppModalOpen(true)} 
+                  deleteAppointment={deleteAppointment} 
+               />
+            )}
+            {activeTab === 3 && (
+               <ClientHistoryTab 
+                  history={history} 
+                  appointments={appointments} 
+               />
+            )}
+            {activeTab === 4 && (
+               <ClientReportsTab 
+                  history={history} 
+                  vehicles={vehicles} 
+                  appointments={appointments} 
+               />
+            )}
          </div>
       </main>
 

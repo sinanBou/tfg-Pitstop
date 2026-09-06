@@ -33,8 +33,8 @@ export function BottomNav({ tabs, activeTab, onTabChange, theme }: BottomNavProp
   }, [activeTab, tabs]);
 
   return (
-    <div className="fixed bottom-0 left-0 w-full h-32 md:h-40 bg-gradient-to-t from-black via-zinc-950/90 to-transparent pointer-events-none z-50 flex items-end justify-center pb-6 md:pb-10">
-      <nav className={`relative pointer-events-auto bg-neutral-950/80 backdrop-blur-2xl border ${navBorderClass} ring-1 ring-white/5 p-2 rounded-[2rem] flex gap-1 shadow-[0_10px_50px_rgba(0,0,0,1)] hover:shadow-[0_10px_60px_rgba(0,0,0,1)] transition-shadow duration-500`}>
+    <div className="fixed bottom-0 left-0 w-full h-32 md:h-40 bg-gradient-to-t from-slate-200/90 via-slate-100/60 to-transparent dark:from-black dark:via-zinc-950/90 dark:to-transparent pointer-events-none z-50 flex items-end justify-center pb-6 md:pb-10 transition-colors">
+      <nav className={`relative pointer-events-auto bg-white/80 dark:bg-neutral-950/80 backdrop-blur-2xl border ${navBorderClass} ring-1 ring-black/5 dark:ring-white/5 p-2 rounded-[2rem] flex gap-1 shadow-[0_10px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_50px_rgba(0,0,0,1)] hover:shadow-[0_10px_50px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_10px_60px_rgba(0,0,0,1)] transition-all duration-500`}>
         
         {/* Animated Backing Indicator */}
         <div 
@@ -52,7 +52,7 @@ export function BottomNav({ tabs, activeTab, onTabChange, theme }: BottomNavProp
             className={`px-5 md:px-8 py-3.5 md:py-4 rounded-[1.5rem] text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all duration-300 relative z-10 flex items-center justify-center ${
               activeTab === index 
                 ? 'text-white scale-100' 
-                : 'text-neutral-500 hover:text-white hover:bg-white/5 scale-95 hover:scale-100'
+                : 'text-slate-600 dark:text-neutral-500 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 scale-95 hover:scale-100'
             }`}
           >
             {tab}

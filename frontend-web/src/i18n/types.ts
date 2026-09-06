@@ -295,6 +295,7 @@ export interface Translations {
     partsTab: string;
     teamTab: string;
     alertsTab: string;
+    agendaTab: string;
     openTime: string;
     closeTime: string;
     hourlyRate: string;
@@ -604,6 +605,15 @@ export interface Translations {
     delayDesc: string;
     confirmDelay: string;
     collisionWarning: string;
+    totalDayAppointments: string;
+    assignedAppointments: string;
+    unassignedQueue: string;
+    totalEstimatedHours: string;
+    dragToAssignHint: string;
+    currentTime: string;
+    workloadLabel: string;
+    fullscreen: string;
+    exitFullscreen: string;
   };
   reportsTab: {
     loadingHistory: string;

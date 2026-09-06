@@ -164,9 +164,9 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/80 backdrop-blur-3xl animate-in fade-in duration-300">
+    <div className="fixed inset-0 z-[9998] flex items-center justify-center p-6 bg-black/50 dark:bg-black/80 backdrop-blur-md dark:backdrop-blur-3xl animate-in fade-in duration-300">
       <style>{`
-        /* Estilo personalizado de scrollbar premium negra */
+        /* Estilo personalizado de scrollbar premium */
         .profile-scrollbar::-webkit-scrollbar {
           width: 6px;
         }
@@ -174,16 +174,22 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
           background: transparent;
         }
         .profile-scrollbar::-webkit-scrollbar-thumb {
-          background: #000000;
+          background: #cbd5e1;
           border-radius: 9999px;
+        }
+        .dark .profile-scrollbar::-webkit-scrollbar-thumb {
+          background: #000000;
           border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .profile-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
+        }
+        .dark .profile-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #080808;
         }
       `}</style>
       
-      <div className="w-full max-w-2xl bg-neutral-900 border border-neutral-800 rounded-2xl relative shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="w-full max-w-2xl bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-2xl relative shadow-2xl dark:shadow-[0_50px_100px_-20px_rgba(0,0,0,1)] animate-in zoom-in-95 duration-300 max-h-[90vh] flex flex-col overflow-hidden">
         {/* Glow premium azul para cliente */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-[100px] -mr-32 -mt-32 pointer-events-none"></div>
 
@@ -191,30 +197,30 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-8 right-8 p-3 bg-black/40 hover:bg-neutral-800 text-neutral-500 hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
+          className="absolute top-8 right-8 p-3 bg-slate-100 hover:bg-slate-200 dark:bg-black/40 dark:hover:bg-neutral-800 text-slate-500 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white rounded-2xl transition-all z-50 cursor-pointer"
         >
           <X className="w-6 h-6" />
         </button>
 
         {/* Contenido scrolleable */}
         <div className="p-10 overflow-y-auto flex-1 profile-scrollbar">
-          <header className="mb-10 relative z-10 border-b border-white/5 pb-6">
-            <h3 className="text-3xl font-black uppercase tracking-widest text-white">
+          <header className="mb-10 relative z-10 border-b border-slate-200 dark:border-white/5 pb-6">
+            <h3 className="text-3xl font-black uppercase tracking-widest text-slate-900 dark:text-white">
               {t('profile.title')}
             </h3>
           </header>
 
           <form onSubmit={handleFormSubmit} className="relative z-10 space-y-8">
             {/* Foto de perfil estática (iniciales) */}
-            <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-white/5">
-              <div className="w-20 h-20 bg-neutral-950 border border-neutral-800 rounded-2xl flex items-center justify-center text-white font-black text-3xl shadow-2xl relative overflow-hidden shrink-0 select-none">
+            <div className="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-200 dark:border-white/5">
+              <div className="w-20 h-20 bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-2xl flex items-center justify-center text-slate-900 dark:text-white font-black text-3xl shadow-sm dark:shadow-2xl relative overflow-hidden shrink-0 select-none">
                 {profileForm.firstname.charAt(0).toUpperCase() || '?'}
               </div>
               <div className="flex flex-col gap-1 items-center sm:items-start text-center sm:text-left">
-                <h4 className="text-white font-bold text-base uppercase tracking-wider">
+                <h4 className="text-slate-900 dark:text-white font-bold text-base uppercase tracking-wider">
                   {profileForm.firstname} {profileForm.lastname}
                 </h4>
-                <p className="text-xs text-neutral-500 font-semibold">{clientProfile.email}</p>
+                <p className="text-xs text-slate-500 dark:text-neutral-500 font-semibold">{clientProfile.email}</p>
               </div>
             </div>
 
@@ -294,11 +300,11 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
           </form>
 
           {/* Separador */}
-          <div className="my-10 border-b border-white/5"></div>
+          <div className="my-10 border-b border-slate-200 dark:border-white/5"></div>
 
           {/* Sección de Cambio de Contraseña */}
           <section className="relative z-10 space-y-6">
-            <h4 className="text-lg font-black uppercase tracking-widest text-white mb-2">
+            <h4 className="text-lg font-black uppercase tracking-widest text-slate-900 dark:text-white mb-2">
               {t('profile.securityPassword')}
             </h4>
             
@@ -346,20 +352,19 @@ export const MiPerfilCliente: React.FC<MiPerfilClienteProps> = ({
               )}
 
               <div className="pt-2 flex justify-end">
-                <Button
+                <button
                   type="submit"
-                  variant="primary"
                   disabled={passwordLoading}
-                  className="bg-neutral-800 hover:bg-neutral-700 text-white border border-neutral-700 hover:border-neutral-600 transition-all shadow-md active:scale-[0.98]"
+                  className="px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md hover:shadow-lg hover:shadow-blue-600/25 active:scale-[0.98] cursor-pointer disabled:opacity-50"
                 >
                   {passwordLoading ? t('common.processing') : t('profile.updatePasswordBtn')}
-                </Button>
+                </button>
               </div>
             </form>
           </section>
 
           {/* Separador */}
-          <div className="my-10 border-b border-white/5"></div>
+          <div className="my-10 border-b border-slate-200 dark:border-white/5"></div>
 
           {/* Sección crítica: Eliminación de Cuenta */}
           <section className="relative z-10 pb-6">

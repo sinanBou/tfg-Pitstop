@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { getBrandLogo } from '@/assets/BrandLogos';
 import { useToast } from '@/hooks/useToast';
 import { ConfirmCardModal } from '@/components/common/ConfirmCardModal';
-import { CheckCircle, Edit, Lock, FileText, X } from '@/assets/icons';
+import { CheckCircle, Edit, Lock, FileText, X, GripVertical } from '@/assets/icons';
 import { useTranslation } from '@/i18n';
 
 interface UnassignedAppointment {
@@ -130,13 +130,19 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
   return (
     <div
       style={{ width: columnWidth, height: gridHeight }}
-      className="shrink-0 border-r border-neutral-800/60 relative flex flex-col"
+      className="shrink-0 border-r border-slate-200 dark:border-neutral-800/60 relative flex flex-col bg-slate-50/40 dark:bg-neutral-950/20"
     >
+      {/* Top hint bar */}
+      <div className="px-3 py-2 bg-blue-50/70 dark:bg-blue-950/20 border-b border-blue-100 dark:border-blue-900/30 flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-blue-700 dark:text-blue-400 select-none">
+        <GripVertical className="w-3 h-3 shrink-0 opacity-60" />
+        <span className="truncate">{t('appointmentsTab.dragToAssignHint')}</span>
+      </div>
+
       <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
         {sorted.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center px-4 py-12 opacity-50">
-            <CheckCircle className="w-10 h-10 text-neutral-600 mb-3" strokeWidth={1.5} />
-            <p className="text-neutral-600 text-[10px] font-black uppercase tracking-widest">
+            <CheckCircle className="w-10 h-10 text-slate-400 dark:text-neutral-600 mb-3" strokeWidth={1.5} />
+            <p className="text-slate-500 dark:text-neutral-600 text-[10px] font-black uppercase tracking-widest">
               {t('appointmentsTab.noUnassignedApps')}
             </p>
           </div>
@@ -146,8 +152,9 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
             const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
             const day = dateObj.getDate().toString().padStart(2, '0');
             const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-            const dateStr = `${day} - ${month}`;
+            const dateStr = `${day}/${month}`;
             const isDragging = draggedId === app.id;
+            const isReceived = (app as any).vehicleReceived === true;
 
             return (
               <div
@@ -159,109 +166,119 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
                   group/card relative rounded-2xl overflow-hidden
                   transition-all duration-200
                   ${readOnly ? 'cursor-default' : 'cursor-grab active:cursor-grabbing'}
-                  ${isDragging ? 'scale-95 opacity-40' : 'hover:scale-[1.02] hover:shadow-lg hover:shadow-blue-500/10'}
-                  border border-transparent hover:border-blue-500/20
+                  ${isDragging ? 'scale-95 opacity-40' : 'hover:scale-[1.01] hover:shadow-md'}
+                  border border-transparent hover:border-blue-500/30
                 `}
               >
-                <div className="bg-neutral-900/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-neutral-800/40">
-                  <div className="flex items-center justify-between px-3 py-2 bg-blue-500/5 border-b border-blue-500/10">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-1.5 h-1.5 rounded-full ${app.isTask ? 'bg-emerald-400' : 'bg-blue-400'} animate-pulse`} />
-                      <span className={`text-[9px] font-black uppercase tracking-widest ${app.isTask ? 'text-emerald-400' : 'text-blue-400'}`}>
+                <div className={`bg-white dark:bg-neutral-900 rounded-2xl overflow-hidden border border-slate-200/90 dark:border-neutral-800/80 shadow-sm ${app.isTask ? 'border-l-[4px] border-l-emerald-500' : 'border-l-[4px] border-l-blue-500'}`}>
+                  {/* Card header */}
+                  <div className="flex items-center justify-between px-3 py-1.5 bg-slate-50/80 dark:bg-neutral-800/40 border-b border-slate-100 dark:border-neutral-800/60">
+                    <div className="flex items-center gap-1.5">
+                      <GripVertical className="w-3.5 h-3.5 text-slate-400 dark:text-neutral-500 cursor-grab" />
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md ${
+                        app.isTask
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                          : 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20'
+                      }`}>
                         {app.isTask ? t('appointmentsTab.taskLabel') : t('appointmentsTab.appointmentLabel')}
                       </span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-white text-[11px] font-black font-mono">
+                    <div className="flex items-center gap-1 text-slate-800 dark:text-white text-[10px] font-black font-mono">
                       <span>{dateStr}</span>
-                      <span className="text-neutral-700 font-normal">|</span>
+                      <span className="text-slate-300 dark:text-neutral-600">·</span>
                       <span>{timeStr}</span>
                     </div>
                   </div>
 
-                  <div className="px-3 py-2.5 space-y-1">
+                  {/* Vehicle & Client Info */}
+                  <div className="px-3 py-2 space-y-1">
                     {app.vehicleDisplay && (
-                      <div className="text-white font-black text-[13px] uppercase tracking-tight leading-tight truncate flex items-center gap-2">
-                        <span className="shrink-0 flex items-center justify-center [&_svg]:w-4 [&_svg]:h-4 [&_div]:w-4 [&_div]:h-4 [&_div]:text-[8px]">
+                      <div className="text-slate-900 dark:text-white font-black text-[13px] uppercase tracking-tight leading-snug truncate flex items-center gap-1.5">
+                        <span className="shrink-0 flex items-center justify-center [&_svg]:w-3.5 [&_svg]:h-3.5 [&_div]:w-3.5 [&_div]:h-3.5 [&_div]:text-[7px]">
                           {getBrandLogo(app.vehicleDisplay.split(' ')[0])}
                         </span>
-                        <span>{app.vehicleDisplay}</span>
+                        <span className="truncate">{app.vehicleDisplay}</span>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between gap-2">
                       {app.clientFullName && (
-                        <span className="text-neutral-400 text-[10px] font-bold truncate">
+                        <span className="text-slate-600 dark:text-neutral-400 text-[10px] font-bold truncate">
                           {app.clientFullName}
                         </span>
                       )}
                       {app.estimatedDuration && (
-                        <span className="text-neutral-500 text-[9px] font-mono font-bold shrink-0 bg-neutral-800/60 px-1.5 py-0.5 rounded-md">
+                        <span className="text-slate-700 dark:text-neutral-300 text-[9px] font-mono font-bold shrink-0 bg-slate-100 dark:bg-neutral-800/80 px-1.5 py-0.5 rounded-md border border-slate-200/60 dark:border-white/5">
                           {formatDuration(app.estimatedDuration)}
                         </span>
                       )}
                     </div>
 
+                    {/* Reception badge */}
+                    <div className="flex items-center gap-1 pt-0.5">
+                      {isReceived ? (
+                        <span className="text-[7px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-0.5">
+                          En taller
+                        </span>
+                      ) : (
+                        <span className="text-[7px] font-black px-1.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center gap-0.5">
+                          <Lock className="w-2 h-2" />
+                          Sin recep.
+                        </span>
+                      )}
+                    </div>
+
                     {app.description && (
-                      <p className="text-neutral-500 text-[10px] italic line-clamp-1 mt-0.5">
+                      <p className="text-slate-500 dark:text-neutral-500 text-[10px] italic line-clamp-1 mt-0.5">
                         "{app.description}"
                       </p>
                     )}
                   </div>
 
-                  <div className="flex items-center gap-1 px-2 py-1.5 bg-black/40 border-t border-neutral-800/40 opacity-0 group-hover/card:opacity-100 transition-all duration-200">
-                    {(() => {
-                      const isReceived = (app as any).vehicleReceived === true;
-                      return (
-                        <>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (!isReceived) return;
-                              onManage ? onManage(app) : toast.info(`${t('appointmentsTab.manage')}: ${app.vehicleDisplay}`);
-                            }}
-                            disabled={!isReceived}
-                            className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
-                              isReceived
-                                ? 'text-neutral-400 hover:text-white hover:bg-white/10 cursor-pointer'
-                                : 'text-amber-500/50 cursor-not-allowed'
-                            }`}
-                            title={isReceived ? t('appointmentsTab.manageTooltip') : t('appointmentsTab.receptionTooltip')}
-                          >
-                            {isReceived ? (
-                              <Edit className="w-3 h-3" />
-                            ) : (
-                              <Lock className="w-3 h-3" />
-                            )}
-                            {isReceived ? t('appointmentsTab.manage') : t('appointmentsTab.reception')}
-                          </button>
+                  {/* Actions Bar on Hover */}
+                  <div className="flex items-center gap-1 px-2 py-1 bg-slate-50 dark:bg-neutral-950/70 border-t border-slate-100 dark:border-neutral-800/60 opacity-0 group-hover/card:opacity-100 transition-all duration-200">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!isReceived) return;
+                        onManage ? onManage(app) : toast.info(`${t('appointmentsTab.manage')}: ${app.vehicleDisplay}`);
+                      }}
+                      disabled={!isReceived}
+                      className={`flex-1 flex items-center justify-center gap-1 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                        isReceived
+                          ? 'text-slate-700 dark:text-neutral-300 hover:text-white hover:bg-red-600 dark:hover:bg-red-600 cursor-pointer'
+                          : 'text-amber-500/50 cursor-not-allowed'
+                      }`}
+                      title={isReceived ? t('appointmentsTab.manageTooltip') : t('appointmentsTab.receptionTooltip')}
+                    >
+                      {isReceived ? <Edit className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                      {isReceived ? t('appointmentsTab.manage') : t('appointmentsTab.reception')}
+                    </button>
 
-                          {app.isTask && app.serviceType && onViewChecklist && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); if (isReceived) onViewChecklist(app); }}
-                              disabled={!isReceived}
-                              className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${
-                                isReceived
-                                  ? 'text-blue-400 hover:text-white hover:bg-blue-500/20 cursor-pointer'
-                                  : 'text-amber-500/40 cursor-not-allowed'
-                              }`}
-                              title={isReceived ? t('appointmentsTab.viewChecklistTooltip') : t('appointmentsTab.receptionTooltip')}
-                            >
-                              <FileText className="w-3 h-3" />
-                            </button>
-                          )}
+                    {app.isTask && app.serviceType && onViewChecklist && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); if (isReceived) onViewChecklist(app); }}
+                        disabled={!isReceived}
+                        className={`flex items-center justify-center w-7 h-7 rounded-lg transition-all ${
+                          isReceived
+                            ? 'text-blue-500 dark:text-blue-400 hover:text-white hover:bg-blue-600 cursor-pointer'
+                            : 'text-amber-500/40 cursor-not-allowed'
+                        }`}
+                        title={isReceived ? t('appointmentsTab.viewChecklistTooltip') : t('appointmentsTab.receptionTooltip')}
+                      >
+                        <FileText className="w-3 h-3" />
+                      </button>
+                    )}
 
-                          {!readOnly && onUpdateStatus && (
-                            <button
-                              onClick={(e) => handleDelete(e, app)}
-                              className="flex items-center justify-center w-7 h-7 rounded-lg text-red-400 hover:text-white hover:bg-red-500/20 transition-all cursor-pointer"
-                              title={t('common.delete')}
-                            >
-                              <X className="w-3 h-3" strokeWidth={2.5} />
-                            </button>
-                          )}
-                        </>
-                      );
-                    })()}
+                    {!readOnly && onUpdateStatus && (
+                      <button
+                        onClick={(e) => handleDelete(e, app)}
+                        className="flex items-center justify-center w-7 h-7 rounded-lg text-red-500 hover:text-white hover:bg-red-600 transition-all cursor-pointer"
+                        title={t('common.delete')}
+                      >
+                        <X className="w-3 h-3" strokeWidth={2.5} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -271,8 +288,8 @@ export const UnassignedColumn: React.FC<UnassignedColumnProps> = ({
       </div>
 
       {sorted.length > 0 && (
-        <div className="sticky bottom-0 flex items-center justify-center py-2 bg-gradient-to-t from-neutral-900/95 via-neutral-900/80 to-transparent pointer-events-none">
-          <span className="px-3 py-1 bg-blue-500/15 border border-blue-500/20 rounded-full text-[9px] font-black uppercase tracking-widest text-blue-400">
+        <div className="sticky bottom-0 flex items-center justify-center py-2 bg-gradient-to-t from-white dark:from-neutral-900 via-white/80 dark:via-neutral-900/80 to-transparent pointer-events-none">
+          <span className="px-3 py-1 bg-blue-500/15 border border-blue-500/30 rounded-full text-[9px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 shadow-sm">
             {sorted.length} {t('appointmentsTab.appointmentLabel')}
           </span>
         </div>

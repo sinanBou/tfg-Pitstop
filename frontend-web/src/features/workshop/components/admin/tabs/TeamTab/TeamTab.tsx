@@ -123,7 +123,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
         {selectedEmp && (
           <div className="flex flex-col items-center text-center space-y-6 overflow-y-auto pr-1 max-h-[460px] custom-scrollbar">
             <div 
-              className={`w-24 h-24 bg-neutral-950 border-2 border-red-600/20 rounded-2xl flex items-center justify-center text-white font-black text-4xl shadow-2xl overflow-hidden shrink-0 ${selectedEmp.profilePictureUrl ? 'cursor-zoom-in hover:scale-105 active:scale-95 transition-all duration-300' : ''}`}
+              className={`w-24 h-24 bg-slate-100 dark:bg-neutral-950 border-2 border-red-600/20 rounded-2xl flex items-center justify-center text-slate-900 dark:text-white font-black text-4xl shadow-2xl overflow-hidden shrink-0 ${selectedEmp.profilePictureUrl ? 'cursor-zoom-in hover:scale-105 active:scale-95 transition-all duration-300' : ''}`}
               onClick={selectedEmp.profilePictureUrl ? () => { setPreviewUrl(selectedEmp.profilePictureUrl); setPreviewTitle(`${selectedEmp.firstname} ${selectedEmp.lastname}`); } : undefined}
             >
               {selectedEmp.profilePictureUrl ? (
@@ -134,7 +134,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
             </div>
             
             <div>
-              <h2 className="text-xl font-black uppercase tracking-widest text-white">{selectedEmp.firstname} {selectedEmp.lastname}</h2>
+              <h2 className="text-xl font-black uppercase tracking-widest text-slate-900 dark:text-white">{selectedEmp.firstname} {selectedEmp.lastname}</h2>
               <div className="mt-2">
                 <Badge variant={selectedEmp.role === 'WORKSHOP_OWNER' ? 'danger' : selectedEmp.role === 'WORKSHOP_MANAGER' ? 'secondary' : 'neutral'}>
                   {selectedEmp.role === 'WORKSHOP_OWNER' ? t('roles.owner') : selectedEmp.role === 'WORKSHOP_MANAGER' ? t('roles.manager') : t('roles.staff')}
@@ -143,20 +143,20 @@ export const TeamTab: React.FC<TeamTabProps> = ({
             </div>
 
             <div className="w-full grid grid-cols-1 gap-4 pt-4">
-              <div className="bg-black/40 border border-neutral-800 p-5 rounded-2xl text-left space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-widest text-neutral-500">{t('teamTab.emailLabel')}</p>
-                <p className="text-sm font-black text-white selection:bg-red-500">{selectedEmp.email}</p>
+              <div className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-5 rounded-2xl text-left space-y-1.5">
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500">{t('teamTab.emailLabel')}</p>
+                <p className="text-sm font-black text-slate-900 dark:text-white selection:bg-red-500">{selectedEmp.email}</p>
               </div>
 
-              <div className="bg-black/40 border border-neutral-800 p-5 rounded-2xl text-left space-y-1.5">
-                <p className="text-[9px] font-black uppercase tracking-widest text-neutral-500">{t('profile.residenceAddress')}</p>
-                <p className="text-xs font-semibold text-neutral-300 leading-relaxed">{selectedEmp.address || t('common.none')}</p>
+              <div className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-5 rounded-2xl text-left space-y-1.5">
+                <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500">{t('profile.residenceAddress')}</p>
+                <p className="text-xs font-semibold text-slate-600 dark:text-neutral-300 leading-relaxed">{selectedEmp.address || t('common.none')}</p>
               </div>
 
               {/* Permisos de Acceso al Dashboard (Solo Mecánicos, no para Gerentes ni Propietarios) */}
               {selectedEmp.role === 'WORKSHOP_STAFF' && (
-                <div className="bg-black/40 border border-neutral-800 p-5 rounded-2xl text-left space-y-3.5 w-full">
-                  <p className="text-[9px] font-black uppercase tracking-widest text-neutral-500">{t('teamTab.dashboardPermissionsTitle')}</p>
+                <div className="bg-slate-100 dark:bg-black/40 border border-slate-200 dark:border-neutral-800 p-5 rounded-2xl text-left space-y-3.5 w-full">
+                  <p className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500">{t('teamTab.dashboardPermissionsTitle')}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {[
                       { value: 'PLANIFICACIÓN', label: t('nav.timeline') },
@@ -179,16 +179,16 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                           type="button"
                           onClick={() => handleTogglePermission(selectedEmp.id, currentAllowed, tab.value)}
                           variant={isAllowed ? 'danger' : 'ghost'}
-                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-1 border border-neutral-800/60 rounded-xl h-8 ${
+                          className={`px-3 py-2 text-[9px] font-black uppercase tracking-widest transition-all duration-300 flex items-center justify-center gap-1 border border-slate-200 dark:border-neutral-800/60 rounded-xl h-8 ${
                             isAllowed
-                              ? 'bg-red-600/10 border-red-500/30 text-red-400'
-                              : 'text-neutral-500 hover:text-white'
+                              ? 'bg-red-600/10 border-red-500/30 text-red-600 dark:text-red-400'
+                              : 'text-slate-500 hover:text-slate-900 dark:text-neutral-500 dark:hover:text-white'
                           }`}
                         >
                           {isAllowed ? (
-                            <Check className="w-3 h-3 text-red-400 shrink-0" strokeWidth={3} />
+                            <Check className="w-3 h-3 text-red-500 shrink-0" strokeWidth={3} />
                           ) : (
-                            <Plus className="w-3 h-3 text-neutral-600 shrink-0" strokeWidth={3} />
+                            <Plus className="w-3 h-3 text-slate-400 dark:text-neutral-600 shrink-0" strokeWidth={3} />
                           )}
                           {tab.label}
                         </Button>
@@ -199,7 +199,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
               )}
             </div>
 
-            <div className="w-full flex flex-col gap-3 mt-6 pt-5 border-t border-neutral-800/60">
+            <div className="w-full flex flex-col gap-3 mt-6 pt-5 border-t border-slate-200 dark:border-neutral-800/60">
               {/* Botón de Ascenso (Solo Dueño y si el empleado es mecánico) */}
               {userRole === 'WORKSHOP_OWNER' && selectedEmp.role === 'WORKSHOP_STAFF' && (
                 <Button 
@@ -269,8 +269,8 @@ export const TeamTab: React.FC<TeamTabProps> = ({
       </BaseModal>
 
       {/* FORMULARIO DE ALTA (TARJETA GLOBAL Y INPUTS MODULARES) */}
-      <Card variant="neutral" padding="lg" className="!rounded-2xl">
-        <h3 className="text-sm font-black uppercase tracking-widest text-white mb-8 flex items-center gap-3">
+      <Card variant="neutral" padding="lg" className="!rounded-2xl border border-slate-200 dark:border-neutral-800/80 shadow-sm dark:shadow-none bg-white dark:bg-neutral-900/30">
+        <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 dark:text-white mb-8 flex items-center gap-3">
           <div className="p-2 bg-red-600/10 rounded-lg">
             <UserPlus className="w-4 h-4 text-red-500" strokeWidth={2.5} />
           </div>
@@ -313,7 +313,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
             />
             
             <div className="md:col-span-2 space-y-2 mt-2">
-              <label className="text-[9px] font-black uppercase tracking-widest text-neutral-500 ml-1">{t('teamTab.roleLabel')}</label>
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-500 dark:text-neutral-500 ml-1">{t('teamTab.roleLabel')}</label>
               <div className="grid grid-cols-2 gap-4">
                 <Button 
                   type="button" 
@@ -358,7 +358,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
       {/* PLANTILLA ACTUAL (Tarjetas Limpias) */}
       <div>
         <div className="flex items-center justify-between mb-6 px-2">
-          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
+          <h3 className="text-xs font-black uppercase tracking-[0.2em] text-slate-900 dark:text-white flex items-center gap-2">
             {t('overviewTab.registeredStaff')} ({employees.length})
           </h3>
         </div>
@@ -371,12 +371,12 @@ export const TeamTab: React.FC<TeamTabProps> = ({
               variant="neutral"
               padding="sm"
               border={false}
-              className="group relative transition-all duration-300 cursor-pointer shadow-lg hover:shadow-2xl overflow-hidden !rounded-2xl"
+              className="group relative transition-all duration-300 cursor-pointer shadow-sm hover:shadow-lg dark:hover:shadow-[0_0_30px_rgba(220,38,38,0.08)] overflow-hidden !rounded-2xl border border-slate-200 dark:border-neutral-800/80 hover:border-red-500/50 dark:hover:border-red-500/50 bg-white dark:bg-neutral-900/30"
             >
               <div className="flex items-start justify-between relative z-10">
                 <div className="flex items-center gap-5">
                   <div 
-                    className="w-16 h-16 rounded-2xl bg-neutral-950 border border-neutral-800 flex items-center justify-center text-white font-black text-2xl shadow-inner group-hover:scale-105 transition-transform overflow-hidden shrink-0"
+                    className="w-16 h-16 rounded-2xl bg-slate-100 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 flex items-center justify-center text-slate-900 dark:text-white font-black text-2xl shadow-inner group-hover:scale-105 transition-transform overflow-hidden shrink-0"
                     onClick={emp.profilePictureUrl ? (e) => {
                       e.stopPropagation();
                       setPreviewUrl(emp.profilePictureUrl);
@@ -390,7 +390,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                     )}
                   </div>
                   <div>
-                    <h4 className="text-white font-black uppercase text-base tracking-widest leading-none mb-2.5">{emp.firstname} {emp.lastname}</h4>
+                    <h4 className="text-slate-900 dark:text-white font-black uppercase text-base tracking-widest leading-none mb-2.5">{emp.firstname} {emp.lastname}</h4>
                     <Badge variant={emp.role === 'WORKSHOP_OWNER' ? 'danger' : emp.role === 'WORKSHOP_MANAGER' ? 'secondary' : 'neutral'}>
                       {emp.role === 'WORKSHOP_OWNER' ? t('roles.owner') : emp.role === 'WORKSHOP_MANAGER' ? t('roles.manager') : t('roles.staff')}
                     </Badge>
@@ -398,15 +398,15 @@ export const TeamTab: React.FC<TeamTabProps> = ({
                 </div>
               </div>
 
-              <div className="mt-6 pt-5 border-t border-neutral-800/50 space-y-4">
+              <div className="mt-6 pt-5 border-t border-slate-200 dark:border-neutral-800/50 space-y-4">
                 <div className="space-y-1">
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">{t('auth.emailLabel')}</p>
-                  <p className="text-xs font-black text-white break-words transition-colors group-hover:text-red-500">{emp.email}</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-neutral-500">{t('auth.emailLabel')}</p>
+                  <p className="text-xs font-black text-slate-900 dark:text-white break-words transition-colors group-hover:text-red-500">{emp.email}</p>
                 </div>
                 {emp.address && (
                   <div className="space-y-1">
-                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500">{t('profile.residenceAddress')}</p>
-                    <p className="text-[11px] font-bold text-neutral-400 leading-relaxed break-words">{emp.address}</p>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 dark:text-neutral-500">{t('profile.residenceAddress')}</p>
+                    <p className="text-[11px] font-bold text-slate-600 dark:text-neutral-400 leading-relaxed break-words">{emp.address}</p>
                   </div>
                 )}
               </div>

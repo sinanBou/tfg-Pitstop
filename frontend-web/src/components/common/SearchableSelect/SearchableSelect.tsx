@@ -35,30 +35,30 @@ export const SearchableSelect = ({
     <div className="space-y-1 relative" ref={containerRef}>
       <label className="text-[10px] uppercase font-bold text-neutral-500 ml-2">{label}</label>
       <div 
-        className={`w-full bg-black/50 border ${isOpen ? 'border-blue-500' : 'border-neutral-800'} rounded-xl p-3 text-sm flex justify-between items-center cursor-pointer transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+        className={`w-full bg-slate-100 dark:bg-black/50 border ${isOpen ? 'border-blue-500' : 'border-slate-300 dark:border-neutral-800'} rounded-xl p-3 text-sm flex justify-between items-center cursor-pointer transition-all ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
         data-testid="select-trigger"
       >
         <span className="flex items-center gap-2">
           {value && label.toUpperCase() === 'MARCA' && (
-            <span className="text-white flex items-center shrink-0">
+            <span className="text-slate-900 dark:text-white flex items-center shrink-0">
               {getBrandLogo(value)}
             </span>
           )}
-          <span className={value ? 'text-white' : 'text-neutral-700'}>
+          <span className={value ? 'text-slate-900 dark:text-white font-medium' : 'text-slate-400 dark:text-neutral-500'}>
             {value || placeholder}
           </span>
         </span>
-        <ChevronDown className={`w-4 h-4 text-neutral-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 text-slate-500 dark:text-neutral-500 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </div>
 
       {isOpen && (
-        <div className="absolute z-[60] mt-2 w-full bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-          <div className="p-3 border-b border-neutral-800 bg-black/20">
+        <div className="absolute z-[60] mt-2 w-full bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-3 border-b border-slate-200 dark:border-neutral-800 bg-slate-100/70 dark:bg-black/20">
             <input 
               type="text" 
               autoFocus
-              className="w-full bg-neutral-800 border-none rounded-lg p-2 text-xs text-white placeholder:text-neutral-600 focus:ring-1 focus:ring-blue-500 outline-none"
+              className="w-full bg-slate-100 dark:bg-neutral-800 border-none rounded-lg p-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-neutral-500 focus:ring-1 focus:ring-blue-500 outline-none"
               placeholder="Buscar..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -71,14 +71,14 @@ export const SearchableSelect = ({
               <>
                 {populars.length > 0 && (
                   <div>
-                    <div className="px-4 py-2 text-[9px] uppercase font-black tracking-widest text-neutral-500 bg-neutral-950/20 border-b border-neutral-800/30">
+                    <div className="px-4 py-2 text-[9px] uppercase font-black tracking-widest text-slate-500 dark:text-neutral-500 bg-slate-100 dark:bg-neutral-950/20 border-b border-slate-200 dark:border-neutral-800/30">
                       {popularLabel}
                     </div>
                     {populars.map((opt, i) => (
                       <button
                         key={`pop-${i}`}
                         type="button"
-                        className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors hover:bg-blue-600/20 hover:text-blue-400 ${value === opt ? 'bg-blue-600/10 text-blue-500 font-bold' : 'text-neutral-400'}`}
+                        className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors hover:bg-blue-50 dark:hover:bg-blue-600/20 hover:text-blue-600 dark:hover:text-blue-400 ${value === opt ? 'bg-blue-50 text-blue-600 dark:bg-blue-600/10 dark:text-blue-500 font-bold' : 'text-slate-700 dark:text-neutral-400'}`}
                         onClick={() => handleSelect(opt)}
                       >
                         {label.toUpperCase() === 'MARCA' && getBrandLogo(opt)}
@@ -91,7 +91,7 @@ export const SearchableSelect = ({
                 {rest.length > 0 && (
                   <div>
                     {populars.length > 0 && (
-                      <div className="px-4 py-2 text-[9px] uppercase font-black tracking-widest text-neutral-500 bg-neutral-950/20 border-y border-neutral-800/30">
+                      <div className="px-4 py-2 text-[9px] uppercase font-black tracking-widest text-slate-500 dark:text-neutral-500 bg-slate-100 dark:bg-neutral-950/20 border-y border-slate-200 dark:border-neutral-800/30">
                         {restLabel}
                       </div>
                     )}
@@ -99,7 +99,7 @@ export const SearchableSelect = ({
                       <button
                         key={`rest-${i}`}
                         type="button"
-                        className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors hover:bg-blue-600/20 hover:text-blue-400 ${value === opt ? 'bg-blue-600/10 text-blue-500 font-bold' : 'text-neutral-400'}`}
+                        className={`w-full text-left px-4 py-3 text-sm flex items-center gap-3 transition-colors hover:bg-blue-50 dark:hover:bg-blue-600/20 hover:text-blue-600 dark:hover:text-blue-400 ${value === opt ? 'bg-blue-50 text-blue-600 dark:bg-blue-600/10 dark:text-blue-500 font-bold' : 'text-slate-700 dark:text-neutral-400'}`}
                         onClick={() => handleSelect(opt)}
                       >
                         {label.toUpperCase() === 'MARCA' && getBrandLogo(opt)}
@@ -110,7 +110,7 @@ export const SearchableSelect = ({
                 )}
               </>
             ) : (
-              <p className="p-4 text-xs text-neutral-600 text-center italic">No hay resultados</p>
+              <p className="p-4 text-xs text-slate-400 dark:text-neutral-600 text-center italic">No hay resultados</p>
             )}
           </div>
         </div>

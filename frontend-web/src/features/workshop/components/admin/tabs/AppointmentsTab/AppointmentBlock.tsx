@@ -232,115 +232,127 @@ export const AppointmentBlock: React.FC<AppointmentBlockProps> = ({
     >
         <div className="w-full h-full relative p-[2px]">
 
-           {/* Visual Card - actúa como el contenedor del grupo de hover */}
-           <div className={`w-full h-full relative ${isResizing ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''} rounded-2xl hover:[&_.actions-bar]:opacity-100 hover:[&_.actions-bar]:pointer-events-auto hover:[&_.resize-handle]:opacity-100`}>
+            {/* Visual Card - actúa como el contenedor del grupo de hover */}
+            <div className={`w-full h-full relative ${isResizing ? 'ring-2 ring-red-500 ring-offset-2 ring-offset-white dark:ring-offset-neutral-900 shadow-xl' : ''} rounded-2xl hover:[&_.actions-bar]:opacity-100 hover:[&_.actions-bar]:pointer-events-auto hover:[&_.resize-handle]:opacity-100`}>
 
-             {/* Botones de acción — flotando centrados encima de la tarjeta */}
-             <div className={`actions-bar absolute ${topPosition < 40 ? 'top-2' : '-top-9'} left-1/2 -translate-x-1/2 z-30 flex gap-2 bg-black/95 backdrop-blur-md border border-white/10 rounded-full px-2 py-1 shadow-2xl opacity-0 transition-all duration-200 pointer-events-none whitespace-nowrap`}>
+              {/* Botones de acción — flotando centrados encima de la tarjeta */}
+              <div className={`actions-bar absolute ${topPosition < 40 ? 'top-2' : '-top-10'} left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-full px-2 py-1 shadow-xl opacity-0 transition-all duration-200 pointer-events-none whitespace-nowrap`}>
 
-               {/* Gestionar */}
-               <button
-                 onClick={(e) => {
-                   e.stopPropagation();
-                   if (!isVehicleReceived) return;
-                   onManage ? onManage(appointment) : toast.info(`${t('appointmentsTab.manage')}: ${appointment.vehicleDisplay}`);
-                 }}
-                 disabled={!isVehicleReceived}
-                 className={`w-8 h-8 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
-                   isVehicleReceived
-                     ? 'bg-white/5 border-white/10 text-white/70 hover:bg-white hover:text-black cursor-pointer'
-                     : 'bg-amber-950/20 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
-                 }`}
-                 title={isVehicleReceived ? t('appointmentsTab.manageTooltip') : t('appointmentsTab.receptionTooltip')}
-               >
-                 {isVehicleReceived ? (
-                   <Edit className="w-4 h-4" />
-                 ) : (
-                   <Lock className="w-4 h-4" />
-                 )}
-               </button>
+                {/* Gestionar */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (!isVehicleReceived) return;
+                    onManage ? onManage(appointment) : toast.info(`${t('appointmentsTab.manage')}: ${appointment.vehicleDisplay}`);
+                  }}
+                  disabled={!isVehicleReceived}
+                  className={`w-7 h-7 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
+                    isVehicleReceived
+                      ? 'bg-slate-100 dark:bg-white/10 border-slate-300 dark:border-white/20 text-slate-700 dark:text-white hover:bg-red-600 hover:text-white dark:hover:bg-red-600 dark:hover:text-white cursor-pointer shadow-sm'
+                      : 'bg-amber-500/10 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
+                  }`}
+                  title={isVehicleReceived ? t('appointmentsTab.manageTooltip') : t('appointmentsTab.receptionTooltip')}
+                >
+                  {isVehicleReceived ? (
+                    <Edit className="w-3.5 h-3.5" />
+                  ) : (
+                    <Lock className="w-3.5 h-3.5" />
+                  )}
+                </button>
 
-               {/* Checklist */}
-               {appointment.isTask && appointment.serviceType && (
-                 <button
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     if (!isVehicleReceived) return;
-                     onViewChecklist ? onViewChecklist(appointment) : undefined;
-                   }}
-                   disabled={!isVehicleReceived}
-                   className={`w-8 h-8 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
-                     isVehicleReceived
-                       ? 'bg-blue-500/10 border-blue-500/30 text-blue-400 hover:bg-blue-500 hover:text-white cursor-pointer'
-                       : 'bg-amber-950/20 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
-                   }`}
-                   title={isVehicleReceived ? t('appointmentsTab.viewChecklistTooltip') : t('appointmentsTab.receptionTooltip')}
-                 >
-                   <FileText className="w-4 h-4" />
-                 </button>
-               )}
+                {/* Checklist */}
+                {appointment.isTask && appointment.serviceType && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!isVehicleReceived) return;
+                      onViewChecklist ? onViewChecklist(appointment) : undefined;
+                    }}
+                    disabled={!isVehicleReceived}
+                    className={`w-7 h-7 border rounded-full transition-all flex items-center justify-center active:scale-95 ${
+                      isVehicleReceived
+                        ? 'bg-blue-500/10 border-blue-500/30 text-blue-600 dark:text-blue-400 hover:bg-blue-600 hover:text-white cursor-pointer'
+                        : 'bg-amber-500/10 border-amber-500/20 text-amber-500/40 cursor-not-allowed'
+                    }`}
+                    title={isVehicleReceived ? t('appointmentsTab.viewChecklistTooltip') : t('appointmentsTab.receptionTooltip')}
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                  </button>
+                )}
 
-               {/* Retrasar */}
-               {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
-                 <button
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     setConfirmModal({
-                       isOpen: true,
-                       type: 'delay',
-                       title: t('appointmentsTab.delayTitle'),
-                       description: t('appointmentsTab.delayDesc'),
-                       confirmText: t('appointmentsTab.confirmDelay'),
-                       theme: 'amber'
-                     });
-                   }}
-                   className="w-8 h-8 border border-amber-500/30 bg-amber-500/10 text-amber-400 rounded-full transition-all hover:bg-amber-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
-                   title={t('appointmentsTab.markDelayedTooltip')}
-                 >
-                   <Clock className="w-4 h-4" strokeWidth={2.5} />
-                 </button>
-               )}
+                {/* Retrasar */}
+                {onUpdateStatus && appointment.status !== 'DELAYED' && appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setConfirmModal({
+                        isOpen: true,
+                        type: 'delay',
+                        title: t('appointmentsTab.delayTitle'),
+                        description: t('appointmentsTab.delayDesc'),
+                        confirmText: t('appointmentsTab.confirmDelay'),
+                        theme: 'amber'
+                      });
+                    }}
+                    className="w-7 h-7 border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded-full transition-all hover:bg-amber-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
+                    title={t('appointmentsTab.markDelayedTooltip')}
+                  >
+                    <Clock className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  </button>
+                )}
 
-               {/* Cancelar / Eliminar */}
-               {!readOnly && onUpdateStatus && (
-                 <button
-                   onClick={handleCancel}
-                   className="w-8 h-8 border border-red-500/30 bg-red-500/10 text-red-400 rounded-full transition-all hover:bg-red-500 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
-                   title={t('appointmentsTab.cancelAppointmentTooltip')}
-                 >
-                   <X className="w-4 h-4" strokeWidth={2.5} />
-                 </button>
-               )}
-             </div>
+                {/* Cancelar / Eliminar */}
+                {!readOnly && onUpdateStatus && (
+                  <button
+                    onClick={handleCancel}
+                    className="w-7 h-7 border border-red-500/30 bg-red-500/10 text-red-600 dark:text-red-400 rounded-full transition-all hover:bg-red-600 hover:text-white flex items-center justify-center active:scale-95 cursor-pointer"
+                    title={t('appointmentsTab.cancelAppointmentTooltip')}
+                  >
+                    <X className="w-3.5 h-3.5" strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
 
-             {/* Contenido de la tarjeta */}
-             <div className="w-full h-full">
-               <AppointmentCard
-                 type={appointment.isTask ? "TAREA" : "CITA"}
-                 dateTime={appointment.dateTime}
-                 description={appointment.description}
-                 status={appointment.status}
-                 variant={columnId === null ? "blue" : "red"}
-                 vehicleDisplay={appointment.vehicleDisplay}
-                 clientName={appointment.clientFullName}
-                 isCompact={true}
-                 serviceType={appointment.serviceType}
-                 completedTasks={appointment.completedTasks}
-                 estimatedDuration={appointment.estimatedDuration}
-                 vehicleReceived={appointment.vehicleReceived}
-               />
-             </div>
+              {/* Contenido de la tarjeta */}
+              <div className="w-full h-full">
+                <AppointmentCard
+                  type={appointment.isTask ? "TAREA" : "CITA"}
+                  dateTime={appointment.dateTime}
+                  description={appointment.description}
+                  status={appointment.status}
+                  variant={columnId === null ? "blue" : "red"}
+                  vehicleDisplay={appointment.vehicleDisplay}
+                  clientName={appointment.clientFullName}
+                  isCompact={true}
+                  serviceType={appointment.serviceType}
+                  completedTasks={appointment.completedTasks}
+                  estimatedDuration={duration}
+                  vehicleReceived={appointment.vehicleReceived}
+                />
+              </div>
 
-             {/* Resize handle (Bottom) */}
-             {!readOnly && (
-               <div
-                 onPointerDown={handlePointerDown}
-                 className="resize-handle absolute bottom-0 left-0 right-0 h-4 flex items-end justify-center cursor-ns-resize opacity-0 transition-opacity z-20 pb-1"
-               >
-                 <div className="w-12 h-1.5 bg-white/40 hover:bg-white/70 rounded-full transition-colors mix-blend-screen" />
-               </div>
-             )}
-           </div>
+              {/* Resize handle (Bottom) */}
+              {!readOnly && (
+                <div
+                  onPointerDown={handlePointerDown}
+                  className="resize-handle absolute bottom-0 left-0 right-0 h-5 flex items-end justify-center cursor-ns-resize opacity-0 transition-opacity z-20 pb-1"
+                  title="Arrastra para cambiar duración"
+                >
+                  <div className="w-14 h-2 bg-slate-300 dark:bg-white/20 hover:bg-red-500 dark:hover:bg-red-500 rounded-full flex items-center justify-center gap-1 transition-all shadow-sm group-hover/resize:scale-105">
+                    <span className="w-1 h-1 rounded-full bg-slate-500 dark:bg-white/60"></span>
+                    <span className="w-1 h-1 rounded-full bg-slate-500 dark:bg-white/60"></span>
+                    <span className="w-1 h-1 rounded-full bg-slate-500 dark:bg-white/60"></span>
+                  </div>
+                </div>
+              )}
+
+              {/* Live duration tooltip during resize */}
+              {isResizing && (
+                <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-[10px] font-mono font-black px-2 py-0.5 rounded-md shadow-xl border border-white/20 dark:border-black/10 pointer-events-none z-50 whitespace-nowrap">
+                  {duration >= 60 ? `${Math.floor(duration / 60)}h${duration % 60 > 0 ? ` ${duration % 60}m` : ''}` : `${duration}m`}
+                </div>
+              )}
+            </div>
         </div>
         {confirmModal && (
            <ConfirmCardModal

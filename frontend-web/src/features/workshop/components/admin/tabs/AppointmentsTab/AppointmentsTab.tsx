@@ -77,7 +77,7 @@ export const AppointmentsTab: React.FC<AppointmentsTabProps> = ({
       variant="neutral"
       rounded="2xl"
       padding="sm"
-      className="bg-neutral-900/20 overflow-hidden"
+      className="bg-transparent border-none shadow-none overflow-hidden"
     >
       <PlanningTimeline 
         columns={columns}

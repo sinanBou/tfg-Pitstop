@@ -360,15 +360,15 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-neutral-500 gap-4">
-        <div className="w-12 h-12 border-2 border-neutral-800 border-t-red-600 rounded-full animate-spin" />
+      <div className="flex flex-col items-center justify-center py-20 text-slate-500 dark:text-neutral-500 gap-4">
+        <div className="w-12 h-12 border-2 border-slate-300 dark:border-neutral-800 border-t-red-600 rounded-full animate-spin" />
         <p className="text-xs uppercase tracking-widest font-black">{t('partsTab.loadingInventory')}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 text-white animate-fade-in-up select-none">
+    <div className="space-y-6 text-slate-900 dark:text-white animate-fade-in-up select-none">
       {/* Title Block */}
       <TabHeader
         title={t('partsTab.title')}
@@ -381,19 +381,19 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       {/* Search Input Bar */}
       <div className="relative">
         <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-          <Search className="w-5 h-5 text-neutral-500" />
+          <Search className="w-5 h-5 text-slate-400 dark:text-neutral-500" />
         </span>
         <input
           type="text"
           value={searchTerm}
           onChange={e => setSearchTerm(e.target.value)}
           placeholder={t('partsTab.searchPlaceholder')}
-          className="w-full bg-neutral-950 border border-neutral-800 rounded-2xl pl-12 pr-12 py-3.5 text-white text-xs focus:outline-none focus:border-red-500/50 focus:bg-black/40 transition-all placeholder-neutral-500 font-semibold"
+          className="w-full bg-white dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 rounded-2xl pl-12 pr-12 py-3.5 text-slate-900 dark:text-white text-xs focus:outline-none focus:border-red-500/50 focus:bg-slate-100/50 dark:focus:bg-black/40 transition-all placeholder-slate-400 dark:placeholder-neutral-500 font-semibold shadow-sm"
         />
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="absolute inset-y-0 right-0 flex items-center pr-4 text-neutral-500 hover:text-white cursor-pointer"
+            className="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-700 dark:text-neutral-500 dark:hover:text-white cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -418,12 +418,12 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
       {/* Categories Grid Layout */}
       <div className="space-y-4">
         {categories.length === 0 ? (
-          <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-neutral-900/80 border-neutral-800/40 shadow-sm">
-            <p className="text-neutral-400 text-sm font-semibold uppercase tracking-wider">{t('partsTab.noCategories')}</p>
+          <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-white/80 dark:bg-neutral-900/80 border-slate-200 dark:border-neutral-800/40 shadow-sm">
+            <p className="text-slate-600 dark:text-neutral-400 text-sm font-semibold uppercase tracking-wider">{t('partsTab.noCategories')}</p>
           </Card>
         ) : Object.keys(groupedInventory).length === 0 ? (
-          <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-neutral-900/80 border-neutral-800/40 shadow-sm">
-            <p className="text-neutral-400 text-sm font-semibold">{t('partsTab.noSearchHits', { search: searchTerm })}</p>
+          <Card rounded="2xl" variant="neutral" padding="none" className="text-center py-20 bg-white/80 dark:bg-neutral-900/80 border-slate-200 dark:border-neutral-800/40 shadow-sm">
+            <p className="text-slate-600 dark:text-neutral-400 text-sm font-semibold">{t('partsTab.noSearchHits', { search: searchTerm })}</p>
           </Card>
         ) : (
           categories.map(cat => {
@@ -439,7 +439,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
                 rounded="2xl"
                 variant="neutral" 
                 padding="none" 
-                className="bg-neutral-900/80 border-neutral-800/40 overflow-hidden transition-all duration-300 shadow-sm"
+                className="bg-white/80 dark:bg-neutral-900/80 border-slate-200 dark:border-neutral-800/40 overflow-hidden transition-all duration-300 shadow-sm"
               >
                 {/* Category Header */}
                 <CategoryHeader
@@ -485,7 +485,7 @@ export const PartsTab: React.FC<PartsTabProps> = ({ workshopId }) => {
                 {isExpanded && (
                   <div className="px-6 pb-6 space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     {items.length === 0 ? (
-                      <p className="text-xs text-neutral-500 italic py-2 text-center">{t('partsTab.noPartsInCat')}</p>
+                      <p className="text-xs text-slate-500 dark:text-neutral-500 italic py-2 text-center">{t('partsTab.noPartsInCat')}</p>
                     ) : (
                       items.map(item => {
                         const isEditingThis = editingItem?.id === item.id;
